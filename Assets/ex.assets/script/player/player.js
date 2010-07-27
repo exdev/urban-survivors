@@ -18,6 +18,8 @@ var rotationSpeed = 100.0;
 var aimPos : Vector3;
 var aimDir : Vector3;
 
+private var dbgText;
+
 ///////////////////////////////////////////////////////////////////////////////
 // functions
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,14 +45,26 @@ function Update () {
     var moveFB = Input.GetAxis ("Vertical") * moveSpeed * Time.deltaTime;
     var moveLR = Input.GetAxis ("Horizontal") * moveSpeed * Time.deltaTime;
 
-    var rotationV = Input.GetAxis ("Vertical.2") * rotationSpeed * Time.deltaTime;
-    var rotationH = Input.GetAxis ("Horizontal.2") * rotationSpeed * Time.deltaTime;
+    var rotationH = Input.GetAxis ("Mouse X") * rotationSpeed * Time.deltaTime;
+    var rotationV = Input.GetAxis ("Mouse Y") * rotationSpeed * Time.deltaTime;
 
     // Move translation along the object's z-axis
     transform.Translate (moveLR, 0, moveFB);
 
     // Rotate around our y-axis
     var rot = Quaternion.identity;
-    rot.eulerAngles = Vector3(0, rotationH, rotationV);
+    rot.eulerAngles = Vector3(rotationV, rotationH, 0.0);
     aimDir = rot * aimDir;
+
+    // DEBUG { 
+    dbgText = "roth = " + rotationH + ", rotv = " + rotationV;
+    // } DEBUG end 
+}
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
+function OnGUI () {
+    GUI.Label ( Rect (10, 10, 200, 20), dbgText.ToString() );
 }
