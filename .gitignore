@@ -6,13 +6,44 @@
 # ======================================================================================
 
 #/////////////////////////////////////////////////////////////////////////////
-# unity files
+# Logs and databases
 #/////////////////////////////////////////////////////////////////////////////
 
+*.log
+*.sql
+*.sqlite
+
+#/////////////////////////////////////////////////////////////////////////////
+# OS generated files
+#/////////////////////////////////////////////////////////////////////////////
+
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
+
+#/////////////////////////////////////////////////////////////////////////////
+# unity files
+#
+# obey the rule of external vcs in unity:
+# http://unity3d.com/support/documentation/Manual/ExternalVersionControlSystemSupport.html
+#
+# When checking the project into a version control system, you should at 
+# least add the Assets directory to the system. If you want to track project 
+# and build settings as well you can also add Library/*.asset, and Library/BuildPlayer.prefs. 
+# Do not add any other files or directories located inside the Library directory. 
+# When creating new assets, make sure both the asset itself and the associated .meta 
+# file is added to version control.
+#/////////////////////////////////////////////////////////////////////////////
+
+Temp/
 Library/cache/
 Library/metadata/
 Library/ScriptAssemblies/
-Temp/
+
+Library/*
+!Library/*.asset
+!Library/BuildPlayer.prefs
 
 # /////////////////////////////////////////////////////////////////////////////
 # exvim files 
