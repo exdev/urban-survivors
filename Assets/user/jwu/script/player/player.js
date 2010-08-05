@@ -9,15 +9,47 @@
 // variables
 ///////////////////////////////////////////////////////////////////////////////
 
-// A very simplistic car driving on the x-z plane.
-var moveSpeed = 50.0;
-var rotationSpeed = 100.0;
+var maxSpeed = 50.0; // the max speed for running
+var acceleration = 2.0; // from move to run
+var deceleration = 2.0; // from run to move
+// TODO: var rotationSpeed = 100.0; // no used yet
+var velocity = Vector3 ( 0.0, 0.0, 0.0 );
 
 private var dbgText = "null";
+private var moveFB = 0;
+private var moveLR = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 // functions
 ///////////////////////////////////////////////////////////////////////////////
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
+private function HandleInput () {
+    // DISABLE { 
+    // DEBUG: dbgText = "hori: " + Input.GetAxis ("Horizontal") + " vert: " + Input.GetAxis ("Vertical");
+    // moveFB = Input.GetAxis ("Vertical") * camForward * moveSpeed * Time.deltaTime;
+    // moveLR = Input.GetAxis ("Horizontal") * camRight * moveSpeed * Time.deltaTime;
+    // } DISABLE end 
+
+    moveFB = 0;
+    moveLR = 0;
+
+    // TODO: use unity player control system { 
+    if ( Input.GetKey("w") )
+        moveFB += 1;
+    if ( Input.GetKey("s") )
+        moveFB -= 1;
+    if ( Input.GetKey("d") )
+        moveLR += 1;
+    if ( Input.GetKey("a") )
+        moveLR -= 1;
+    // } TODO end 
+
+    dbgText = "FB: " + moveFB + " LR: " + moveLR;
+}
 
 // ------------------------------------------------------------------ 
 // Desc: 
@@ -37,14 +69,37 @@ function Update () {
     // process translate 
     // ======================================================== 
 
-    // TODO: the move direction should consistence with camera lookat direction { 
-    // Get the horizontal and vertical axis.
-    var moveFB = Input.GetAxis ("Vertical") * moveSpeed * Time.deltaTime;
-    var moveLR = Input.GetAxis ("Horizontal") * moveSpeed * Time.deltaTime;
+    var mainCamera = Camera.main.GetComponent(Transform);
+    var camForward = Vector3( mainCamera.forward.x, 0.0, mainCamera.forward.z );
+    camForward.Normalize();
+    var camRight = Vector3( mainCamera.right.x, 0.0, mainCamera.right.z );
+    camRight.Normalize();
 
-    // Move translation along the object's z-axis
-    transform.Translate (moveLR, 0, moveFB);
-    // } TODO end 
+    // Get the horizontal and vertical axis.
+    HandleInput ();
+
+    var linear = Vector3 ( 0.0, 0.0, 0.0 );
+    if ( moveFB || moveLR ) { // if we are moving.
+        linear = moveFB * camForward + moveLR * camRight;
+        linear *= acceleration;
+    } 
+    else if ( velocity.magnitude >= 0.001 ) { // if we still not stopped.
+        linear = -velocity;
+        linear.Normalize(); 
+        linear *= deceleration;
+    }
+
+    // update velocity
+    velocity += linear * Time.deltaTime;
+    if ( velocity.magnitude > maxSpeed ) {
+        velocity.Normalize();
+        velocity *= maxSpeed;
+    }
+
+    // now position
+    transform.Translate (velocity * Time.deltaTime);
+
+    dbgText += "velocity: " + velocity; 
 
     // ======================================================== 
     // process rotations 
