@@ -78,23 +78,41 @@ function Update () {
     // Get the horizontal and vertical axis.
     HandleInput ();
 
-    var linear = Vector3 ( 0.0, 0.0, 0.0 );
-    if ( moveFB || moveLR ) { // if we are moving.
-        linear = moveFB * camForward + moveLR * camRight;
-        linear *= acceleration;
-    } 
-    else if ( velocity.magnitude >= 0.001 ) { // if we still not stopped.
-        linear = -velocity;
-        linear.Normalize(); 
-        linear *= deceleration;
+    var speed = 20.0;
+
+    var linearFB = moveFB * camForward; 
+    var linearLR = moveLR * camRight; 
+
+    // FB
+    if ( moveFB ) {
+        linearFB *= acceleration;
     }
+    else if ( Mathf.Abs(velocity.x) >= 0.1 ) {
+        linearFB.x = -velocity.x;
+        linearFB.Normalize();
+        linearFB *= deceleration;
+    }
+    else
+        velocity.x = 0.0;
+
+    // LR
+    if ( moveLR ) {
+        linearLR *= acceleration;
+    }
+    else if ( Mathf.Abs(velocity.z) >= 0.1 ) {
+        linearLR.z = -velocity.z;
+        linearLR.Normalize();
+        linearLR *= deceleration;
+    }
+    else
+        velocity.z = 0.0;
 
     // update velocity
-    velocity += linear * Time.deltaTime;
+    velocity += (linearFB + linearLR) * Time.deltaTime;
     if ( velocity.magnitude > maxSpeed ) {
         velocity.Normalize();
         velocity *= maxSpeed;
-    }
+    } 
 
     // now position
     transform.Translate (velocity * Time.deltaTime);
