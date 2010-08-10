@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : player.js
+// File         : player_control.js
 // Author       : Wu Jie 
-// Last Change  : 07/19/2010 | 21:27:33 PM | Monday,July
+// Last Change  : 08/10/2010 | 23:40:08 PM | Tuesday,August
 // Description  : 
 // ======================================================================================
 
@@ -10,9 +10,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var maxSpeed = 50.0; // the max speed for running
-// var acceleration = 2.0; // from move to run
-// var deceleration = 2.0; // from run to move
+var acceleration = 2.0; // from move to run
+var deceleration = 2.0; // from run to move
 
+private var velocity = Vector3.zero;
+private var curSpeed = 0.0;
 private var aimPos = Vector3.zero;
 private var moveFB = 0;
 private var moveLR = 0;
@@ -66,7 +68,21 @@ private function HandleInput () {
 // Desc: 
 // ------------------------------------------------------------------ 
 
-function ProcessMovement () {
+function Start () {
+    // TODO:
+}
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
+function Update () {
+
+    dbgText = "";
+
+    // Get the horizontal and vertical axis.
+    HandleInput ();
+
     // ======================================================== 
     // process rotations 
     // ======================================================== 
@@ -87,42 +103,78 @@ function ProcessMovement () {
     var camRight = Vector3( mainCamera.right.x, 0.0, mainCamera.right.z );
     camRight.Normalize();
 
-    //
-    var linearFB = moveFB * camForward; 
-    var linearLR = moveLR * camRight; 
-    var dir = (linearFB + linearLR).normalized * 1000.0; // 1000.0 is a scale value for force.
+    // DISABLE: use rigidbody { 
+    // var linearFB = moveFB * camForward; 
+    // var linearLR = moveLR * camRight; 
 
-    rigidbody.AddForce ( dir * maxSpeed * Time.deltaTime );
-    transform.position = new Vector3( transform.position.x, 10.0, transform.position.z );
-}
+    // rigidbody.AddForce ( (linearFB + linearLR).normalized * 1000.0 * 50.0 * Time.deltaTime );
+    // transform.position = new Vector3( transform.position.x, 10.0, transform.position.z );
+    // } DISABLE end 
 
-// ------------------------------------------------------------------ 
-// Desc: 
-// ------------------------------------------------------------------ 
+    // 
+    // DISABLE: acceleration without decelerate adjustment { 
+    var dir = Vector3.zero;
+    if ( moveFB || moveLR ) {
+        var linearFB = moveFB * camForward; 
+        var linearLR = moveLR * camRight; 
+        dir = linearFB + linearLR; 
+        dir.Normalize();
+        curSpeed += acceleration * Time.deltaTime;
+        if ( curSpeed > maxSpeed ) {
+            curSpeed = maxSpeed;
+        } 
+    }
+    else if ( curSpeed > 0.0 ) {
+        curSpeed -= deceleration * Time.deltaTime;
+        dir = velocity;
+        dir.Normalize();
+    }
+    velocity = dir * curSpeed;
+    transform.position += velocity * Time.deltaTime;
+    // } DISABLE end 
 
-function Start () {
-    // TODO:
-}
+    // DISABLE { 
+    // var linearFB = moveFB * camForward;
+    // var linearLR = moveLR * camRight;
 
-// ------------------------------------------------------------------ 
-// Desc: 
-// ------------------------------------------------------------------ 
+    // // FB
+    // if ( moveFB ) {
+    //     linearFB *= acceleration;
+    // }
+    // else if ( velocity.x > 0.01 ) {
+    //     linearFB = -linearFB;
+    //     linearFB *= deceleration;
+    // }
 
-function Update () {
+    // // LR
+    // if ( moveLR ) {
+    //     linearLR *= acceleration;
+    // }
+    // else if ( velocity.z > 0.01 ) {
+    //     linearLR = -linearLR;
+    //     linearLR *= deceleration;
+    // }
 
-    dbgText = "";
+    // // update velocity
+    // velocity += (linearFB + linearLR) * Time.deltaTime;
+    // if ( velocity.magnitude > maxSpeed ) {
+    //     velocity.Normalize();
+    //     velocity *= maxSpeed;
+    // } 
 
-    // Get the horizontal and vertical axis.
-    // Get the mouse aiming pos.
-    HandleInput ();
+    // // now position
+    // transform.position += velocity * Time.deltaTime;
+    // } DISABLE end 
 
-    // Process translation and rotation.
-    ProcessMovement ();
 
     // DEBUG { 
-    var velocity = rigidbody.GetPointVelocity(transform.position);
-    dbgText += "velocity: " + velocity;
+    dbgText += "velocity: " + velocity; 
     Debug.DrawLine ( transform.position, transform.position + velocity, Color.white );
+
+    // if ( moveFB )
+    //     Debug.DrawLine ( transform.position, transform.position + linearFB, Color.red );
+    // if ( moveLR )
+    //     Debug.DrawLine ( transform.position, transform.position + linearLR, Color.blue );
     // } DEBUG end 
 }
 
