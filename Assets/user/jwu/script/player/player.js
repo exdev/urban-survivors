@@ -10,6 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var maxSpeed = 50.0; // the max speed for running
+var horizon = 10.0;
 // var acceleration = 2.0; // from move to run
 // var deceleration = 2.0; // from run to move
 
@@ -93,7 +94,7 @@ function ProcessMovement () {
     var dir = (linearFB + linearLR).normalized * 1000.0; // 1000.0 is a scale value for force.
 
     rigidbody.AddForce ( dir * maxSpeed * Time.deltaTime );
-    transform.position = new Vector3( transform.position.x, 10.0, transform.position.z );
+    transform.position = new Vector3( transform.position.x, horizon, transform.position.z );
 }
 
 // ------------------------------------------------------------------ 
