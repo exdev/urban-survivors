@@ -23,6 +23,7 @@ Icon?
 Thumbs.db
 
 #/////////////////////////////////////////////////////////////////////////////
+# NOTE: IMPORTANT!!!!! the description below is point to Unity-Pro version, not suite for Unity-Free version.
 # unity files
 #
 # obey the rule of external vcs in unity:
@@ -38,10 +39,10 @@ Thumbs.db
 
 Temp/
 Library/cache/
-Library/metadata/
 Library/ScriptAssemblies/
 
 Library/*
+!Library/metadata/
 !Library/*.asset
 !Library/BuildPlayer.prefs
 
