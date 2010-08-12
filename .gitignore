@@ -38,10 +38,10 @@ Thumbs.db
 #/////////////////////////////////////////////////////////////////////////////
 
 Temp/
-Library/cache/
-Library/ScriptAssemblies/
+!Library/cache/
+!Library/ScriptAssemblies/
 
-Library/*
+!Library/*
 !Library/metadata/
 !Library/*.asset
 !Library/BuildPlayer.prefs
