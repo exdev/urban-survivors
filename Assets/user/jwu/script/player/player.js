@@ -14,9 +14,15 @@ var horizon = 10.0;
 // var acceleration = 2.0; // from move to run
 // var deceleration = 2.0; // from run to move
 
+// Q: why don't we just use UpperBody in this game?
+// A: this metho will make sure the 'upper-body' is specific by user regardless the name of the entity, 
+//    so it can be flexiable enough for different game.
+var upperBody : Transform;
+
 private var aimPos = Vector3.zero;
 private var moveFB = 0;
 private var moveLR = 0;
+private var zoomIn = false;
 
 private var dbgText = "";
 
@@ -49,18 +55,40 @@ private function HandleInput () {
         moveLR -= 1;
     // } TODO end 
 
+    // camera zoom or not
+    if ( Input.GetKey(KeyCode.LeftShift) ) {
+        zoomIn = true; 
+    } else {
+        zoomIn = false; 
+    }
+
     var ray = Camera.main.ScreenPointToRay (Input.mousePosition); 
     var plane = Plane ( Vector3.up, transform.position.y );
     var dist = 0.0;
     plane.Raycast( ray, dist );
     aimPos = ray.origin + ray.direction * dist;
+    aimPos.y = transform.position.y;
 
     // DEBUG { 
-    Debug.DrawRay ( ray.origin, ray.direction * 100, Color.yellow );
-    DebugHelper.DrawBall ( aimPos, 1.0, Color.red );
+    // Debug.DrawRay ( ray.origin, ray.direction * 100, Color.yellow ); // camera look-foward ray
+    DebugHelper.DrawBall ( aimPos, 1.0, Color.red ); // player aiming position
+    Debug.DrawLine ( transform.position, aimPos, Color.red ); // player aiming direction
     // } DEBUG end 
 
-    dbgText = "FB: " + moveFB + " LR: " + moveLR + "\n";
+    dbgText = "FB: " + moveFB + " LR: " + moveLR + "zoom: " + zoomIn + "\n";
+}
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
+function ProcessCamera () {
+    var cam = Camera.main.GetComponent(Camera);
+    var wantedFov = 60.0;
+    if ( zoomIn ) {
+        wantedFov = 40.0;
+    }
+    cam.fieldOfView = Mathf.Lerp (cam.fieldOfView, wantedFov, 8.0 * Time.deltaTime);
 }
 
 // ------------------------------------------------------------------ 
@@ -75,7 +103,7 @@ function ProcessMovement () {
     var aimDir = aimPos - transform.position; 
     aimDir.y = 0.0;
     aimDir.Normalize();
-    transform.forward = aimDir;
+    upperBody.forward = aimDir;
 
     // ======================================================== 
     // process translate 
@@ -118,6 +146,7 @@ function Update () {
     HandleInput ();
 
     // Process translation and rotation.
+    ProcessCamera ();
     ProcessMovement ();
 
     // DEBUG { 
