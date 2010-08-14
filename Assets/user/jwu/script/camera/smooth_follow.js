@@ -69,7 +69,7 @@ function LateUpdate () {
     currentLocation.z = Mathf.Lerp (currentLocation.z, wantedLocation.z, horizonDamping * Time.deltaTime);
 
     // ======================================================== 
-    // 
+    // do real transform 
     // ======================================================== 
 
     // update the exact position
