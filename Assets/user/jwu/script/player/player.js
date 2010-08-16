@@ -17,6 +17,7 @@ var horizon = 10.0;
 // Q: why don't we just use UpperBody in this game?
 // A: this metho will make sure the 'upper-body' is specific by user regardless the name of the entity, 
 //    so it can be flexiable enough for different game.
+var lowerBody : Transform;
 var upperBody : Transform;
 
 private var aimPos = Vector3.zero;
@@ -25,6 +26,7 @@ private var moveLR = 0;
 private var zoomIn = false;
 
 private var dbgText = "";
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // functions
@@ -129,6 +131,26 @@ function ProcessMovement () {
 // Desc: 
 // ------------------------------------------------------------------ 
 
+function ProcessAnimation () {
+    lowerAnim = lowerBody.GetComponent(Animation);
+    if ( moveFB > 0 ) {
+        lowerAnim.Play("moveForward");
+    }
+    else if ( moveFB < 0 ) {
+        lowerAnim.Play("moveBackward");
+    }
+    else if ( moveLR > 0 ) {
+        lowerAnim.Play("moveRight");
+    }
+    else if ( moveLR < 0 ) {
+        lowerAnim.Play("moveLeft");
+    }
+}
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
 function Start () {
     // TODO:
 }
@@ -148,6 +170,7 @@ function Update () {
     // Process translation and rotation.
     ProcessCamera ();
     ProcessMovement ();
+    ProcessAnimation ();
 
     // DEBUG { 
     var velocity = rigidbody.GetPointVelocity(transform.position);
