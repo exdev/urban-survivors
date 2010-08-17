@@ -121,9 +121,10 @@ function ProcessMovement () {
     //
     var linearFB = moveFB * camForward; 
     var linearLR = moveLR * camRight; 
-    var dir = (linearFB + linearLR).normalized * 1000.0; // 1000.0 is a scale value for force.
+    var dir = (linearFB + linearLR).normalized; // 100.0 is a scale value for force.
 
-    rigidbody.AddForce ( dir * maxSpeed * Time.deltaTime );
+    rigidbody.AddForce ( dir * maxSpeed, ForceMode.Acceleration );
+    // rigidbody.AddForce ( dir * maxSpeed, ForceMode.VelocityChange );
     transform.position = new Vector3( transform.position.x, horizon, transform.position.z );
 }
 
@@ -169,7 +170,7 @@ function Update () {
 
     // Process translation and rotation.
     ProcessCamera ();
-    ProcessMovement ();
+    // ProcessMovement (); // change this to FixedUpdate to prevent shaking when moving
     ProcessAnimation ();
 
     // DEBUG { 
@@ -177,6 +178,14 @@ function Update () {
     dbgText += "velocity: " + velocity;
     Debug.DrawLine ( transform.position, transform.position + velocity, Color.white );
     // } DEBUG end 
+}
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
+function FixedUpdate () {
+    ProcessMovement ();
 }
 
 // ------------------------------------------------------------------ 
