@@ -9,22 +9,27 @@
 // variables
 ///////////////////////////////////////////////////////////////////////////////
 
-var maxSpeed = 50.0; // the max speed for running
-var horizon = 10.0;
-// var acceleration = 2.0; // from move to run
-// var deceleration = 2.0; // from run to move
+var maxSpeed = 50.0; // the max speed for running.
+var rotDamping = 10.0;
+var degreeToRot = 15.0;
+
+// DELME: I think this should remove soon, and use follow terrain technique. 
+var horizon = 1.5; // the fixed height for player.
 
 // Q: why don't we just use UpperBody in this game?
 // A: this metho will make sure the 'upper-body' is specific by user regardless the name of the entity, 
 //    so it can be flexiable enough for different game.
-var lowerBody : Transform;
 var upperBody : Transform;
+var lowerBody : Transform;
 
+// camera, keyboard controls
 private var aimPos = Vector3.zero;
 private var moveFB = 0;
 private var moveLR = 0;
 private var zoomIn = false;
+private var wantedRot = Quaternion.identity;
 
+// for DEBUG:
 private var dbgText = "";
 
 
@@ -108,6 +113,12 @@ function ProcessMovement () {
     aimDir.y = 0.0;
     aimDir.Normalize();
     upperBody.forward = aimDir;
+    // if ( Vector3.Dot ( upperBody.forward, lowerBody.forward ) )
+    var angle = Quaternion.Angle ( upperBody.rotation, lowerBody.rotation );
+    if ( angle > degreeToRot ) {
+        wantedRot = upperBody.rotation;
+    }
+    lowerBody.rotation = Quaternion.Slerp( lowerBody.rotation, wantedRot, rotDamping * Time.deltaTime );
 
     // ======================================================== 
     // process translate 
@@ -157,7 +168,7 @@ function ProcessAnimation () {
 // ------------------------------------------------------------------ 
 
 function Start () {
-    // TODO:
+    wantedRot = upperBody.rotation;
 }
 
 // ------------------------------------------------------------------ 
