@@ -65,19 +65,21 @@ private function HandleInput () {
     }
 
     var ray = Camera.main.ScreenPointToRay (Input.mousePosition); 
-    var plane = Plane ( Vector3.up, transform.position.y );
+    var plane = Plane ( Vector3.up, -upperBody.position.y );
     var dist = 0.0;
     plane.Raycast( ray, dist );
     aimPos = ray.origin + ray.direction * dist;
-    aimPos.y = transform.position.y;
+    // aimPos.y = upperBody.position.y;
 
     // DEBUG { 
     // Debug.DrawRay ( ray.origin, ray.direction * 100, Color.yellow ); // camera look-foward ray
     DebugHelper.DrawBall ( aimPos, 1.0, Color.red ); // player aiming position
-    Debug.DrawLine ( transform.position, aimPos, Color.red ); // player aiming direction
+    Debug.DrawLine ( upperBody.position, aimPos, Color.red ); // player aiming direction
     // } DEBUG end 
 
     dbgText = "FB: " + moveFB + " LR: " + moveLR + "zoom: " + zoomIn + "\n";
+    dbgText += "up_pos: " + upperBody.position + "\n";
+    dbgText += "aimpos: " + aimPos + "\n";
 }
 
 // ------------------------------------------------------------------ 
@@ -102,7 +104,7 @@ function ProcessMovement () {
     // process rotations 
     // ======================================================== 
 
-    var aimDir = aimPos - transform.position; 
+    var aimDir = aimPos - upperBody.position; 
     aimDir.y = 0.0;
     aimDir.Normalize();
     upperBody.forward = aimDir;
@@ -134,18 +136,20 @@ function ProcessMovement () {
 
 function ProcessAnimation () {
     lowerAnim = lowerBody.GetComponent(Animation);
-    if ( moveFB > 0 ) {
-        lowerAnim.Play("moveForward");
-    }
-    else if ( moveFB < 0 ) {
-        lowerAnim.Play("moveBackward");
-    }
-    else if ( moveLR > 0 ) {
-        lowerAnim.Play("moveRight");
-    }
-    else if ( moveLR < 0 ) {
-        lowerAnim.Play("moveLeft");
-    }
+    // DISABLE { 
+    // if ( moveFB > 0 ) {
+    //     lowerAnim.Play("moveForward");
+    // }
+    // else if ( moveFB < 0 ) {
+    //     lowerAnim.Play("moveBackward");
+    // }
+    // else if ( moveLR > 0 ) {
+    //     lowerAnim.Play("moveRight");
+    // }
+    // else if ( moveLR < 0 ) {
+    //     lowerAnim.Play("moveLeft");
+    // }
+    // } DISABLE end 
 }
 
 // ------------------------------------------------------------------ 
@@ -193,5 +197,5 @@ function FixedUpdate () {
 // ------------------------------------------------------------------ 
 
 function OnGUI () {
-    GUI.Label ( Rect (10, 10, 200, 50), dbgText.ToString() );
+    GUI.Label ( Rect (10, 10, 200, 100), dbgText.ToString() );
 }
