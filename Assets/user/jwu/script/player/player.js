@@ -146,7 +146,10 @@ function ProcessMovement () {
 // ------------------------------------------------------------------ 
 
 function ProcessAnimation () {
-    lowerAnim = lowerBody.GetComponent(Animation);
+    anim = transform.GetComponent(Animation);
+    if ( moveFB || moveLR ) {
+        anim.Play("moveForward");
+    }
     // DISABLE { 
     // if ( moveFB > 0 ) {
     //     lowerAnim.Play("moveForward");
