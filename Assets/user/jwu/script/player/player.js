@@ -10,8 +10,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var maxSpeed = 50.0; // the max speed for running.
-var rotDamping = 10.0;
+// var rotDamping = 10.0;
 var degreeToRot = 15.0;
+var rotTime = 2.0;
 
 // DELME: I think this should remove soon, and use follow terrain technique. 
 var horizon = 1.5; // the fixed height for player.
@@ -22,12 +23,19 @@ var horizon = 1.5; // the fixed height for player.
 var upperBody : Transform;
 var lowerBody : Transform;
 
-// camera, keyboard controls
+// for camera
+private var zoomIn = false;
 private var aimPos = Vector3.zero;
+
+// for movement
 private var moveFB = 0;
 private var moveLR = 0;
-private var zoomIn = false;
-private var wantedRot = Quaternion.identity;
+
+// for rotation
+// private var wantedRot = Quaternion.identity;
+// private var originalRot = Quaternion.identity;
+// private var rotBegin = 0.0;
+// private var rotating = false;
 
 // for DEBUG:
 private var dbgText = "";
@@ -105,20 +113,6 @@ function ProcessCamera () {
 // ------------------------------------------------------------------ 
 
 function ProcessMovement () {
-    // ======================================================== 
-    // process rotations 
-    // ======================================================== 
-
-    var aimDir = aimPos - upperBody.position; 
-    aimDir.y = 0.0;
-    aimDir.Normalize();
-    upperBody.forward = aimDir;
-    // if ( Vector3.Dot ( upperBody.forward, lowerBody.forward ) )
-    var angle = Quaternion.Angle ( upperBody.rotation, lowerBody.rotation );
-    if ( angle > degreeToRot ) {
-        wantedRot = upperBody.rotation;
-    }
-    lowerBody.rotation = Quaternion.Slerp( lowerBody.rotation, wantedRot, rotDamping * Time.deltaTime );
 
     // ======================================================== 
     // process translate 
@@ -145,9 +139,56 @@ function ProcessMovement () {
 // Desc: 
 // ------------------------------------------------------------------ 
 
+function PostAnim () {
+    // ======================================================== 
+    // process rotations 
+    // ======================================================== 
+
+    var aimDir = aimPos - upperBody.position; 
+    aimDir.y = 0.0;
+    aimDir.Normalize();
+    upperBody.forward = aimDir;
+    // if ( Vector3.Dot ( upperBody.forward, lowerBody.forward ) )
+    var angle = Quaternion.Angle ( upperBody.rotation, lowerBody.rotation );
+    // DISABLE { 
+    // if ( !rotating && angle > degreeToRot ) {
+    //     originalRot = lowerBody.rotation; 
+    //     wantedRot = upperBody.rotation;
+    //     rotBegin = Time.time;
+    //     rotating = true;
+    // }
+    // // lowerBody.rotation = Quaternion.Slerp( lowerBody.rotation, wantedRot, rotDamping * Time.deltaTime );
+    // var t = (Time.time - rotBegin) / rotTime;
+    // if ( t >= 1.0 ) {
+    //     rotating = false;
+    //     t = 1.0;
+    // }
+    // lowerBody.rotation = Quaternion.Slerp( originalRot, wantedRot, t );
+    // } DISABLE end 
+    if ( angle > degreeToRot ) {
+        iTween.RotateTo( lowerBody.gameObject, {
+            "rotation": upperBody.eulerAngles,
+            "time": 1.0,
+            "easeType": iTween.EaseType.easeOutCirc
+            } );
+    }
+}
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
+function dummyUpdate () {
+}
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
 function ProcessAnimation () {
-    anim = transform.GetComponent(Animation);
+    anim = transform.GetComponentInChildren(Animation);
     if ( moveFB || moveLR ) {
+        // anim.Play("moveLeft");
         anim.Play("moveForward");
     }
     // DISABLE { 
@@ -193,9 +234,17 @@ function Update () {
 
     // DEBUG { 
     var velocity = rigidbody.GetPointVelocity(transform.position);
-    dbgText += "velocity: " + velocity;
+    dbgText += "velocity: " + velocity + "\n";
     Debug.DrawLine ( transform.position, transform.position + velocity, Color.white );
     // } DEBUG end 
+}
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
+function LateUpdate () {
+    PostAnim ();
 }
 
 // ------------------------------------------------------------------ 
