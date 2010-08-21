@@ -10,9 +10,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var maxSpeed = 50.0; // the max speed for running.
-// var rotDamping = 10.0;
 var degreeToRot = 15.0;
-var rotTime = 2.0;
+var rotTime = 1.0;
 
 // DELME: I think this should remove soon, and use follow terrain technique. 
 var horizon = 1.5; // the fixed height for player.
@@ -30,12 +29,6 @@ private var aimPos = Vector3.zero;
 // for movement
 private var moveFB = 0;
 private var moveLR = 0;
-
-// for rotation
-// private var wantedRot = Quaternion.identity;
-// private var originalRot = Quaternion.identity;
-// private var rotBegin = 0.0;
-// private var rotating = false;
 
 // for DEBUG:
 private var dbgText = "";
@@ -86,7 +79,7 @@ private function HandleInput () {
 
     // DEBUG { 
     // Debug.DrawRay ( ray.origin, ray.direction * 100, Color.yellow ); // camera look-foward ray
-    DebugHelper.DrawBall ( aimPos, 1.0, Color.red ); // player aiming position
+    DebugHelper.DrawBall ( aimPos, 0.2, Color.red ); // player aiming position
     Debug.DrawLine ( upperBody.position, aimPos, Color.red ); // player aiming direction
     // } DEBUG end 
 
@@ -150,35 +143,20 @@ function PostAnim () {
     upperBody.forward = aimDir;
     // if ( Vector3.Dot ( upperBody.forward, lowerBody.forward ) )
     var angle = Quaternion.Angle ( upperBody.rotation, lowerBody.rotation );
-    // DISABLE { 
-    // if ( !rotating && angle > degreeToRot ) {
-    //     originalRot = lowerBody.rotation; 
-    //     wantedRot = upperBody.rotation;
-    //     rotBegin = Time.time;
-    //     rotating = true;
-    // }
-    // // lowerBody.rotation = Quaternion.Slerp( lowerBody.rotation, wantedRot, rotDamping * Time.deltaTime );
-    // var t = (Time.time - rotBegin) / rotTime;
-    // if ( t >= 1.0 ) {
-    //     rotating = false;
-    //     t = 1.0;
-    // }
-    // lowerBody.rotation = Quaternion.Slerp( originalRot, wantedRot, t );
-    // } DISABLE end 
     if ( angle > degreeToRot ) {
         iTween.RotateTo( lowerBody.gameObject, {
             "rotation": upperBody.eulerAngles,
-            "time": 1.0,
+            "time": rotTime,
             "easeType": iTween.EaseType.easeOutCirc
             } );
+
+        // TODO: we can play this in ProcessAnimation by left/right, and once the anim finished, it will crossfade to idle. 
+        // 1. how can it be finished?? 
+        // 2. how to detect if left or right?? { 
+        // anim = transform.GetComponentInChildren(Animation);
+        // anim.Play("turnRight");
+        // } TODO end 
     }
-}
-
-// ------------------------------------------------------------------ 
-// Desc: 
-// ------------------------------------------------------------------ 
-
-function dummyUpdate () {
 }
 
 // ------------------------------------------------------------------ 
@@ -186,25 +164,35 @@ function dummyUpdate () {
 // ------------------------------------------------------------------ 
 
 function ProcessAnimation () {
+    // get the animation forward,right so that we can pickup the proper animation.
+    var curVelocity = rigidbody.velocity; 
+    var vel_lbspace = lowerBody.worldToLocalMatrix * curVelocity;
+    vel_lbspace.y = 0.0;
+    vel_lbspace.Normalize();
+    dbgText += "vel in lowerBody space: " + vel_lbspace + "\n";
+
+    // TODO: once nantas confirm and move the animation-component to the player, we
+    // should use GetComponent { 
     anim = transform.GetComponentInChildren(Animation);
-    if ( moveFB || moveLR ) {
-        // anim.Play("moveLeft");
-        anim.Play("moveForward");
-    }
-    // DISABLE { 
-    // if ( moveFB > 0 ) {
-    //     lowerAnim.Play("moveForward");
-    // }
-    // else if ( moveFB < 0 ) {
-    //     lowerAnim.Play("moveBackward");
-    // }
-    // else if ( moveLR > 0 ) {
-    //     lowerAnim.Play("moveRight");
-    // }
-    // else if ( moveLR < 0 ) {
-    //     lowerAnim.Play("moveLeft");
-    // }
-    // } DISABLE end 
+    // } TODO end 
+
+    //
+    var animFB = vel_lbspace.z > 0 ? anim["moveForward"] : anim["moveBackward"];
+    var animLR = vel_lbspace.x > 0 ? anim["moveRight"] : anim["moveLeft"];
+
+    var abs_x = Mathf.Abs(vel_lbspace.x);
+    var abs_z = Mathf.Abs(vel_lbspace.z);
+
+    anim.Blend(animFB.name, abs_z );
+    animFB.normalizedSpeed = abs_z;
+
+    anim.Blend(animLR.name, abs_x );
+    animLR.normalizedSpeed = abs_x;
+
+    // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
+    if ( vel_lbspace.sqrMagnitude < 0.5 )
+        anim.CrossFade("idle");
+    // } TODO end 
 }
 
 // ------------------------------------------------------------------ 
@@ -212,7 +200,12 @@ function ProcessAnimation () {
 // ------------------------------------------------------------------ 
 
 function Start () {
-    wantedRot = upperBody.rotation;
+    anim = transform.GetComponentInChildren(Animation);
+    var anim_keys = ["moveForward", "moveBackward", "moveRight", "moveLeft"];
+    for (key in anim_keys) {
+        var state = anim[key];
+        state.wrapMode = WrapMode.Loop;
+    }
 }
 
 // ------------------------------------------------------------------ 
