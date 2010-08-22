@@ -29,6 +29,7 @@ private var aimPos = Vector3.zero;
 // for movement
 private var moveFB = 0;
 private var moveLR = 0;
+private var rotating = false;
 
 // for DEBUG:
 private var dbgText = "";
@@ -147,16 +148,27 @@ function PostAnim () {
         iTween.RotateTo( lowerBody.gameObject, {
             "rotation": upperBody.eulerAngles,
             "time": rotTime,
-            "easeType": iTween.EaseType.easeOutCirc
+            "easeType": iTween.EaseType.easeOutCirc,
+            "oncomplete": "onRotateEnd",
+            "oncompletetarget": gameObject
             } );
+            rotating = true;
 
         // TODO: we can play this in ProcessAnimation by left/right, and once the anim finished, it will crossfade to idle. 
         // 1. how can it be finished?? 
         // 2. how to detect if left or right?? { 
-        // anim = transform.GetComponentInChildren(Animation);
-        // anim.Play("turnRight");
+        anim = transform.GetComponentInChildren(Animation);
+        anim.Play("turnRight");
         // } TODO end 
     }
+}
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
+function onRotateEnd () {
+    rotating = false;
 }
 
 // ------------------------------------------------------------------ 
@@ -190,8 +202,12 @@ function ProcessAnimation () {
     animLR.normalizedSpeed = abs_x;
 
     // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
-    if ( vel_lbspace.sqrMagnitude < 0.5 )
-        anim.CrossFade("idle");
+    // if ( vel_lbspace.sqrMagnitude < 0.2 )
+    if ( moveFB == 0 && moveLR == 0 ) {
+        if ( rotating == false ) {
+            anim.CrossFade("idle");
+        }
+    }
     // } TODO end 
 }
 
@@ -200,12 +216,18 @@ function ProcessAnimation () {
 // ------------------------------------------------------------------ 
 
 function Start () {
+    var state;
     anim = transform.GetComponentInChildren(Animation);
     var anim_keys = ["moveForward", "moveBackward", "moveRight", "moveLeft"];
     for (key in anim_keys) {
-        var state = anim[key];
+        state = anim[key];
         state.wrapMode = WrapMode.Loop;
     }
+
+    state = anim["turnRight"];
+    state.wrapMode = WrapMode.Once;
+    state = anim["idle"];
+    state.wrapMode = WrapMode.Loop;
 }
 
 // ------------------------------------------------------------------ 
