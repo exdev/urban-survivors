@@ -157,8 +157,10 @@ function PostAnim () {
         // TODO: we can play this in ProcessAnimation by left/right, and once the anim finished, it will crossfade to idle. 
         // 1. how can it be finished?? 
         // 2. how to detect if left or right?? { 
-        anim = transform.GetComponentInChildren(Animation);
-        anim.Play("turnRight");
+        if ( moveFB == 0 && moveLR == 0 ) {
+            anim = transform.GetComponentInChildren(Animation);
+            anim.CrossFade("turnRight");
+        }
         // } TODO end 
     }
 }
@@ -188,27 +190,47 @@ function ProcessAnimation () {
     anim = transform.GetComponentInChildren(Animation);
     // } TODO end 
 
-    //
-    var animFB = vel_lbspace.z > 0 ? anim["moveForward"] : anim["moveBackward"];
-    var animLR = vel_lbspace.x > 0 ? anim["moveRight"] : anim["moveLeft"];
-
-    var abs_x = Mathf.Abs(vel_lbspace.x);
-    var abs_z = Mathf.Abs(vel_lbspace.z);
-
-    anim.Blend(animFB.name, abs_z );
-    animFB.normalizedSpeed = abs_z;
-
-    anim.Blend(animLR.name, abs_x );
-    animLR.normalizedSpeed = abs_x;
-
     // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
     // if ( vel_lbspace.sqrMagnitude < 0.2 )
     if ( moveFB == 0 && moveLR == 0 ) {
+        var fadeSpeed = 5.0 * Time.deltaTime;
+        anim["moveForward"].weight -= fadeSpeed;
+        anim["moveBackward"].weight -= fadeSpeed;
+        anim["moveLeft"].weight -= fadeSpeed;
+        anim["moveRight"].weight -= fadeSpeed;
+
         if ( rotating == false ) {
             anim.CrossFade("idle");
         }
     }
     // } TODO end 
+    else {
+        var anim_f = anim["moveForward"];
+        var anim_b = anim["moveBackward"];
+        if ( vel_lbspace.z > 0 ) {
+            anim_f.weight = vel_lbspace.z * 2.0;
+            anim_f.normalizedSpeed = vel_lbspace.z;
+            anim_b.weight = 0.0;
+        }
+        else {
+            anim_f.weight = 0.0;
+            anim_b.weight = -vel_lbspace.z * 2.0; 
+            anim_b.normalizedSpeed = -vel_lbspace.z;
+        }
+
+        var anim_l = anim["moveLeft"];
+        var anim_r = anim["moveRight"];
+        if ( vel_lbspace.x > 0 ) {
+            anim_r.weight = vel_lbspace.x * 2.0;
+            anim_r.normalizedSpeed = vel_lbspace.x;
+            anim_l.weight = 0.0;
+        }
+        else {
+            anim_r.weight = 0.0;
+            anim_l.weight = -vel_lbspace.x * 2.0;
+            anim_l.normalizedSpeed = -vel_lbspace.x;
+        }
+    }
 }
 
 // ------------------------------------------------------------------ 
@@ -221,13 +243,23 @@ function Start () {
     var anim_keys = ["moveForward", "moveBackward", "moveRight", "moveLeft"];
     for (key in anim_keys) {
         state = anim[key];
+        state.layer = 1;
         state.wrapMode = WrapMode.Loop;
+        state.weight = 1.0;
+        state.blendMode = AnimationBlendMode.Blend;
+        state.enabled = true;
     }
 
     state = anim["turnRight"];
     state.wrapMode = WrapMode.Once;
+    state.layer = 0;
+    state.weight = 1.0;
+
     state = anim["idle"];
     state.wrapMode = WrapMode.Loop;
+    state.layer = 0;
+    state.weight = 1.0;
+    state.enabled = true;
 }
 
 // ------------------------------------------------------------------ 
