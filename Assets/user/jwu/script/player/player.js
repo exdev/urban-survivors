@@ -30,6 +30,7 @@ private var aimPos = Vector3.zero;
 private var moveFB = 0;
 private var moveLR = 0;
 private var rotating = false;
+private var need_rewind = true;
 
 // for DEBUG:
 private var dbgText = "";
@@ -152,16 +153,15 @@ function PostAnim () {
             "oncomplete": "onRotateEnd",
             "oncompletetarget": gameObject
             } );
-            rotating = true;
-
-        // TODO: we can play this in ProcessAnimation by left/right, and once the anim finished, it will crossfade to idle. 
-        // 1. how can it be finished?? 
-        // 2. how to detect if left or right?? { 
+        rotating = true;
         if ( moveFB == 0 && moveLR == 0 ) {
+            var cross_product = Vector3.Cross(upperBody.forward,lowerBody.forward);
             anim = transform.GetComponentInChildren(Animation);
-            anim.CrossFade("turnRight");
+            if ( cross_product.y > 0.0 )
+                anim.CrossFade("turnRight");
+            else if ( cross_product.y < 0.0 )
+                anim.CrossFade("turnLeft");
         }
-        // } TODO end 
     }
 }
 
@@ -194,10 +194,11 @@ function ProcessAnimation () {
     // if ( vel_lbspace.sqrMagnitude < 0.2 )
     if ( moveFB == 0 && moveLR == 0 ) {
         var fadeSpeed = 5.0 * Time.deltaTime;
-        anim["moveForward"].weight -= fadeSpeed;
-        anim["moveBackward"].weight -= fadeSpeed;
-        anim["moveLeft"].weight -= fadeSpeed;
-        anim["moveRight"].weight -= fadeSpeed;
+        anim.Blend( "moveForward", 0.0 );
+        anim.Blend( "moveBackward", 0.0 );
+        anim.Blend( "moveLeft", 0.0 );
+        anim.Blend( "moveRight", 0.0 );
+        need_rewind = true;
 
         if ( rotating == false ) {
             anim.CrossFade("idle");
@@ -205,30 +206,37 @@ function ProcessAnimation () {
     }
     // } TODO end 
     else {
-        var anim_f = anim["moveForward"];
-        var anim_b = anim["moveBackward"];
-        if ( vel_lbspace.z > 0 ) {
-            anim_f.weight = vel_lbspace.z * 2.0;
-            anim_f.normalizedSpeed = vel_lbspace.z;
-            anim_b.weight = 0.0;
-        }
-        else {
-            anim_f.weight = 0.0;
-            anim_b.weight = -vel_lbspace.z * 2.0; 
-            anim_b.normalizedSpeed = -vel_lbspace.z;
+        // rewind the animation so that each time it moved, it start from the beginning frame.
+        if ( need_rewind ) {
+            need_rewind = false;
+            anim.Rewind("moveForward");
+            anim.Rewind("moveBackward");
+            anim.Rewind("moveLeft");
+            anim.Rewind("moveRight");
         }
 
-        var anim_l = anim["moveLeft"];
-        var anim_r = anim["moveRight"];
-        if ( vel_lbspace.x > 0 ) {
-            anim_r.weight = vel_lbspace.x * 2.0;
-            anim_r.normalizedSpeed = vel_lbspace.x;
-            anim_l.weight = 0.0;
+        // blend forward/backward
+        if ( vel_lbspace.z > 0 ) {
+            anim.Blend("moveForward", vel_lbspace.z * 2.0 );
+            anim.Blend("moveBackward", 0.0 );
+            anim["moveForward"].normalizedSpeed = vel_lbspace.z;
         }
         else {
-            anim_r.weight = 0.0;
-            anim_l.weight = -vel_lbspace.x * 2.0;
-            anim_l.normalizedSpeed = -vel_lbspace.x;
+            anim.Blend("moveForward", 0.0 );
+            anim.Blend("moveBackward", -vel_lbspace.z * 2.0 );
+            anim["moveBackward"].normalizedSpeed = -vel_lbspace.z;
+        }
+
+        // blend left/right
+        if ( vel_lbspace.x > 0 ) {
+            anim.Blend("moveRight", vel_lbspace.x * 2.0 );
+            anim.Blend("moveLeft", 0.0 );
+            anim["moveRight"].normalizedSpeed = vel_lbspace.x;
+        }
+        else {
+            anim.Blend("moveRight", 0.0 );
+            anim.Blend("moveLeft", -vel_lbspace.x * 2.0 );
+            anim["moveLeft"].normalizedSpeed = -vel_lbspace.x;
         }
     }
 }
@@ -251,6 +259,11 @@ function Start () {
     }
 
     state = anim["turnRight"];
+    state.wrapMode = WrapMode.Once;
+    state.layer = 0;
+    state.weight = 1.0;
+
+    state = anim["turnLeft"];
     state.wrapMode = WrapMode.Once;
     state.layer = 0;
     state.weight = 1.0;
