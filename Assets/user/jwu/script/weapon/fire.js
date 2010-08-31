@@ -10,9 +10,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var bullet : GameObject; 
-var freq = 0.5;
+var freq = 0.1;
 
 private var timer = 0.0;
+private var cur_player;
 
 ///////////////////////////////////////////////////////////////////////////////
 // defines
@@ -23,7 +24,9 @@ private var timer = 0.0;
 // ------------------------------------------------------------------ 
 
 function Invoke () {
-    Debug.Log("bang!");
+    // create a bullet, and rotate it based on the vector inputRotation
+    var spawn_bullet = Instantiate(bullet, transform.position, transform.rotation );
+    Physics.IgnoreCollision( spawn_bullet.collider, cur_player.collider );
 }
 
 // ------------------------------------------------------------------ 
@@ -32,6 +35,7 @@ function Invoke () {
 
 function Start () {
     timer = 0.0;
+    cur_player = GameObject.FindWithTag ("Player");
 }
 
 // ------------------------------------------------------------------ 
