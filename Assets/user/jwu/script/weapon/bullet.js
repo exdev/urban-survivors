@@ -28,6 +28,7 @@ function Update () {
         Destroy(gameObject);
     }
     transform.position = transform.position + speed * Time.deltaTime * transform.forward;
+    // CollisionIgnoreManager.Instance().AddIgnore( collider, 0x00f0, 0x00ff );
 }
 
 // ------------------------------------------------------------------ 

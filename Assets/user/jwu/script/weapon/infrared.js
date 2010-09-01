@@ -38,10 +38,17 @@ function Start () {
 function Update () {
     var lr = GetComponent(LineRenderer);
     if ( lr ) {
+
+        var layerMask = 1 << 2;
+        // This would cast rays only against colliders in layer 2.
+        // But instead we want to collide against everything except layer 2. 
+        // The ~ operator does this, it inverts a bitmask.
+        layerMask = ~layerMask;
+
         var dist = 100.0;
         var hit : RaycastHit;
         var fwd = transform.TransformDirection (Vector3.forward);
-        if ( Physics.Raycast (transform.position, fwd, hit, 100.0) ) {
+        if ( Physics.Raycast (transform.position, fwd, hit, 100.0, layerMask ) ) {
             dist = hit.distance;
         }
         lr.SetPosition( 1, Vector3.forward * dist );

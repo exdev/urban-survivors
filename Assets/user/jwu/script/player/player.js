@@ -246,6 +246,13 @@ function ProcessAnimation () {
 // ------------------------------------------------------------------ 
 
 function Start () {
+    // wait until the CollisionIgnoreManager is ready 
+    while ( CollisionIgnoreManager.Instance() == null ) { 
+        yield WaitForSeconds(0.1);
+    } 
+    CollisionIgnoreManager.Instance().AddIgnore( collider, Constant.mask_player, Constant.mask_none );
+
+    // animation
     var state;
     anim = transform.GetComponentInChildren(Animation);
     var anim_keys = ["moveForward", "moveBackward", "moveRight", "moveLeft"];
