@@ -11,6 +11,7 @@
 
 var speed = 10.0;
 var lifeTime = 1.0;
+var parBulletHit : GameObject;
 
 private var counter = 0.0;
 
@@ -28,7 +29,6 @@ function Update () {
         Destroy(gameObject);
     }
     transform.position = transform.position + speed * Time.deltaTime * transform.forward;
-    // CollisionIgnoreManager.Instance().AddIgnore( collider, 0x00f0, 0x00ff );
 }
 
 // ------------------------------------------------------------------ 
@@ -36,7 +36,11 @@ function Update () {
 // ------------------------------------------------------------------ 
 
 function OnCollisionEnter ( other : Collision ) {
-    Debug.Log("touch: " + other.gameObject.name );
+    // Debug.Log("touch: " + other.gameObject.name );
+    // TODO: play particles
+    Instantiate(parBulletHit, transform.position, transform.rotation );
+    Destroy(gameObject);
+    // parBulletHit
 }
 
 

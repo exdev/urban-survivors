@@ -26,7 +26,6 @@ private var cur_player;
 function Invoke () {
     // create a bullet, and rotate it based on the vector inputRotation
     var spawn_bullet = Instantiate(bullet, transform.position, transform.rotation );
-    // Physics.IgnoreCollision( spawn_bullet.collider, cur_player.collider );
     CollisionIgnoreManager.Instance().AddIgnore( spawn_bullet.collider, Constant.mask_bullet, Constant.mask_player|Constant.mask_bullet );
 }
 
