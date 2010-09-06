@@ -43,10 +43,10 @@ function Start () {
 // ------------------------------------------------------------------ 
 
 function Update () {
-    if ( Input.GetMouseButtonDown(0) ) {
+    if ( Input.GetButtonDown("Fire") ) {
         Invoke();
     }
-    else if ( Input.GetMouseButton(0) ) {
+    else if ( Input.GetButton("Fire") ) {
         timer += Time.deltaTime;
         if ( timer >= freq ) {
             timer = 0.0;

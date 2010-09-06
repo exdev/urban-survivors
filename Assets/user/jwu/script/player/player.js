@@ -51,22 +51,12 @@ private function HandleInput () {
     // moveLR = Input.GetAxis ("Horizontal") * camRight * moveSpeed * Time.deltaTime;
     // } DISABLE end 
 
-    moveFB = 0;
-    moveLR = 0;
-
-    // TODO: use unity player control system { 
-    if ( Input.GetKey("w") )
-        moveFB += 1;
-    if ( Input.GetKey("s") )
-        moveFB -= 1;
-    if ( Input.GetKey("d") )
-        moveLR += 1;
-    if ( Input.GetKey("a") )
-        moveLR -= 1;
-    // } TODO end 
+    // get axis raw
+    moveFB = Input.GetAxisRaw("Vertical");
+    moveLR = Input.GetAxisRaw("Horizontal");
 
     // camera zoom or not
-    if ( Input.GetKey(KeyCode.LeftShift) ) {
+    if ( Input.GetButton("Zoom") ) {
         zoomIn = true; 
     } else {
         zoomIn = false; 
