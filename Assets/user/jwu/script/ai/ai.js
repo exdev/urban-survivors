@@ -10,14 +10,15 @@
 // ------------------------------------------------------------------ 
 
 var target: Transform;
+var btree : BehaveTree;
 
 // ------------------------------------------------------------------ 
 // Desc: 
 // ------------------------------------------------------------------ 
 
 function Start () {
-    var btree : Btree = new Btree("hello foobar!");
-    // btree.init();
+    btree = new BehaveTree("MyBehave");
+    btree.init( BTSeq( [BTCond("is walk"), BTAct("hello world") ] ) );
     // Debug.Log( "var1 = " + btree.myvar + ", var2 = " + btree.myvar2 );
 }
 
@@ -30,5 +31,6 @@ function Update () {
     // transform.position.z += Mathf.Sin(Time.time) * 10.0 * Time.deltaTime;
     var wanted_rot = Quaternion.LookRotation( target.position - transform.position );
     transform.rotation = Quaternion.Slerp ( transform.rotation, wanted_rot, Time.deltaTime * 4.0 );
+    btree.tick();
 }
 
