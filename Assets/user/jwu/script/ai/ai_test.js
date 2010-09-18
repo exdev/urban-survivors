@@ -1,45 +1,56 @@
 // ======================================================================================
 // File         : ai_test.js
 // Author       : Wu Jie 
-// Last Change  : 07/26/2010 | 15:52:06 PM | Monday,July
+// Last Change  : 09/18/2010 | 22:44:44 PM | Saturday,September
 // Description  : 
 // ======================================================================================
 
-///////////////////////////////////////////////////////////////////////////////
-// properties
-///////////////////////////////////////////////////////////////////////////////
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
 
-var target : Transform;
-var rot_speed = 5.0;
+private var dest : Vector3; 
+private var counter = 0.0;
 
-///////////////////////////////////////////////////////////////////////////////
-// functions
-///////////////////////////////////////////////////////////////////////////////
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
+function Start () {
+    dest = transform.position;
+    counter = Time.time;
+}
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
+function GetRandomDest () {
+    if ( Time.time - counter > 2.0 ) {
+        counter = Time.time;
+        dest = Vector3( 
+            Random.Range(-20.0,20.0), 
+            0.0,
+            Random.Range(-20.0,20.0) 
+        );
+    }
+}
 
 // ------------------------------------------------------------------ 
 // Desc: 
 // ------------------------------------------------------------------ 
 
 function Update () {
-    transform.position.x += 0.1 * Mathf.Cos( Time.time );
-    // transform.position.z += 0.1 * Mathf.Sin( Time.time );
+    // movement
+    GetRandomDest();
+    var delta = dest - transform.position;
+    if ( delta.magnitude > 1.0 ) {
+        transform.position += delta.normalized * 20.0 * Time.deltaTime;
+    }
 
-    var wanted_rot = Quaternion.LookRotation  ( target.position - transform.position );
-
-    // euler lerp
-    // transform.eulerAngles = Vector3( 
-    //     Mathf.Lerp ( transform.eulerAngles.x,  wanted_rot.eulerAngles.x, rot_speed * Time.deltaTime ), 
-    //     Mathf.Lerp ( transform.eulerAngles.y,  wanted_rot.eulerAngles.y, rot_speed * Time.deltaTime ), 
-    //     Mathf.Lerp ( transform.eulerAngles.z,  wanted_rot.eulerAngles.z, rot_speed * Time.deltaTime )
-    // );
-
-    // euler angle lerp
-    transform.eulerAngles = Vector3(
-        Mathf.LerpAngle ( transform.eulerAngles.x,  wanted_rot.eulerAngles.x, rot_speed * Time.deltaTime ), 
-        Mathf.LerpAngle ( transform.eulerAngles.y,  wanted_rot.eulerAngles.y, 0.5 * rot_speed * Time.deltaTime ), 
-        Mathf.LerpAngle ( transform.eulerAngles.z,  wanted_rot.eulerAngles.z, 0.1 * rot_speed * Time.deltaTime )
-    );
-
-    // slerp
-    // transform.rotation = Quaternion.Slerp( transform.rotation, wanted_rot, rot_speed * Time.deltaTime );
+    //
+    var player = GameObject.FindWithTag("Player");
+    var wanted_rot = Quaternion.LookRotation( player.transform.position - transform.position );
+    transform.rotation = Quaternion.Slerp ( transform.rotation, wanted_rot, Time.deltaTime * 8.0 );
 }
+

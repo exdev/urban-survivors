@@ -22,13 +22,16 @@ var lineColor : Color;
 // ------------------------------------------------------------------ 
 
 function Start () {
-    var lr = gameObject.AddComponent(LineRenderer);
-    lr.useWorldSpace = false;
-    lr.SetWidth(lineSize, lineSize);
-    lr.material = material;
-    lr.SetPosition(0, Vector3.zero );
-    lr.SetPosition(1, Vector3.forward * 10.0 );
-    lr.SetColors(lineColor,lineColor);
+    var lr = gameObject.GetComponent(LineRenderer);
+    if ( lr == null ) {
+        lr = gameObject.AddComponent(LineRenderer);
+        lr.useWorldSpace = false;
+        lr.SetWidth(lineSize, lineSize);
+        lr.material = material;
+        lr.SetPosition(0, Vector3.zero );
+        lr.SetPosition(1, Vector3.forward * 10.0 );
+        lr.SetColors(lineColor,lineColor);
+    }
 }
 
 // ------------------------------------------------------------------ 
