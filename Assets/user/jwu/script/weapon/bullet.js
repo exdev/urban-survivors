@@ -9,7 +9,7 @@
 // properties
 ///////////////////////////////////////////////////////////////////////////////
 
-var speed = 10.0;
+var speed = 20.0;
 var lifeTime = 1.0;
 var parBulletHit : GameObject;
 

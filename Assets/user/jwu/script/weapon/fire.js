@@ -9,10 +9,6 @@
 // properties
 ///////////////////////////////////////////////////////////////////////////////
 
-var bullet : GameObject; 
-var freq = 0.1;
-
-private var timer = 0.0;
 private var cur_player;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,18 +19,7 @@ private var cur_player;
 // Desc: 
 // ------------------------------------------------------------------ 
 
-function Invoke () {
-    // create a bullet, and rotate it based on the vector inputRotation
-    var spawn_bullet = Instantiate(bullet, transform.position, transform.rotation );
-    CollisionIgnoreManager.Instance().AddIgnore( spawn_bullet.collider, Constant.mask_bullet, Constant.mask_player|Constant.mask_bullet );
-}
-
-// ------------------------------------------------------------------ 
-// Desc: 
-// ------------------------------------------------------------------ 
-
 function Start () {
-    timer = 0.0;
     cur_player = GameObject.FindWithTag ("Player");
 }
 
@@ -42,16 +27,7 @@ function Start () {
 // Desc: 
 // ------------------------------------------------------------------ 
 
-function Update () {
-    if ( Input.GetButtonDown("Fire") ) {
-        Invoke();
-    }
-    else if ( Input.GetButton("Fire") ) {
-        timer += Time.deltaTime;
-        if ( timer >= freq ) {
-            timer = 0.0;
-            Invoke();
-        }
-    }
+virtual function Trigger () {
+    Debug.Log("warning! pls reimplement fire in sub-class");
 }
 

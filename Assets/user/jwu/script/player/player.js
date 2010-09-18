@@ -21,6 +21,7 @@ var horizon = 1.5; // the fixed height for player.
 //    so it can be flexiable enough for different game.
 var upperBody : Transform;
 var lowerBody : Transform;
+var curWeapon : GameObject;
 
 // for camera
 private var zoomIn = false;
@@ -68,6 +69,17 @@ private function HandleInput () {
     plane.Raycast( ray, dist );
     aimPos = ray.origin + ray.direction * dist;
     // aimPos.y = upperBody.position.y;
+
+    // handle fire 
+    if ( Input.GetButton("Fire") ) {
+        // if we have weapon in hand.
+        if ( curWeapon ) {
+            var fire = curWeapon.GetComponent("fire");
+            if (fire) {
+                fire.Trigger();
+            }
+        }
+    }
 
     // DEBUG { 
     // Debug.DrawRay ( ray.origin, ray.direction * 100, Color.yellow ); // camera look-foward ray

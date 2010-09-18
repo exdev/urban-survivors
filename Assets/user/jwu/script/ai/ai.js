@@ -9,7 +9,6 @@
 // Desc: 
 // ------------------------------------------------------------------ 
 
-var target: Transform;
 var btree : BehaveTree;
 
 // ------------------------------------------------------------------ 
@@ -17,8 +16,13 @@ var btree : BehaveTree;
 // ------------------------------------------------------------------ 
 
 function Start () {
-    btree = new BehaveTree("MyBehave");
-    btree.init( BTSeq( [BTCond("is walk"), BTAct("hello world") ] ) );
+    // DISABLE { 
+    // btree = new BehaveTree("MyBehave");
+    // btree.init( 
+    //     BTSeq( [ BT_move() ] ) 
+    // );
+    // } DISABLE end 
+
     // Debug.Log( "var1 = " + btree.myvar + ", var2 = " + btree.myvar2 );
 }
 
@@ -27,10 +31,16 @@ function Start () {
 // ------------------------------------------------------------------ 
 
 function Update () {
+    // DISABLE { 
+    // btree.tick();
+    // } DISABLE end 
+
+    // move towards player
+
     // transform.position.x += Mathf.Cos(Time.time) * 10.0 * Time.deltaTime;
     // transform.position.z += Mathf.Sin(Time.time) * 10.0 * Time.deltaTime;
-    var wanted_rot = Quaternion.LookRotation( target.position - transform.position );
-    transform.rotation = Quaternion.Slerp ( transform.rotation, wanted_rot, Time.deltaTime * 4.0 );
-    btree.tick();
+
+    // var wanted_rot = Quaternion.LookRotation( target.position - transform.position );
+    // transform.rotation = Quaternion.Slerp ( transform.rotation, wanted_rot, Time.deltaTime * 4.0 );
 }
 

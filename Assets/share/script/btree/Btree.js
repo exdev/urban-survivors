@@ -53,10 +53,6 @@ class BTNode {
 ///////////////////////////////////////////////////////////////////////////////
 
 class BTPrim extends BTNode {
-    var name : String;
-    function BTPrim ( _name : String ) {
-        this.name = _name;
-    }
     virtual function exec () : boolean { 
         Debug.Log ("BTPrim::exec invoked!");
         return true;
@@ -71,9 +67,6 @@ class BTPrim extends BTNode {
 ///////////////////////////////////////////////////////////////////////////////
 
 class BTCond extends BTPrim {
-    function BTCond ( _name : String ) {
-        super(_name);
-    }
     virtual function exec () : boolean {
         Debug.Log ("BTCond::exec invoked!");
         return true;
@@ -88,9 +81,6 @@ class BTCond extends BTPrim {
 ///////////////////////////////////////////////////////////////////////////////
 
 class BTAct extends BTPrim {
-    function BTAct ( _name : String ) {
-        super(_name);
-    }
     virtual function exec () : boolean {
         Debug.Log ("BTAct::exec invoked!");
         return true;
