@@ -30,7 +30,7 @@ function GetRandomDest () {
         counter = Time.time;
         dest = Vector3( 
             Random.Range(-20.0,20.0), 
-            0.0,
+            1.5,
             Random.Range(-20.0,20.0) 
         );
     }
