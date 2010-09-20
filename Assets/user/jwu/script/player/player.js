@@ -5,6 +5,8 @@
 // Description  : 
 // ======================================================================================
 
+#pragma strict
+
 ///////////////////////////////////////////////////////////////////////////////
 // variables
 ///////////////////////////////////////////////////////////////////////////////
@@ -74,7 +76,7 @@ private function HandleInput () {
     if ( Input.GetButton("Fire") ) {
         // if we have weapon in hand.
         if ( curWeapon ) {
-            var fire = curWeapon.GetComponent("fire");
+            var fire : fire = curWeapon.GetComponent(fire);
             if (fire) {
                 fire.Trigger();
             }
@@ -97,7 +99,7 @@ private function HandleInput () {
 // ------------------------------------------------------------------ 
 
 function ProcessCamera () {
-    var cam = Camera.main.GetComponent(Camera);
+    var cam : Camera = Camera.main.GetComponent(Camera);
     var wantedFov = 60.0;
     if ( zoomIn ) {
         wantedFov = 40.0;
@@ -116,7 +118,7 @@ function ProcessMovement () {
     // ======================================================== 
 
     // get camera forward and right
-    var mainCamera = Camera.main.GetComponent(Transform);
+    var mainCamera:Transform = Camera.main.GetComponent(Transform);
     var camForward = Vector3( mainCamera.forward.x, 0.0, mainCamera.forward.z );
     camForward.Normalize();
     var camRight = Vector3( mainCamera.right.x, 0.0, mainCamera.right.z );
@@ -158,7 +160,7 @@ function PostAnim () {
             } );
         if ( moveFB == 0 && moveLR == 0 ) {
             var cross_product = Vector3.Cross(upperBody.forward,lowerBody.forward);
-            anim = GetComponentInChildren(Animation);
+            var anim:Animation = GetComponentInChildren(Animation);
             if ( cross_product.y > 0.0 )
                 anim.CrossFade("turnRight");
             else if ( cross_product.y < 0.0 )
@@ -190,7 +192,7 @@ function ProcessAnimation () {
 
     // TODO: once nantas confirm and move the animation-component to the player, we
     // should use GetComponent { 
-    anim = GetComponentInChildren(Animation);
+    var anim:Animation = GetComponentInChildren(Animation);
     // } TODO end 
 
     // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
@@ -259,8 +261,8 @@ function Start () {
     }
 
     // animation
-    var state;
-    anim = GetComponentInChildren(Animation);
+    var state:AnimationState;
+    var anim:Animation = GetComponentInChildren(Animation);
     var anim_keys = ["moveForward", "moveBackward", "moveRight", "moveLeft"];
     for (key in anim_keys) {
         state = anim[key];

@@ -5,6 +5,8 @@
 // Description  : 
 // ======================================================================================
 
+#pragma strict
+
 class emitter_forward extends emitter {
 
     // ------------------------------------------------------------------ 
@@ -13,7 +15,7 @@ class emitter_forward extends emitter {
 
     virtual function Emit ( _bullet : GameObject ) {
         // create a bullet, and rotate it based on the vector inputRotation
-        var spawn_bullet = Instantiate(_bullet, transform.position, transform.rotation );
+        var spawn_bullet:GameObject = Instantiate(_bullet, transform.position, transform.rotation );
         CollisionIgnoreManager.Instance().AddIgnore( spawn_bullet.collider, Constant.mask_bullet, Constant.mask_player|Constant.mask_bullet );
     }
 }

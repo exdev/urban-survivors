@@ -5,6 +5,8 @@
 // Description  : 
 // ======================================================================================
 
+#pragma strict
+
 ///////////////////////////////////////////////////////////////////////////////
 // properties
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,7 +45,7 @@ function OnCollisionEnter ( other : Collision ) {
     // parBulletHit
 
     // HARDCODE { 
-    var ai = other.collider.GetComponent("ai_generic");
+    var ai:ai_generic = other.collider.GetComponent("ai_generic");
     ai.HP -= 10.0;
     // } HARDCODE end 
 }

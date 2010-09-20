@@ -5,6 +5,8 @@
 // Description  : 
 // ======================================================================================
 
+#pragma strict
+
 ///////////////////////////////////////////////////////////////////////////////
 // properties
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,7 +24,7 @@ var lineColor : Color;
 // ------------------------------------------------------------------ 
 
 function Start () {
-    var lr = gameObject.GetComponent(LineRenderer);
+    var lr:LineRenderer = gameObject.GetComponent(LineRenderer);
     if ( lr == null ) {
         lr = gameObject.AddComponent(LineRenderer);
         lr.useWorldSpace = false;
@@ -39,7 +41,7 @@ function Start () {
 // ------------------------------------------------------------------ 
 
 function Update () {
-    var lr = GetComponent(LineRenderer);
+    var lr:LineRenderer = GetComponent(LineRenderer);
     if ( lr ) {
 
         var layerMask = 1 << 2;

@@ -5,6 +5,8 @@
 // Description  : 
 // ======================================================================================
 
+#pragma strict 
+
 ///////////////////////////////////////////////////////////////////////////////
 // members
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,9 +23,9 @@ private var anim : Animation;
 // ------------------------------------------------------------------ 
 
 protected function InitAnim () {
-    ai = GetComponent("ai_generic");
+    ai = GetComponent(ai_generic);
 
-    var state;
+    var state:AnimationState;
     anim = transform.GetComponent(Animation);
 
     state = anim["walk"];
@@ -37,7 +39,7 @@ protected function InitAnim () {
     state.wrapMode = WrapMode.Loop;
     state.layer = 1;
     state.weight = 1.0;
-    state.normalizedSpeed = 2.0;
+    state.normalizedSpeed = 1.0;
 }
 
 // ------------------------------------------------------------------ 

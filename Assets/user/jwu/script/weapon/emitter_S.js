@@ -5,6 +5,8 @@
 // Description  : 
 // ======================================================================================
 
+#pragma strict
+
 ///////////////////////////////////////////////////////////////////////////////
 // properties
 ///////////////////////////////////////////////////////////////////////////////
@@ -27,7 +29,7 @@ class emitter_S extends emitter {
             var rot = transform.rotation;
             rot.eulerAngles.y += Random.Range(-half_ang, half_ang);
 
-            var spawn_bullet = Instantiate(_bullet, transform.position, rot );
+            var spawn_bullet:GameObject = Instantiate(_bullet, transform.position, rot );
             spawn_bullet.transform.position += Random.Range(0.0,3.0) * spawn_bullet.transform.forward;
             CollisionIgnoreManager.Instance().AddIgnore( spawn_bullet.collider, Constant.mask_bullet, Constant.mask_player|Constant.mask_bullet );
         }
