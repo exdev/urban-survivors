@@ -151,11 +151,11 @@ function PostAnim () {
         iTween.RotateTo( lowerBody.gameObject, {
             "rotation": upperBody.eulerAngles,
             "time": rotTime,
-            "easeType": iTween.EaseType.easeOutCirc,
+            "delay": 0.05,
+            "easeType": iTween.EaseType.easeOutCubic,
             "oncomplete": "onRotateEnd",
             "oncompletetarget": gameObject
             } );
-        rotating = true;
         if ( moveFB == 0 && moveLR == 0 ) {
             var cross_product = Vector3.Cross(upperBody.forward,lowerBody.forward);
             anim = transform.GetComponentInChildren(Animation);
@@ -164,6 +164,7 @@ function PostAnim () {
             else if ( cross_product.y < 0.0 )
                 anim.CrossFade("turnLeft");
         }
+        rotating = true;
     }
 }
 
@@ -301,7 +302,7 @@ function Update () {
 
     // Process translation and rotation.
     ProcessCamera ();
-    // ProcessMovement (); // change this to FixedUpdate to prevent shaking when moving
+    // ProcessMovement (); // DELME: change this to FixedUpdate to prevent shaking when moving
     ProcessAnimation ();
 
     // DEBUG { 
