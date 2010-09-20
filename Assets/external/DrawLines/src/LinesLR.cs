@@ -88,7 +88,7 @@ public class LinesLR : MonoBehaviour {
 		GameObject canvas = new GameObject("canvas" + canvasIndex); 
 		canvas.transform.parent = transform;
 		canvas.transform.rotation = transform.rotation;
-		LineRenderer lines = (LineRenderer) canvas.AddComponent<LineRenderer>();
+		LineRenderer lines = (LineRenderer) canvas.AddComponent("LineRenderer");
 		lines.material = new Material(shader);
 		lines.material.color = c;
 		lines.useWorldSpace = false;
