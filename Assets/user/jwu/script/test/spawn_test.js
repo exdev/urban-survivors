@@ -10,6 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var zombie_prototype : GameObject;
+var max_zombies = 20;
 
 ///////////////////////////////////////////////////////////////////////////////
 // defines
@@ -20,7 +21,7 @@ var zombie_prototype : GameObject;
 // ------------------------------------------------------------------ 
 
 function Start () {
-    for ( i = 0; i < 40; ++i ) {
+    for ( i = 0; i < max_zombies; ++i ) {
         var rot = transform.rotation;
         rot.eulerAngles.y += Random.Range(-180, 180);
 
@@ -32,3 +33,24 @@ function Start () {
         var zombie = Instantiate(zombie_prototype, pos, rot );
     }
 }
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
+function Update () {
+    var zombies = GameObject.FindGameObjectsWithTag ("Zombie");
+    var count = max_zombies - zombies.length;
+    for ( i = 0; i < count; ++i ) {
+        var rot = transform.rotation;
+        rot.eulerAngles.y += Random.Range(-180, 180);
+
+        var pos = Vector3 ( 
+            Random.Range(-20.0, 20.0), 
+            0.0,
+            Random.Range(-20.0, 20.0) 
+        );
+        Instantiate(zombie_prototype, pos, rot );
+    }
+}
+

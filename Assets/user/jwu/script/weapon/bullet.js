@@ -41,6 +41,11 @@ function OnCollisionEnter ( other : Collision ) {
     Instantiate(parBulletHit, transform.position, transform.rotation );
     Destroy(gameObject);
     // parBulletHit
+
+    // HARDCODE { 
+    var ai = other.collider.GetComponent("ai_generic");
+    ai.HP -= 10.0;
+    // } HARDCODE end 
 }
 
 
