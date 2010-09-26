@@ -20,7 +20,7 @@ var max_zombies = 20;
 // Desc: 
 // ------------------------------------------------------------------ 
 
-function Start () {
+function Awake () {
     for ( i = 0; i < max_zombies; ++i ) {
         var rot = transform.rotation;
         rot.eulerAngles.y += Random.Range(-180, 180);
