@@ -35,9 +35,9 @@ public class Infrared : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Start () {
-        LineRenderer lr = GetComponent<LineRenderer>();
+        LineRenderer lr = GetComponent(typeof(LineRenderer)) as LineRenderer;
         if ( lr == null ) {
-            lr = gameObject.AddComponent<LineRenderer>();
+            lr = gameObject.AddComponent(typeof(LineRenderer)) as LineRenderer;
             lr.useWorldSpace = false;
             lr.SetWidth(lineSize, lineSize);
             lr.material = material;
@@ -52,7 +52,7 @@ public class Infrared : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Update () {
-        LineRenderer lr = GetComponent<LineRenderer>();
+        LineRenderer lr = GetComponent(typeof(LineRenderer)) as LineRenderer;
         if ( lr ) {
             int layerMask = 1 << 2;
             // This would cast rays only against colliders in layer 2.

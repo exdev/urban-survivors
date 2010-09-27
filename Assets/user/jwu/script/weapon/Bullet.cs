@@ -86,7 +86,7 @@ public class Bullet : MonoBehaviour {
         // HARDCODE { 
         // it is possible the collider already destroied 
         if ( _other.collider != null ) {
-            AI_generic ai = _other.collider.GetComponent<AI_generic>();
+            AI_generic ai = _other.collider.GetComponent( typeof(AI_generic) ) as AI_generic;
             if ( ai != null ) {
                 ai.HP -= 10.0f;
             }

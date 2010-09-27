@@ -34,10 +34,10 @@ public class Anim_zombie : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     protected void InitAnim () {
-        ai = GetComponent<AI_generic>();
+        ai = GetComponent( typeof(AI_generic) ) as AI_generic;
 
         AnimationState state;
-        anim = transform.GetComponent<Animation>();
+        anim = transform.GetComponent(typeof(Animation)) as Animation;
 
         state = anim["walk"];
         state.layer = 1;

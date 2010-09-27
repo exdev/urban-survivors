@@ -89,7 +89,7 @@ public class Player : MonoBehaviour {
         if ( Input.GetButton("Fire") ) {
             // if we have weapon in hand.
             if ( curWeapon ) {
-                Fire fire = curWeapon.GetComponent<Fire>();
+                Fire fire = curWeapon.GetComponent(typeof(Fire)) as Fire;
                 if (fire) {
                     fire.Trigger();
                 }
@@ -112,7 +112,7 @@ public class Player : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     private void ProcessCamera () {
-        Camera cam = Camera.main.GetComponent<Camera>();
+        Camera cam = Camera.main.GetComponent( typeof(Camera) ) as Camera;
         float wantedFov = 60.0f;
         if ( zoomIn ) {
             wantedFov = 40.0f;
@@ -131,7 +131,7 @@ public class Player : MonoBehaviour {
         // ======================================================== 
 
         // get camera forward and right
-        Transform mainCamera = Camera.main.GetComponent<Transform>();
+        Transform mainCamera = Camera.main.GetComponent( typeof(Transform) ) as Transform;
         Vector3 camForward = new Vector3( mainCamera.forward.x, 0.0f, mainCamera.forward.z );
         camForward.Normalize();
         Vector3 camRight = new Vector3( mainCamera.right.x, 0.0f, mainCamera.right.z );
@@ -173,7 +173,7 @@ public class Player : MonoBehaviour {
                              ) );
             if ( moveFB == 0 && moveLR == 0 ) {
                 Vector3 cross_product = Vector3.Cross(upperBody.forward,lowerBody.forward);
-                Animation anim = GetComponentInChildren<Animation>();
+                Animation anim = GetComponentInChildren( typeof(Animation) ) as Animation;
                 if ( cross_product.y > 0.0 )
                     anim.CrossFade("turnRight");
                 else if ( cross_product.y < 0.0 )
@@ -205,7 +205,7 @@ public class Player : MonoBehaviour {
 
         // TODO: once nantas confirm and move the animation-component to the player, we
         // should use GetComponent { 
-        Animation anim = GetComponentInChildren<Animation>();
+        Animation anim = GetComponentInChildren( typeof(Animation) ) as Animation;
         // } TODO end 
 
         // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
@@ -271,7 +271,7 @@ public class Player : MonoBehaviour {
 
         // animation
         AnimationState state;
-        Animation anim = GetComponentInChildren<Animation>();
+        Animation anim = GetComponentInChildren( typeof(Animation) ) as Animation;
         string[] anim_keys = { "moveForward", "moveBackward", "moveRight", "moveLeft" };
         foreach (string key in anim_keys) {
             state = anim[key];

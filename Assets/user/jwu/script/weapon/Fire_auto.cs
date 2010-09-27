@@ -39,7 +39,7 @@ public class Fire_auto : Fire {
 	new void Start () {
         base.Start();
         lastFireTime = Time.time;
-        emitter = GetComponent<Emitter>();
+        emitter = GetComponent( typeof(Emitter) ) as Emitter;
 	}
 	
     // ------------------------------------------------------------------ 
