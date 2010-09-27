@@ -37,14 +37,14 @@ Thumbs.db
 # file is added to version control.
 #/////////////////////////////////////////////////////////////////////////////
 
-Temp/
-!Library/cache/
-!Library/ScriptAssemblies/
-
 !Library/*
 !Library/metadata/
 !Library/*.asset
 !Library/BuildPlayer.prefs
+
+Temp/
+Library/cache/
+Library/ScriptAssemblies/
 
 # /////////////////////////////////////////////////////////////////////////////
 # exvim files 

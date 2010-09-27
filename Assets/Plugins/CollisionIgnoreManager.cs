@@ -37,7 +37,7 @@ public class CollisionIgnoreManager : MonoBehaviour {
     // Desc: Use this for initialization
     // ------------------------------------------------------------------ 
 
-    void Start () {
+    void Awake () {
         if( collisionIgnoreManager == null )
             collisionIgnoreManager = this;
     }
@@ -49,7 +49,8 @@ public class CollisionIgnoreManager : MonoBehaviour {
     void Update () {
         // clean up any dead objects
         for( int i = ignoreObjects.Count - 1; i >= 0; i-- ) {
-            if( ignoreObjects[ i ] == null ) {
+            Collider collider = ignoreObjects[i] as Collider;
+            if( collider == null || collider.gameObject.active == false ) {
                 ignoreObjects.RemoveAt( i );
                 ignoreMasks.RemoveAt( i );
             }
@@ -70,9 +71,12 @@ public class CollisionIgnoreManager : MonoBehaviour {
 
     public void AddIgnore( Collider newCollider, int thisMask, int mask ) {
         for( int i = 0; i < ignoreObjects.Count; i++ ) {
-            Collider collider = ignoreObjects[ i ] as Collider;
+            Collider collider = ignoreObjects[i] as Collider;
 
-            if( collider != null && ( mask & ( (int) ignoreMasks[ i ]) ) != 0 )
+            if( collider == null || collider.gameObject.active == false )
+                continue;
+
+            if( ( mask & ( (int) ignoreMasks[ i ]) ) != 0 )
                 Physics.IgnoreCollision( newCollider, collider, true );
         }
 
