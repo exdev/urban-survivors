@@ -6,6 +6,8 @@
 // ======================================================================================
 
 #pragma strict
+#pragma implicit
+#pragma downcast
 
 ///////////////////////////////////////////////////////////////////////////////
 // defines
@@ -41,7 +43,7 @@ class BehaveTree {
 class BTNode {
     function BTNode () { 
     }
-    virtual function exec () : boolean {
+    function exec () : boolean {
         Debug.Log ("warnnig: please implement exec in your node!");
         return false;
     }
@@ -55,7 +57,7 @@ class BTNode {
 ///////////////////////////////////////////////////////////////////////////////
 
 class BTPrim extends BTNode {
-    virtual function exec () : boolean { 
+    function exec () : boolean { 
         Debug.Log ("BTPrim::exec invoked!");
         return true;
     }
@@ -69,7 +71,7 @@ class BTPrim extends BTNode {
 ///////////////////////////////////////////////////////////////////////////////
 
 class BTCond extends BTPrim {
-    virtual function exec () : boolean {
+    function exec () : boolean {
         Debug.Log ("BTCond::exec invoked!");
         return true;
     }
@@ -83,7 +85,7 @@ class BTCond extends BTPrim {
 ///////////////////////////////////////////////////////////////////////////////
 
 class BTAct extends BTPrim {
-    virtual function exec () : boolean {
+    function exec () : boolean {
         Debug.Log ("BTAct::exec invoked!");
         return true;
     }
@@ -104,7 +106,7 @@ class BTComp extends BTNode {
         this.sub_nodes = _nodes;
     }
 
-    virtual function exec () : boolean {
+    function exec () : boolean {
         Debug.Log ("BTComp::exec invoked!");
         return true;
     }
@@ -121,7 +123,7 @@ class BTSeq extends BTComp {
     function BTSeq ( _nodes : Array ) {
         super(_nodes);
     }
-    virtual function exec () : boolean {
+    function exec () : boolean {
         for ( i = 0; i < this.sub_nodes.length; ++i ) {
             if ( sub_nodes[i].exec() == false ) {
                 return false;
@@ -142,7 +144,7 @@ class BTSel extends BTComp {
     function BTSel ( _nodes : Array ) {
         super (_nodes);
     }
-    virtual function exec () : boolean {
+    function exec () : boolean {
         for ( i = 0; i < this.sub_nodes.length; ++i ) {
             if ( sub_nodes[i].exec() ) {
                 return true;
@@ -163,7 +165,7 @@ class BTPrl extends BTComp {
     function BTPrl ( _nodes : Array ) {
         super (_nodes);
     }
-    virtual function exec () : boolean {
+    function exec () : boolean {
         // TODO { 
         // for ( i = 0; i < this.sub_nodes.length; ++i ) {
         //     // MonoBehaviour.StartCoroutine ( sub_nodes[i].exec() );
@@ -186,7 +188,7 @@ class BTDec extends BTComp {
     function BTDec ( _nodes : Array ) {
         super (_nodes);
     }
-    virtual function exec () : boolean {
+    function exec () : boolean {
         // TODO: assert sub_nodes only have one item.
         return this.sub_nodes[0].exec();
     }

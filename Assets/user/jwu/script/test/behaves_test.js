@@ -14,7 +14,7 @@
 // ------------------------------------------------------------------ 
 
 class BT_move extends BTAct {
-    virtual function exec () : boolean {
+    function exec () : boolean {
         wait();
         return true;
     }
