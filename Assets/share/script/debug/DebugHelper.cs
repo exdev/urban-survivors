@@ -78,4 +78,29 @@ public class DebugHelper : MonoBehaviour {
         DebugHelper.DrawCircleY ( _center, _radius, _color );
         DebugHelper.DrawCircleZ ( _center, _radius, _color );
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [System.Diagnostics.Conditional("UNITY_EDITOR")]
+    public static void Assert(bool _comparison, string _message)
+    {
+        if (!_comparison) {
+            Debug.LogWarning("Assert Failed: " + _message);
+            Debug.Break();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [System.Diagnostics.Conditional("UNITY_EDITOR")]
+    public static void Check(bool _comparison, string _message)
+    {
+        if (!_comparison) {
+            Debug.LogWarning("Check Failed: " + _message);
+        }
+    }
 }
