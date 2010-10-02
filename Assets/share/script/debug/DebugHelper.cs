@@ -18,6 +18,69 @@ using System.Collections;
 
 public class DebugHelper : MonoBehaviour {
 
+    ///////////////////////////////////////////////////////////////////////////////
+    // properties
+    ///////////////////////////////////////////////////////////////////////////////
+
+    private static DebugHelper instance = null;
+
+    // debug text
+    private string debug_text = "";
+
+    // fps counter
+    private float updateInterval = 0.5f;
+    private float lastInterval = 0.0f;
+    private float fps = 0.0f;
+    private int frames = 0;
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // functions
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Awake () {
+        if( instance == null )
+            instance = this;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Update () {
+        // count fps
+        ++frames;
+        float timeNow = Time.realtimeSinceStartup;
+        if( timeNow > lastInterval + updateInterval ) {
+            fps = frames / (timeNow - lastInterval);
+            frames = 0;
+            lastInterval = timeNow;
+        }
+
+        // clear debug text
+        debug_text = "";
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnGUI () {
+        GUILayout.Label ( "fps: " + fps.ToString("f2") );
+        GUILayout.Label ( debug_text );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static void ScreenPrint ( string _text ) {
+        instance.debug_text = instance.debug_text + _text + "\n"; 
+    }
+
     // ------------------------------------------------------------------ 
     // Desc: DrawCircle
     // ------------------------------------------------------------------ 

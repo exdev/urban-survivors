@@ -49,9 +49,6 @@ public class Player : MonoBehaviour {
     private bool rotating = false;
     private bool need_rewind = true;
 
-    // for DEBUG:
-    private string dbgText = "";
-
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -62,7 +59,7 @@ public class Player : MonoBehaviour {
 
     private void HandleInput () {
         // DISABLE { 
-        // DEBUG: dbgText = "hori: " + Input.GetAxis ("Horizontal") + " vert: " + Input.GetAxis ("Vertical");
+        // DEBUG: DebugHelper.ScreenPrint ( "hori: " + Input.GetAxis ("Horizontal") + " vert: " + Input.GetAxis ("Vertical") );
         // moveFB = Input.GetAxis ("Vertical") * camForward * moveSpeed * Time.deltaTime;
         // moveLR = Input.GetAxis ("Horizontal") * camRight * moveSpeed * Time.deltaTime;
         // } DISABLE end 
@@ -102,9 +99,10 @@ public class Player : MonoBehaviour {
         Debug.DrawLine ( upperBody.position, aimPos, Color.red ); // player aiming direction
         // } DEBUG end 
 
-        dbgText = "FB: " + moveFB + " LR: " + moveLR + "zoom: " + zoomIn + "\n";
-        dbgText += "up_pos: " + upperBody.position + "\n";
-        dbgText += "aimpos: " + aimPos + "\n";
+        DebugHelper.ScreenPrint ( "FB: " + moveFB + " LR: " + moveLR );
+        DebugHelper.ScreenPrint ( "zoom: " + zoomIn );
+        DebugHelper.ScreenPrint ( "up_pos: " + upperBody.position );
+        DebugHelper.ScreenPrint ( "aimpos: " + aimPos );
     }
 
     // ------------------------------------------------------------------ 
@@ -201,7 +199,7 @@ public class Player : MonoBehaviour {
         Vector3 vel_lbspace = lowerBody.worldToLocalMatrix * curVelocity;
         vel_lbspace.y = 0.0f;
         vel_lbspace.Normalize();
-        dbgText += "vel in lowerBody space: " + vel_lbspace + "\n";
+        DebugHelper.ScreenPrint( "vel in lowerBody space: " + vel_lbspace );
 
         // TODO: once nantas confirm and move the animation-component to the player, we
         // should use GetComponent { 
@@ -305,8 +303,6 @@ public class Player : MonoBehaviour {
 
     void Update () {
 
-        dbgText = "";
-
         // Get the horizontal and vertical axis.
         // Get the mouse aiming pos.
         HandleInput ();
@@ -318,7 +314,7 @@ public class Player : MonoBehaviour {
 
         // DEBUG { 
         Vector3 velocity = rigidbody.GetPointVelocity(transform.position);
-        dbgText += "velocity: " + velocity + "\n";
+        DebugHelper.ScreenPrint( "velocity: " + velocity );
         Debug.DrawLine ( transform.position, transform.position + velocity, Color.white );
         // } DEBUG end 
     }
@@ -337,14 +333,6 @@ public class Player : MonoBehaviour {
 
     void FixedUpdate () {
         ProcessMovement ();
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void OnGUI () {
-        GUI.Label ( new Rect (10, 10, 200, 100), dbgText.ToString() );
     }
 }
 
