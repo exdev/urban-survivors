@@ -171,7 +171,7 @@ public class Player : MonoBehaviour {
                              ) );
             if ( moveFB == 0 && moveLR == 0 ) {
                 Vector3 cross_product = Vector3.Cross(upperBody.forward,lowerBody.forward);
-                Animation anim = GetComponentInChildren( typeof(Animation) ) as Animation;
+                Animation anim = GetComponent( typeof(Animation) ) as Animation;
                 if ( cross_product.y > 0.0 )
                     anim.CrossFade("turnRight");
                 else if ( cross_product.y < 0.0 )
@@ -203,7 +203,7 @@ public class Player : MonoBehaviour {
 
         // TODO: once nantas confirm and move the animation-component to the player, we
         // should use GetComponent { 
-        Animation anim = GetComponentInChildren( typeof(Animation) ) as Animation;
+        Animation anim = GetComponent( typeof(Animation) ) as Animation;
         // } TODO end 
 
         // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
@@ -269,7 +269,7 @@ public class Player : MonoBehaviour {
 
         // animation
         AnimationState state;
-        Animation anim = GetComponentInChildren( typeof(Animation) ) as Animation;
+        Animation anim = GetComponent( typeof(Animation) ) as Animation;
         string[] anim_keys = { "moveForward", "moveBackward", "moveRight", "moveLeft" };
         foreach (string key in anim_keys) {
             state = anim[key];
