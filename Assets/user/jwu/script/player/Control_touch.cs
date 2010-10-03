@@ -26,7 +26,7 @@ public class Control_touch : MonoBehaviour {
     public Texture tex_analog;
     public Texture tex_edge;
 
-    // private float analog_region;
+    private float analog_region;
 
     private Vector2 analog_pos;
 
@@ -41,12 +41,12 @@ public class Control_touch : MonoBehaviour {
 	void Start () {
         DebugHelper.Assert( tex_analog, "pls set the analog texture first!" );
         DebugHelper.Assert( tex_edge, "pls set the edge texture first!" );
-        // analog_region = tex_edge.width;
+        analog_region = tex_edge.width;
 
-        int pos_x = -20;
-        int pos_y = Screen.height - tex_edge.height;
-        analog_pos.x = pos_x;
-        analog_pos.y = pos_y;
+        // int pos_x = -20;
+        // int pos_y = Screen.height - tex_edge.height;
+        analog_pos.x = 40;
+        analog_pos.y = Screen.height - 10;
 	}
 	
     // ------------------------------------------------------------------ 
