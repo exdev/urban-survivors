@@ -22,6 +22,10 @@ public class DebugHelper : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    public bool showFps = true;
+    public bool showDebugText = true;
+    public bool showHotPoints = true;
+
     private static DebugHelper instance = null;
 
     // debug text
@@ -50,6 +54,15 @@ public class DebugHelper : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    IEnumerator CleanDebugText () {
+        yield return new WaitForEndOfFrame();
+        debug_text = "";
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     void Update () {
         // count fps
         ++frames;
@@ -59,9 +72,6 @@ public class DebugHelper : MonoBehaviour {
             frames = 0;
             lastInterval = timeNow;
         }
-
-        // clear debug text
-        debug_text = "";
     }
 
     // ------------------------------------------------------------------ 
@@ -69,8 +79,29 @@ public class DebugHelper : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void OnGUI () {
-        GUILayout.Label ( "fps: " + fps.ToString("f2") );
-        GUILayout.Label ( debug_text );
+        if ( showFps )
+            GUILayout.Label ( "fps: " + fps.ToString("f2") );
+        if ( showDebugText )
+            GUILayout.Label ( debug_text );
+        StartCoroutine(CleanDebugText());
+        if ( showHotPoints ) {
+            foreach ( Touch t in Input.touches ) {
+                if (t.phase != TouchPhase.Ended && t.phase != TouchPhase.Canceled) {
+                    Vector2 screen_pos = new Vector2 ( t.position.x, Screen.height - t.position.y );
+                    // TODO { 
+                    // GUI.DrawTexture ( new Rect( screen_pos.x,
+                    //                             screen_pos.y,
+                    //                             tex_hotpoint.width, 
+                    //                             tex_hotpoint.height ), 
+                    //                   tex_hotpoint, 
+                    //                   ScaleMode.ScaleToFit, 
+                    //                   true, 
+                    //                   0.0f );
+                    // } TODO end 
+                    GUI.Box ( new Rect( screen_pos.x-5, screen_pos.y-5, 10, 10 ), "" );
+                }
+            }
+        }
     }
 
     // ------------------------------------------------------------------ 

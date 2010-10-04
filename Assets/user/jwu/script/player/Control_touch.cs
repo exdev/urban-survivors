@@ -23,12 +23,17 @@ public class Control_touch : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public Texture tex_analog;
-    public Texture tex_edge;
+    public Texture tex_MoveAnalog;
+    public Texture tex_MoveOutline;
 
-    private float analog_region;
+    private float moveOutlineRadius;
+    private Vector2 moveOutlineCenter;
+    private Vector2 moveAnalogCenter;
+    // private Vector2 moveDir;
 
-    private Vector2 analog_pos;
+    // TODO:
+    // Layer (LayerStack, active layer, )
+    // Controller ( active, combine by widgets )
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
@@ -39,14 +44,21 @@ public class Control_touch : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
 	void Start () {
-        DebugHelper.Assert( tex_analog, "pls set the analog texture first!" );
-        DebugHelper.Assert( tex_edge, "pls set the edge texture first!" );
-        analog_region = tex_edge.width;
+        DebugHelper.Assert( tex_MoveAnalog, "pls set the analog texture first!" );
+        DebugHelper.Assert( tex_MoveOutline, "pls set the edge texture first!" );
 
-        // int pos_x = -20;
-        // int pos_y = Screen.height - tex_edge.height;
-        analog_pos.x = 40;
-        analog_pos.y = Screen.height - 10;
+        // TEMP: init analog pos { 
+        // init
+        int pos_x = 0;
+        int pos_y = Screen.height - tex_MoveOutline.height;
+
+        moveOutlineCenter.x = pos_x + tex_MoveOutline.width/2;
+        moveOutlineCenter.y = pos_y + tex_MoveOutline.height/2;
+        moveOutlineRadius = tex_MoveOutline.width/2 - 40;
+
+        moveAnalogCenter.x = moveOutlineCenter.x;
+        moveAnalogCenter.y = moveOutlineCenter.y;
+        // } TEMP end 
 	}
 	
     // ------------------------------------------------------------------ 
@@ -60,10 +72,19 @@ public class Control_touch : MonoBehaviour {
                 touches.Add(t);
         }
 
-        if ( touches.Count == 1 ) {
-            Touch t = touches[0];
-            analog_pos = t.position;
+        // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
+        foreach ( Touch t in touches ) {
+            Vector2 screen_pos = new Vector2 ( t.position.x, Screen.height - t.position.y );
+
+            // check if it is in the region 
+            Vector2 delta = screen_pos - moveOutlineCenter;
+            if ( delta.magnitude <= moveOutlineRadius ) {
+                float limit = Mathf.Min(delta.magnitude, moveOutlineRadius - 40);
+                moveAnalogCenter = moveOutlineCenter + delta.normalized * limit;
+                // moveDir = delta.normalized;
+            }
         }
+        DebugHelper.ScreenPrint ( "analog center: " + moveAnalogCenter );
 	}
 
     // ------------------------------------------------------------------ 
@@ -71,22 +92,21 @@ public class Control_touch : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void OnGUI() {
-        int pos_x = -20;
-        int pos_y = Screen.height - tex_edge.height; 
-
-        GUI.DrawTexture ( new Rect( pos_x, pos_y, tex_edge.width, tex_edge.height ), 
-                          tex_edge, 
+        GUI.DrawTexture ( new Rect( moveOutlineCenter.x - tex_MoveOutline.width/2, 
+                                    moveOutlineCenter.y - tex_MoveOutline.height/2, 
+                                    tex_MoveOutline.width, 
+                                    tex_MoveOutline.height ), 
+                          tex_MoveOutline, 
                           ScaleMode.ScaleToFit, 
                           true, 
                           0.0f );
 
-        int half_width = tex_analog.width / 2;
-        int half_height = tex_analog.height / 2;
-        GUI.DrawTexture ( new Rect( analog_pos.x - half_width, 
-                                    Screen.height - analog_pos.y - half_height, 
-                                    tex_analog.width, 
-                                    tex_analog.height ), 
-                          tex_analog, 
+
+        GUI.DrawTexture ( new Rect( moveAnalogCenter.x - tex_MoveAnalog.width/2, 
+                                    moveAnalogCenter.y - tex_MoveAnalog.height/2, 
+                                    tex_MoveAnalog.width, 
+                                    tex_MoveAnalog.height ), 
+                          tex_MoveAnalog, 
                           ScaleMode.ScaleToFit, 
                           true, 
                           0.0f );
