@@ -52,10 +52,6 @@ public class HUD : MonoBehaviour {
 
     private GameObject move_widget;
 
-    private Vector2 screen_size;
-    private Vector2 sprite_size;
-    private float worldpixel;
-
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -75,10 +71,6 @@ public class HUD : MonoBehaviour {
         float screen_height = sprite.height / worldUnitsPerScreenPixel;
         Vector3 worldpos = hud_camera.ScreenToWorldPoint( new Vector3( screen_width/2, screen_height/2, 1 ) );
         move_widget.transform.position = worldpos;
-
-        screen_size = new Vector2(screen_width, screen_height);
-        sprite_size = new Vector2(sprite.width, sprite.height);
-        worldpixel = worldUnitsPerScreenPixel;
     }
 
     // ------------------------------------------------------------------ 
@@ -101,10 +93,6 @@ public class HUD : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
 	void Update () {
-        DebugHelper.ScreenPrint ( "sprite size: " + sprite_size );
-        DebugHelper.ScreenPrint ( "screen_size: " + screen_size );
-        DebugHelper.ScreenPrint ( "worldpixel: " + worldpixel );
-        
         List<Touch> touches = new List<Touch>();
         foreach ( Touch t in Input.touches ) {
             if (t.phase != TouchPhase.Ended && t.phase != TouchPhase.Canceled)

@@ -103,9 +103,6 @@ public class SpriteMesh : ISpriteMesh
 		{
 			meshFilter.sharedMesh = new Mesh();
 			m_mesh = meshFilter.sharedMesh;
-
-			if (m_sprite.persistent)
-				GameObject.DontDestroyOnLoad(m_mesh);
 		}
 
 		// Assign to mesh object:
@@ -141,7 +138,7 @@ public class SpriteMesh : ISpriteMesh
 			else
 				m_sprite.SetCamera(m_sprite.renderCamera);
 		}
-		else if (!m_sprite.hidden)
+		else
 			m_sprite.SetSize(m_sprite.width, m_sprite.height);
 
 #if SPRITE_WANT_NORMALS
@@ -185,9 +182,6 @@ public class SpriteMesh : ISpriteMesh
 
 	public virtual void SetWindingOrder(SpriteRoot.WINDING_ORDER winding)
 	{
-/*		Commented out because this should now be taken care of
- *		by the fact we now reverse the x position of the vertices.
- * 
 		if (winding == SpriteRoot.WINDING_ORDER.CCW)
 		{
 			// Counter-clockwise:
@@ -200,7 +194,6 @@ public class SpriteMesh : ISpriteMesh
 			m_faces[5] = 2;	// 4/_|5
 		}
 		else
-*/
 		{
 			// Clock-wise:
 			m_faces[0] = 0;	//	0_ 1			0 ___ 3

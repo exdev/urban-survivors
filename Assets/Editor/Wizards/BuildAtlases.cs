@@ -66,7 +66,7 @@ public class BuildAtlases : ScriptableWizard
 	public int padding = 1;				// Pixels of padding to place around each packed texture
 	public bool trimImages = true;		// Whether or not to trim blank pixels from sprite frames automatically.
 	public bool forceSquare = false;	// Force the output atlases to be square?
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE
 	public bool onlyScanProjectFolder = true;	// Scan the entire "Assets" folder for prefabs containing packable sprites.
 #else
 	public bool scanProjectFolder = false;	// Reuse the entire "Assets" folder for prefabs containing packable sprites.
@@ -195,14 +195,14 @@ public class BuildAtlases : ScriptableWizard
 			texList = null;
 
 			// Try to free some memory:
-#if !UNITY_IPHONE || UNITY_3_0
+#if !UNITY_IPHONE
 			Resources.UnloadUnusedAssets();
 #endif
 
 			++numAtlasesBuilt;
 		}
 
-#if !UNITY_IPHONE || UNITY_3_0
+#if !UNITY_IPHONE
 		// Make sure all changes to objects are committed to disk:
 		//AssetDatabase.SaveAssets();
 #endif
@@ -225,7 +225,7 @@ public class BuildAtlases : ScriptableWizard
 
 		for (int i = 0; i < o.Length; ++i)
 		{
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE
 			if (onlyScanProjectFolder)
 #else
 			if (scanProjectFolder)
@@ -239,7 +239,7 @@ public class BuildAtlases : ScriptableWizard
 				// iPhone, we can't tell if a scene instance is a
 				// prefab instance and we'll mess up prefab relationships
 				// otherwise:
-#if !UNITY_IPHONE || UNITY_3_0
+#if !UNITY_IPHONE
 				if (PrefabType.PrefabInstance != EditorUtility.GetPrefabType(o[i]))
 					sprites.Add(o[i]);
 #endif
@@ -249,7 +249,7 @@ public class BuildAtlases : ScriptableWizard
 		}
 
 		// See if we need to scan the Assets folder for sprite objects
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE
 		if (onlyScanProjectFolder)
 #else
 		if (scanProjectFolder)
@@ -487,7 +487,7 @@ public class BuildAtlases : ScriptableWizard
 		}
 		texList.trimmedTextures.Clear();
 
-#if !UNITY_IPHONE || UNITY_3_0
+#if !UNITY_IPHONE
 		Resources.UnloadUnusedAssets();
 #endif
 

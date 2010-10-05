@@ -211,7 +211,6 @@ public class SpriteTimeline : ISTE
 	Rect durationLabel;
 	Rect durationRect;
 	Rect previewButtonRect;
-	Rect clearRect;
 	Rect staticTexRect;
 	Rect timelineRect;
 	Rect timelineViewportRect;
@@ -314,7 +313,6 @@ public class SpriteTimeline : ISTE
 		durationLabel = new Rect(350, 30, 60, 20);
 		durationRect = new Rect(400, 30, 40, 20);
 		previewButtonRect = new Rect(400, 5, 60, 20);
-		clearRect = new Rect(5, 50, 30, 20);
 		staticTexRect = new Rect(40, 50, 200, 20);
 #else
 		addBtnRect = new Rect(5, 5, 20, 20);
@@ -599,11 +597,6 @@ public class SpriteTimeline : ISTE
 		// Draw the static texture selection box:
 		if (sprite is PackedSprite)
 		{
-#if UNITY_IPHONE && !UNITY_3_0
-			// Draw a "clear" button:
-			if(GUI.Button(clearRect, "X"))
-				((PackedSprite)sprite).staticTexGUID = System.Guid.Empty.ToString();
-#endif
 			staticTexture = (Texture2D)EditorGUI.ObjectField(staticTexRect, "Static Texture:", AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(((PackedSprite)sprite).staticTexGUID), typeof(Texture2D)), typeof(Texture2D));
 			((PackedSprite)sprite).staticTexPath = AssetDatabase.GetAssetPath(staticTexture);
 			((PackedSprite)sprite).staticTexGUID = AssetDatabase.AssetPathToGUID(((PackedSprite)sprite).staticTexPath);

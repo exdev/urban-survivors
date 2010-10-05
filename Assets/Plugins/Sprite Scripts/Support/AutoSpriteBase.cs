@@ -62,7 +62,7 @@ public class TextureAnim
 	// point to the UV locations of where the textures were placed on 
 	// the atlas.
 	[HideInInspector]
-	public CSpriteFrame[] spriteFrames;		// Array that parallels the Texture2D frameGUIDs array and holds the post-packing atlas UV coords for the given frame
+	public CSpriteFrame[] spriteFrames;		// Array that parallels the Texture2D frames array and holds the post-packing atlas UV coords for the given frame
 
 	// Allocates enough elements in each of the "frame info" fields
 	// to hold info for each animation frame specified in "frames":
@@ -205,26 +205,9 @@ public abstract class AutoSpriteBase : SpriteBase, ISpriteAggregator
 			return Vector2.zero;
 		if (a.frameGUIDs.Length == 0)
 			return Vector2.zero;
-		if(f == null)
-		{
-			Debug.LogWarning("Sprite \"" + name + "\" does not seem to have been built to an atlas yet.");
-			return Vector2.zero;
-		}
-
-		Vector2 size = Vector2.zero;
 
 		Texture2D tex = (Texture2D) loader(guid2Path(a.frameGUIDs[0]), typeof(Texture2D));
-
-		if(tex == null)
-		{
-			if(spriteMesh != null)
-			{
-				tex = (Texture2D)spriteMesh.material.GetTexture("_MainTex");
-				size = new Vector2(f.uvs.width * tex.width, f.uvs.height * tex.height);
-			}
-		}
-		else
-			size = new Vector2(tex.width * (1f / (f.scaleFactor.x * 2f)), tex.height * (1f / (f.scaleFactor.y * 2f)));
+		Vector2 size = new Vector2(tex.width * (1f / (f.scaleFactor.x * 2f)), tex.height * (1f / (f.scaleFactor.y * 2f)));
 
 		return size;
 	}
@@ -341,20 +324,19 @@ public abstract class AutoSpriteBase : SpriteBase, ISpriteAggregator
 
 		sp = (AutoSpriteBase)s;
 
+		if (sp.animations.Length > 0)
+		{
+			animations = new UVAnimation[sp.animations.Length];
+			for (int i = 0; i < animations.Length; ++i)
+				animations[i] = sp.animations[i].Clone();
+		}
+
 		States = new TextureAnim[sp.States.Length];
 
-		for (int i = 0; i < States.Length; ++i)
+		for(int i=0; i<States.Length; ++i)
 		{
 			States[i] = new TextureAnim();
 			States[i].Copy(sp.States[i]);
-		}
-
-		animations = new UVAnimation[States.Length];
-
-		for (int i = 0; i < States.Length; ++i)
-		{
-			animations[i] = new UVAnimation();
-			animations[i].SetAnim(States[i], i);
 		}
 	}
 
@@ -401,7 +383,6 @@ public abstract class AutoSpriteBase : SpriteBase, ISpriteAggregator
 						PauseAnim();
 
 						// Update mesh UVs:
-						uvRect = frameInfo.uvs;
 						SetBleedCompensation();
 
 						// Resize if selected:
@@ -948,10 +929,6 @@ public abstract class AutoSpriteBase : SpriteBase, ISpriteAggregator
 			else
 			{
 				States[i].frameGUIDs = new string[States[i].framePaths.Length];
-
-				States[i].spriteFrames = new CSpriteFrame[States[i].framePaths.Length];
-				for (int j = 0; j < States[i].spriteFrames.Length; ++j)
-					States[i].spriteFrames[j] = new CSpriteFrame();
 
 				for (int j = 0; j < States[i].framePaths.Length; ++j)
 				{

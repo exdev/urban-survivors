@@ -592,15 +592,18 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	/// <summary>
 	/// Automatically sizes the sprite so that it will 
 	/// display pixel-perfect on-screen.
-	/// NOTE: If you change the orthographic size of 
-	/// the camera or the distance between the text 
-	/// and a perspective camera, call SetCamera()
-	/// to make the text pixel-perfect again.
+	/// NOTE: Only use this when you are using an orthographic 
+	/// projection.  Also note that if you change the
+	/// orthographic size of the camera to achieve a zooming
+	/// effect, sprites set to render pixel-perfect will
+	/// not appear to change size on-screen as they will be
+	/// scaled to always draw the same visible size. This
+	/// can be useful for things such as UI elements.
 	/// However, if you want automatic resizing functionality
 	/// without being pixel-perfect and therefore allowing
 	/// zooming in and out, use <see cref="autoResize"/> instead.
 	/// </summary>
-	public bool pixelPerfect = false;			// Automatically sizes the sprite so that it will display pixel-perfect on-screen
+	public bool pixelPerfect = false;			// Automatically sizes the sprite so that it will display pixel-perfect on-screen (NOTE: Only use this when you are using an orthographic projection)
 
 	/// <summary>
 	/// Automatically resizes the sprite based on its new 
@@ -629,13 +632,6 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	// (bottom-right) "
 	protected Vector2 brTruncate = new Vector2(1f, 1f);
 	protected bool truncated;					// Keeps track of whether truncation is to be applied - gets set to true when any truncation value is set to anything other than 1.0.
-	protected Rect clippingRect;				// Rect against which the sprite will be clipped.
-	protected Rect localClipRect;				// Will hold clippingRect in local space.
-	protected float leftClipPct = 1f;			// The percentage of the sprite that remains unclipped
-	protected float rightClipPct= 1f;			// The percentage of the sprite that remains unclipped
-	protected float topClipPct = 1f;			// The percentage of the sprite that remains unclipped
-	protected float bottomClipPct = 1f;			// The percentage of the sprite that remains unclipped
-	protected bool clipped = false;				// Keeps track of whether we are to be clipped by a bounding box
 
 	[HideInInspector]
 	public bool billboarded = false;			// Is the sprite to be billboarded? (not currently supported)
@@ -675,7 +671,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	protected Rect prevUVRect;					// The previous UV rect
 	[HideInInspector]
 	public Vector2 pixelsPerUV;				// The number of pixels in both axes per UV unit
-	protected float worldUnitsPerScreenPixel;	// The number of world units in both axes per screen pixel
+	protected float worldUnitsPerScreenPixel;	// The number of world units in both axes per screen pixel when using orthographic projections
 
 	protected SpriteResizedDelegate resizedDelegate = null; // Delegate to be called upon sprite resizing.
 
@@ -700,11 +696,11 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	{
 		// This will get reset SetCamera() in Start() (if running the game),
 		// or in Start() via OnDrawGizmos() if the game isn't running.
-		screenSize.x = 0;
-		screenSize.y = 0;
+		//screenSize.x = 0;
+		//screenSize.y = 0;
 
 		// Determine if we are a clone:
-		if (name.EndsWith("(Clone)"))
+		if (name.Contains("(Clone)"))
 			isClone = true;
 
 		if (!managed)
@@ -754,7 +750,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 			DontDestroyOnLoad(this);
 		}
 
-		prevUVRect = frameInfo.uvs;
+		prevUVRect = uvRect;
 
 		if (m_spriteMesh == null && !managed)
 			AddMesh();
@@ -816,9 +812,9 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		// Copy the material:
 		if (!managed)
 		{
-			if (m_spriteMesh != null && s.spriteMesh != null)
+			if(m_spriteMesh != null && s.spriteMesh != null)
 				((SpriteMesh)m_spriteMesh).material = s.spriteMesh.material;
-			else if (!s.managed)
+			else if(!s.managed)
 			{
 				renderer.sharedMaterial = s.renderer.sharedMaterial;
 			}
@@ -827,21 +823,11 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		drawLayer = s.drawLayer;
 
 		// Copy the camera:
-		if (s.renderCamera != null)
-			SetCamera(s.renderCamera);
-		if (renderCamera == null)
-			renderCamera = Camera.main;
+		SetCamera(s.camera);
 
-		if (m_spriteMesh != null)
-		{
+		if(m_spriteMesh != null)
 			if (m_spriteMesh.texture != null)
 				SetPixelToUV(m_spriteMesh.texture);
-			else if (!managed)
-			{
-				((SpriteMesh)m_spriteMesh).material = renderer.sharedMaterial;
-				SetPixelToUV(m_spriteMesh.texture);
-			}
-		}
 
 		plane = s.plane;
 		winding = s.winding;
@@ -855,9 +841,6 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		scaleFactor = s.scaleFactor;
 		topLeftOffset = s.topLeftOffset;
 		bottomRightOffset = s.bottomRightOffset;
-
-		width = s.width;
-		height = s.height;
 
 		SetColor(s.color);
 	}
@@ -891,7 +874,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	{
 		// Only do this at runtime, or else some managed 
 		// sprites will disappear inexplicably:
-		//if (Application.isPlaying)
+		if (Application.isPlaying)
 		{
 			if (managed && manager != null && m_started)
 				manager.AddSprite(this);
@@ -904,7 +887,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	{
 		// Only do this at runtime, or else some managed 
 		// sprites will disappear inexplicably:
-		//if (Application.isPlaying)
+		if (Application.isPlaying)
 		{
 			// Make sure if we are being deleted that
 			// we are removed from the manager so that
@@ -1015,74 +998,13 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		{
 			// If we haven't already adjusted the size
 			// based on our UV truncation:
-			topLeft.x = bottomRight.x - (bottomRight.x - topLeft.x) * tlTruncate.x;
-			topLeft.y = bottomRight.y - (bottomRight.y - topLeft.y) * tlTruncate.y;
-			bottomRight.x = topLeft.x - (topLeft.x - bottomRight.x) * brTruncate.x;
-			bottomRight.y = topLeft.y - (topLeft.y - bottomRight.y) * brTruncate.y;
-		}
-
-		// If we're clipping and our sprite isn't of 0 size on one or more sides:
-		if(clipped && bottomRight.x - topLeft.x != 0 && topLeft.y - bottomRight.y != 0)
-		{
-			Vector3 origTL = topLeft;
-			Vector3 origBR = bottomRight;
-
-			// Clip the sprite horizontally:
-			if (topLeft.x < localClipRect.x)
+			if (!pixelPerfect && !autoResize)
 			{
-				// Trim the sprite:
-				leftClipPct = 1f - (localClipRect.x - origTL.x) / (origBR.x - origTL.x);
-				topLeft.x = Mathf.Clamp(localClipRect.x, origTL.x, origBR.x);
-
-				if (leftClipPct <= 0)
-					topLeft.x = bottomRight.x = localClipRect.x;
+				topLeft.x = bottomRight.x - (bottomRight.x - topLeft.x) * tlTruncate.x;
+				topLeft.y = bottomRight.y - (bottomRight.y - topLeft.y) * tlTruncate.y;
+				bottomRight.x = topLeft.x - (topLeft.x - bottomRight.x) * brTruncate.x;
+				bottomRight.y = topLeft.y - (topLeft.y - bottomRight.y) * brTruncate.y;
 			}
-			else
-				leftClipPct = 1;
-
-			if (bottomRight.x > localClipRect.xMax)
-			{
-				// Trim the sprite:
-				rightClipPct = (localClipRect.xMax - origTL.x) / (origBR.x - origTL.x);
-				bottomRight.x = Mathf.Clamp(localClipRect.xMax, origTL.x, origBR.x);
-
-				if (rightClipPct <= 0)
-					bottomRight.x = topLeft.x = localClipRect.xMax;
-			}
-			else
-				rightClipPct = 1;
-
-			// Clip the sprite vertically:
-			if (topLeft.y > localClipRect.yMax)
-			{
-				// Trim the sprite:
-				topClipPct = (localClipRect.yMax - origBR.y) / (origTL.y - origBR.y);
-				topLeft.y = Mathf.Clamp(localClipRect.yMax, origBR.y, origTL.y);
-
-				if (topClipPct <= 0)
-					topLeft.y = bottomRight.y = localClipRect.yMax;
-			}
-			else
-				topClipPct = 1;
-
-			if (bottomRight.y < localClipRect.y)
-			{
-				// Trim the sprite:
-				bottomClipPct = 1f - (localClipRect.y - origBR.y) / (origTL.y - origBR.y);
-				bottomRight.y = Mathf.Clamp(localClipRect.y, origBR.y, origTL.y);
-
-				if (bottomClipPct <= 0)
-					bottomRight.y = topLeft.y = localClipRect.y;
-			}
-			else
-				bottomClipPct = 1;
-		}
-
-		// Reverse the X positions if the winding order is CCW:
-		if(winding == WINDING_ORDER.CCW)
-		{
-			topLeft.x *= -1f;
-			bottomRight.x *= -1f;
 		}
 	}
 
@@ -1104,9 +1026,9 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		if (pixelPerfect)
 		{
 			// Calculate the size based on the orthographic size:
-			//worldUnitsPerScreenPixel = (renderCamera.orthographicSize * 2f) / screenSize.y;
-			width = worldUnitsPerScreenPixel * frameInfo.uvs.width * pixelsPerUV.x;
-			height = worldUnitsPerScreenPixel * frameInfo.uvs.height * pixelsPerUV.y;
+			worldUnitsPerScreenPixel = (renderCamera.orthographicSize * 2f) / screenSize.y;
+			width = worldUnitsPerScreenPixel * uvRect.width * pixelsPerUV.x;
+			height = worldUnitsPerScreenPixel * uvRect.height * pixelsPerUV.y;
 		}
 		else if (autoResize) // Else calculate the size based on the change in UV dimensions:
 		{
@@ -1114,8 +1036,8 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 			if (prevUVRect.width != 0 && prevUVRect.height != 0)
 			{
 				// Find the percentage change in the UV:
-				tempUV.x = frameInfo.uvs.width / prevUVRect.width;
-				tempUV.y = frameInfo.uvs.height / prevUVRect.height;
+				tempUV.x = uvRect.width / prevUVRect.width;
+				tempUV.y = uvRect.height / prevUVRect.height;
 
 				// Change the width and height accordingly:
 				width *= tempUV.x;
@@ -1128,7 +1050,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		// this method is called again without 
 		// there being a UV change, we don't
 		// continue to resize the sprite:
-		prevUVRect = frameInfo.uvs;
+		prevUVRect = uvRect;
 
 		SetSize(width, height);
 	}
@@ -1171,51 +1093,25 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 
 		Vector3[] vertices = m_spriteMesh.vertices;
 
-		if(winding == WINDING_ORDER.CW)
-		{
-			// Upper-left
-			vertices[0].x = offset.x + topLeft.x;
-			vertices[0].y = offset.y + topLeft.y;
-			vertices[0].z = offset.z;
+		// Upper-left
+		vertices[0].x = offset.x + topLeft.x;
+		vertices[0].y = offset.y + topLeft.y;
+		vertices[0].z = offset.z;
 
-			// Lower-left
-			vertices[1].x = offset.x + topLeft.x;
-			vertices[1].y = offset.y + bottomRight.y;
-			vertices[1].z = offset.z;
+		// Lower-left
+		vertices[1].x = offset.x + topLeft.x;
+		vertices[1].y = offset.y + bottomRight.y;
+		vertices[1].z = offset.z;
 
-			// Lower-right
-			vertices[2].x = offset.x + bottomRight.x;
-			vertices[2].y = offset.y + bottomRight.y;
-			vertices[2].z = offset.z;
+		// Lower-right
+		vertices[2].x = offset.x + bottomRight.x;
+		vertices[2].y = offset.y + bottomRight.y;
+		vertices[2].z = offset.z;
 
-			// Upper-right
-			vertices[3].x = offset.x + bottomRight.x;
-			vertices[3].y = offset.y + topLeft.y;
-			vertices[3].z = offset.z;
-		}
-		else
-		{
-			// Upper-left
-			vertices[0].x = offset.x + topLeft.x;
-			vertices[0].y = offset.y + topLeft.y;
-			vertices[0].z = offset.z;
-
-			// Lower-left
-			vertices[1].x = offset.x + topLeft.x;
-			vertices[1].y = offset.y + bottomRight.y;
-			vertices[1].z = offset.z;
-
-			// Lower-right
-			vertices[2].x = offset.x + bottomRight.x;
-			vertices[2].y = offset.y + bottomRight.y;
-			vertices[2].z = offset.z;
-
-			// Upper-right
-			vertices[3].x = offset.x + bottomRight.x;
-			vertices[3].y = offset.y + topLeft.y;
-			vertices[3].z = offset.z;
-
-		}
+		// Upper-right
+		vertices[3].x = offset.x + bottomRight.x;
+		vertices[3].y = offset.y + topLeft.y;
+		vertices[3].z = offset.z;
 
 		m_spriteMesh.UpdateVerts();
 	}
@@ -1392,22 +1288,6 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	}
 
 	/// <summary>
-	/// Removes any clipping that is being applied to the
-	/// sprite.
-	/// </summary>
-	public virtual void Unclip()
-	{
-		leftClipPct = 0;
-		rightClipPct = 0;
-		topClipPct = 0;
-		bottomClipPct = 0;
-		clipped = false;
-		uvRect = frameInfo.uvs;// Need to make sure we reset
-		SetBleedCompensation();// Redo bleed compensation since we just re-copied the raw framinfo which lacks this
-		CalcSize();
-	}
-
-	/// <summary>
 	/// Applies any changes to the UVs to the actual sprite mesh.
 	/// </summary>
 	public virtual void UpdateUVs()
@@ -1419,17 +1299,10 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		// Truncate our UVs if needed:
 		if (truncated)
 		{
-			uvRect.x = frameInfo.uvs.xMax - (frameInfo.uvs.width) * tlTruncate.x * leftClipPct;
-			uvRect.y = frameInfo.uvs.yMax - (frameInfo.uvs.height) * brTruncate.y * bottomClipPct;
-			uvRect.xMax = frameInfo.uvs.x - (-frameInfo.uvs.width) * brTruncate.x * rightClipPct;
-			uvRect.yMax = frameInfo.uvs.y - (-frameInfo.uvs.height) * tlTruncate.y * topClipPct;
-		}
-		else if(clipped)
-		{
-			uvRect.x = Mathf.Lerp(frameInfo.uvs.xMax, frameInfo.uvs.x, leftClipPct);
-			uvRect.y = Mathf.Lerp(frameInfo.uvs.yMax, frameInfo.uvs.y, bottomClipPct);
-			uvRect.xMax = Mathf.Lerp(frameInfo.uvs.x, frameInfo.uvs.xMax, rightClipPct);
-			uvRect.yMax = Mathf.Lerp(frameInfo.uvs.y, frameInfo.uvs.yMax, topClipPct);
+			uvRect.x = frameInfo.uvs.xMax - (frameInfo.uvs.width) * tlTruncate.x;
+			uvRect.y = frameInfo.uvs.yMax - (frameInfo.uvs.height) * brTruncate.y;
+			uvRect.xMax = frameInfo.uvs.x - (-frameInfo.uvs.width) * brTruncate.x;
+			uvRect.yMax = frameInfo.uvs.y - (-frameInfo.uvs.height) * tlTruncate.y;
 		}
 
 		if (m_spriteMesh == null)
@@ -1437,15 +1310,13 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 
 		Vector2[] uvs = m_spriteMesh.uvs;
 
-//		if (winding == WINDING_ORDER.CW)
+		if (winding == WINDING_ORDER.CW)
 		{
 			uvs[0].x = uvRect.x; uvs[0].y = uvRect.yMax;
 			uvs[1].x = uvRect.x; uvs[1].y = uvRect.y;
 			uvs[2].x = uvRect.xMax; uvs[2].y = uvRect.y;
 			uvs[3].x = uvRect.xMax; uvs[3].y = uvRect.yMax;
 		}
-/*	Commented out because this should now be addressed by
- *  the fact that we reverse the X position of the vertices.
 		else
 		{
 			uvs[3].x = uvRect.x; uvs[3].y = uvRect.yMax;
@@ -1453,7 +1324,6 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 			uvs[1].x = uvRect.xMax; uvs[1].y = uvRect.y;
 			uvs[0].x = uvRect.xMax; uvs[0].y = uvRect.yMax;
 		}
-*/
 
 		m_spriteMesh.UpdateUVs();
 	}
@@ -1478,7 +1348,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	/// Sets the sprite's color to the specified color.
 	/// </summary>
 	/// <param name="c">Color to shade the sprite.</param>
-	public virtual void SetColor(Color c)
+	public void SetColor(Color c)
 	{
 		color = c;
 
@@ -1504,15 +1374,15 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	// pixel-perfect sprite size:
 	/// <summary>
 	/// Sets the camera to use when calculating
-	/// a pixel-perfect sprite size.
+	/// a pixel-perfect sprite size. Be sure
+	/// that this camera is set to use an orthographic
+	/// projection.
 	/// </summary>
 	/// <param name="c"></param>
 	public void SetCamera(Camera c)
 	{
-		if (c == null || !m_started)
+		if (c == null)
 			return;
-
-		float dist;
 
 		if (!Application.isPlaying)
 		{
@@ -1530,21 +1400,9 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 				return;
 
 			renderCamera = c;
-
-			// Determine the world distance between two vertical
-			// screen pixels for this camera:
-			dist = Vector3.Distance(c.transform.position, transform.position);
-			worldUnitsPerScreenPixel = Vector3.Distance(c.ScreenToWorldPoint(new Vector3(0, 1, dist)), c.ScreenToWorldPoint(new Vector3(0, 0, dist)));
-
-			if(!hidden)
-				CalcSize();
+			CalcSize();
 			return;
 		}
-
-		// Determine the world distance between two vertical
-		// screen pixels for this camera:
-		dist = Vector3.Distance(c.transform.position, transform.position);
-		worldUnitsPerScreenPixel = Vector3.Distance(c.ScreenToWorldPoint(new Vector3(0, 1, dist)), c.ScreenToWorldPoint(new Vector3(0, 0, dist)));
 
 		screenSize.x = c.pixelWidth;
 		screenSize.y = c.pixelHeight;
@@ -1552,15 +1410,15 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		CalcSize();
 	}
 
+	// Hides the sprite by disabling the mesh renderer:
 	/// <summary>
 	/// Hides or displays the sprite by disabling/enabling
-	/// the sprite's mesh renderer component, or if managed,
-	/// sets the mesh size to 0.
+	/// the sprite's mesh renderer component.
 	/// </summary>
 	/// <param name="tf">When true, the sprite is hidden, when false, the sprite will be displayed.</param>
 	public virtual void Hide(bool tf)
 	{
-		if (m_spriteMesh != null)
+		if(m_spriteMesh != null)
 			m_spriteMesh.Hide(tf);
 	}
 
@@ -1802,48 +1660,6 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 				return new Vector3(offset.x, verts[0].y - 0.5f * (verts[0].y - verts[2].y), verts[0].z - 0.5f * (verts[0].z - verts[2].z));
 			default:
 				return new Vector3(verts[0].x + 0.5f * (verts[2].x - verts[0].x), verts[0].y - 0.5f * (verts[0].y - verts[2].y), offset.z);
-		}
-	}
-
-	/// <summary>
-	/// The rect against which the sprite should be clipped.  
-	/// The sprite will be immediately clipped by this rect when set.
-	/// When setting, the rect should be in world space.
-	/// </summary>
-	public virtual Rect ClippingRect
-	{
-		get { return clippingRect; }
-		set
-		{
-			clippingRect = value;
-
-			Vector3 ul = transform.InverseTransformPoint(new Vector3(clippingRect.x, clippingRect.yMax));
-			Vector3 br = transform.InverseTransformPoint(new Vector3(clippingRect.xMax, clippingRect.y));
-			localClipRect = Rect.MinMaxRect(ul.x, br.y, br.x, ul.y);
-
-			clipped = true;
-			CalcSize();
-			UpdateUVs();
-		}
-	}
-
-
-	/// <summary>
-	/// Accessor for whether the sprite is to be clipped
-	/// by any already-specified clipping rect.
-	/// </summary>
-	public virtual bool Clipped
-	{
-		get { return clipped; }
-		set
-		{
-			if (value && !clipped)
-			{
-				clipped = true;
-				CalcSize();
-			}
-			else if (clipped)
-				Unclip();
 		}
 	}
 
