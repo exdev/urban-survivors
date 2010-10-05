@@ -35,8 +35,23 @@ public class SuperSpriteAnimElement
 
 	public void Init()
 	{
-		if(sprite != null)
+		bool wasDeactivated = false;
+
+		if (sprite != null)
+		{
+			// See if we need to activate our sprite
+			// to work with it:
+			if(!sprite.gameObject.active)
+			{
+				wasDeactivated = true;
+				sprite.gameObject.active = true;
+			}
+
 			anim = sprite.GetAnim(animName);
+
+			if (wasDeactivated)
+				sprite.gameObject.active = false;
+		}
 	}
 
 	/// <summary>
@@ -71,6 +86,33 @@ public class SuperSpriteAnimElement
 [System.Serializable]
 public class SuperSpriteAnim
 {
+	/// <remarks>
+	/// The action to take when an animation ends.
+	/// </remarks>
+	public enum ANIM_END_ACTION
+	{
+		/// <summary>
+		/// Do nothing when the animation ends.
+		/// </summary>
+		Do_Nothing,
+
+		/// <summary>
+		/// Play the default animation when the animation ends.
+		/// </summary>
+		Play_Default_Anim,
+
+		/// <summary>
+		/// Deactivate the SuperSprite when the animation ends 
+		/// (sets the GameObject's .active property to false).
+		/// </summary>
+		Deactivate,
+
+		/// <summary>
+		/// Destroys the SuperSprite when the animation ends.
+		/// </summary>
+		Destroy
+	};
+	
 	public delegate void AnimCompletedDelegate(SuperSpriteAnim anim);
 
 	/// <summary>
@@ -111,6 +153,24 @@ public class SuperSpriteAnim
 	/// </summary>
 	public bool pingPong = false;
 
+	/// <summary>
+	/// What the SuperSprite should do when the animation is done playing.
+	/// </summary>
+	public ANIM_END_ACTION onAnimEnd = ANIM_END_ACTION.Do_Nothing;
+
+	/// <summary>
+	/// When set to true, non-playing sprites' GameObjects will be 
+	/// deactivated and not merely hidden.
+	/// </summary>
+	public bool deactivateNonPlaying = false;
+
+	/// <summary>
+	/// When set to true, non-playing sprites' GameObjecs will be
+	/// deactivated recursively.
+	/// NOTE: Only has effect if deactivateNonPlaying is set to true.
+	/// </summary>
+	public bool deactivateRecursively = false;
+
 	protected int curAnim = 0;		// The index of the current anim being played.
 	protected int stepDir = 1;		// The direction we're moving through our list.
 	protected int numLoops = 0;		// The number of loop iterations that have passed
@@ -135,6 +195,9 @@ public class SuperSpriteAnim
 					// so we don't have to check them
 					// constantly later on:
 					anims.Add(spriteAnims[i]);
+					
+					// Hide each sprite by default:
+					HideSprite(spriteAnims[i].sprite, true);
 				}
 
 		spriteAnims = anims.ToArray();
@@ -196,7 +259,7 @@ public class SuperSpriteAnim
 					else
 					{
 						// Hide the current sprite
-						sp.Hide(true);
+						HideSprite(sp, true);
 
 						// Unset our delegate:
 						sp.SetAnimCompleteDelegate(null);
@@ -211,12 +274,12 @@ public class SuperSpriteAnim
 		{
 			// Unset our delegate:
 			sp.SetAnimCompleteDelegate(null);
-			sp.Hide(true);
+			HideSprite(sp, true);
 			curAnim += stepDir;
 		}
 		
 		// Proceed to play the next animation:
-		spriteAnims[curAnim].sprite.Hide(false);
+		HideSprite(spriteAnims[curAnim].sprite, false);
 		spriteAnims[curAnim].sprite.SetAnimCompleteDelegate(AnimFinished);
 		if (stepDir > 0)
 			spriteAnims[curAnim].Play();
@@ -238,7 +301,7 @@ public class SuperSpriteAnim
 
 		// Hide all but the first:
 		for (int i = 1; i < spriteAnims.Length; ++i)
-			spriteAnims[i].sprite.Hide(true);
+			HideSprite(spriteAnims[i].sprite, true);
 	}
 
 	/// <summary>
@@ -256,7 +319,7 @@ public class SuperSpriteAnim
 		// Register our ending delegate:
 		spriteAnims[curAnim].sprite.SetAnimCompleteDelegate(AnimFinished);
 
-		spriteAnims[curAnim].sprite.Hide(false);
+		HideSprite(spriteAnims[curAnim].sprite, false);
 		spriteAnims[curAnim].Play();
 	}
 
@@ -323,7 +386,7 @@ public class SuperSpriteAnim
 		if (curAnim < 0 || curAnim >= spriteAnims.Length)
 			return;
 
-		spriteAnims[curAnim].sprite.Hide(tf);
+		HideSprite(spriteAnims[curAnim].sprite, tf);
 	}
 
 	/// <summary>
@@ -337,6 +400,32 @@ public class SuperSpriteAnim
 			return false; // Assume no
 
 		return spriteAnims[curAnim].sprite.IsHidden();
+	}
+
+	// Helper method that hides a sprite using the method
+	// set for this animation (hiding vs deactivation).
+	protected void HideSprite(SpriteBase sp, bool tf)
+	{
+		if (deactivateNonPlaying)
+			if (deactivateRecursively)
+				sp.gameObject.SetActiveRecursively(!tf);
+			else
+				sp.gameObject.active = !tf;
+		else
+			sp.Hide(tf);
+	}
+
+	/// <summary>
+	/// Calls Delete() on each constituent sprite.
+	/// </summary>
+	public void Delete()
+	{
+		for(int i=0; i<spriteAnims.Length; ++i)
+			if (spriteAnims[i].sprite != null)
+			{
+				spriteAnims[i].sprite.Delete();
+				UnityEngine.Object.Destroy(spriteAnims[i].sprite);
+			}
 	}
 }
 
@@ -352,6 +441,15 @@ public class SuperSpriteAnim
 [System.Serializable]
 public class SuperSprite : MonoBehaviour 
 {
+	/// <remarks>
+	/// Defines a delegate that can be called upon animation completion.
+	/// Use this if you want something to happen as soon as an animation
+	/// reaches the end.  Receives a reference to the SuperSprite.
+	/// </remarks>
+	/// <param name="sprite">A reference to the SuperSprite whose animation has finished.</param>
+	public delegate void AnimCompleteDelegate(SuperSprite sprite);
+
+
 	/// <summary>
 	/// Whether or not to play the default animation
 	/// when the object is started.
@@ -372,6 +470,8 @@ public class SuperSprite : MonoBehaviour
 	protected SuperSpriteAnim curAnim;
 
 	protected bool animating;
+
+	protected AnimCompleteDelegate animCompleteDelegate;
 
 
 	// Use this for initialization
@@ -394,6 +494,9 @@ public class SuperSprite : MonoBehaviour
 	/// <param name="anim">The SuperSprite animation to be played.</param>
 	public void PlayAnim(SuperSpriteAnim anim)
 	{
+		if (curAnim != null)
+			curAnim.Hide(true);
+
 		curAnim = anim;
 		curAnim.Reset();
 
@@ -501,7 +604,7 @@ public class SuperSprite : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Hides 
+	/// Hides the SuperSprite.
 	/// </summary>
 	/// <param name="tf"></param>
 	public void Hide(bool tf)
@@ -604,5 +707,41 @@ public class SuperSprite : MonoBehaviour
 	protected void AnimFinished(SuperSpriteAnim anim)
 	{
 		animating = false;
+
+		if (animCompleteDelegate != null)
+			animCompleteDelegate(this);
+
+		// Handle the OnAnimEnd action:
+		if(curAnim != null)
+		{
+			switch(curAnim.onAnimEnd)
+			{
+				case SuperSpriteAnim.ANIM_END_ACTION.Play_Default_Anim:
+					PlayAnim(defaultAnim);
+					break;
+				case SuperSpriteAnim.ANIM_END_ACTION.Deactivate:
+					gameObject.SetActiveRecursively(false);
+					break;
+				case SuperSpriteAnim.ANIM_END_ACTION.Destroy:
+					for (int i = 0; i < animations.Length; ++i)
+						animations[i].Delete();
+
+					Destroy(gameObject);
+					break;
+				default:
+					// Do nothing
+					break;
+			}
+		}
+	}
+
+
+	/// <summary>
+	/// Sets the delegate to be called upon animation completion.
+	/// </summary>
+	/// <param name="del">The delegate to be called when an animation finishes playing.</param>
+	public void SetAnimCompleteDelegate(AnimCompleteDelegate del)
+	{
+		animCompleteDelegate = del;
 	}
 }

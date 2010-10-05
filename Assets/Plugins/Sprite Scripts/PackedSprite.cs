@@ -114,9 +114,9 @@ public class PackedSprite : AutoSpriteBase
 	/// <param name="s">A reference to the sprite to be copied.</param>
 	public override void Copy(SpriteRoot s)
 	{
-		PackedSprite sp;
-
 		base.Copy(s);
+
+		PackedSprite sp;
 
 		// Check the type:
 		if (!(s is PackedSprite))
@@ -194,6 +194,10 @@ public class PackedSprite : AutoSpriteBase
 			{
 				textureAnimations[i].frameGUIDs = new string[textureAnimations[i].framePaths.Length];
 
+				textureAnimations[i].spriteFrames = new CSpriteFrame[textureAnimations[i].framePaths.Length];
+				for (int j = 0; j < textureAnimations[i].spriteFrames.Length; ++j)
+					textureAnimations[i].spriteFrames[j] = new CSpriteFrame();
+
 				for (int j = 0; j < textureAnimations[i].framePaths.Length; ++j)
 				{
 					if (textureAnimations[i].framePaths[j].Length < 1)
@@ -225,5 +229,36 @@ public class PackedSprite : AutoSpriteBase
 
 		sourceTextures = texList.ToArray();
 		spriteFrames = frameList.ToArray();
+	}
+
+
+	/// <summary>
+	/// Creates a GameObject and attaches this
+	/// component type to it.
+	/// </summary>
+	/// <param name="name">Name to give to the new GameObject.</param>
+	/// <param name="pos">Position, in world space, where the new object should be created.</param>
+	/// <returns>Returns a reference to the component.</returns>
+	static public PackedSprite Create(string name, Vector3 pos)
+	{
+		GameObject go = new GameObject(name);
+		go.transform.position = pos;
+		return (PackedSprite)go.AddComponent(typeof(PackedSprite));
+	}
+
+	/// <summary>
+	/// Creates a GameObject and attaches this
+	/// component type to it.
+	/// </summary>
+	/// <param name="name">Name to give to the new GameObject.</param>
+	/// <param name="pos">Position, in world space, where the new object should be created.</param>
+	/// <param name="rotation">Rotation of the object.</param>
+	/// <returns>Returns a reference to the component.</returns>
+	static public PackedSprite Create(string name, Vector3 pos, Quaternion rotation)
+	{
+		GameObject go = new GameObject(name);
+		go.transform.position = pos;
+		go.transform.rotation = rotation;
+		return (PackedSprite)go.AddComponent(typeof(PackedSprite));
 	}
 }

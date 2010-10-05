@@ -134,13 +134,13 @@ public class Sprite : SpriteBase
 	{
 		Sprite sp;
 
+		base.Copy(s);
+
 		// Check the type:
 		if (!(s is Sprite))
 			return;
 
 		sp = (Sprite)s;
-
-		base.Copy(s);
 
 		lowerLeftPixel = sp.lowerLeftPixel;
 		pixelDimensions = sp.pixelDimensions;
@@ -287,6 +287,7 @@ public class Sprite : SpriteBase
 						PauseAnim();
 
 						// Update mesh UVs:
+						uvRect = frameInfo.uvs;
 						SetBleedCompensation();
 
 						// Resize if selected:
@@ -833,6 +834,37 @@ public class Sprite : SpriteBase
 			Init();
 			mirror.Mirror(this);	// Update the mirror
 		}
+	}
+
+
+	/// <summary>
+	/// Creates a GameObject and attaches this
+	/// component type to it.
+	/// </summary>
+	/// <param name="name">Name to give to the new GameObject.</param>
+	/// <param name="pos">Position, in world space, where the new object should be created.</param>
+	/// <returns>Returns a reference to the component.</returns>
+	static public Sprite Create(string name, Vector3 pos)
+	{
+		GameObject go = new GameObject(name);
+		go.transform.position = pos;
+		return (Sprite)go.AddComponent(typeof(Sprite));
+	}
+
+	/// <summary>
+	/// Creates a GameObject and attaches this
+	/// component type to it.
+	/// </summary>
+	/// <param name="name">Name to give to the new GameObject.</param>
+	/// <param name="pos">Position, in world space, where the new object should be created.</param>
+	/// <param name="rotation">Rotation of the object.</param>
+	/// <returns>Returns a reference to the component.</returns>
+	static public Sprite Create(string name, Vector3 pos, Quaternion rotation)
+	{
+		GameObject go = new GameObject(name);
+		go.transform.position = pos;
+		go.transform.rotation = rotation;
+		return (Sprite)go.AddComponent(typeof(Sprite));
 	}
 }
 

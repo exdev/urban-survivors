@@ -309,6 +309,70 @@ public class UVAnimation
 		return frames;
 	}
 
+
+	/// <summary>
+	/// Constructs an array of frames based upon the info
+	/// supplied.  NOTE: When the edge of the texture is reached,
+	/// this algorithm will "wrap" to the extreme left edge of the
+	/// atlas.
+	/// </summary>
+	/// <param name="start">The UV of the lower-left corner of the first cell</param>
+	/// <param name="cellSize">width and height, in UV space, of each cell</param>
+	/// <param name="cols">This argument is ignored but retained for compatibility.</param>
+	/// <param name="rows">This argument is ignored but retained for compatibility.</param>
+	/// <param name="totalCells">Total number of cells in the in the animation.</param>
+	/// <returns>Array of SPRITE_FRAME objects that contain the UVs of each frame of animation.</returns>
+	public SPRITE_FRAME[] BuildWrappedUVAnim(Vector2 start, Vector2 cellSize, int cols, int rows, int totalCells)
+	{
+		return BuildWrappedUVAnim(start, cellSize, totalCells);
+	}
+
+
+	/// <summary>
+	/// Constructs an array of frames based upon the info
+	/// supplied.  NOTE: When the edge of the texture is reached,
+	/// this algorithm will "wrap" to the extreme left edge of the
+	/// atlas.
+	/// </summary>
+	/// <param name="start">The UV of the lower-left corner of the first cell</param>
+	/// <param name="cellSize">width and height, in UV space, of each cell</param>
+	/// <param name="totalCells">Total number of cells in the in the animation.</param>
+	/// <returns>Array of SPRITE_FRAME objects that contain the UVs of each frame of animation.</returns>
+	public SPRITE_FRAME[] BuildWrappedUVAnim(Vector2 start, Vector2 cellSize, int totalCells)
+	{
+		int cellCount = 0;
+		Vector2 curPos;
+
+		frames = new SPRITE_FRAME[totalCells];
+
+		frames[0] = new SPRITE_FRAME(0);
+		frames[0].uvs.x = start.x;
+		frames[0].uvs.y = start.y;
+		frames[0].uvs.xMax = start.x + cellSize.x;
+		frames[0].uvs.yMax = start.y + cellSize.y;
+
+		curPos = start;
+
+		for (cellCount = 1; cellCount < totalCells; ++cellCount)
+		{
+			curPos.x += cellSize.x;
+			if (curPos.x + cellSize.x > 1.01f)
+			{
+				curPos.x = 0;
+				curPos.y -= cellSize.y;
+			}
+
+			frames[cellCount] = new SPRITE_FRAME(0);
+			frames[cellCount].uvs.x = curPos.x;
+			frames[cellCount].uvs.y = curPos.y;
+			frames[cellCount].uvs.xMax = curPos.x + cellSize.x;
+			frames[cellCount].uvs.yMax = curPos.y + cellSize.y;
+		}
+
+		return frames;
+	}
+
+
 	/// <summary>
 	/// Assigns the specified array of frames to the
 	/// animation, replacing its current contents.
@@ -659,6 +723,7 @@ public class UVAnimation_Multi
 	/// </summary>
 	public UVAnimation_Auto[] clips;	// The actual sprite animation clips that make up this animation sequence
 
+	[HideInInspector]
 	public int index;
 
 	protected int curClip;				// Index of the currently-playing clip

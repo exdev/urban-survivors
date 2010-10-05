@@ -54,6 +54,12 @@ public class SpriteManager : MonoBehaviour
 
 	public bool drawBoundingBox = false;
 
+	/// <summary>
+	/// If true, the SpriteManager object and associated mesh
+	/// will survive a level load.
+	/// </summary>
+	public bool persistent = false;
+
 	protected bool initialized = false;
 
 	protected EZLinkedList<SpriteMesh_Managed> availableBlocks = new EZLinkedList<SpriteMesh_Managed>(); // Array of references to sprites which are currently not in use
@@ -73,7 +79,7 @@ public class SpriteManager : MonoBehaviour
 	protected SpriteDrawLayerComparer drawOrderComparer = new SpriteDrawLayerComparer(); // Used to sort our draw order array
 	protected float boundUpdateInterval;	// Interval, in seconds, to update the mesh bounds
 
-	protected EZLinkedList<SpriteRoot> spriteAddQueue = new EZLinkedList<SpriteRoot>(); // List of sprites to be added that we have accumilated before initialization
+	protected EZLinkedList<SpriteRoot> spriteAddQueue; // List of sprites to be added that we have accumilated before initialization
 
 	protected SkinnedMeshRenderer meshRenderer;
 	protected Mesh mesh;					// Reference to our mesh (contained in the SkinnedMeshRenderer)
@@ -178,6 +184,9 @@ public class SpriteManager : MonoBehaviour
 
 	void Awake()
 	{
+		if (spriteAddQueue == null)
+			spriteAddQueue = new EZLinkedList<SpriteRoot>();
+		
 		// Make sure the manager is centered:
 		//transform.position = Vector3.zero;
 
@@ -190,6 +199,12 @@ public class SpriteManager : MonoBehaviour
 		if (meshRenderer.sharedMesh == null)
 			meshRenderer.sharedMesh = new Mesh();
 		mesh = meshRenderer.sharedMesh;
+
+		if(persistent)
+		{
+			DontDestroyOnLoad(this);
+			DontDestroyOnLoad(mesh);
+		}
 
 		// Create our first batch of sprites 'n' such:
 		EnlargeArrays(allocBlockSize);
@@ -333,7 +348,7 @@ public class SpriteManager : MonoBehaviour
 			availableBlocks.Add(sprites[i]);
 
 			// Init triangle indices:
-			if (winding == SpriteRoot.WINDING_ORDER.CCW)
+/*			if (winding == SpriteRoot.WINDING_ORDER.CCW)
 			{	// Counter-clockwise winding
 				triIndices[i * 6 + 0] = i * 4 + 0;	//	0_ 2			0 ___ 3
 				triIndices[i * 6 + 1] = i * 4 + 1;	//  | /		Verts:	 |	/|
@@ -344,7 +359,7 @@ public class SpriteManager : MonoBehaviour
 				triIndices[i * 6 + 5] = i * 4 + 2;	// 4/_|5
 			}
 			else
-			{	// Clockwise winding
+*/			{	// Clockwise winding
 				triIndices[i * 6 + 0] = i * 4 + 0;	//	0_ 1			0 ___ 3
 				triIndices[i * 6 + 1] = i * 4 + 3;	//  | /		Verts:	 |	/|
 				triIndices[i * 6 + 2] = i * 4 + 1;	// 2|/				1|/__|2
@@ -433,6 +448,9 @@ public class SpriteManager : MonoBehaviour
 		// add queue:
 		if(!initialized)
 		{
+			if (spriteAddQueue == null)
+				spriteAddQueue = new EZLinkedList<SpriteRoot>();
+
 			spriteAddQueue.Add(sprite);
 			return null;
 		}
@@ -813,12 +831,12 @@ public class SpriteManager : MonoBehaviour
 
 				// Clockwise winding
 				triIndices[i * 6 + 0] = s.mv1;		//	0_ 1			1 ___ 4
-				triIndices[i * 6 + 1] = s.mv2;		//  | /		Verts:	 |	/|
-				triIndices[i * 6 + 2] = s.mv4;		// 2|/				2|/__|3
+				triIndices[i * 6 + 1] = s.mv4;		//  | /		Verts:	 |	/|
+				triIndices[i * 6 + 2] = s.mv2;		// 2|/				2|/__|3
 
 				triIndices[i * 6 + 3] = s.mv4;		//	  3
-				triIndices[i * 6 + 4] = s.mv2;		//   /|
-				triIndices[i * 6 + 5] = s.mv3;		// 5/_|4
+				triIndices[i * 6 + 4] = s.mv3;		//   /|
+				triIndices[i * 6 + 5] = s.mv2;		// 5/_|4
 			}
 		}
 
@@ -1046,7 +1064,6 @@ public class SpriteManager : MonoBehaviour
 				updateBounds = true;
 
 				mesh.vertices = vertices;
-				updateBounds = true;
 			}
 
 			if(updateBounds)

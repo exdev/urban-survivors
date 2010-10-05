@@ -7,6 +7,7 @@
 
 #define PUMP_ALWAYS_RUNNING
 #define PUMP_EVERY_FRAME
+// #define USE_DELTA_TIME	// Base animation on Time.deltaTime instead of Time.realtimeSinceStartup
 
 
 using UnityEngine;
@@ -115,8 +116,10 @@ public class SpriteAnimationPump : MonoBehaviour
 	// The coroutine that drives animation:
 	protected static IEnumerator AnimationPump()
 	{
+#if !USE_DELTA_TIME
 		float startTime = Time.realtimeSinceStartup;
 		float time;
+#endif
 		float elapsed;
 		SpriteBase next;
 
@@ -130,9 +133,14 @@ public class SpriteAnimationPump : MonoBehaviour
 			yield return null;
 #endif
 
+
+#if USE_DELTA_TIME
+			elapsed = Time.deltaTime;
+#else
 			time = Time.realtimeSinceStartup;
 			elapsed = time - startTime;
 			startTime = time;
+#endif
 
 			// Start at the beginning:
 			cur = head;

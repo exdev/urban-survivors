@@ -968,9 +968,9 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		// Copy the material:
 		if (!managed)
 		{
-			if(m_spriteMesh != null && s.spriteMesh != null)
+			if (m_spriteMesh != null && s.spriteMesh != null)
 				((SpriteMesh)m_spriteMesh).material = s.spriteMesh.material;
-			else if(!s.managed)
+			else if (!s.managed)
 			{
 				renderer.sharedMaterial = s.renderer.sharedMaterial;
 			}
@@ -984,7 +984,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		if (renderCamera == null)
 			renderCamera = Camera.main;
 
-		if(m_spriteMesh != null)
+		if (m_spriteMesh != null)
 		{
 			if (m_spriteMesh.texture != null)
 				SetPixelToUV(m_spriteMesh.texture);
@@ -1170,11 +1170,11 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		{
 			// If we haven't already adjusted the size
 			// based on our UV truncation:
-				topLeft.x = bottomRight.x - (bottomRight.x - topLeft.x) * tlTruncate.x;
-				topLeft.y = bottomRight.y - (bottomRight.y - topLeft.y) * tlTruncate.y;
-				bottomRight.x = topLeft.x - (topLeft.x - bottomRight.x) * brTruncate.x;
-				bottomRight.y = topLeft.y - (topLeft.y - bottomRight.y) * brTruncate.y;
-			}
+			topLeft.x = bottomRight.x - (bottomRight.x - topLeft.x) * tlTruncate.x;
+			topLeft.y = bottomRight.y - (bottomRight.y - topLeft.y) * tlTruncate.y;
+			bottomRight.x = topLeft.x - (topLeft.x - bottomRight.x) * brTruncate.x;
+			bottomRight.y = topLeft.y - (topLeft.y - bottomRight.y) * brTruncate.y;
+		}
 
 		// If we're clipping and our sprite isn't of 0 size on one or more sides:
 		if(clipped && bottomRight.x - topLeft.x != 0 && topLeft.y - bottomRight.y != 0)
@@ -1721,7 +1721,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	/// <param name="tf">When true, the sprite is hidden, when false, the sprite will be displayed.</param>
 	public virtual void Hide(bool tf)
 	{
-		if(m_spriteMesh != null)
+		if (m_spriteMesh != null)
 			m_spriteMesh.Hide(tf);
 		m_hidden = tf;
 	}

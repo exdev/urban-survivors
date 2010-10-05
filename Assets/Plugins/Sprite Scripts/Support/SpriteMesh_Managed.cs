@@ -192,8 +192,8 @@ public class SpriteMesh_Managed : ISpriteMesh, IEZLinkedListItem<SpriteMesh_Mana
 			if (m_sprite.pixelPerfect)
 				m_sprite.CalcSize();
 			else
-			m_sprite.SetSize(m_sprite.width, m_sprite.height);
-	}
+				m_sprite.SetSize(m_sprite.width, m_sprite.height);
+		}
 	}
 
 	public virtual bool IsHidden()
