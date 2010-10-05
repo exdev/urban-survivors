@@ -391,6 +391,7 @@ public class UVAnimation
 	/// animation data.
 	/// </summary>
 	/// <param name="anim">Reference to the TextureAnim containing the desired info.</param>
+	/// <param name="idx">The index of this animation.</param>
 	public void SetAnim(TextureAnim anim, int idx)
 	{
 		if (anim == null)

@@ -886,7 +886,10 @@ public class SpriteTimeline : ISTE
 				zoomCoef = 1f;
 			}
 			else
+			{
 				selGO = null;
+				sprite = null;
+			}
 
 			// Select a safe value for our selected frame:
 			if (sprite != null)
@@ -897,7 +900,10 @@ public class SpriteTimeline : ISTE
 					animSettingsTracker.Synch(sprite.States[selectedAnim]);
 				}
 
-				if (sprite.States.Length != animList.Length)
+				// Commented out because two different sprites with
+				// the same number of frames in their selected anim
+				// would cause the list not to be updated:
+				//if (sprite.States.Length != animList.Length)
 					BuildAnimList();
 
 				if (sprite.States.Length > 0)

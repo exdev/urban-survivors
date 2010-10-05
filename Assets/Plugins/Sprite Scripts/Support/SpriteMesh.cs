@@ -78,6 +78,8 @@ public class SpriteMesh : ISpriteMesh
 		{ 
 			meshRenderer.sharedMaterial = value;
 			m_texture = meshRenderer.sharedMaterial.mainTexture;
+			if (m_sprite != null)
+				m_sprite.SetPixelToUV(m_texture);
 		}
 	}
 
@@ -141,7 +143,7 @@ public class SpriteMesh : ISpriteMesh
 			else
 				m_sprite.SetCamera(m_sprite.renderCamera);
 		}
-		else if (!m_sprite.hidden)
+		else if (!m_sprite.hideAtStart)
 			m_sprite.SetSize(m_sprite.width, m_sprite.height);
 
 #if SPRITE_WANT_NORMALS
@@ -160,7 +162,8 @@ public class SpriteMesh : ISpriteMesh
 
 	public virtual void UpdateUVs()
 	{
-		m_mesh.uv = m_uvs;
+		if(m_mesh != null)
+			m_mesh.uv = m_uvs;
 	}
 
 	public virtual void UpdateColors(Color color)
@@ -175,11 +178,17 @@ public class SpriteMesh : ISpriteMesh
 
 	public virtual void Hide(bool tf)
 	{
+		if (meshRenderer == null)
+			return;
+
 		meshRenderer.enabled = !tf;
 	}
 
 	public virtual bool IsHidden()
 	{
+		if (meshRenderer == null)
+			return true;
+
 		return !meshRenderer.enabled;
 	}
 
