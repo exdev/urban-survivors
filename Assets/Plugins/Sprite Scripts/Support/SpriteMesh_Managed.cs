@@ -138,7 +138,7 @@ public class SpriteMesh_Managed : ISpriteMesh, IEZLinkedListItem<SpriteMesh_Mana
 			else
 				m_sprite.SetCamera(m_sprite.renderCamera);
 		}
-		else
+		else if(!m_sprite.hideAtStart)
 			m_sprite.SetSize(m_sprite.width, m_sprite.height);
 
 		// Set colors:
@@ -188,7 +188,12 @@ public class SpriteMesh_Managed : ISpriteMesh, IEZLinkedListItem<SpriteMesh_Mana
 			UpdateVerts();
 		}
 		else
+		{
+			if (m_sprite.pixelPerfect)
+				m_sprite.CalcSize();
+			else
 			m_sprite.SetSize(m_sprite.width, m_sprite.height);
+	}
 	}
 
 	public virtual bool IsHidden()

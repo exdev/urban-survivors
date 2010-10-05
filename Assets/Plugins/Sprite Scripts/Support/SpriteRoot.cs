@@ -373,7 +373,6 @@ public class EZLinkedList<T> where T : IEZLinkedListItem<T>
 		{
 			item.next = head;
 			head.prev = item;
-			head = item;
 		}
 
 		head = item;
@@ -457,6 +456,146 @@ public class EZLinkedList<T> where T : IEZLinkedListItem<T>
 		} while (cur != null);
 	}
 }
+
+
+
+/// <summary>
+/// Represents a 2D rect that exists in 3D space and
+/// is not axis-aligned.
+/// </summary>
+public struct Rect3D
+{
+	Vector3 m_tl;		// Top-left
+	Vector3 m_tr;		// Top-right
+	Vector3 m_bl;		// Bottom-left
+	Vector3 m_br;		// Bottom-right
+	float m_width;		// Width
+	float m_height;		// Height
+
+	public Vector3 topLeft		{ get { return m_tl; } }
+	public Vector3 topRight		{ get { return m_tr; } }
+	public Vector3 bottomLeft	{ get { return m_bl; } }
+	public Vector3 bottomRight	{ get { return m_br; } }
+	
+	public float width			
+	{ 
+		get 
+		{ 
+			if(float.IsNaN(m_width))
+				m_width = Vector3.Distance(m_tr, m_tl);
+			return m_width; 
+		} 
+	}
+	
+	public float height	
+	{ 
+		get 
+		{
+			if(float.IsNaN(m_height))
+				m_height = Vector3.Distance(m_tl, m_bl);
+			return m_height;
+		} 
+	}
+
+	/// <summary>
+	/// Defines a 3D rectangle from three points
+	/// which must form a right-triangle.
+	/// </summary>
+	/// <param name="tl">The top-left point</param>
+	/// <param name="tr">The top-right point</param>
+	/// <param name="bl">The bottom-left point</param>
+	public void FromPoints(Vector3 tl, Vector3 tr, Vector3 bl)
+	{
+		m_tl = tl;
+		m_tr = tr;
+		m_bl = bl;
+		m_br = tr + (bl - tl);
+
+		m_width = m_height = float.NaN;
+	}
+
+	/// <summary>
+	/// Constructs a new 3D rectangle from three points
+	/// which must form a right-triangle.
+	/// </summary>
+	/// <param name="tl">The top-left point</param>
+	/// <param name="tr">The top-right point</param>
+	/// <param name="bl">The bottom-left point</param>
+	public Rect3D(Vector3 tl, Vector3 tr, Vector3 bl)
+	{
+		m_tl = m_tr = m_bl = m_br = Vector3.zero;
+		m_width = m_height = 0;
+		FromPoints(tl, tr, bl);
+	}
+
+	/// <summary>
+	/// Constructs a new 3D rectangle from a standard
+	/// Rect.
+	/// </summary>
+	/// <param name="r">A Rect upon which the 3D rect will be based.</param>
+	public Rect3D(Rect r)
+	{
+		m_tl = m_tr = m_bl = m_br = Vector3.zero;
+		m_width = m_height = 0;
+		FromRect(r);
+	}
+
+	/// <summary>
+	/// Returns a Rect just using the x and y coordinates
+	/// of the 3D rect.
+	/// </summary>
+	/// <returns>A new Rect based upon the X,Y coordinates of the 3D rect.</returns>
+	public Rect GetRect()
+	{
+		return Rect.MinMaxRect(m_bl.x, m_bl.y, m_tr.x, m_tl.y);
+	}
+
+	/// <summary>
+	/// Defines a Rect3D from a standard Rect.
+	/// </summary>
+	/// <param name="r">The rect from which to define the 3D rect.</param>
+	public void FromRect(Rect r)
+	{
+		FromPoints( new Vector3(r.xMin, r.yMax),
+					new Vector3(r.xMax, r.yMax),
+					new Vector3(r.xMin, r.yMin));
+	}
+
+	/// <summary>
+	/// Multiplies the points in the Rect3D by the specified
+	/// matrix in a non-projective way.  Alters the contents
+	/// of the Rect3D.
+	/// </summary>
+	/// <param name="matrix">The matrix by which the points shall be transformed.</param>
+	public void MultFast(Matrix4x4 matrix)
+	{
+		m_tl = matrix.MultiplyPoint3x4(m_tl);
+		m_tr = matrix.MultiplyPoint3x4(m_tr);
+		m_bl = matrix.MultiplyPoint3x4(m_bl);
+		m_br = matrix.MultiplyPoint3x4(m_br);
+
+		// Invalidate our width and height since it
+		// may have changed:
+		m_width = m_height = float.NaN;
+	}
+
+	/// <summary>
+	/// Multiplies the points in the specified Rect3D by the 
+	/// specified matrix in a non-projective way and returns 
+	/// the result.
+	/// </summary>
+	/// <param name="rect">The Rect3D to be transformed.</param>
+	/// <param name="matrix">The matrix by which the points shall be transformed.</param>
+	public static Rect3D MultFast(Rect3D rect, Matrix4x4 matrix)
+	{
+		return new Rect3D(matrix.MultiplyPoint3x4(rect.m_tl),
+						  matrix.MultiplyPoint3x4(rect.m_tr),
+						  matrix.MultiplyPoint3x4(rect.m_bl));
+	}
+}
+
+
+
 
 
 
@@ -592,18 +731,15 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	/// <summary>
 	/// Automatically sizes the sprite so that it will 
 	/// display pixel-perfect on-screen.
-	/// NOTE: Only use this when you are using an orthographic 
-	/// projection.  Also note that if you change the
-	/// orthographic size of the camera to achieve a zooming
-	/// effect, sprites set to render pixel-perfect will
-	/// not appear to change size on-screen as they will be
-	/// scaled to always draw the same visible size. This
-	/// can be useful for things such as UI elements.
+	/// NOTE: If you change the orthographic size of 
+	/// the camera or the distance between the text 
+	/// and a perspective camera, call SetCamera()
+	/// to make the text pixel-perfect again.
 	/// However, if you want automatic resizing functionality
 	/// without being pixel-perfect and therefore allowing
 	/// zooming in and out, use <see cref="autoResize"/> instead.
 	/// </summary>
-	public bool pixelPerfect = false;			// Automatically sizes the sprite so that it will display pixel-perfect on-screen (NOTE: Only use this when you are using an orthographic projection)
+	public bool pixelPerfect = false;			// Automatically sizes the sprite so that it will display pixel-perfect on-screen
 
 	/// <summary>
 	/// Automatically resizes the sprite based on its new 
@@ -624,14 +760,24 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		protected Vector2 lowerLeftUV;				// UV coordinate for the upper-left corner of the sprite
 		protected Vector2 uvDimensions;				// Distance from the upper-left UV to place the other UVs
 	*/
-	protected Vector2 topLeft;					// The adjustment needed for the current anchoring scheme
-	protected Vector2 bottomRight;				// The adjustment needed for the current anchoring scheme
+	protected Vector3 topLeft;					// The adjustment needed for the current anchoring scheme
+	protected Vector3 bottomRight;				// The adjustment needed for the current anchoring scheme
+
+	protected Vector3 unclippedTopLeft;			// Where the corner would be without any clipping or trimming.
+	protected Vector3 unclippedBottomRight;		// Where the corner would be without any clipping or trimming.
 
 	// (top-left) Will hold values from 0-1 that indicate by how much the sprite should be "truncated" on each side.
 	protected Vector2 tlTruncate = new Vector2(1f, 1f);
 	// (bottom-right) "
 	protected Vector2 brTruncate = new Vector2(1f, 1f);
 	protected bool truncated;					// Keeps track of whether truncation is to be applied - gets set to true when any truncation value is set to anything other than 1.0.
+	protected Rect3D clippingRect;				// Rect against which the sprite will be clipped.
+	protected Rect localClipRect;				// Will hold clippingRect in local space.
+	protected float leftClipPct = 1f;			// The percentage of the sprite that remains unclipped
+	protected float rightClipPct= 1f;			// The percentage of the sprite that remains unclipped
+	protected float topClipPct = 1f;			// The percentage of the sprite that remains unclipped
+	protected float bottomClipPct = 1f;			// The percentage of the sprite that remains unclipped
+	protected bool clipped = false;				// Keeps track of whether we are to be clipped by a bounding box
 
 	[HideInInspector]
 	public bool billboarded = false;			// Is the sprite to be billboarded? (not currently supported)
@@ -671,7 +817,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	protected Rect prevUVRect;					// The previous UV rect
 	[HideInInspector]
 	public Vector2 pixelsPerUV;				// The number of pixels in both axes per UV unit
-	protected float worldUnitsPerScreenPixel;	// The number of world units in both axes per screen pixel when using orthographic projections
+	protected float worldUnitsPerScreenPixel;	// The number of world units in both axes per screen pixel
 
 	protected SpriteResizedDelegate resizedDelegate = null; // Delegate to be called upon sprite resizing.
 
@@ -679,7 +825,14 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	/// <summary>
 	/// Whether the sprite will be hidden when it starts.
 	/// </summary>
-	public bool hidden = false;
+	public bool hideAtStart = false;
+
+	// Will tell us if we INTEND for the sprite to be hidden,
+	// so that if the mesh renderer happens to be incidentally
+	// disabled, such as on a prefab that is uninstantiated,
+	// we don't mistake that for being hidden.
+	// We set this when we intentionall hide the sprite.
+	protected bool m_hidden = false;
 
 
 	// Used to help us update the sprite's 
@@ -696,11 +849,11 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	{
 		// This will get reset SetCamera() in Start() (if running the game),
 		// or in Start() via OnDrawGizmos() if the game isn't running.
-		//screenSize.x = 0;
-		//screenSize.y = 0;
+		screenSize.x = 0;
+		screenSize.y = 0;
 
 		// Determine if we are a clone:
-		if (name.Contains("(Clone)"))
+		if (name.EndsWith("(Clone)"))
 			isClone = true;
 
 		if (!managed)
@@ -750,7 +903,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 			DontDestroyOnLoad(this);
 		}
 
-		prevUVRect = uvRect;
+		prevUVRect = frameInfo.uvs;
 
 		if (m_spriteMesh == null && !managed)
 			AddMesh();
@@ -768,7 +921,10 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		else
 			SetCamera(renderCamera);
 
-		if(hidden)
+		if (clipped)
+			UpdateUVs();
+
+		if(hideAtStart)
 			Hide(true);
 	}
 
@@ -823,11 +979,21 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		drawLayer = s.drawLayer;
 
 		// Copy the camera:
-		SetCamera(s.camera);
+		if (s.renderCamera != null)
+			SetCamera(s.renderCamera);
+		if (renderCamera == null)
+			renderCamera = Camera.main;
 
 		if(m_spriteMesh != null)
+		{
 			if (m_spriteMesh.texture != null)
 				SetPixelToUV(m_spriteMesh.texture);
+			else if (!managed)
+			{
+				((SpriteMesh)m_spriteMesh).material = renderer.sharedMaterial;
+				SetPixelToUV(m_spriteMesh.texture);
+			}
+		}
 
 		plane = s.plane;
 		winding = s.winding;
@@ -841,6 +1007,9 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		scaleFactor = s.scaleFactor;
 		topLeftOffset = s.topLeftOffset;
 		bottomRightOffset = s.bottomRightOffset;
+
+		width = s.width;
+		height = s.height;
 
 		SetColor(s.color);
 	}
@@ -874,7 +1043,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	{
 		// Only do this at runtime, or else some managed 
 		// sprites will disappear inexplicably:
-		if (Application.isPlaying)
+		//if (Application.isPlaying)
 		{
 			if (managed && manager != null && m_started)
 				manager.AddSprite(this);
@@ -887,7 +1056,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	{
 		// Only do this at runtime, or else some managed 
 		// sprites will disappear inexplicably:
-		if (Application.isPlaying)
+		//if (Application.isPlaying)
 		{
 			// Make sure if we are being deleted that
 			// we are removed from the manager so that
@@ -994,17 +1163,86 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 				break;
 		}
 
+		unclippedTopLeft = topLeft + offset;
+		unclippedBottomRight = bottomRight + offset;
+
 		if (truncated)
 		{
 			// If we haven't already adjusted the size
 			// based on our UV truncation:
-			if (!pixelPerfect && !autoResize)
-			{
 				topLeft.x = bottomRight.x - (bottomRight.x - topLeft.x) * tlTruncate.x;
 				topLeft.y = bottomRight.y - (bottomRight.y - topLeft.y) * tlTruncate.y;
 				bottomRight.x = topLeft.x - (topLeft.x - bottomRight.x) * brTruncate.x;
 				bottomRight.y = topLeft.y - (topLeft.y - bottomRight.y) * brTruncate.y;
 			}
+
+		// If we're clipping and our sprite isn't of 0 size on one or more sides:
+		if(clipped && bottomRight.x - topLeft.x != 0 && topLeft.y - bottomRight.y != 0)
+		{
+			Vector3 origTL = topLeft;
+			Vector3 origBR = bottomRight;
+			Rect tempClipRect = localClipRect;
+
+			// Account for any offset:
+			tempClipRect.x -= offset.x;
+			tempClipRect.y -= offset.y;
+
+			// Clip the sprite horizontally:
+			if (topLeft.x < tempClipRect.x)
+			{
+				// Trim the sprite:
+				leftClipPct = 1f - (tempClipRect.x - origTL.x) / (origBR.x - origTL.x);
+				topLeft.x = Mathf.Clamp(tempClipRect.x, origTL.x, origBR.x);
+
+				if (leftClipPct <= 0)
+					topLeft.x = bottomRight.x = tempClipRect.x;
+			}
+			else
+				leftClipPct = 1;
+
+			if (bottomRight.x > tempClipRect.xMax)
+			{
+				// Trim the sprite:
+				rightClipPct = (tempClipRect.xMax - origTL.x) / (origBR.x - origTL.x);
+				bottomRight.x = Mathf.Clamp(tempClipRect.xMax, origTL.x, origBR.x);
+
+				if (rightClipPct <= 0)
+					bottomRight.x = topLeft.x = tempClipRect.xMax;
+			}
+			else
+				rightClipPct = 1;
+
+			// Clip the sprite vertically:
+			if (topLeft.y > tempClipRect.yMax)
+			{
+				// Trim the sprite:
+				topClipPct = (tempClipRect.yMax - origBR.y) / (origTL.y - origBR.y);
+				topLeft.y = Mathf.Clamp(tempClipRect.yMax, origBR.y, origTL.y);
+
+				if (topClipPct <= 0)
+					topLeft.y = bottomRight.y = tempClipRect.yMax;
+			}
+			else
+				topClipPct = 1;
+
+			if (bottomRight.y < tempClipRect.y)
+			{
+				// Trim the sprite:
+				bottomClipPct = 1f - (tempClipRect.y - origBR.y) / (origTL.y - origBR.y);
+				bottomRight.y = Mathf.Clamp(tempClipRect.y, origBR.y, origTL.y);
+
+				if (bottomClipPct <= 0)
+					bottomRight.y = topLeft.y = tempClipRect.y;
+			}
+			else
+				bottomClipPct = 1;
+		}
+
+		// Reverse the X positions if the winding order is CCW:
+		if(winding == WINDING_ORDER.CCW)
+		{
+			topLeft.x *= -1f;
+			bottomRight.x *= -1f;
 		}
 	}
 
@@ -1026,9 +1264,9 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		if (pixelPerfect)
 		{
 			// Calculate the size based on the orthographic size:
-			worldUnitsPerScreenPixel = (renderCamera.orthographicSize * 2f) / screenSize.y;
-			width = worldUnitsPerScreenPixel * uvRect.width * pixelsPerUV.x;
-			height = worldUnitsPerScreenPixel * uvRect.height * pixelsPerUV.y;
+			//worldUnitsPerScreenPixel = (renderCamera.orthographicSize * 2f) / screenSize.y;
+			width = worldUnitsPerScreenPixel * frameInfo.uvs.width * pixelsPerUV.x;
+			height = worldUnitsPerScreenPixel * frameInfo.uvs.height * pixelsPerUV.y;
 		}
 		else if (autoResize) // Else calculate the size based on the change in UV dimensions:
 		{
@@ -1036,8 +1274,8 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 			if (prevUVRect.width != 0 && prevUVRect.height != 0)
 			{
 				// Find the percentage change in the UV:
-				tempUV.x = uvRect.width / prevUVRect.width;
-				tempUV.y = uvRect.height / prevUVRect.height;
+				tempUV.x = frameInfo.uvs.width / prevUVRect.width;
+				tempUV.y = frameInfo.uvs.height / prevUVRect.height;
 
 				// Change the width and height accordingly:
 				width *= tempUV.x;
@@ -1050,7 +1288,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		// this method is called again without 
 		// there being a UV change, we don't
 		// continue to resize the sprite:
-		prevUVRect = uvRect;
+		prevUVRect = frameInfo.uvs;
 
 		SetSize(width, height);
 	}
@@ -1093,25 +1331,51 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 
 		Vector3[] vertices = m_spriteMesh.vertices;
 
-		// Upper-left
-		vertices[0].x = offset.x + topLeft.x;
-		vertices[0].y = offset.y + topLeft.y;
-		vertices[0].z = offset.z;
+		if(winding == WINDING_ORDER.CW)
+		{
+			// Upper-left
+			vertices[0].x = offset.x + topLeft.x;
+			vertices[0].y = offset.y + topLeft.y;
+			vertices[0].z = offset.z;
 
-		// Lower-left
-		vertices[1].x = offset.x + topLeft.x;
-		vertices[1].y = offset.y + bottomRight.y;
-		vertices[1].z = offset.z;
+			// Lower-left
+			vertices[1].x = offset.x + topLeft.x;
+			vertices[1].y = offset.y + bottomRight.y;
+			vertices[1].z = offset.z;
 
-		// Lower-right
-		vertices[2].x = offset.x + bottomRight.x;
-		vertices[2].y = offset.y + bottomRight.y;
-		vertices[2].z = offset.z;
+			// Lower-right
+			vertices[2].x = offset.x + bottomRight.x;
+			vertices[2].y = offset.y + bottomRight.y;
+			vertices[2].z = offset.z;
 
-		// Upper-right
-		vertices[3].x = offset.x + bottomRight.x;
-		vertices[3].y = offset.y + topLeft.y;
-		vertices[3].z = offset.z;
+			// Upper-right
+			vertices[3].x = offset.x + bottomRight.x;
+			vertices[3].y = offset.y + topLeft.y;
+			vertices[3].z = offset.z;
+		}
+		else
+		{
+			// Upper-left
+			vertices[0].x = offset.x + topLeft.x;
+			vertices[0].y = offset.y + topLeft.y;
+			vertices[0].z = offset.z;
+
+			// Lower-left
+			vertices[1].x = offset.x + topLeft.x;
+			vertices[1].y = offset.y + bottomRight.y;
+			vertices[1].z = offset.z;
+
+			// Lower-right
+			vertices[2].x = offset.x + bottomRight.x;
+			vertices[2].y = offset.y + bottomRight.y;
+			vertices[2].z = offset.z;
+
+			// Upper-right
+			vertices[3].x = offset.x + bottomRight.x;
+			vertices[3].y = offset.y + topLeft.y;
+			vertices[3].z = offset.z;
+
+		}
 
 		m_spriteMesh.UpdateVerts();
 	}
@@ -1288,6 +1552,22 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	}
 
 	/// <summary>
+	/// Removes any clipping that is being applied to the
+	/// sprite.
+	/// </summary>
+	public virtual void Unclip()
+	{
+		leftClipPct = 0;
+		rightClipPct = 0;
+		topClipPct = 0;
+		bottomClipPct = 0;
+		clipped = false;
+		uvRect = frameInfo.uvs;// Need to make sure we reset
+		SetBleedCompensation();// Redo bleed compensation since we just re-copied the raw framinfo which lacks this
+		CalcSize();
+	}
+
+	/// <summary>
 	/// Applies any changes to the UVs to the actual sprite mesh.
 	/// </summary>
 	public virtual void UpdateUVs()
@@ -1299,10 +1579,17 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		// Truncate our UVs if needed:
 		if (truncated)
 		{
-			uvRect.x = frameInfo.uvs.xMax - (frameInfo.uvs.width) * tlTruncate.x;
-			uvRect.y = frameInfo.uvs.yMax - (frameInfo.uvs.height) * brTruncate.y;
-			uvRect.xMax = frameInfo.uvs.x - (-frameInfo.uvs.width) * brTruncate.x;
-			uvRect.yMax = frameInfo.uvs.y - (-frameInfo.uvs.height) * tlTruncate.y;
+			uvRect.x = frameInfo.uvs.xMax - (frameInfo.uvs.width) * tlTruncate.x * leftClipPct;
+			uvRect.y = frameInfo.uvs.yMax - (frameInfo.uvs.height) * brTruncate.y * bottomClipPct;
+			uvRect.xMax = frameInfo.uvs.x - (-frameInfo.uvs.width) * brTruncate.x * rightClipPct;
+			uvRect.yMax = frameInfo.uvs.y - (-frameInfo.uvs.height) * tlTruncate.y * topClipPct;
+		}
+		else if(clipped)
+		{
+			uvRect.x = Mathf.Lerp(frameInfo.uvs.xMax, frameInfo.uvs.x, leftClipPct);
+			uvRect.y = Mathf.Lerp(frameInfo.uvs.yMax, frameInfo.uvs.y, bottomClipPct);
+			uvRect.xMax = Mathf.Lerp(frameInfo.uvs.x, frameInfo.uvs.xMax, rightClipPct);
+			uvRect.yMax = Mathf.Lerp(frameInfo.uvs.y, frameInfo.uvs.yMax, topClipPct);
 		}
 
 		if (m_spriteMesh == null)
@@ -1310,13 +1597,15 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 
 		Vector2[] uvs = m_spriteMesh.uvs;
 
-		if (winding == WINDING_ORDER.CW)
+//		if (winding == WINDING_ORDER.CW)
 		{
 			uvs[0].x = uvRect.x; uvs[0].y = uvRect.yMax;
 			uvs[1].x = uvRect.x; uvs[1].y = uvRect.y;
 			uvs[2].x = uvRect.xMax; uvs[2].y = uvRect.y;
 			uvs[3].x = uvRect.xMax; uvs[3].y = uvRect.yMax;
 		}
+/*	Commented out because this should now be addressed by
+ *  the fact that we reverse the X position of the vertices.
 		else
 		{
 			uvs[3].x = uvRect.x; uvs[3].y = uvRect.yMax;
@@ -1324,6 +1613,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 			uvs[1].x = uvRect.xMax; uvs[1].y = uvRect.y;
 			uvs[0].x = uvRect.xMax; uvs[0].y = uvRect.yMax;
 		}
+*/
 
 		m_spriteMesh.UpdateUVs();
 	}
@@ -1348,7 +1638,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	/// Sets the sprite's color to the specified color.
 	/// </summary>
 	/// <param name="c">Color to shade the sprite.</param>
-	public void SetColor(Color c)
+	public virtual void SetColor(Color c)
 	{
 		color = c;
 
@@ -1374,15 +1664,16 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	// pixel-perfect sprite size:
 	/// <summary>
 	/// Sets the camera to use when calculating
-	/// a pixel-perfect sprite size. Be sure
-	/// that this camera is set to use an orthographic
-	/// projection.
+	/// a pixel-perfect sprite size.
 	/// </summary>
 	/// <param name="c"></param>
-	public void SetCamera(Camera c)
+	public virtual void SetCamera(Camera c)
 	{
-		if (c == null)
+		if (c == null || !m_started)
 			return;
+
+		float dist;
+		Plane nearPlane = new Plane(c.transform.forward, c.transform.position);
 
 		if (!Application.isPlaying)
 		{
@@ -1400,9 +1691,21 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 				return;
 
 			renderCamera = c;
-			CalcSize();
+
+			// Determine the world distance between two vertical
+			// screen pixels for this camera:
+			dist = nearPlane.GetDistanceToPoint(transform.position);
+			worldUnitsPerScreenPixel = Vector3.Distance(c.ScreenToWorldPoint(new Vector3(0, 1, dist)), c.ScreenToWorldPoint(new Vector3(0, 0, dist)));
+
+			if(!hideAtStart)
+				CalcSize();
 			return;
 		}
+
+		// Determine the world distance between two vertical
+		// screen pixels for this camera:
+		dist = nearPlane.GetDistanceToPoint(transform.position);
+		worldUnitsPerScreenPixel = Vector3.Distance(c.ScreenToWorldPoint(new Vector3(0, 1, dist)), c.ScreenToWorldPoint(new Vector3(0, 0, dist)));
 
 		screenSize.x = c.pixelWidth;
 		screenSize.y = c.pixelHeight;
@@ -1410,16 +1713,17 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		CalcSize();
 	}
 
-	// Hides the sprite by disabling the mesh renderer:
 	/// <summary>
 	/// Hides or displays the sprite by disabling/enabling
-	/// the sprite's mesh renderer component.
+	/// the sprite's mesh renderer component, or if managed,
+	/// sets the mesh size to 0.
 	/// </summary>
 	/// <param name="tf">When true, the sprite is hidden, when false, the sprite will be displayed.</param>
 	public virtual void Hide(bool tf)
 	{
 		if(m_spriteMesh != null)
 			m_spriteMesh.Hide(tf);
+		m_hidden = tf;
 	}
 
 	/// <summary>
@@ -1429,40 +1733,45 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	/// <returns>True when hidden, false when set to be displayed.</returns>
 	public bool IsHidden()
 	{
-		if (m_spriteMesh != null)
-			return m_spriteMesh.IsHidden();
-		else
-			return false;
+		return m_hidden;
+// 		if (m_spriteMesh != null)
+// 			return m_spriteMesh.IsHidden();
+// 		else
+// 			return true;
 	}
 
 
 	/// <summary>
 	/// Sets the sprite to a managed or batched state.
 	/// </summary>
-	/// <param name="tf">True will cause the sprite to be managed, false, not.</param>
-	public void Managed(bool tf)
+	public bool Managed
 	{
-		if (tf)
+		get { return managed; }
+
+		set
 		{
-			if (!managed)
-				DestroyMesh();
-			managed = tf;
-		}
-		else
-		{
-			if(managed)
+			if (value)
 			{
-				if (manager != null)
-					manager.RemoveSprite(this);
-				manager = null;
+				if (!managed)
+					DestroyMesh();
+				managed = value;
 			}
+			else
+			{
+				if (managed)
+				{
+					if (manager != null)
+						manager.RemoveSprite(this);
+					manager = null;
+				}
 
-			managed = tf;
+				managed = value;
 
-			if (m_spriteMesh == null)
-				AddMesh();
-			else if (!(m_spriteMesh is SpriteMesh))
-				AddMesh();
+				if (m_spriteMesh == null)
+					AddMesh();
+				else if (!(m_spriteMesh is SpriteMesh))
+					AddMesh();
+			}
 		}
 	}
 
@@ -1664,6 +1973,46 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	}
 
 	/// <summary>
+	/// The rect against which the sprite should be clipped.  
+	/// The sprite will be immediately clipped by this rect when set.
+	/// When setting, the rect should be in world space.
+	/// </summary>
+	public virtual Rect3D ClippingRect
+	{
+		get { return clippingRect; }
+		set
+		{
+			clippingRect = value;
+
+			localClipRect = Rect3D.MultFast(clippingRect, transform.worldToLocalMatrix).GetRect();
+
+			clipped = true;
+			CalcSize();
+			UpdateUVs();
+		}
+	}
+
+
+	/// <summary>
+	/// Accessor for whether the sprite is to be clipped
+	/// by any already-specified clipping rect.
+	/// </summary>
+	public virtual bool Clipped
+	{
+		get { return clipped; }
+		set
+		{
+			if (value && !clipped)
+			{
+				clipped = true;
+				CalcSize();
+			}
+			else if (clipped)
+				Unclip();
+		}
+	}
+
+	/// <summary>
 	/// Sets the anchor method to use.
 	/// See <see cref="ANCHOR_METHOD"/>
 	/// </summary>
@@ -1685,6 +2034,70 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	{
 		offset = o;
 		SetSize(width, height);
+	}
+
+	/// <summary>
+	/// The top-left corner of the sprite when
+	/// no clipping or trimming is applied.
+	/// </summary>
+	public Vector3 UnclippedTopLeft
+	{
+		get 
+		{
+			// If we're being asked for our outline, then
+			// we need to have already started:
+			if (!m_started)
+				Start();
+
+			return unclippedTopLeft; 
+		}
+	}
+
+	/// <summary>
+	/// The bottom-right corner of the sprite when
+	/// no clipping or trimming is applied.
+	/// </summary>
+	public Vector3 UnclippedBottomRight
+	{
+		get
+		{		
+			// If we're being asked for our outline, then
+			// we need to have already started:
+			if (!m_started)
+				Start();
+ 
+			return unclippedBottomRight; 
+		}
+	}
+
+	/// <summary>
+	/// Returns the position of the top-left vertex
+	/// of the sprite after any clipping or trimming.
+	/// </summary>
+	public Vector3 TopLeft
+	{
+		get
+		{
+			if (m_spriteMesh != null)
+				return m_spriteMesh.vertices[0];
+			else
+				return Vector3.zero;
+		}
+	}
+
+	/// <summary>
+	/// Returns the position of the bottom-right vertex
+	/// of the sprite after any clipping or trimming.
+	/// </summary>
+	public Vector3 BottomRight
+	{
+		get
+		{
+			if (m_spriteMesh != null)
+				return m_spriteMesh.vertices[2];
+			else
+				return Vector3.zero;
+		}
 	}
 
 	// Accessor for the sprite's mesh manager
@@ -1816,6 +2229,14 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	}
 
 
+	// Included to work around the Unity bug where Start() is not
+	// called when reintering edit mode if play lasts for longer 
+	// than 10 seconds:
+#if UNITY_3_0 && UNITY_EDITOR
+	void Update() {}
+#endif
+
+
 	// Ensures that the sprite is updated in the scene view
 	// while editing:
 	public virtual void OnDrawGizmosSelected()
@@ -1876,7 +2297,7 @@ public class SpriteRootMirror
 	public bool pixelPerfect;
 	public bool autoResize;
 	public Camera renderCamera;
-	public bool hidden;
+	public bool hideAtStart;
 /*
 	public Vector3 pos;
 	public Vector3 scale;
@@ -1900,7 +2321,7 @@ public class SpriteRootMirror
 		pixelPerfect = s.pixelPerfect;
 		autoResize = s.autoResize;
 		renderCamera = s.renderCamera;
-		hidden = s.hidden;
+		hideAtStart = s.hideAtStart;
 /*
 		pos = s.transform.position;
 		scale = s.transform.localScale;
@@ -1977,9 +2398,9 @@ public class SpriteRootMirror
 			return true;
 		if (s.renderCamera != renderCamera)
 			return true;
-		if (s.hidden != hidden)
+		if (s.hideAtStart != hideAtStart)
 		{
-			s.Hide(s.hidden);
+			s.Hide(s.hideAtStart);
 			return true;
 		}
 
@@ -1990,12 +2411,12 @@ public class SpriteRootMirror
 	// sprite is changed:
 	protected virtual void HandleManageState(SpriteRoot s)
 	{
-		// Since the Managed() method checks the previous
+		// Since the Managed property checks the previous
 		// value, we'll need to set it back temporarily
 		// and it will get updated to the current desired
 		// value internally:
 		s.managed = managed;
-		s.Managed(!managed);
+		s.Managed = !managed;
 	}
 
 	public virtual void UpdateManager(SpriteRoot s)

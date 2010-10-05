@@ -461,6 +461,8 @@ public abstract class AutoSpriteBase : SpriteBase, ISpriteAggregator
 		// Resize if selected:
 		if (autoResize || pixelPerfect)
 			CalcSize();
+		else if (anchor == SpriteRoot.ANCHOR_METHOD.TEXTURE_OFFSET)
+			SetSize(width, height);
 
 		//timeSinceLastFrame = 0;
 
@@ -811,7 +813,7 @@ public abstract class AutoSpriteBase : SpriteBase, ISpriteAggregator
 		if (curAnim == null)
 			return;
 
-		curAnim.SetCurrentFrame(index + curAnim.StepDirection);
+		curAnim.SetCurrentFrame(index - curAnim.StepDirection);
 		timeSinceLastFrame = timeBetweenAnimFrames;
 		StepAnim(0);
 	}

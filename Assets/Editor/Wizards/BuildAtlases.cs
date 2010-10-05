@@ -712,9 +712,9 @@ public class BuildAtlases : ScriptableWizard
 		}
 
 		// Check for an empty frame, and in which case, 
-		// leave a 1x1 pixel area:
+		// leave a 2x2 pixel area:
 		if (area.width == 0 || area.height == 0)
-			area = new Rect(0, 0, 1f, 1f);
+			area = new Rect(0, 0, 2f, 2f);
 
 		return area;
 	}

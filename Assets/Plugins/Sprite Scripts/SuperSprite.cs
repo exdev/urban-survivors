@@ -299,6 +299,22 @@ public class SuperSpriteAnim
 	}
 
 	/// <summary>
+	/// Returns a reference to the sprite currently showing
+	/// for this animation.  Returns null if no sprite is
+	/// the current one.
+	/// </summary>
+	public SpriteBase CurrentSprite
+	{
+		get 
+		{
+			if (curAnim < 0 || curAnim >= spriteAnims.Length)
+				return null;
+
+			return spriteAnims[curAnim].sprite; 
+		}
+	}
+
+	/// <summary>
 	/// Hides the sprite of the current animation.
 	/// </summary>
 	/// <param name="tf">Whether to hide the animation.</param>
@@ -530,6 +546,22 @@ public class SuperSprite : MonoBehaviour
 	public SuperSpriteAnim GetCurAnim()
 	{
 		return curAnim;
+	}
+
+
+	/// <summary>
+	/// Returns a reference to the sprite that is currently showing
+	/// for the current animation, if any.
+	/// </summary>
+	public SpriteRoot CurrentSprite
+	{
+		get
+		{
+			if (curAnim == null)
+				return null;
+
+			return curAnim.CurrentSprite;
+		}
 	}
 
 	/// <summary>
