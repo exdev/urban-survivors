@@ -1,8 +1,8 @@
 // ======================================================================================
-// File         : HUD.cs
+// File         : HUD_noused.cs
 // Author       : Wu Jie 
-// Last Change  : 10/03/2010 | 22:14:10 PM | Sunday,October
-// Description  : 
+// Last Change  : 10/06/2010 | 08:18:27 AM | Wednesday,October
+// Description  : this script is just backup what I have researched in using SM2 for HUD 
 // ======================================================================================
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ using System.Collections.Generic;
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
-public class HUD : MonoBehaviour {
+public class HUD_noused : MonoBehaviour {
 
     private Camera hud_camera;
     private GameObject move_widget;
@@ -37,6 +37,23 @@ public class HUD : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    IEnumerator Init () {
+        yield return new WaitForEndOfFrame();
+
+        PackedSprite sprite = move_widget.transform.Find("Outline").GetComponent("PackedSprite") as PackedSprite;
+        DebugHelper.Assert( sprite != null, "can't find PackedSprite" );
+
+        float worldUnitsPerScreenPixel = Vector3.Distance(hud_camera.ScreenToWorldPoint(new Vector3(0, 1, 10)), hud_camera.ScreenToWorldPoint(new Vector3(0, 0, 10)));
+        float screen_width = sprite.width / worldUnitsPerScreenPixel;
+        float screen_height = sprite.height / worldUnitsPerScreenPixel;
+        Vector3 worldpos = hud_camera.ScreenToWorldPoint( new Vector3( screen_width/2, screen_height/2, 1 ) );
+        move_widget.transform.position = worldpos;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
 	void Start () {
         hud_camera = GetComponent("Camera") as Camera;
         DebugHelper.Assert( hud_camera != null, "can't find child hud_camera" );
@@ -44,9 +61,8 @@ public class HUD : MonoBehaviour {
         move_widget = transform.Find("Move").gameObject;
         DebugHelper.Assert( move_widget != null, "can't find child Move" );
 
-        // DEBUG { 
-        transform.Find("dev_center").gameObject.SetActiveRecursively(false);
-        // } DEBUG end 
+        // we need to wait to the end of the frame to decide the size of the sprite.
+        StartCoroutine(Init());
     }
 	
     // ------------------------------------------------------------------ 
@@ -72,3 +88,4 @@ public class HUD : MonoBehaviour {
         }
 	}
 }
+

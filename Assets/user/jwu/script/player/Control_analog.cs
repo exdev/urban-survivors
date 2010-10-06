@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : HUD.cs
+// File         : Control_analog.cs
 // Author       : Wu Jie 
-// Last Change  : 10/03/2010 | 22:14:10 PM | Sunday,October
+// Last Change  : 10/06/2010 | 10:33:14 AM | Wednesday,October
 // Description  : 
 // ======================================================================================
 
@@ -14,23 +14,22 @@ using System.Collections;
 using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
-// defines
+// class define
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// class HUD 
-// 
-// Purpose: 
-// 
-///////////////////////////////////////////////////////////////////////////////
-
-public class HUD : MonoBehaviour {
-
-    private Camera hud_camera;
-    private GameObject move_widget;
+public class Control_analog : MonoBehaviour {
 
     ///////////////////////////////////////////////////////////////////////////////
-    // functions
+    // properties
+    ///////////////////////////////////////////////////////////////////////////////
+
+    public float outlineRadius;
+    public Vector2 outlineCenter;
+
+    public Transform analog;
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // function defines
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
@@ -38,16 +37,8 @@ public class HUD : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
 	void Start () {
-        hud_camera = GetComponent("Camera") as Camera;
-        DebugHelper.Assert( hud_camera != null, "can't find child hud_camera" );
-
-        move_widget = transform.Find("Move").gameObject;
-        DebugHelper.Assert( move_widget != null, "can't find child Move" );
-
-        // DEBUG { 
-        transform.Find("dev_center").gameObject.SetActiveRecursively(false);
-        // } DEBUG end 
-    }
+        DebugHelper.Assert( analog, "pls set the analog first!" );
+	}
 	
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -61,14 +52,17 @@ public class HUD : MonoBehaviour {
         }
 
         // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
-        if ( touches.Count == 1 ) {
-            Touch t = touches[0];
-            // DEBUG { 
-            Vector2 screen_pos = new Vector2 ( t.position.x, t.position.y );
-            Vector3 worldpos = hud_camera.ScreenToWorldPoint( new Vector3( screen_pos.x, screen_pos.y, 1 ) );
-            DebugHelper.ScreenPrint ( "touch point in screen: " + screen_pos );
-            DebugHelper.ScreenPrint ( "touch point in world: " + worldpos );
-            // } DEBUG end 
+        foreach ( Touch t in touches ) {
+            Vector2 screen_pos = new Vector2 ( t.position.x, Screen.height - t.position.y );
+
+            // check if it is in the region 
+            Vector2 delta = screen_pos - outlineCenter;
+            if ( delta.magnitude <= outlineRadius ) {
+                float limit = Mathf.Min(delta.magnitude, outlineRadius - 40);
+                Vector2 analog_center = outlineCenter + delta.normalized * limit; 
+                analog.position = new Vector3( analog_center.x, analog_center.y, analog.position.z ); 
+                // TODO: moveDir = delta.normalized;
+            }
         }
 	}
 }
