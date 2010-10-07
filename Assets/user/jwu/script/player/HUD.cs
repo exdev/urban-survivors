@@ -26,8 +26,12 @@ using System.Collections.Generic;
 
 public class HUD : MonoBehaviour {
 
-    private Camera hud_camera;
-    private GameObject move_widget;
+    public Camera hud_camera;
+    public GameObject analog;
+    public Circle move_zone;
+    public float move_limitation;
+
+    private Vector2 move_dir;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -38,11 +42,8 @@ public class HUD : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
 	void Start () {
-        hud_camera = GetComponent("Camera") as Camera;
-        DebugHelper.Assert( hud_camera != null, "can't find child hud_camera" );
-
-        move_widget = transform.Find("Move").gameObject;
-        DebugHelper.Assert( move_widget != null, "can't find child Move" );
+        DebugHelper.Assert( hud_camera != null, "pls assign hud_camera" );
+        DebugHelper.Assert( analog != null, "pls assign analog" );
 
         // DEBUG { 
         transform.Find("dev_center").gameObject.SetActiveRecursively(false);
@@ -54,21 +55,53 @@ public class HUD : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
 	void Update () {
-        List<Touch> touches = new List<Touch>();
-        foreach ( Touch t in Input.touches ) {
-            if (t.phase != TouchPhase.Ended && t.phase != TouchPhase.Canceled)
-                touches.Add(t);
-        }
-
+#if UNITY_IPHONE
+// #if FALSE
         // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
-        if ( touches.Count == 1 ) {
-            Touch t = touches[0];
+        move_dir = Vector2.zero;
+        foreach ( Touch t in Input.touches ) {
+            Vector2 screenPos = new Vector2 ( t.position.x, t.position.y );
             // DEBUG { 
-            Vector2 screen_pos = new Vector2 ( t.position.x, t.position.y );
-            Vector3 worldpos = hud_camera.ScreenToWorldPoint( new Vector3( screen_pos.x, screen_pos.y, 1 ) );
-            DebugHelper.ScreenPrint ( "touch point in screen: " + screen_pos );
-            DebugHelper.ScreenPrint ( "touch point in world: " + worldpos );
+            DebugHelper.ScreenPrint ( "touch point in screen: " + screenPos );
+            // float len = (screenPos - move_zone.center).magnitude;
+            // DebugHelper.ScreenPrint ( "len is " + len );
             // } DEBUG end 
+
+            // touch move
+            if ( move_zone.Contains(screenPos) ) {
+                HandleMove(screenPos);
+            }
         }
+#else
+        Vector2 screenPos = new Vector2 ( Input.mousePosition.x, Input.mousePosition.y );
+        // DEBUG { 
+        DebugHelper.ScreenPrint ( "mouse point in screen: " + screenPos );
+        // } DEBUG end 
+
+        // touch move
+        if ( Input.GetMouseButton(0) && move_zone.Contains(screenPos) ) {
+            HandleMove(screenPos);
+        }
+#endif
 	}
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void HandleMove ( Vector2 _screenPos ) {
+        Vector2 delta = _screenPos - move_zone.center;
+        move_dir = delta.normalized;
+        float len = delta.magnitude;
+        Vector2 final_pos = move_zone.center + move_dir * Mathf.Min( len, move_limitation );
+
+        Vector3 worldpos = hud_camera.ScreenToWorldPoint( new Vector3( final_pos.x, final_pos.y, 1 ) );
+        analog.transform.position = new Vector3( worldpos.x, worldpos.y, analog.transform.position.z ); 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Vector2 GetMoveDirection () { return move_dir; }
 }
