@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : HUD.cs
+// File         : ScreenPad.cs
 // Author       : Wu Jie 
-// Last Change  : 10/03/2010 | 22:14:10 PM | Sunday,October
+// Last Change  : 10/08/2010 | 23:09:04 PM | Friday,October
 // Description  : 
 // ======================================================================================
 
@@ -18,13 +18,13 @@ using System.Collections.Generic;
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// class HUD 
+// class ScreenPad 
 // 
 // Purpose: 
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
-public class HUD : MonoBehaviour {
+public class ScreenPad : MonoBehaviour {
 
     public Camera hud_camera;
     public GameObject analog;
@@ -83,6 +83,18 @@ public class HUD : MonoBehaviour {
             HandleMove(screenPos);
         }
 #endif
+        // if there is no move, keep the analog at the center of the move_zone. 
+        if ( move_dir.magnitude == 0.0f ) {
+            Vector3 worldpos = hud_camera.ScreenToWorldPoint( new Vector3( move_zone.center.x, move_zone.center.y, 1 ) );
+            // analog.transform.position = new Vector3( worldpos.x, worldpos.y, analog.transform.position.z ); 
+
+            Hashtable args = iTween.Hash( "position", worldpos,
+                                          "time", 0.1f,
+                                          "easetype", iTween.EaseType.easeInCubic 
+                                        );
+            // iTween.MoveTo ( analog, worldpos, 0.2f );
+            iTween.MoveTo ( analog, args );
+        }
 	}
 
     // ------------------------------------------------------------------ 
@@ -90,6 +102,7 @@ public class HUD : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void HandleMove ( Vector2 _screenPos ) {
+        iTween.Stop (analog);
         Vector2 delta = _screenPos - move_zone.center;
         move_dir = delta.normalized;
         float len = delta.magnitude;
