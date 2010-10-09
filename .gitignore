@@ -41,9 +41,9 @@ Thumbs.db
 !Library/metadata/
 !Library/*.asset
 !Library/BuildPlayer.prefs
+!Library/cache/
 
 Temp/
-Library/cache/
 Library/previews/
 Library/ScriptAssemblies/
 
