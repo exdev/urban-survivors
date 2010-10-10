@@ -262,6 +262,15 @@ public class Player : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Start () {
+        // TEMP: this is my first approch to create correct control node for upperBody { 
+        GameObject obj = new GameObject("upperBody helper");
+        obj.transform.rotation = Quaternion.identity;
+        obj.transform.position = upperBody.transform.position;
+        obj.transform.parent = upperBody.parent; 
+        upperBody.parent = obj.transform; 
+        upperBody = obj.transform;
+        // } TEMP end 
+
         // this will prevent animation not init problem when the scene don't have Global prefab.
         if ( GameObject.FindWithTag("Global") != null ) {
             CollisionIgnoreManager.Instance().AddIgnore( collider, Constant.mask_player, Constant.mask_none );
