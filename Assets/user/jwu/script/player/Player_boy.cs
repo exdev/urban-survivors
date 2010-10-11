@@ -20,15 +20,12 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 [RequireComponent (typeof (Animation))]
-public class Player_boy : MonoBehaviour {
+public class Player_boy : Player_base {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public float maxSpeed = 50.0f;
-
-    private ScreenPad screenPad;
     private Vector3 moveDir;
     private Animation anim;
 
@@ -40,9 +37,8 @@ public class Player_boy : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	void Start () {
-        screenPad = GameObject.Find("HUD").GetComponent(typeof(ScreenPad)) as ScreenPad;
-        DebugHelper.Assert( screenPad, "screenPad not found" );
+	new void Start () {
+        base.Start();
         initAnim ();
 	}
 	
