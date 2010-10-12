@@ -20,15 +20,12 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 [RequireComponent (typeof (Animation))]
-public class Player_boy : MonoBehaviour {
+public class Player_boy : Player_base {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public float maxSpeed = 50.0f;
-
-    private ScreenPad screenPad;
     private Vector3 moveDir;
     private Animation anim;
 
@@ -40,9 +37,8 @@ public class Player_boy : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	void Start () {
-        screenPad = GameObject.Find("HUD").GetComponent(typeof(ScreenPad)) as ScreenPad;
-        DebugHelper.Assert( screenPad, "screenPad not found" );
+	new void Start () {
+        base.Start();
         initAnim ();
 	}
 	
@@ -59,6 +55,7 @@ public class Player_boy : MonoBehaviour {
 
         //
         HandleInput();
+        ProcessAnimation();
 	}
 
     // ------------------------------------------------------------------ 
@@ -131,11 +128,20 @@ public class Player_boy : MonoBehaviour {
             //                  "easeType", iTween.EaseType.easeOutCubic
             //                  ) );
             // } TODO end 
+        }
+    }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    private void ProcessAnimation () {
+        if ( moveDir.magnitude > 0.0f ) {
             anim.CrossFade("moveforward");
         }
         else {
             anim.CrossFade("idle");
         }
     }
+
 }

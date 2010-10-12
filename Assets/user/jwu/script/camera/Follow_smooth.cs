@@ -37,6 +37,9 @@ public class Follow_smooth: MonoBehaviour {
     public float horizonDamping = 2.0f;
     public float rotationDamping = 3.0f;
 
+    //
+    private bool zoomIn = false;
+
     ///////////////////////////////////////////////////////////////////////////////
     // defines
     ///////////////////////////////////////////////////////////////////////////////
@@ -89,6 +92,22 @@ public class Follow_smooth: MonoBehaviour {
                                            currentHeight,
                                            currentLocation.z
                                          );
+
+        // process zomming
+        AdjustZooming ();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void AdjustZooming () {
+        Camera cam = GetComponent( typeof(Camera) ) as Camera;
+        float wantedFov = 60.0f;
+        if ( zoomIn ) {
+            wantedFov = 40.0f;
+        }
+        cam.fieldOfView = Mathf.Lerp (cam.fieldOfView, wantedFov, 8.0f * Time.deltaTime);
     }
 
 }

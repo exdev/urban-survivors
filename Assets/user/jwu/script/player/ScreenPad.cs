@@ -102,7 +102,7 @@ public class ScreenPad : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void HandleMove ( Vector2 _screenPos ) {
-        iTween.Stop (analog);
+        iTween.Stop (analog,"move");
         Vector2 delta = _screenPos - move_zone.center;
         move_dir = delta.normalized;
         float len = delta.magnitude;
