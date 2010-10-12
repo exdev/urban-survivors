@@ -55,6 +55,7 @@ public class Player_boy : Player_base {
 
         //
         HandleInput();
+        ProcessAnimation();
 	}
 
     // ------------------------------------------------------------------ 
@@ -127,11 +128,20 @@ public class Player_boy : Player_base {
             //                  "easeType", iTween.EaseType.easeOutCubic
             //                  ) );
             // } TODO end 
+        }
+    }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    private void ProcessAnimation () {
+        if ( moveDir.magnitude > 0.0f ) {
             anim.CrossFade("moveforward");
         }
         else {
             anim.CrossFade("idle");
         }
     }
+
 }
