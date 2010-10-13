@@ -160,12 +160,12 @@ public class Player : MonoBehaviour {
         upperBody.forward = aimDir;
         // if ( Vector3.Dot ( upperBody.forward, lowerBody.forward ) )
         float angle = Quaternion.Angle ( upperBody.rotation, lowerBody.rotation );
-        if ( angle > degreeToRot ) {
+        if ( !rotating && angle > degreeToRot ) {
+            // iTween.Stop( lowerBody.gameObject, "rotate" );
             iTween.RotateTo( lowerBody.gameObject, iTween.Hash (
                              "rotation", upperBody.eulerAngles,
                              "time", rotTime,
-                             "delay", 0.05,
-                             "easeType", iTween.EaseType.easeOutCubic,
+                             "easeType", iTween.EaseType.easeOutQuart,
                              "oncomplete", "onRotateEnd",
                              "oncompletetarget", gameObject
                              ) );

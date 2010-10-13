@@ -21,17 +21,19 @@ using System.Collections;
 
 public class Player_girl : Player_base {
 
+    // private
+    private Vector3 moveDir;
+    private Animation anim;
+    private Vector3 aimPos = Vector3.zero;
+    private bool rotating = false;
+    private bool need_rewind = true;
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    private Vector3 moveDir;
-    private Animation anim;
-
-    // rotate
-    private Vector3 aimPos = Vector3.zero;
-    private bool rotating = false;
-    private bool need_rewind = true;
+    public float degreeToRot = 15.0f;
+    public float rotTime = 1.0f;
 
     // Q: why don't we just use UpperBody in this game?
     // A: this metho will make sure the 'upper-body' is specific by user regardless the name of the entity, 
@@ -39,9 +41,6 @@ public class Player_girl : Player_base {
     public Transform upperBody;
     public Transform lowerBody;
     public GameObject curWeapon;
-
-    public float degreeToRot = 15.0f;
-    public float rotTime = 1.0f;
 
     public GameObject followTarget;
 
@@ -287,7 +286,13 @@ public class Player_girl : Player_base {
         }
 
         // TEST { 
-        lowerBody.transform.Rotate(Vector3.up, Time.deltaTime * 100.0f);
+        // lowerBody.transform.Rotate(Vector3.up, Time.deltaTime * 100.0f);
+        // lowerBody.transform.eulerAngles += new Vector3( lowerBody.transform.eulerAngles.x, 
+        //                                                180.0f * Mathf.Deg2Rad,
+        //                                                lowerBody.transform.eulerAngles.z );
+        lowerBody.transform.eulerAngles += new Vector3( 0.0f,
+                                                       180.0f * Mathf.Deg2Rad,
+                                                       0.0f );
         // } TEST end 
     }
 
