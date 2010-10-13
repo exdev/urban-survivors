@@ -24,7 +24,7 @@ public class Player_girl : Player_base {
     // private
     private Vector3 moveDir;
     private Animation anim;
-    private Vector3 aimPos = Vector3.zero;
+    private Vector3 aimDir = Vector3.forward;
     private bool rotating = false;
     private bool need_rewind = true;
 
@@ -131,6 +131,7 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     private void HandleInput() {
+        // get move direction
         moveDir = Vector3.zero; 
         Vector2 screen_dir = screenPad.GetMoveDirection();
         if ( screen_dir.magnitude >= 0.0f ) {
@@ -142,14 +143,25 @@ public class Player_girl : Player_base {
             moveDir = moveDir.normalized;
         }
 
-        // TODO: change mousePosition to screepad.touchPosition { 
-        Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition); 
-        Plane plane = new Plane ( Vector3.up, -upperBody.position.y );
-        float dist = 0.0f;
-        plane.Raycast( ray, out dist );
-        aimPos = ray.origin + ray.direction * dist;
-        // aimPos.y = upperBody.position.y;
-        // } TODO end 
+        // process aiming
+        if ( screenPad.AvailableTouches().Count != 0 ) {
+            Touch lastTouch = screenPad.GetLastTouch();
+            Ray ray = Camera.main.ScreenPointToRay (lastTouch.position); 
+            Plane plane = new Plane ( Vector3.up, -upperBody.position.y );
+            float dist = 0.0f;
+            plane.Raycast( ray, out dist );
+            Vector3 aimPos = ray.origin + ray.direction * dist;
+
+            aimDir = aimPos - upperBody.position; 
+            aimDir.y = 0.0f;
+            aimDir.Normalize();
+
+            // DEBUG { 
+            // Debug.DrawRay ( ray.origin, ray.direction * 100, Color.yellow ); // camera look-foward ray
+            DebugHelper.DrawBall ( aimPos, 0.2f, Color.red ); // player aiming position
+            Debug.DrawLine ( upperBody.position, aimPos, Color.red ); // player aiming direction
+            // } DEBUG end 
+        }
 
         // TODO: use screenpad "fire" { 
         // // handle fire 
@@ -163,12 +175,6 @@ public class Player_girl : Player_base {
         //     }
         // }
         // } TODO end 
-
-        // DEBUG { 
-        // Debug.DrawRay ( ray.origin, ray.direction * 100, Color.yellow ); // camera look-foward ray
-        DebugHelper.DrawBall ( aimPos, 0.2f, Color.red ); // player aiming position
-        Debug.DrawLine ( upperBody.position, aimPos, Color.red ); // player aiming direction
-        // } DEBUG end 
     }
 
     // ------------------------------------------------------------------ 
@@ -254,14 +260,9 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     private void PostAnim () {
-        // ======================================================== 
-        // process rotations 
-        // ======================================================== 
+        // process lower-body rotation
+        lowerBody.forward = aimDir;
 
-        Vector3 aimDir = aimPos - upperBody.position; 
-        aimDir.y = 0.0f;
-        aimDir.Normalize();
-        upperBody.forward = aimDir;
         // if ( Vector3.Dot ( upperBody.forward, lowerBody.forward ) )
         float angle = Quaternion.Angle ( upperBody.rotation, lowerBody.rotation );
         if ( angle > degreeToRot ) {
@@ -285,15 +286,9 @@ public class Player_girl : Player_base {
             rotating = true;
         }
 
-        // TEST { 
-        // lowerBody.transform.Rotate(Vector3.up, Time.deltaTime * 100.0f);
-        // lowerBody.transform.eulerAngles += new Vector3( lowerBody.transform.eulerAngles.x, 
-        //                                                180.0f * Mathf.Deg2Rad,
-        //                                                lowerBody.transform.eulerAngles.z );
-        lowerBody.transform.eulerAngles += new Vector3( 0.0f,
-                                                       180.0f * Mathf.Deg2Rad,
-                                                       0.0f );
-        // } TEST end 
+        // NOTE: upper-body rotation must be calculate after lower-body.
+        // process upper-body rotation
+        upperBody.forward = aimDir;
     }
 
     // ------------------------------------------------------------------ 

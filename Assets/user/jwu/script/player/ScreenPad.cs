@@ -32,6 +32,7 @@ public class ScreenPad : MonoBehaviour {
     public float move_limitation;
 
     private Vector2 move_dir;
+    private List<Touch> available_touches = new List<Touch>();
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -59,6 +60,7 @@ public class ScreenPad : MonoBehaviour {
 // #if FALSE
         // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
         move_dir = Vector2.zero;
+        available_touches.Clear();
         foreach ( Touch t in Input.touches ) {
             Vector2 screenPos = new Vector2 ( t.position.x, t.position.y );
             // DEBUG { 
@@ -71,6 +73,9 @@ public class ScreenPad : MonoBehaviour {
             if ( move_zone.Contains(screenPos) ) {
                 HandleMove(screenPos);
             }
+            else {
+                available_touches.Add(t);
+            }
         }
 #else
         Vector2 screenPos = new Vector2 ( Input.mousePosition.x, Input.mousePosition.y );
@@ -81,6 +86,16 @@ public class ScreenPad : MonoBehaviour {
         // touch move
         if ( Input.GetMouseButton(0) && move_zone.Contains(screenPos) ) {
             HandleMove(screenPos);
+        }
+        else {
+            Touch t;
+            t.fingerid = 0;
+            t.position = Input.mousePosition;
+            t.deltaPoistion = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+            t.deltaTime = 0.0f;
+            t.tapCount = 0;
+            t.phase = TouchPhase.Began;
+            available_touches.Add(t)
         }
 #endif
         // if there is no move, keep the analog at the center of the move_zone. 
@@ -117,4 +132,19 @@ public class ScreenPad : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public Vector2 GetMoveDirection () { return move_dir; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public List<Touch> AvailableTouches () { return available_touches; } 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Touch GetLastTouch () { 
+        DebugHelper.Assert ( available_touches.Count != 0, "the available_touches is empty." );
+        return available_touches[available_touches.Count-1];
+    }
 }
