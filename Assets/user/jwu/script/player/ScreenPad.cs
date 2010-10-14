@@ -78,25 +78,13 @@ public class ScreenPad : MonoBehaviour {
             }
         }
 #else
-        Vector2 screenPos = new Vector2 ( Input.mousePosition.x, Input.mousePosition.y );
-        // DEBUG { 
-        DebugHelper.ScreenPrint ( "mouse point in screen: " + screenPos );
-        // } DEBUG end 
 
-        // touch move
-        if ( Input.GetMouseButton(0) && move_zone.Contains(screenPos) ) {
-            HandleMove(screenPos);
-        }
-        else {
-            Touch t;
-            t.fingerid = 0;
-            t.position = Input.mousePosition;
-            t.deltaPoistion = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-            t.deltaTime = 0.0f;
-            t.tapCount = 0;
-            t.phase = TouchPhase.Began;
-            available_touches.Add(t)
-        }
+        // handle keyboard move
+        float moveFB = Input.GetAxisRaw("Vertical");
+        float moveLR = Input.GetAxisRaw("Horizontal");
+        Vector2 dir = new Vector2(moveLR,moveFB);
+        Vector2 screenPos = move_limitation * dir.normalized + move_zone.center;
+        HandleMove(screenPos);
 #endif
         // if there is no move, keep the analog at the center of the move_zone. 
         if ( move_dir.magnitude == 0.0f ) {

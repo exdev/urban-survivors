@@ -34,6 +34,7 @@ public class Player_girl : Player_base {
 
     public float degreeToRot = 15.0f;
     public float rotTime = 1.0f;
+    public float stepSpeed = 1.0f;
 
     // Q: why don't we just use UpperBody in this game?
     // A: this metho will make sure the 'upper-body' is specific by user regardless the name of the entity, 
@@ -43,6 +44,10 @@ public class Player_girl : Player_base {
     public GameObject curWeapon;
 
     public GameObject followTarget;
+
+    // TEMP { 
+    public bool animLeftRight = false;
+    // } TEMP end 
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -144,9 +149,13 @@ public class Player_girl : Player_base {
         }
 
         // process aiming
+#if UNITY_IPHONE
         if ( screenPad.AvailableTouches().Count != 0 ) {
             Touch lastTouch = screenPad.GetLastTouch();
             Ray ray = Camera.main.ScreenPointToRay (lastTouch.position); 
+#else
+            Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition); 
+#endif
             Plane plane = new Plane ( Vector3.up, -upperBody.position.y );
             float dist = 0.0f;
             plane.Raycast( ray, out dist );
@@ -161,7 +170,9 @@ public class Player_girl : Player_base {
             DebugHelper.DrawBall ( aimPos, 0.2f, Color.red ); // player aiming position
             Debug.DrawLine ( upperBody.position, aimPos, Color.red ); // player aiming direction
             // } DEBUG end 
+#if UNITY_IPHONE
         }
+#endif
 
         // TODO: use screenpad "fire" { 
         // // handle fire 
@@ -231,26 +242,24 @@ public class Player_girl : Player_base {
 
             // blend forward/backward
             if ( vel_lbspace.z > 0 ) {
-                anim.Blend("moveForward", vel_lbspace.z * 2.0f );
-                anim.Blend("moveBackward", 0.0f );
-                anim["moveForward"].normalizedSpeed = vel_lbspace.z;
+                anim.CrossFade("moveForward" );
+                anim["moveForward"].normalizedSpeed = stepSpeed;
             }
             else {
-                anim.Blend("moveForward", 0.0f );
-                anim.Blend("moveBackward", -vel_lbspace.z * 2.0f );
-                anim["moveBackward"].normalizedSpeed = -vel_lbspace.z;
+                anim.CrossFade("moveBackward" );
+                anim["moveBackward"].normalizedSpeed = stepSpeed;
             }
 
             // blend left/right
-            if ( vel_lbspace.x > 0 ) {
-                anim.Blend("moveRight", vel_lbspace.x * 2.0f );
-                anim.Blend("moveLeft", 0.0f );
-                anim["moveRight"].normalizedSpeed = vel_lbspace.x;
-            }
-            else {
-                anim.Blend("moveRight", 0.0f );
-                anim.Blend("moveLeft", -vel_lbspace.x * 2.0f );
-                anim["moveLeft"].normalizedSpeed = -vel_lbspace.x;
+            if ( animLeftRight ) {
+                if ( vel_lbspace.x > 0.9f ) {
+                    anim.CrossFade("moveRight" );
+                    anim["moveRight"].normalizedSpeed = stepSpeed;
+                }
+                else if ( vel_lbspace.x < -0.9f )  {
+                    anim.CrossFade("moveLeft" );
+                    anim["moveLeft"].normalizedSpeed = stepSpeed;
+                }
             }
         }
     }
