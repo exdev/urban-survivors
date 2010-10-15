@@ -25,8 +25,7 @@ public class Player_girl : Player_base {
     private Vector3 moveDir;
     private Animation anim;
     private Vector3 aimDir = Vector3.forward;
-    private bool rotating = false;
-    private bool need_rewind = true;
+    // TEMP DISABLE: private bool rotating = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -35,6 +34,7 @@ public class Player_girl : Player_base {
     public float degreeToRot = 15.0f;
     public float rotTime = 1.0f;
     public float stepSpeed = 1.0f;
+    public float degreePlayMoveLeftRight = 60.0f;
 
     // Q: why don't we just use UpperBody in this game?
     // A: this metho will make sure the 'upper-body' is specific by user regardless the name of the entity, 
@@ -44,10 +44,6 @@ public class Player_girl : Player_base {
     public GameObject curWeapon;
 
     public GameObject followTarget;
-
-    // TEMP { 
-    public bool animLeftRight = false;
-    // } TEMP end 
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -59,6 +55,7 @@ public class Player_girl : Player_base {
 
 	new void Start () {
         base.Start();
+        DebugHelper.Assert( degreePlayMoveLeftRight <= 90.0f, "the degree can't larger than 90.0" );
         initAnim ();
 	}
 	
@@ -107,10 +104,9 @@ public class Player_girl : Player_base {
         string[] anim_keys = { "moveForward", "moveBackward", "moveRight", "moveLeft" };
         foreach (string key in anim_keys) {
             state = anim[key];
-            state.layer = 1;
+            state.layer = 0;
             state.wrapMode = WrapMode.Loop;
             state.weight = 1.0f;
-            state.blendMode = AnimationBlendMode.Blend;
             state.enabled = true;
         }
 
@@ -211,57 +207,17 @@ public class Player_girl : Player_base {
     private void ProcessAnimation () {
         // get the animation forward,right so that we can pickup the proper animation.
         Vector3 curVelocity = rigidbody.velocity; 
-        Vector3 vel_lbspace = lowerBody.worldToLocalMatrix * curVelocity;
-        vel_lbspace.y = 0.0f;
-        vel_lbspace.Normalize();
+        Vector3 vel_ubspace = upperBody.worldToLocalMatrix * curVelocity;
+        vel_ubspace.y = 0.0f;
+        vel_ubspace.Normalize();
 
         // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
-        // if ( vel_lbspace.sqrMagnitude < 0.2 )
+        // if ( vel_ubspace.sqrMagnitude < 0.2 )
         if ( moveDir.magnitude == 0.0f ) {
             // float fadeSpeed = 5.0f * Time.deltaTime;
-            anim.Blend( "moveForward", 0.0f );
-            anim.Blend( "moveBackward", 0.0f );
-            anim.Blend( "moveLeft", 0.0f );
-            anim.Blend( "moveRight", 0.0f );
-            need_rewind = true;
-
-            if ( rotating == false ) {
-                anim.CrossFade("idle");
-            }
+            anim.CrossFade("idle");
         }
         // } TODO end 
-        else {
-            // rewind the animation so that each time it moved, it start from the beginning frame.
-            if ( need_rewind ) {
-                need_rewind = false;
-                anim.Rewind("moveForward");
-                anim.Rewind("moveBackward");
-                anim.Rewind("moveLeft");
-                anim.Rewind("moveRight");
-            }
-
-            // blend forward/backward
-            if ( vel_lbspace.z > 0 ) {
-                anim.CrossFade("moveForward" );
-                anim["moveForward"].normalizedSpeed = stepSpeed;
-            }
-            else {
-                anim.CrossFade("moveBackward" );
-                anim["moveBackward"].normalizedSpeed = stepSpeed;
-            }
-
-            // blend left/right
-            if ( animLeftRight ) {
-                if ( vel_lbspace.x > 0.9f ) {
-                    anim.CrossFade("moveRight" );
-                    anim["moveRight"].normalizedSpeed = stepSpeed;
-                }
-                else if ( vel_lbspace.x < -0.9f )  {
-                    anim.CrossFade("moveLeft" );
-                    anim["moveLeft"].normalizedSpeed = stepSpeed;
-                }
-            }
-        }
     }
 
     // ------------------------------------------------------------------ 
@@ -270,41 +226,71 @@ public class Player_girl : Player_base {
 
     private void PostAnim () {
         // process lower-body rotation
+        float angle = Vector3.Angle ( moveDir, aimDir );
+        // DebugHelper.ScreenPrint("angle = " + angle); // DEBUG
         lowerBody.forward = aimDir;
-
-        // if ( Vector3.Dot ( upperBody.forward, lowerBody.forward ) )
-        float angle = Quaternion.Angle ( upperBody.rotation, lowerBody.rotation );
-        if ( angle > degreeToRot ) {
-            // iTween.Stop (lowerBody.gameObject,"rotate");
-            // iTween.RotateTo( lowerBody.gameObject, iTween.Hash (
-            //                  "rotation", upperBody.eulerAngles,
-            //                  "time", rotTime,
-            //                  "easeType", iTween.EaseType.easeOutCubic,
-            //                  "oncomplete", "onRotateEnd",
-            //                  "oncompletetarget", gameObject
-            //                  ) );
-            DebugHelper.ScreenPrint("rotating");
-            // if ( moveDir.magnitude == 0.0f ) {
-            //     Vector3 cross_product = Vector3.Cross(upperBody.forward,lowerBody.forward);
-            //     Animation anim = GetComponent( typeof(Animation) ) as Animation;
-            //     if ( cross_product.y > 0.0 )
-            //         anim.CrossFade("turnRight");
-            //     else if ( cross_product.y < 0.0 )
-            //         anim.CrossFade("turnLeft");
-            // }
-            rotating = true;
+        string animName = "";
+        if ( moveDir.magnitude != 0.0f ) {
+            if ( angle > 180.0f - degreePlayMoveLeftRight ) {
+                lowerBody.forward = -moveDir;
+                animName = "moveBackward";
+            }
+            else if ( angle < degreePlayMoveLeftRight ) {
+                lowerBody.forward = moveDir;
+                animName = "moveForward";
+            }
+            else {
+                Vector3 up = Vector3.Cross(moveDir,aimDir);
+                if ( up.y > 0.0f ) {
+                    animName = "moveLeft";
+                }
+                else {
+                    animName = "moveRight";
+                }
+            }
+            anim.CrossFade(animName);
+            anim[animName].normalizedSpeed = stepSpeed;
         }
+
+        // TODO: smooth rotation
+        // TEMP DISABLE { 
+        // if ( Vector3.Dot ( upperBody.forward, lowerBody.forward ) )
+        // float angle = Quaternion.Angle ( upperBody.rotation, lowerBody.rotation );
+        // if ( angle > degreeToRot ) {
+        //     DebugHelper.ScreenPrint("rotating");
+        //     // iTween.Stop (lowerBody.gameObject,"rotate");
+        //     // iTween.RotateTo( lowerBody.gameObject, iTween.Hash (
+        //     //                  "rotation", upperBody.eulerAngles,
+        //     //                  "time", rotTime,
+        //     //                  "easeType", iTween.EaseType.easeOutCubic,
+        //     //                  "oncomplete", "onRotateEnd",
+        //     //                  "oncompletetarget", gameObject
+        //     //                  ) );
+        //     // if ( moveDir.magnitude == 0.0f ) {
+        //     //     Vector3 cross_product = Vector3.Cross(upperBody.forward,lowerBody.forward);
+        //     //     Animation anim = GetComponent( typeof(Animation) ) as Animation;
+        //     //     if ( cross_product.y > 0.0 )
+        //     //         anim.CrossFade("turnRight");
+        //     //     else if ( cross_product.y < 0.0 )
+        //     //         anim.CrossFade("turnLeft");
+        //     // }
+        //     rotating = true;
+        // }
+        // } TEMP DISABLE end 
 
         // NOTE: upper-body rotation must be calculate after lower-body.
         // process upper-body rotation
         upperBody.forward = aimDir;
     }
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
+    // TODO: smooth rotation
+    // TEMP DISABLE { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
 
-    private void onRotateEnd () {
-        rotating = false;
-    }
+    // private void onRotateEnd () {
+    //     rotating = false;
+    // }
+    // } TEMP DISABLE end 
 }
