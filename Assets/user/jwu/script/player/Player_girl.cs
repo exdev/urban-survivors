@@ -44,6 +44,7 @@ public class Player_girl : Player_base {
     public GameObject curWeapon;
 
     public GameObject followTarget;
+    public float followDistance = 1.5f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -71,7 +72,8 @@ public class Player_girl : Player_base {
         // } DEBUG end 
 
         //
-        HandleInput();
+        HandleInput ();
+        ProcessFollowing ();
         ProcessAnimation ();
 	}
 
@@ -134,14 +136,16 @@ public class Player_girl : Player_base {
     private void HandleInput() {
         // get move direction
         moveDir = Vector3.zero; 
-        Vector2 screen_dir = screenPad.GetMoveDirection();
-        if ( screen_dir.magnitude >= 0.0f ) {
-            moveDir.x = screen_dir.x;
-            moveDir.y = screen_dir.y;
-            Transform mainCamera = Camera.main.GetComponent( typeof(Transform) ) as Transform;
-            moveDir = mainCamera.TransformDirection(moveDir.normalized); 
-            moveDir.y = 0.0f;
-            moveDir = moveDir.normalized;
+        if ( followTarget == null ) {
+            Vector2 screen_dir = screenPad.GetMoveDirection();
+            if ( screen_dir.magnitude >= 0.0f ) {
+                moveDir.x = screen_dir.x;
+                moveDir.y = screen_dir.y;
+                Transform mainCamera = Camera.main.GetComponent( typeof(Transform) ) as Transform;
+                moveDir = mainCamera.TransformDirection(moveDir.normalized); 
+                moveDir.y = 0.0f;
+                moveDir = moveDir.normalized;
+            }
         }
 
         // process aiming
@@ -166,22 +170,53 @@ public class Player_girl : Player_base {
             DebugHelper.DrawBall ( aimPos, 0.2f, Color.red ); // player aiming position
             Debug.DrawLine ( upperBody.position, aimPos, Color.red ); // player aiming direction
             // } DEBUG end 
+
+            // handle fire 
+#if UNITY_IPHONE
+            if ( lastTouch.phase != TouchPhase.Ended ) {
+#else
+            if ( Input.GetButton("Fire") ) {
+#endif
+                // if we have weapon in hand.
+                if ( curWeapon ) {
+                    Fire fire = curWeapon.GetComponent(typeof(Fire)) as Fire;
+                    if (fire) {
+                        fire.Trigger();
+                    }
+                }
+            }
 #if UNITY_IPHONE
         }
 #endif
+    }
 
-        // TODO: use screenpad "fire" { 
-        // // handle fire 
-        // if ( Input.GetButton("Fire") ) {
-        //     // if we have weapon in hand.
-        //     if ( curWeapon ) {
-        //         Fire fire = curWeapon.GetComponent(typeof(Fire)) as Fire;
-        //         if (fire) {
-        //             fire.Trigger();
-        //         }
-        //     }
-        // }
-        // } TODO end 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    private void ProcessFollowing () {
+        if (followTarget != null) {
+            Vector3 dir = (transform.position - followTarget.transform.position).normalized;
+            Vector3 destination = dir * followDistance + followTarget.transform.position;
+
+            Vector3 delta = destination - transform.position;
+
+            // if we are from idle to move
+            Vector3 curVelocity = rigidbody.velocity; 
+            if ( curVelocity.magnitude < 0.2f ) {
+                if ( delta.magnitude > 0.5f ) {
+                    moveDir = delta.normalized; 
+                }
+            }
+            else if ( delta.magnitude > 0.1f ) {
+                moveDir = delta.normalized; 
+            }
+
+            // DEBUG { 
+            DebugHelper.DrawCircleY( followTarget.transform.position, followDistance, Color.yellow );
+            DebugHelper.DrawBall( destination, 0.2f, Color.green );
+            // } DEBUG end 
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -189,14 +224,10 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     private void ProcessMovement () {
-        // in following mode
-        if ( followTarget ) {
-        }
-        else {
-            if ( moveDir.magnitude > 0.0f ) {
-                rigidbody.AddForce ( moveDir * maxSpeed, ForceMode.Acceleration );
-                transform.position = new Vector3( transform.position.x, 0.0f, transform.position.z );
-            }
+        // 
+        if ( moveDir.magnitude > 0.0f ) {
+            rigidbody.AddForce ( moveDir * maxSpeed, ForceMode.Acceleration );
+            transform.position = new Vector3( transform.position.x, 0.0f, transform.position.z );
         }
     }
 
