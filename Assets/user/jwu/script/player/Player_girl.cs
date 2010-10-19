@@ -19,6 +19,7 @@ using System.Collections;
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
+[RequireComponent (typeof (Animation))]
 public class Player_girl : Player_base {
 
     // private

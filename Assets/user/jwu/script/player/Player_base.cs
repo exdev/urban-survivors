@@ -26,8 +26,10 @@ public class Player_base : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     public float maxSpeed = 50.0f;
+    public float maxHP = 100.0f;
 
     protected ScreenPad screenPad;
+    protected float curHP = 60.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -37,9 +39,16 @@ public class Player_base : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public float GetHP () { return curHP/maxHP; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
 	protected void Start () {
         screenPad = GameObject.Find("HUD").GetComponent(typeof(ScreenPad)) as ScreenPad;
         DebugHelper.Assert( screenPad, "screenPad not found" );
+        // curHP = maxHP;
     }
 }
 
