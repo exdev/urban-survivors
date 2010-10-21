@@ -112,7 +112,7 @@ public class AI_generic : MonoBehaviour {
 
         // move ai
         Vector3 delta = player.transform.position - transform.position;
-        if ( delta.magnitude >= 2.0f ) {
+        if ( delta.magnitude >= 1.5f ) {
             // transform.position += delta.normalized * move_speed * Time.deltaTime;
             transform.position += transform.forward * move_speed * Time.deltaTime;
 

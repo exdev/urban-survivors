@@ -66,7 +66,7 @@ public class Infrared : MonoBehaviour {
             if ( Physics.Raycast (transform.position, fwd, out hit, 100.0f, layerMask ) ) {
                 dist = hit.distance;
             }
-            lr.SetPosition( 1, Vector3.forward * dist * 0.5f );
+            lr.SetPosition( 1, Vector3.forward * dist );
         }
     }
 }
