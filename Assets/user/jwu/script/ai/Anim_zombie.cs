@@ -46,7 +46,7 @@ public class Anim_zombie : MonoBehaviour {
         state.blendMode = AnimationBlendMode.Blend;
         state.enabled = true;
 
-        state = anim["attack"];
+        state = anim["attack_copy"];
         state.wrapMode = WrapMode.Loop;
         state.layer = 1;
         state.weight = 1.0f;
@@ -62,7 +62,7 @@ public class Anim_zombie : MonoBehaviour {
             anim.CrossFade("walk");
         }
         if ( ai.state_attack ) {
-            anim.CrossFade("attack");
+            anim.CrossFade("attack_copy");
         }
     }
 

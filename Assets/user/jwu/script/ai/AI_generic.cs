@@ -139,4 +139,16 @@ public class AI_generic : MonoBehaviour {
             Destroy(gameObject);
         }
     }
+	void AttackOn (){
+		//TODO: attach collision to zombie arm
+		Debug.Log("Zombie girl Attacking!");
+	}
+	
+	void AttackOff (){
+		//TODO: remove collision from zombie arm
+		Debug.Log("Zombie girl finished attacking!");
+	}
+	
 }
+
+
