@@ -49,26 +49,54 @@ public class CurvesTransferer
         string copyPath = importedPath.Substring(0, importedPath.LastIndexOf("/"));
         copyPath += "/" + imported.name + duplicatePostfix + ".anim";
 
-        CopyClip(importedPath, copyPath);
-
         AnimationClip copy = AssetDatabase.LoadAssetAtPath(copyPath, typeof(AnimationClip)) as AnimationClip;
+        bool direct_copy = false;
+        if ( copy == null ) // if the animclip_copy exists, we should get store its AnimationEvents
+        {
+            CopyClip(importedPath, copyPath);
+            direct_copy = true;
+        }
+
+        // now, check the copy again to ensure it exists.
+        copy = AssetDatabase.LoadAssetAtPath(copyPath, typeof(AnimationClip)) as AnimationClip;
         if (copy == null)
         {
             Debug.Log("No copy found at " + copyPath);
             return;
         }
         // Copy curves from imported to copy
-        AnimationClipCurveData[] curveDatas = AnimationUtility.GetAllCurves(imported, true);
-        for (int i = 0; i < curveDatas.Length; i++)
-        {
-            AnimationUtility.SetEditorCurve(
-                                            copy,
-                                            curveDatas[i].path,
-                                            curveDatas[i].type,
-                                            curveDatas[i].propertyName,
-                                            curveDatas[i].curve
-                                           );
+        AnimationClipCurveData[] src_curveData = AnimationUtility.GetAllCurves(imported, true);
+        direct_copy = true; // TEMP HACK: you need to finish the TODO to delete this.
+        if ( direct_copy ) {
+            for ( int i = 0; i < src_curveData.Length; ++i ) {
+                AnimationUtility.SetEditorCurve( copy,
+                                                 src_curveData[i].path,
+                                                 src_curveData[i].type,
+                                                 src_curveData[i].propertyName,
+                                                 src_curveData[i].curve );
+            }
         }
+        else {
+            // TODO: not finish yet! { 
+            // AnimationClipCurveData[] copy_curveData = AnimationUtility.GetAllCurves(copy, true);
+            // for ( int i = 0; i < src_curveData.Length; ++i ) {
+            //     for ( int j = 0; j < copy_curveData.Length; ++j ) {
+            //         if ( src_curveData[i].path == copy_curveData[j].path &&
+            //              src_curveData[i].type == copy_curveData[j].type &&
+            //              src_curveData[i].propertyName == copy_curveData[j].propertyName ) {
+            //             AnimationUtility.SetEditorCurve( copy,
+            //                                              src_curveData[i].path,
+            //                                              src_curveData[i].type,
+            //                                              src_curveData[i].propertyName,
+            //                                              src_curveData[i].curve );
+            //             copy_curveData.RemoveAt(j);
+            //             break;
+            //         }
+            //     }
+            // }
+            // } TODO end 
+        }
+
 
         Debug.Log("Copying curves into " + copy.name + " is done");
     }

@@ -50,5 +50,15 @@ public class Player_base : MonoBehaviour {
         DebugHelper.Assert( screenPad, "screenPad not found" );
         // curHP = maxHP;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnTriggerEnter ( Collider _other ) {
+        if ( _other.tag == "Zombie" ) {
+            curHP -= 5.0f;
+        }
+    }
 }
 
