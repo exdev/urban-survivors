@@ -32,8 +32,12 @@ public class AI_generic : MonoBehaviour {
     public bool state_move = false;
     public bool state_attack = false;
 
+    public Transform atkWrapper;
+    public Transform atkAttachedBone;
+
     private Vector3 wanted_pos;
     private Quaternion wanted_rot;
+    private Transform target;
 
     ///////////////////////////////////////////////////////////////////////////////
     // defines
@@ -51,22 +55,35 @@ public class AI_generic : MonoBehaviour {
         // );
         // } DISABLE end 
 
+        DebugHelper.Assert(atkWrapper, "attack wrapper not assigned");
+        DebugHelper.Assert(atkAttachedBone, "attack attached bone not assigned");
+        atkWrapper.parent = atkAttachedBone;
+        atkWrapper.gameObject.active = false;
+
         // init ai
         wanted_pos = transform.position;
         wanted_rot = transform.rotation;
 
-        // GetRandomDest(2.0);
-        GetPlayerPos(2.0f);
+        // StartCoroutine(GetRandomDest(2.0));
+        StartCoroutine(GeNearestPlayerPos(2.0f));
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    IEnumerator GetPlayerPos ( float _tickTime ) {
+    IEnumerator GeNearestPlayerPos ( float _tickTime ) {
         while ( true ) {
-            GameObject player = GameObject.FindWithTag("Player");
-            wanted_pos = player.transform.position;
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+            float nearest = 999.0f;
+            foreach( GameObject player in players ) {
+                float len = (player.transform.position - transform.position).magnitude;
+                if ( len < nearest ) {
+                    nearest = len;
+                    wanted_pos = player.transform.position;
+                    target = player.transform;
+                }
+            }
             yield return new WaitForSeconds (_tickTime);
         }
     }
@@ -106,12 +123,11 @@ public class AI_generic : MonoBehaviour {
         // } DISABLE end 
 
         // reset the state
-        GameObject player = GameObject.FindWithTag("Player");
         state_attack = false;
         state_move = false;
 
         // move ai
-        Vector3 delta = player.transform.position - transform.position;
+        Vector3 delta = target.position - transform.position;
         if ( delta.magnitude >= 1.5f ) {
             // transform.position += delta.normalized * move_speed * Time.deltaTime;
             transform.position += transform.forward * move_speed * Time.deltaTime;
@@ -124,7 +140,7 @@ public class AI_generic : MonoBehaviour {
         }
 
         // rotate ai
-        wanted_rot = Quaternion.LookRotation( player.transform.position - transform.position );
+        wanted_rot = Quaternion.LookRotation( target.position - transform.position );
         wanted_rot.x = 0.0f; wanted_rot.z = 0.0f;
         transform.rotation = Quaternion.Slerp ( 
                                                transform.rotation, 
@@ -139,14 +155,21 @@ public class AI_generic : MonoBehaviour {
             Destroy(gameObject);
         }
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
 	void AttackOn (){
-		//TODO: attach collision to zombie arm
-		Debug.Log("Zombie girl Attacking!");
+        atkWrapper.gameObject.active = true;
 	}
 	
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
 	void AttackOff (){
-		//TODO: remove collision from zombie arm
-		Debug.Log("Zombie girl finished attacking!");
+        atkWrapper.gameObject.active = false;
 	}
 	
 }
