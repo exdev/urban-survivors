@@ -24,7 +24,7 @@ public class Player_base : MonoBehaviour {
     protected ScreenPad screenPad;
     protected float curHP = 60.0f;
     protected Vector3 faceInitPos;
-
+	protected PackedSprite faceSprite;
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -56,6 +56,7 @@ public class Player_base : MonoBehaviour {
         UIProgressBar hpProgressBar = ui_HP.GetComponent(typeof(UIProgressBar)) as UIProgressBar;
         hpProgressBar.Value = this.GetHP();
         faceInitPos = ui_face.transform.position; 
+		faceSprite = ui_face.GetComponent(typeof(PackedSprite)) as PackedSprite;
     }
 
     // ------------------------------------------------------------------ 
@@ -69,6 +70,13 @@ public class Player_base : MonoBehaviour {
             // update UI
             UIProgressBar hpProgressBar = ui_HP.GetComponent(typeof(UIProgressBar)) as UIProgressBar;
             hpProgressBar.Value = this.GetHP();
+			//Temporary code by nantas:
+			//added animation change when HP is too low
+			if (hpProgressBar.Value <= 0.2) {
+				faceSprite.PlayAnim(0); //index for 0-goBerserk
+			}
+			//Temp code ends	
+				
 
             iTween.Stop(ui_face, "shake" );
             ui_face.transform.position = faceInitPos;
