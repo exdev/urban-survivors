@@ -26,14 +26,25 @@ using System.Collections.Generic;
 
 public class ScreenPad : MonoBehaviour {
 
+    //
+    private Vector2 move_dir;
+    private int moveID = -1;
+    private Vector2 aiming_dir = Vector2.up;
+    private int aimingID = -1;
+    private List<Touch> available_touches = new List<Touch>();
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // properties
+    ///////////////////////////////////////////////////////////////////////////////
+
     public Camera hud_camera;
-    public GameObject analog;
+    public Transform analog;
+    public Transform aimingNeedle;
+
     public Circle move_zone;
     public float move_limitation;
 
-    private Vector2 move_dir;
-    private List<Touch> available_touches = new List<Touch>();
-    private int moveID = -1;
+    public Circle aiming_zone;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -62,23 +73,54 @@ public class ScreenPad : MonoBehaviour {
         // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
         move_dir = Vector2.zero;
         available_touches.Clear();
+
         Touch move_finger = new Touch();
+        Touch aiming_finger = new Touch();
         bool tracMoveFinger = false;
+        bool tracAimingFinger = false;
 
         // first check if move finger invalid
         foreach ( Touch t in Input.touches ) {
-            if ( t.fingerId == moveID ) {
-                if ( t.phase == TouchPhase.Ended ||
-                     t.phase == TouchPhase.Canceled ) {
-                    moveID = -1;
-                }
-                else {
-                    move_finger = t;
-                    tracMoveFinger = true;
-                }
+            // if we found them all, skip search the list.
+            if ( tracMoveFinger && tracAimingFinger ) {
                 break;
             }
+
+            // we found the the move finger to trac 
+            if ( tracMoveFinger == false ) {
+                if ( t.fingerId == moveID ) {
+                    if ( t.phase == TouchPhase.Ended ||
+                         t.phase == TouchPhase.Canceled ) {
+                        moveID = -1;
+                    }
+                    else {
+                        move_finger = t;
+                        tracMoveFinger = true;
+                    }
+                    continue;
+                }
+            }
+
+            // we found the aiming finger to trac
+            if ( tracAimingFinger == false ) {
+                if ( t.fingerId == aimingID ) {
+                    if ( t.phase == TouchPhase.Ended ||
+                         t.phase == TouchPhase.Canceled ) {
+                        aimingID = -1;
+                    }
+                    else {
+                        aiming_finger = t;
+                        tracAimingFinger = true;
+                    }
+                    continue;
+                }
+            }
         }
+
+        // NOTE: this will protect the code in UnityRemote mode { 
+        if ( tracMoveFinger == false ) moveID = -1;
+        if ( tracAimingFinger == false ) aimingID = -1;
+        // } NOTE end 
 
         //
         foreach ( Touch t in Input.touches ) {
@@ -87,22 +129,23 @@ public class ScreenPad : MonoBehaviour {
                 continue;
             }
 
-            // skip move finger if we tracing it.
-            if ( tracMoveFinger ) {
-                if ( t.fingerId == moveID ) {
+            // skip move/aiming finger if we tracing it.
+            if ( t.fingerId == moveID || t.fingerId == aimingID ) {
+                continue;
+            }
+
+            // record the finger in the move zone as move finger
+            Vector2 screenPos = t.position;
+            if ( t.phase == TouchPhase.Began ) {
+                if ( move_zone.Contains(screenPos) ) {
+                    move_finger = t;
+                    moveID = t.fingerId;
                     continue;
                 }
-            }
-            else {
-                Vector2 screenPos = t.position;
-
-                // record the finger in the move zone as move finger
-                if ( t.phase == TouchPhase.Began ) {
-                    if ( move_zone.Contains(screenPos) ) {
-                        move_finger = t;
-                        moveID = t.fingerId;
-                        continue;
-                    }
+                else if ( aiming_zone.Contains(screenPos) ) {
+                    aiming_finger = t;
+                    aimingID = t.fingerId;
+                    continue;
                 }
             }
 
@@ -114,12 +157,14 @@ public class ScreenPad : MonoBehaviour {
         if ( moveID != -1 ) {
             HandleMove(move_finger.position);
         }
+        if ( aimingID != -1 ) {
+            HandleAiming(aiming_finger.position);
+        }
 
         // DEBUG { 
-        // DebugHelper.ScreenPrint("moveID = " + moveID);
-        // foreach ( Touch t in Input.touches ) {
-        //     DebugHelper.ScreenPrint("touch: " + t);
-        // }
+        foreach ( Touch t in Input.touches ) {
+            DebugHelper.ScreenPrint("touch position: " + t.position);
+        }
         // } DEBUG end 
 #else
 
@@ -140,7 +185,7 @@ public class ScreenPad : MonoBehaviour {
                                           "easetype", iTween.EaseType.easeInCubic 
                                         );
             // iTween.MoveTo ( analog, worldpos, 0.2f );
-            iTween.MoveTo ( analog, args );
+            iTween.MoveTo ( analog.gameObject, args );
         }
 	}
 
@@ -149,14 +194,36 @@ public class ScreenPad : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void HandleMove ( Vector2 _screenPos ) {
-        iTween.Stop (analog,"move");
+        iTween.Stop (analog.gameObject,"move");
         Vector2 delta = _screenPos - move_zone.center;
         move_dir = delta.normalized;
         float len = delta.magnitude;
         Vector2 final_pos = move_zone.center + move_dir * Mathf.Min( len, move_limitation );
 
         Vector3 worldpos = hud_camera.ScreenToWorldPoint( new Vector3( final_pos.x, final_pos.y, 1 ) );
-        analog.transform.position = new Vector3( worldpos.x, worldpos.y, analog.transform.position.z ); 
+        analog.position = new Vector3( worldpos.x, worldpos.y, analog.position.z ); 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void HandleAiming ( Vector2 _screenPos ) {
+        // the screen touch priority is higher than aiming_zone
+        if ( available_touches.Count != 0 ) {
+            Touch t = GetLastTouch();
+            // aiming_dir = 
+        }
+        else {
+            Vector2 delta = _screenPos - aiming_zone.center;
+            aiming_dir = -delta.normalized;
+            Vector2 up = Vector2.up;
+
+            // use cross to get the direction of the rotation.
+            float sin_theta = aiming_dir.x * up.y - aiming_dir.y * up.x; 
+            float degrees = Vector2.Angle( aiming_dir, Vector2.up );
+            aimingNeedle.eulerAngles = new Vector3( 0.0f, 0.0f, -1.0f * degrees * Mathf.Sign(sin_theta) );
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -164,6 +231,12 @@ public class ScreenPad : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public Vector2 GetMoveDirection () { return move_dir; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Vector2 GetAimingDirection () { return aiming_dir; }
 
     // ------------------------------------------------------------------ 
     // Desc: 

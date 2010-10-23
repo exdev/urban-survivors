@@ -142,12 +142,19 @@ public class Player_girl : Player_base {
             if ( screen_dir.magnitude >= 0.0f ) {
                 moveDir.x = screen_dir.x;
                 moveDir.y = screen_dir.y;
-                Transform mainCamera = Camera.main.GetComponent( typeof(Transform) ) as Transform;
+                Transform mainCamera = Camera.main.transform;
                 moveDir = mainCamera.TransformDirection(moveDir.normalized); 
                 moveDir.y = 0.0f;
                 moveDir = moveDir.normalized;
             }
         }
+
+        Vector2 aimDir2D = screenPad.GetAimingDirection();
+        aimDir = Vector3.zero; 
+        aimDir.x = aimDir2D.x; aimDir.y = aimDir2D.y; 
+        aimDir = Camera.main.transform.TransformDirection(aimDir);
+        aimDir.y = 0.0f;
+        aimDir = aimDir.normalized;
 
         // process aiming
 #if UNITY_IPHONE
