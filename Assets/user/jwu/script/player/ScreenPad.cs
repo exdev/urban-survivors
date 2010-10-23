@@ -33,6 +33,7 @@ public class ScreenPad : MonoBehaviour {
 
     private Vector2 move_dir;
     private List<Touch> available_touches = new List<Touch>();
+    private int moveID = -1;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -61,22 +62,65 @@ public class ScreenPad : MonoBehaviour {
         // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
         move_dir = Vector2.zero;
         available_touches.Clear();
-        foreach ( Touch t in Input.touches ) {
-            Vector2 screenPos = new Vector2 ( t.position.x, t.position.y );
-            // DEBUG { 
-            DebugHelper.ScreenPrint ( "touch point in screen: " + screenPos );
-            // float len = (screenPos - move_zone.center).magnitude;
-            // DebugHelper.ScreenPrint ( "len is " + len );
-            // } DEBUG end 
+        Touch move_finger = new Touch();
+        bool tracMoveFinger = false;
 
-            // touch move
-            if ( move_zone.Contains(screenPos) ) {
-                HandleMove(screenPos);
-            }
-            else {
-                available_touches.Add(t);
+        // first check if move finger invalid
+        foreach ( Touch t in Input.touches ) {
+            if ( t.fingerId == moveID ) {
+                if ( t.phase == TouchPhase.Ended ||
+                     t.phase == TouchPhase.Canceled ) {
+                    moveID = -1;
+                }
+                else {
+                    move_finger = t;
+                    tracMoveFinger = true;
+                }
+                break;
             }
         }
+
+        //
+        foreach ( Touch t in Input.touches ) {
+            if ( t.phase == TouchPhase.Ended ||
+                 t.phase == TouchPhase.Canceled ) {
+                continue;
+            }
+
+            // skip move finger if we tracing it.
+            if ( tracMoveFinger ) {
+                if ( t.fingerId == moveID ) {
+                    continue;
+                }
+            }
+            else {
+                Vector2 screenPos = t.position;
+
+                // record the finger in the move zone as move finger
+                if ( t.phase == TouchPhase.Began ) {
+                    if ( move_zone.Contains(screenPos) ) {
+                        move_finger = t;
+                        moveID = t.fingerId;
+                        continue;
+                    }
+                }
+            }
+
+            // those un-handle touches, will recognized as screen touch.
+            available_touches.Add(t);
+        }
+
+        // now process move by move_finger
+        if ( moveID != -1 ) {
+            HandleMove(move_finger.position);
+        }
+
+        // DEBUG { 
+        // DebugHelper.ScreenPrint("moveID = " + moveID);
+        // foreach ( Touch t in Input.touches ) {
+        //     DebugHelper.ScreenPrint("touch: " + t);
+        // }
+        // } DEBUG end 
 #else
 
         // handle keyboard move
