@@ -149,6 +149,7 @@ public class Player_girl : Player_base {
             }
         }
 
+        // get direction by screenPad
         Vector2 aimDir2D = screenPad.GetAimingDirection();
         aimDir = Vector3.zero; 
         aimDir.x = aimDir2D.x; aimDir.y = aimDir2D.y; 
@@ -156,46 +157,56 @@ public class Player_girl : Player_base {
         aimDir.y = 0.0f;
         aimDir = aimDir.normalized;
 
-        // process aiming
-#if UNITY_IPHONE
-        if ( screenPad.AvailableTouches().Count != 0 ) {
-            Touch lastTouch = screenPad.GetLastTouch();
-            Ray ray = Camera.main.ScreenPointToRay (lastTouch.position); 
-#else
-            Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition); 
-#endif
-            Plane plane = new Plane ( Vector3.up, -upperBody.position.y );
-            float dist = 0.0f;
-            plane.Raycast( ray, out dist );
-            Vector3 aimPos = ray.origin + ray.direction * dist;
-
-            aimDir = aimPos - upperBody.position; 
-            aimDir.y = 0.0f;
-            aimDir.Normalize();
-
-            // DEBUG { 
-            // Debug.DrawRay ( ray.origin, ray.direction * 100, Color.yellow ); // camera look-foward ray
-            DebugHelper.DrawBall ( aimPos, 0.2f, Color.red ); // player aiming position
-            Debug.DrawLine ( upperBody.position, aimPos, Color.red ); // player aiming direction
-            // } DEBUG end 
-
-            // handle fire 
-#if UNITY_IPHONE
-            if ( lastTouch.phase != TouchPhase.Ended ) {
-#else
-            if ( Input.GetButton("Fire") ) {
-#endif
-                // if we have weapon in hand.
-                if ( curWeapon ) {
-                    Fire fire = curWeapon.GetComponent(typeof(Fire)) as Fire;
-                    if (fire) {
-                        fire.Trigger();
-                    }
+        // if we have weapon in hand.
+        if ( screenPad.CanFire() ) {
+            if ( curWeapon ) {
+                Fire fire = curWeapon.GetComponent(typeof(Fire)) as Fire;
+                if (fire) {
+                    fire.Trigger();
                 }
             }
-#if UNITY_IPHONE
         }
-#endif
+
+//         // process aiming
+// #if UNITY_IPHONE
+//         if ( screenPad.AvailableTouches().Count != 0 ) {
+//             Touch lastTouch = screenPad.GetLastTouch();
+//             Ray ray = Camera.main.ScreenPointToRay (lastTouch.position); 
+// #else
+//             Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition); 
+// #endif
+//             Plane plane = new Plane ( Vector3.up, -upperBody.position.y );
+//             float dist = 0.0f;
+//             plane.Raycast( ray, out dist );
+//             Vector3 aimPos = ray.origin + ray.direction * dist;
+
+//             aimDir = aimPos - upperBody.position; 
+//             aimDir.y = 0.0f;
+//             aimDir.Normalize();
+
+//             // DEBUG { 
+//             // Debug.DrawRay ( ray.origin, ray.direction * 100, Color.yellow ); // camera look-foward ray
+//             DebugHelper.DrawBall ( aimPos, 0.2f, Color.red ); // player aiming position
+//             Debug.DrawLine ( upperBody.position, aimPos, Color.red ); // player aiming direction
+//             // } DEBUG end 
+
+//             // handle fire 
+// #if UNITY_IPHONE
+//             if ( lastTouch.phase != TouchPhase.Ended ) {
+// #else
+//             if ( Input.GetButton("Fire") ) {
+// #endif
+//                 // if we have weapon in hand.
+//                 if ( curWeapon ) {
+//                     Fire fire = curWeapon.GetComponent(typeof(Fire)) as Fire;
+//                     if (fire) {
+//                         fire.Trigger();
+//                     }
+//                 }
+//             }
+// #if UNITY_IPHONE
+//         }
+// #endif
     }
 
     // ------------------------------------------------------------------ 
