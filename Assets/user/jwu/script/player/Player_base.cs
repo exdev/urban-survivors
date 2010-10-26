@@ -25,6 +25,7 @@ public class Player_base : MonoBehaviour {
     protected float curHP = 60.0f;
     protected Vector3 faceInitPos;
 	protected PackedSprite faceSprite;
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -34,6 +35,8 @@ public class Player_base : MonoBehaviour {
 
     public GameObject ui_HP;
     public GameObject ui_face;
+
+    public bool inverseHP = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -54,7 +57,7 @@ public class Player_base : MonoBehaviour {
         DebugHelper.Assert( screenPad, "screenPad not found" );
 
         UIProgressBar hpProgressBar = ui_HP.GetComponent(typeof(UIProgressBar)) as UIProgressBar;
-        hpProgressBar.Value = this.GetHP();
+        hpProgressBar.Value = inverseHP ? 1.0f - this.GetHP() : this.GetHP();
         faceInitPos = ui_face.transform.position; 
 		faceSprite = ui_face.GetComponent(typeof(PackedSprite)) as PackedSprite;
     }
@@ -69,15 +72,15 @@ public class Player_base : MonoBehaviour {
 
             // update UI
             UIProgressBar hpProgressBar = ui_HP.GetComponent(typeof(UIProgressBar)) as UIProgressBar;
-            hpProgressBar.Value = this.GetHP();
-			//Temporary code by nantas:
+            hpProgressBar.Value = inverseHP ? 1.0f - this.GetHP() : this.GetHP();
+
+            // TEMP nantas: { 
 			//added animation change when HP is too low
-			if (hpProgressBar.Value <= 0.2) {
+			if ( this.GetHP() <= 0.2f ) {
 				faceSprite.PlayAnim(0); //index for 0-goBerserk
 			}
-			//Temp code ends	
+            // } TEMP end 
 				
-
             iTween.Stop(ui_face, "shake" );
             ui_face.transform.position = faceInitPos;
             iTween.ShakePosition(ui_face, 10.0f * Vector3.right, 0.5f );
