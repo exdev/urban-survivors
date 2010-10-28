@@ -74,7 +74,7 @@ public class AI_generic : MonoBehaviour {
 
     IEnumerator GeNearestPlayerPos ( float _tickTime ) {
         while ( true ) {
-            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+            GameObject[] players = GameRules.Instance().GetPlayers();
             float nearest = 999.0f;
             foreach( GameObject player in players ) {
                 float len = (player.transform.position - transform.position).magnitude;
