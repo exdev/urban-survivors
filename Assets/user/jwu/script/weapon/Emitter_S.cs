@@ -51,7 +51,6 @@ public class Emitter_S : Emitter {
                 Debug.Log("failed to spawn bullet");
             }
             spawn_bullet.transform.position += Random.Range(0.0f,3.0f) * spawn_bullet.transform.forward;
-            CollisionIgnoreManager.Instance().AddIgnore( spawn_bullet.collider, Constant.mask_bullet, Constant.mask_player|Constant.mask_bullet );
         }
     }
 }

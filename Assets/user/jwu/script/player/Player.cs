@@ -271,11 +271,6 @@ public class Player : MonoBehaviour {
         // upperBody = obj.transform;
         // } DELME end 
 
-        // this will prevent animation not init problem when the scene don't have Global prefab.
-        if ( GameObject.FindWithTag("Global") != null ) {
-            CollisionIgnoreManager.Instance().AddIgnore( collider, Constant.mask_player, Constant.mask_none );
-        }
-
         // animation
         AnimationState state;
         Animation anim = GetComponent( typeof(Animation) ) as Animation;

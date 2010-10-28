@@ -17,7 +17,9 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 public class Constant : MonoBehaviour {
-    public static int mask_none  = 0x0000;
-    public static int mask_player = 0x0001;
-    public static int mask_bullet = 0x0002;
+    // DELME { 
+    // public static int mask_none  = 0x0000;
+    // public static int mask_player = 0x0001;
+    // public static int mask_bullet = 0x0002;
+    // } DELME end 
 }
