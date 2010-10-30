@@ -16,14 +16,12 @@ using System.Collections;
 // class 
 ///////////////////////////////////////////////////////////////////////////////
 
-public class Source_periodic : Source_base {
+[RequireComponent (typeof (BoxCollider))]
+public class Source_collider : Source_base {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
-
-    public float StartTime = 0.0f;
-    public float IntervalTime = 0.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -33,26 +31,20 @@ public class Source_periodic : Source_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	protected override void Start () {
+    protected override void Start () {
         base.Start();
-        StartCoroutine(StartCounter());
-	}
+        Collider collider = gameObject.GetComponent(typeof(Collider)) as Collider;
+        DebugHelper.Assert( collider.isTrigger == true, "the collider must set as a trigger" );
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    IEnumerator StartCounter () {
-        // if start time is zero, no need to wait.
-        if ( StartTime > 0.0f ) {
-            yield return new WaitForSeconds (StartTime);
-        }
-        base.Response();
-
-        // now enter the trigger loops
-        while ( base.CanTrigger() ) {
-            yield return new WaitForSeconds (IntervalTime);
+    void OnTriggerEnter ( Collider _other ) {
+        if ( base.CanTrigger() ) {
             base.Response();
         }
     }
-}
+
+}; // end class

@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : Source_periodic.cs
+// File         : Source_base.cs
 // Author       : Wu Jie 
-// Last Change  : 10/30/2010 | 01:11:47 AM | Saturday,October
+// Last Change  : 10/31/2010 | 00:29:56 AM | Sunday,October
 // Description  : 
 // ======================================================================================
 
@@ -13,17 +13,18 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// class 
+// Response_base
 ///////////////////////////////////////////////////////////////////////////////
 
-public class Source_periodic : Source_base {
+public class Source_base : MonoBehaviour {
+
+    protected Response_base[] ResponseList;
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public float StartTime = 0.0f;
-    public float IntervalTime = 0.0f;
+    public int TriggerTimes = -1; // -1 means infinite
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -33,26 +34,32 @@ public class Source_periodic : Source_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	protected override void Start () {
-        base.Start();
-        StartCoroutine(StartCounter());
-	}
+    protected bool CanTrigger () { return TriggerTimes != 0; }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    IEnumerator StartCounter () {
-        // if start time is zero, no need to wait.
-        if ( StartTime > 0.0f ) {
-            yield return new WaitForSeconds (StartTime);
-        }
-        base.Response();
+    protected virtual void Start () {
+        DebugHelper.Assert( TriggerTimes != 0, "TriggerTimes can't be zero. pls set -1 or number large than zero." );
 
-        // now enter the trigger loops
-        while ( base.CanTrigger() ) {
-            yield return new WaitForSeconds (IntervalTime);
-            base.Response();
-        }
+        // get all response for precache
+        ResponseList = GetComponents<Response_base>();
+        DebugHelper.Assert( ResponseList.Length > 0, "There isn't any Response component in your script" );
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected void Response () {
+        // execute each response
+        foreach( Response_base response in ResponseList ) {
+            response.exec();
+        }
+        // no need to minus trigger times if it is less than zero.
+        TriggerTimes = TriggerTimes > 0 ? --TriggerTimes : TriggerTimes;
+    }
+
 }
+
