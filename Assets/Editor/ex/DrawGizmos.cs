@@ -26,7 +26,7 @@ class DrawGizmos {
     static void DrawPeriodicSource ( Source_periodic _triggerSource, GizmoType _gizmoType ) {
         Vector3 position = _triggerSource.transform.position;
         // Draw the icon (A bit above the one drawn)
-        Gizmos.DrawIcon (position, "Source_periodic");
+        Gizmos.DrawIcon (position, "Napster.ico");
 
         // KEEPME { 
         // // Are we selected? Draw a solid sphere surrounding the light
