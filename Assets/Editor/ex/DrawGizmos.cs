@@ -40,6 +40,17 @@ class DrawGizmos {
         // }
         // } KEEPME end 
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
+    static void DrawPeriodicSource ( Source_collider _triggerSource, GizmoType _gizmoType ) {
+        Vector3 position = _triggerSource.transform.position;
+        // Draw the icon (A bit above the one drawn)
+        Gizmos.DrawIcon (position, "Desktop.ico");
+    }
 }
 
 // KEEPME { 
