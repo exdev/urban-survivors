@@ -21,10 +21,10 @@ using System.Collections;
 
 public class Player_base : MonoBehaviour {
 
-    protected ScreenPad screenPad;
+    protected ScreenPad screenPad = null;
     protected float curHP = 60.0f;
-    protected Vector3 faceInitPos;
-	protected PackedSprite faceSprite;
+    protected Vector3 faceInitPos = Vector3.zero;
+	protected PackedSprite faceSprite = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -56,10 +56,14 @@ public class Player_base : MonoBehaviour {
         screenPad = GameObject.Find("HUD").GetComponent(typeof(ScreenPad)) as ScreenPad;
         DebugHelper.Assert( screenPad, "screenPad not found" );
 
-        UIProgressBar hpProgressBar = ui_HP.GetComponent(typeof(UIProgressBar)) as UIProgressBar;
-        hpProgressBar.Value = inverseHP ? 1.0f - this.GetHP() : this.GetHP();
-        faceInitPos = ui_face.transform.position; 
-		faceSprite = ui_face.GetComponent(typeof(PackedSprite)) as PackedSprite;
+        if ( ui_HP ) {
+            UIProgressBar hpProgressBar = ui_HP.GetComponent(typeof(UIProgressBar)) as UIProgressBar;
+            hpProgressBar.Value = inverseHP ? 1.0f - this.GetHP() : this.GetHP();
+        }
+        if ( ui_face ) {
+            faceInitPos = ui_face.transform.position; 
+            faceSprite = ui_face.GetComponent(typeof(PackedSprite)) as PackedSprite;
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -77,14 +81,17 @@ public class Player_base : MonoBehaviour {
             // TEMP nantas: { 
 			//added animation change when HP is too low
 			if ( this.GetHP() <= 0.2f ) {
-				faceSprite.PlayAnim(0); //index for 0-goBerserk
+                if ( faceSprite )
+                    faceSprite.PlayAnim(0); //index for 0-goBerserk
 			}
             // } TEMP end 
 				
-            iTween.Stop(ui_face, "shake" );
-            ui_face.transform.position = faceInitPos;
-            iTween.ShakePosition(ui_face, 10.0f * Vector3.right, 0.5f );
-            // iTween.ShakeRotation(ui_face, 30.0f * Vector3.forward, 0.5f );
+            if ( ui_face ) {
+                iTween.Stop(ui_face, "shake" );
+                ui_face.transform.position = faceInitPos;
+                iTween.ShakePosition(ui_face, 10.0f * Vector3.right, 0.5f );
+                // iTween.ShakeRotation(ui_face, 30.0f * Vector3.forward, 0.5f );
+            }
         }
     }
 }

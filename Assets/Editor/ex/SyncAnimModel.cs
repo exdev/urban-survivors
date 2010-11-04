@@ -78,7 +78,7 @@ public class SyncAnimModel
         }
 
         // replace the old prefab with the new one
-        EditorUtility.ReplacePrefab( old_prefabGO, new_prefabGO );
+        EditorUtility.ReplacePrefab( new_prefabGO, old_prefabGO );
         AssetDatabase.DeleteAsset(new_prefabPath);
 
         //
