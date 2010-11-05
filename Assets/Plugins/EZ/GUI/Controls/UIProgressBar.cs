@@ -143,7 +143,7 @@ public class UIProgressBar : AutoSpriteControlBase
 			emptyObj.transform.localRotation = Quaternion.identity;
 			emptyObj.layer = gameObject.layer;
 			emptySprite = (AutoSprite)emptyObj.AddComponent(typeof(AutoSprite));
-			emptySprite.plane = plane;
+			emptySprite.plane = this.plane;
 			emptySprite.autoResize = autoResize;
 			emptySprite.pixelPerfect = pixelPerfect;
 			emptySprite.persistent = persistent;

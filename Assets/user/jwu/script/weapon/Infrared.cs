@@ -54,9 +54,11 @@ public class Infrared : MonoBehaviour {
     void Update () {
         LineRenderer lr = GetComponent(typeof(LineRenderer)) as LineRenderer;
         if ( lr ) {
-            int layerMask = 1 << 2;
-            // This would cast rays only against colliders in layer 2.
-            // But instead we want to collide against everything except layer 2. 
+            // This would cast rays only against colliders in layer x.
+            // ignore layer: player_bullet, player, trigger
+            int layerMask = 1 << 9 | 1 << 10 | 1 << 14;
+
+            // But instead we want to collide against everything except layer x. 
             // The ~ operator does this, it inverts a bitmask.
             layerMask = ~layerMask;
 

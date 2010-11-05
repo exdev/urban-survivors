@@ -24,7 +24,6 @@ public class Emitter_default : Emitter {
 
     public override void Emit ( GameObject _bullet ) {
         // create a bullet, and rotate it based on the vector inputRotation
-        GameObject spawn_bullet = (GameObject)Instantiate(_bullet, transform.position, transform.rotation );
-        CollisionIgnoreManager.Instance().AddIgnore( spawn_bullet.collider, Constant.mask_bullet, Constant.mask_player|Constant.mask_bullet );
+        Instantiate(_bullet, transform.position, transform.rotation );
     }
 }
