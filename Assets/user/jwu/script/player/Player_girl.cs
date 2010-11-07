@@ -128,6 +128,8 @@ public class Player_girl : Player_base {
         state.layer = 0;
         state.weight = 1.0f;
         state.enabled = true;
+
+        anim.SyncLayer(0);
     }
 
     // ------------------------------------------------------------------ 
@@ -298,8 +300,8 @@ public class Player_girl : Player_base {
                     animName = "moveRight";
                 }
             }
-            anim.CrossFade(animName);
             anim[animName].normalizedSpeed = stepSpeed;
+            anim.CrossFade(animName);
         }
 
         // TODO: smooth rotation
