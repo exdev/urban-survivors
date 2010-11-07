@@ -23,22 +23,10 @@ class DrawGizmos {
     // ------------------------------------------------------------------ 
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
-    static void DrawPeriodicSource ( Source_periodic _triggerSource, GizmoType _gizmoType ) {
-        Vector3 position = _triggerSource.transform.position;
+    static void DrawPeriodicSource ( Source_periodic _c, GizmoType _gizmoType ) {
+        Vector3 position = _c.transform.position;
         // Draw the icon (A bit above the one drawn)
         Gizmos.DrawIcon (position, "Napster.ico");
-
-        // KEEPME { 
-        // // Are we selected? Draw a solid sphere surrounding the light
-        // if ( (_gizmoType & GizmoType.SelectedOrChild) != 0 ) {
-        //     // Indicate that this is the active object by using a brighter color.
-        //     if ( (_gizmoType & GizmoType.Active) != 0 )
-        //         Gizmos.color = Color.red;
-        //     else
-        //         Gizmos.color = Color.red * 0.5F;
-        //     Gizmos.DrawSphere (position, 10.0f);
-        // }
-        // } KEEPME end 
     }
 
     // ------------------------------------------------------------------ 
@@ -46,10 +34,36 @@ class DrawGizmos {
     // ------------------------------------------------------------------ 
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
-    static void DrawPeriodicSource ( Source_collider _triggerSource, GizmoType _gizmoType ) {
-        Vector3 position = _triggerSource.transform.position;
+    static void DrawPeriodicSource ( Source_collider _c, GizmoType _gizmoType ) {
+        Vector3 position = _c.transform.position;
         // Draw the icon (A bit above the one drawn)
         Gizmos.DrawIcon (position, "Desktop.ico");
+
+        // draw the collider
+        Collider co = _c.gameObject.collider;
+        if ( co.GetType() == typeof(BoxCollider) ) {
+            BoxCollider box = co as BoxCollider;
+            Gizmos.color = new Color( 1.0f, 0.0f, 0.0f, 0.2f );
+            Gizmos.DrawCube (box.center + position, box.size);
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube (box.center + position, box.size);
+        }
+    }
+
+    [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
+    static void DrawPeriodicSource ( Spawner_point _c, GizmoType _gizmoType ) {
+        Vector3 position = _c.transform.position;
+        // Draw the icon (A bit above the one drawn)
+        Gizmos.DrawIcon (position, "Blender.ico");
+    }
+
+    [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
+    static void DrawPeriodicSource ( Response_listSpawn _c, GizmoType _gizmoType ) {
+        Gizmos.color = Color.yellow;
+        foreach ( GameObject go in _c.Spawners ) {
+            Vector3 position = _c.transform.position;
+            Gizmos.DrawLine (position, go.transform.position);
+        }
     }
 }
 
