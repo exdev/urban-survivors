@@ -53,8 +53,11 @@ public class Player_base : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
 	protected void Start () {
-        screenPad = GameObject.Find("HUD").GetComponent(typeof(ScreenPad)) as ScreenPad;
-        DebugHelper.Assert( screenPad, "screenPad not found" );
+        GameObject hud = GameObject.Find("HUD");
+        if ( hud ) {
+            screenPad = hud.GetComponent(typeof(ScreenPad)) as ScreenPad;
+        }
+        // DebugHelper.Assert( screenPad, "screenPad not found" );
 
         if ( ui_HP ) {
             UIProgressBar hpProgressBar = ui_HP.GetComponent(typeof(UIProgressBar)) as UIProgressBar;

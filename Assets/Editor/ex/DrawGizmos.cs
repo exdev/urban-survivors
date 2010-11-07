@@ -25,18 +25,16 @@ class DrawGizmos {
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void DrawPeriodicSource ( Source_periodic _c, GizmoType _gizmoType ) {
         Vector3 position = _c.transform.position;
-        // Draw the icon (A bit above the one drawn)
-        Gizmos.DrawIcon (position, "Napster.ico");
+        Gizmos.DrawIcon (position, "Adobe.ico");
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    // Desc: Source_collider
     // ------------------------------------------------------------------ 
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void DrawPeriodicSource ( Source_collider _c, GizmoType _gizmoType ) {
         Vector3 position = _c.transform.position;
-        // Draw the icon (A bit above the one drawn)
         Gizmos.DrawIcon (position, "Desktop.ico");
 
         // draw the collider
@@ -50,12 +48,19 @@ class DrawGizmos {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: Spawner_point
+    // ------------------------------------------------------------------ 
+
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void DrawPeriodicSource ( Spawner_point _c, GizmoType _gizmoType ) {
         Vector3 position = _c.transform.position;
-        // Draw the icon (A bit above the one drawn)
         Gizmos.DrawIcon (position, "Blender.ico");
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Response_listSpawn
+    // ------------------------------------------------------------------ 
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void DrawPeriodicSource ( Response_listSpawn _c, GizmoType _gizmoType ) {
@@ -64,6 +69,16 @@ class DrawGizmos {
             Vector3 position = _c.transform.position;
             Gizmos.DrawLine (position, go.transform.position);
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: StartPoint
+    // ------------------------------------------------------------------ 
+
+    [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
+    static void DrawPeriodicSource ( StartPoint _c, GizmoType _gizmoType ) {
+        Vector3 position = _c.transform.position;
+        Gizmos.DrawIcon (position, "Napster.ico");
     }
 }
 

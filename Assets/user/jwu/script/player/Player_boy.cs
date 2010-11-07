@@ -49,7 +49,7 @@ public class Player_boy : Player_base {
 	void Update () {
         // DEBUG { 
         Vector3 velocity = rigidbody.GetPointVelocity(transform.position);
-        DebugHelper.ScreenPrint( "velocity: " + velocity );
+        // DebugHelper.ScreenPrint( "velocity: " + velocity );
         Debug.DrawLine ( transform.position, transform.position + velocity, Color.white );
         // } DEBUG end 
 
@@ -82,9 +82,15 @@ public class Player_boy : Player_base {
             state.layer = 0;
             state.wrapMode = WrapMode.Loop;
             state.weight = 1.0f;
-            state.blendMode = AnimationBlendMode.Blend;
             state.enabled = false;
         }
+
+        state = anim["melee1_copy"];
+        state.layer = 1;
+        state.wrapMode = WrapMode.Once;
+        state.weight = 1.0f;
+        state.enabled = false;
+
         state = anim["idle"];
         state.wrapMode = WrapMode.Loop;
         state.layer = 0;
@@ -98,7 +104,7 @@ public class Player_boy : Player_base {
 
     private void HandleInput() {
         moveDir = Vector3.zero; 
-        Vector2 screen_dir = screenPad.GetMoveDirection();
+        Vector2 screen_dir = screenPad ? screenPad.GetMoveDirection() : Vector2.zero;
         if ( screen_dir.magnitude >= 0.0f ) {
             moveDir.x = screen_dir.x;
             moveDir.y = screen_dir.y;
@@ -107,6 +113,11 @@ public class Player_boy : Player_base {
             moveDir.y = 0.0f;
             moveDir = moveDir.normalized;
         }
+        // TEMP { 
+        if ( Input.GetKeyDown(KeyCode.Space) ) {
+            anim.CrossFade("melee1_copy");
+        }
+        // } TEMP end 
     }
 
     // ------------------------------------------------------------------ 
@@ -144,4 +155,17 @@ public class Player_boy : Player_base {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    private void StartMeleeAttack () {
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    private void EndMeleeAttack () {
+    }
 }
