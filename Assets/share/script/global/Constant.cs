@@ -16,10 +16,18 @@ using System.Collections;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
-public class Constant : MonoBehaviour {
-    // DELME { 
-    // public static int mask_none  = 0x0000;
-    // public static int mask_player = 0x0001;
-    // public static int mask_bullet = 0x0002;
-    // } DELME end 
+public class Layer {
+    // system layer
+    static public int Default = 0;
+    static public int TransparentFX = 1;
+    static public int IgnoreRaycast = 2;
+    static public int Water = 4;
+    // user layer
+    static public int UI = 8;
+    static public int player_bullet = 9;
+    static public int player = 10;
+    static public int enemy = 11;
+    static public int building = 12;
+    static public int ground = 13;
+    static public int trigger = 14;
 }

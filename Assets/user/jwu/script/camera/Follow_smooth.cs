@@ -17,7 +17,7 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 // Place the script in the Camera-Control group in the component menu
-[AddComponentMenu("Camera-Control/Topdown Follow")]
+[AddComponentMenu("Camera-Control/Topdown Smooth Follow")]
 public class Follow_smooth: MonoBehaviour {
 
     ///////////////////////////////////////////////////////////////////////////////
