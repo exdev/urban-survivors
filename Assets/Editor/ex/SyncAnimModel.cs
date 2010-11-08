@@ -65,6 +65,10 @@ public class SyncAnimModel
         GameObject new_prefabGO = AssetDatabase.LoadAssetAtPath(new_prefabPath, typeof(GameObject)) as GameObject;
         DebugHelper.Assert( new_prefabGO, "Can't find prefab: " + new_prefabPath );
 
+        // copy GO tag & layer
+        new_prefabGO.tag = old_prefabGO.tag;
+        new_prefabGO.layer = old_prefabGO.layer;
+
         // copy the components from the old prefab.
         Component[] old_comps = old_prefabGO.GetComponents<Component>();
         foreach ( Component old_comp in old_comps ) {
