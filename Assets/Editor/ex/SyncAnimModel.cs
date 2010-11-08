@@ -28,6 +28,35 @@ public class SyncAnimModel
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    static void CopyTagAndLayerRecursively ( string _path, Transform _src, Transform _destRoot ) {
+        Transform destChildTrans = null;
+
+        if ( _path == "" ) {
+            destChildTrans = _destRoot;
+        }
+        else {
+            destChildTrans = _destRoot.Find(_path);
+        }
+
+        if ( destChildTrans == null )
+            return;
+
+        destChildTrans.gameObject.tag = _src.gameObject.tag;
+        destChildTrans.gameObject.layer = _src.gameObject.layer;
+        foreach ( Transform child in _src ) {
+            string child_path = "";
+            if ( _path == "" )
+                child_path = child.gameObject.name;
+            else
+                child_path = child.gameObject.name + "/" + _path;
+            CopyTagAndLayerRecursively ( child_path, child, _destRoot );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     [MenuItem("Assets/Sync Animation Model (for .blender file)")]
     static void exec() {
         // Get selected animation model
@@ -66,8 +95,7 @@ public class SyncAnimModel
         DebugHelper.Assert( new_prefabGO, "Can't find prefab: " + new_prefabPath );
 
         // copy GO tag & layer
-        new_prefabGO.tag = old_prefabGO.tag;
-        new_prefabGO.layer = old_prefabGO.layer;
+        CopyTagAndLayerRecursively( "", old_prefabGO.transform, new_prefabGO.transform );
 
         // copy the components from the old prefab.
         Component[] old_comps = old_prefabGO.GetComponents<Component>();
