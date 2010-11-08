@@ -248,7 +248,7 @@ public class Player_girl : Player_base {
         // 
         if ( moveDir.magnitude > 0.0f ) {
             rigidbody.AddForce ( moveDir * maxSpeed, ForceMode.Acceleration );
-            transform.position = new Vector3( transform.position.x, 0.0f, transform.position.z );
+            // DISABLE: transform.position = new Vector3( transform.position.x, 0.0f, transform.position.z );
         }
     }
 
@@ -294,14 +294,18 @@ public class Player_girl : Player_base {
             else {
                 Vector3 up = Vector3.Cross(moveDir,aimDir);
                 if ( up.y > 0.0f ) {
+                    lowerBody.forward = Quaternion.Euler(0,90,0) * moveDir;
+                    // Vector3 wanted_dir = Quaternion.Euler(0,90,0) * moveDir;
+                    // Vector3  = Quaternion.Euler(0,90,0) * moveDir;
                     animName = "moveLeft";
                 }
                 else {
+                    lowerBody.forward = Quaternion.Euler(0,-90,0) * moveDir;
                     animName = "moveRight";
                 }
             }
             anim[animName].normalizedSpeed = stepSpeed;
-            anim.CrossFade(animName);
+            anim.CrossFade(animName,0.3f);
         }
 
         // TODO: smooth rotation

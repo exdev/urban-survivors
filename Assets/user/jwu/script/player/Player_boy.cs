@@ -127,7 +127,7 @@ public class Player_boy : Player_base {
     private void ProcessMovement () {
         if ( moveDir.magnitude > 0.0f ) {
             rigidbody.AddForce ( moveDir * maxSpeed, ForceMode.Acceleration );
-            transform.position = new Vector3( transform.position.x, 0.0f, transform.position.z );
+            // DISABLE: transform.position = new Vector3( transform.position.x, 0.0f, transform.position.z );
             transform.forward = moveDir;
 
             // TODO { 
