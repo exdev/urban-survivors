@@ -85,7 +85,7 @@ public class Player_boy : Player_base {
             state.enabled = false;
         }
 
-        state = anim["melee1_copy"];
+        state = anim["melee1"];
         state.layer = 1;
         state.wrapMode = WrapMode.Once;
         state.weight = 1.0f;
@@ -115,7 +115,7 @@ public class Player_boy : Player_base {
         }
         // TEMP { 
         if ( Input.GetKeyDown(KeyCode.Space) ) {
-            anim.CrossFade("melee1_copy");
+            anim.CrossFade("melee1");
         }
         // } TEMP end 
     }

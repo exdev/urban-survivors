@@ -31,6 +31,7 @@ public class GameRules : MonoBehaviour {
     protected static GameRules instance  = null;
     protected GameObject playerBoy = null;
     protected GameObject playerGirl = null;
+    protected GameObject startPoint = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -57,7 +58,34 @@ public class GameRules : MonoBehaviour {
             DebugHelper.Assert(playerBoy,"can't find palyer.boy in the scene");
             playerGirl = GameObject.FindWithTag("player.girl");
             DebugHelper.Assert(playerGirl,"can't find palyer.girl in the scene");
+
+            //
+            startPoint = GameObject.Find("StartPoint");
+            if ( startPoint ) {
+                PlacePlayerAtStartPoint();
+            }
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void PlacePlayerAtStartPoint () {
+        GameObject boy = GameRules.Instance().GetPlayerBoy();
+        boy.transform.position = transform.position;
+        boy.transform.rotation = transform.rotation;
+
+        GameObject girl = GameRules.Instance().GetPlayerGirl();
+        girl.transform.position = transform.position - boy.transform.forward * 2.0f;
+        girl.transform.rotation = transform.rotation;
+
+        Camera.main.transform.position = new Vector3(transform.position.x, 20.0f, transform.position.z); 
+
+        // DEBUG { 
+        // Debug.Log("boy pos = " + boy.transform.position );
+        // Debug.Log("girl pos = " + girl.transform.position );
+        // } DEBUG end 
     }
 
     // ------------------------------------------------------------------ 

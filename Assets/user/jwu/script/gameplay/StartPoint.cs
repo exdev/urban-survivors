@@ -25,12 +25,18 @@ public class StartPoint : MonoBehaviour {
         yield return new WaitForEndOfFrame();
 
         GameObject boy = GameRules.Instance().GetPlayerBoy();
-        boy.transform.position = transform.position;
-        boy.transform.rotation = transform.rotation;
+        if (boy) {
+            boy.transform.position = transform.position;
+            boy.transform.rotation = transform.rotation;
+        }
 
         GameObject girl = GameRules.Instance().GetPlayerGirl();
-        girl.transform.position = transform.position - boy.transform.forward * 2.0f;
-        girl.transform.rotation = transform.rotation;
+        if (girl) {
+            girl.transform.position = transform.position - boy.transform.forward * 2.0f;
+            girl.transform.rotation = transform.rotation;
+        }
+        Debug.Log("boy pos = " + boy.transform.position );
+        Debug.Log("girl pos = " + girl.transform.position );
 
         Camera.main.transform.position = new Vector3(transform.position.x, 20.0f, transform.position.z); 
     }
