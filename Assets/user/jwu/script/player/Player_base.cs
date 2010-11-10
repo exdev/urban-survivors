@@ -25,12 +25,14 @@ public class Player_base : MonoBehaviour {
     protected float curHP = 60.0f;
     protected Vector3 faceInitPos = Vector3.zero;
 	protected PackedSprite faceSprite = null;
+    protected CharacterController controller = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public float maxSpeed = 50.0f;
+    public float maxSpeed = 10.0f;
+    public float drag = 0.01f; // slow down the movement.
     public float maxHP = 100.0f;
 
     public GameObject ui_HP;
@@ -53,12 +55,16 @@ public class Player_base : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
 	protected void Start () {
+        //
+        controller = GetComponent<CharacterController>();
+
         GameObject hud = GameObject.Find("HUD");
         if ( hud ) {
             screenPad = hud.GetComponent(typeof(ScreenPad)) as ScreenPad;
         }
         // DebugHelper.Assert( screenPad, "screenPad not found" );
 
+        //
         if ( ui_HP ) {
             UIProgressBar hpProgressBar = ui_HP.GetComponent(typeof(UIProgressBar)) as UIProgressBar;
             hpProgressBar.Value = inverseHP ? 1.0f - this.GetHP() : this.GetHP();

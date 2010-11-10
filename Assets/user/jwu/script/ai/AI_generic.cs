@@ -65,14 +65,14 @@ public class AI_generic : MonoBehaviour {
         wanted_rot = transform.rotation;
 
         // StartCoroutine(GetRandomDest(2.0));
-        StartCoroutine(GeNearestPlayerPos(2.0f));
+        StartCoroutine(GetNearestPlayerPos(2.0f));
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    IEnumerator GeNearestPlayerPos ( float _tickTime ) {
+    IEnumerator GetNearestPlayerPos ( float _tickTime ) {
         while ( true ) {
             GameObject[] players = GameRules.Instance().GetPlayers();
             float nearest = 999.0f;

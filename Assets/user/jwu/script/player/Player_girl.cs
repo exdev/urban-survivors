@@ -67,7 +67,7 @@ public class Player_girl : Player_base {
 
 	void Update () {
         // DEBUG { 
-        Vector3 velocity = rigidbody.GetPointVelocity(transform.position);
+        Vector3 velocity = controller.velocity;
         DebugHelper.ScreenPrint( "velocity: " + velocity );
         Debug.DrawLine ( transform.position, transform.position + velocity, Color.white );
         // } DEBUG end 
@@ -75,16 +75,9 @@ public class Player_girl : Player_base {
         //
         HandleInput ();
         ProcessFollowing ();
+        ProcessMovement ();
         ProcessAnimation ();
 	}
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void FixedUpdate () {
-        ProcessMovement ();
-    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -219,11 +212,10 @@ public class Player_girl : Player_base {
         if (followTarget != null) {
             Vector3 dir = (transform.position - followTarget.transform.position).normalized;
             Vector3 destination = dir * followDistance + followTarget.transform.position;
-
             Vector3 delta = destination - transform.position;
 
             // if we are from idle to move
-            Vector3 curVelocity = rigidbody.velocity; 
+            Vector3 curVelocity = controller.velocity; 
             if ( curVelocity.magnitude < 0.2f ) {
                 if ( delta.magnitude > 0.5f ) {
                     moveDir = delta.normalized; 
@@ -245,11 +237,15 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     private void ProcessMovement () {
-        // 
-        if ( moveDir.magnitude > 0.0f ) {
-            rigidbody.AddForce ( moveDir * maxSpeed, ForceMode.Acceleration );
-            // DISABLE: transform.position = new Vector3( transform.position.x, 0.0f, transform.position.z );
-        }
+        float f = Mathf.Pow(drag, Time.deltaTime);
+
+        Vector3 vel = controller.velocity;
+        vel *= f;
+        vel += moveDir * maxSpeed * Time.deltaTime;
+        if ( vel.magnitude > maxSpeed ) 
+            vel = vel.normalized * maxSpeed;
+
+        controller.Move(vel * Time.deltaTime);
     }
 
     // ------------------------------------------------------------------ 
@@ -258,7 +254,7 @@ public class Player_girl : Player_base {
 
     private void ProcessAnimation () {
         // get the animation forward,right so that we can pickup the proper animation.
-        Vector3 curVelocity = rigidbody.velocity; 
+        Vector3 curVelocity = controller.velocity; 
         Vector3 vel_ubspace = upperBody.worldToLocalMatrix * curVelocity;
         vel_ubspace.y = 0.0f;
         vel_ubspace.Normalize();

@@ -48,23 +48,16 @@ public class Player_boy : Player_base {
 
 	void Update () {
         // DEBUG { 
-        Vector3 velocity = rigidbody.GetPointVelocity(transform.position);
+        Vector3 velocity = controller.velocity;
         // DebugHelper.ScreenPrint( "velocity: " + velocity );
         Debug.DrawLine ( transform.position, transform.position + velocity, Color.white );
         // } DEBUG end 
 
         //
         HandleInput();
+        ProcessMovement ();
         ProcessAnimation();
 	}
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void FixedUpdate () {
-        ProcessMovement ();
-    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -125,21 +118,28 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     private void ProcessMovement () {
-        if ( moveDir.magnitude > 0.0f ) {
-            rigidbody.AddForce ( moveDir * maxSpeed, ForceMode.Acceleration );
-            // DISABLE: transform.position = new Vector3( transform.position.x, 0.0f, transform.position.z );
+        float f = Mathf.Pow(drag, Time.deltaTime);
+
+        Vector3 vel = controller.velocity;
+        vel *= f;
+        vel += moveDir * maxSpeed * Time.deltaTime;
+        if ( vel.magnitude > maxSpeed ) 
+            vel = vel.normalized * maxSpeed;
+
+        controller.Move(vel * Time.deltaTime);
+
+        if ( moveDir.magnitude > 0.0f )
             transform.forward = moveDir;
 
-            // TODO { 
-            // Quaternion rot = Quaternion.identity;
-            // rot.SetLookRotation(moveDir);
-            // iTween.RotateTo( gameObject, iTween.Hash (
-            //                  "rotation", rot.eulerAngles,
-            //                  "time", 0.2f,
-            //                  "easeType", iTween.EaseType.easeOutCubic
-            //                  ) );
-            // } TODO end 
-        }
+        // TODO { 
+        // Quaternion rot = Quaternion.identity;
+        // rot.SetLookRotation(moveDir);
+        // iTween.RotateTo( gameObject, iTween.Hash (
+        //                  "rotation", rot.eulerAngles,
+        //                  "time", 0.2f,
+        //                  "easeType", iTween.EaseType.easeOutCubic
+        //                  ) );
+        // } TODO end 
     }
 
     // ------------------------------------------------------------------ 

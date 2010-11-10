@@ -55,9 +55,7 @@ public class GameRules : MonoBehaviour {
 
             //
             playerBoy = GameObject.FindWithTag("player.boy");
-            DebugHelper.Assert(playerBoy,"can't find palyer.boy in the scene");
             playerGirl = GameObject.FindWithTag("player.girl");
-            DebugHelper.Assert(playerGirl,"can't find palyer.girl in the scene");
 
             //
             startPoint = GameObject.Find("StartPoint");
@@ -72,20 +70,21 @@ public class GameRules : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void PlacePlayerAtStartPoint () {
+        Vector3 start_pos = startPoint.transform.position;
+        Quaternion start_rot = startPoint.transform.rotation;
+
         GameObject boy = GameRules.Instance().GetPlayerBoy();
-        boy.transform.position = transform.position;
-        boy.transform.rotation = transform.rotation;
+        if (boy) {
+            boy.transform.position = start_pos;
+            boy.transform.rotation = start_rot;
+        }
 
         GameObject girl = GameRules.Instance().GetPlayerGirl();
-        girl.transform.position = transform.position - boy.transform.forward * 2.0f;
-        girl.transform.rotation = transform.rotation;
-
-        Camera.main.transform.position = new Vector3(transform.position.x, 20.0f, transform.position.z); 
-
-        // DEBUG { 
-        // Debug.Log("boy pos = " + boy.transform.position );
-        // Debug.Log("girl pos = " + girl.transform.position );
-        // } DEBUG end 
+        if (girl) {
+            girl.transform.position = start_pos - boy.transform.forward * 2.0f;
+            girl.transform.rotation = start_rot;
+        }
+        Camera.main.transform.position = new Vector3(start_pos.x, 20.0f, start_pos.z); 
     }
 
     // ------------------------------------------------------------------ 
