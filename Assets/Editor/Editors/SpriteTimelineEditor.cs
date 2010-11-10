@@ -474,7 +474,7 @@ public class SpriteTimeline : ISTE
 		bottom = timelineTop;
 
 
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		EditorGUIUtility.UseControlStyles();
 #endif
 
