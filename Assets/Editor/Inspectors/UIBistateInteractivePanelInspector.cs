@@ -9,7 +9,7 @@ using UnityEngine;
 using System.Collections;
 
 // Only compile if not using Unity iPhone
-#if !UNITY_IPHONE || UNITY_3_0
+#if !UNITY_IPHONE || UNITY_3_1
 [CustomEditor(typeof(UIBistateInteractivePanel))]
 #endif
 public class UIBistateInteractivePanelInspector : UIPanelBaseInspector

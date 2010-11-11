@@ -4652,7 +4652,7 @@ public class AnimParams
 
 	public virtual void DrawGUI(EZAnimation.ANIM_TYPE type, GameObject go, IGUIHelper gui, bool inspector)
 	{
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		float spacing = 20f;
 		float indent = 10f;
 #else
@@ -4686,7 +4686,7 @@ public class AnimParams
 				pingPong = GUILayout.Toggle(pingPong, new GUIContent("PingPong","Ping-Pong: Causes the animated value to go back and forth as it loops."));
 			}
 		}
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		else
 			GUILayout.FlexibleSpace();
 #endif
@@ -4741,7 +4741,7 @@ public class AnimParams
 		{
 			restartOnRepeat = GUILayout.Toggle(restartOnRepeat, new GUIContent("Restart on Loop","Resets the starting value on each loop iteration. Set this to false if you want something like continuous movement in the same direction without going back to the starting point."));
 		}
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		else
 			GUILayout.FlexibleSpace();
 #endif

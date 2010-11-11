@@ -76,7 +76,7 @@ public class SpriteFont
 
 	// Maps character IDs to that character's
 	// index in the array.
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 	protected Hashtable charMap = new Hashtable();
 #else
 	protected Dictionary<char, int>charMap = new Dictionary<char, int>();
@@ -346,14 +346,14 @@ public class SpriteFont
 	public SpriteChar GetSpriteChar(char ch)
 	{
 		int index;
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		if (!charMap.ContainsKey(ch))
 #else
 		if (!charMap.TryGetValue(ch, out index))
 #endif
 			return default(SpriteChar); // Character not found
 
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		index = (int) charMap[ch];
 		return chars[index];
 #else

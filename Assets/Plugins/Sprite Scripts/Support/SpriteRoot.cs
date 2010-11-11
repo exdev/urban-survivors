@@ -2232,7 +2232,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	// Included to work around the Unity bug where Start() is not
 	// called when reintering edit mode if play lasts for longer 
 	// than 10 seconds:
-#if UNITY_3_0 && UNITY_EDITOR
+#if UNITY_3_1 && UNITY_EDITOR
 	void Update() {}
 #endif
 

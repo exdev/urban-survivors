@@ -54,7 +54,7 @@ public class SpriteTimelineEditor : EditorWindow
 	[MenuItem("Window/Sprite Timeline &t")]
 	static public void ShowEditor()
 	{
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		if (instance != null)
 		{
 			instance.Show(true);
@@ -103,14 +103,14 @@ public class SpriteTimelineEditor : EditorWindow
 
 	public void OnDisable()
 	{
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		this.Close();
 #endif
 	}
 
 	public void OnCloseWindow()
 	{
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		instance = null;
 		closing = true;
 		DestroyImmediate(this);
@@ -269,7 +269,7 @@ public class SpriteTimeline : ISTE
 
 		// Move the buttons left to align with the
 		// possible state name box:
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		float diff = Mathf.Abs(loopCyclesRect.x - 20f);
 #else
 		float diff = Mathf.Abs(loopCyclesRect.x - 37f);
@@ -301,7 +301,7 @@ public class SpriteTimeline : ISTE
 
 	public void SetupRects()
 	{
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		addBtnRect = new Rect(5, 5, 30, 20);
 		delBtnRect = new Rect(5, 30, 30, 20);
 		popupRect = new Rect(40, 5, 140, 20);
@@ -368,7 +368,7 @@ public class SpriteTimeline : ISTE
 	/*
 		void OnEnable()
 		{
-	#if UNITY_IPHONE && !UNITY_3_0
+	#if UNITY_IPHONE && !UNITY_3_1
 			addBtnRect = new Rect(5, 5, 30, 30);
 			delBtnRect = new Rect(24, 5, 20, 20);
 			popupRect = new Rect(15, 5, 220, 20);
@@ -599,7 +599,7 @@ public class SpriteTimeline : ISTE
 		// Draw the static texture selection box:
 		if (sprite is PackedSprite)
 		{
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 			// Draw a "clear" button:
 			if(GUI.Button(clearRect, "X"))
 				((PackedSprite)sprite).staticTexGUID = System.Guid.Empty.ToString();
@@ -626,7 +626,7 @@ public class SpriteTimeline : ISTE
 		// view area:
 		GUILayout.Box(GUIContent.none, GUI.skin.label, GUILayout.Width(previewButtonRect.xMax), GUILayout.Height(animHeight + timelineTop + 10));
 
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		oldColor = GUI.contentColor;
 		GUI.contentColor = Color.black;
 #endif
@@ -697,7 +697,7 @@ public class SpriteTimeline : ISTE
 			EditorUtility.SetDirty(sprite.gameObject);
 
 
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 		GUI.contentColor = oldColor;
 #endif
 
@@ -1336,7 +1336,7 @@ public class DraggableTexture : GUIDraggableObject
 		if (selected)
 		{
 			Color oldBGColor = GUI.backgroundColor;
-#if UNITY_IPHONE && !UNITY_3_0
+#if UNITY_IPHONE && !UNITY_3_1
 			GUI.backgroundColor = new Color(1f, 0, 1f, 1f);
 #else
 			GUI.backgroundColor = new Color(1f, 0, 1f, 0.5f);

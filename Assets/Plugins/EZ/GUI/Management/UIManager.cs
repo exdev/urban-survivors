@@ -1321,14 +1321,14 @@ public class UIManager : MonoBehaviour
 	{
 #if UNITY_IPHONE || UNITY_ANDROID
 
-#if UNITY_3_0
+#if UNITY_3_1
 		Touch touch;
 #else
-		iPhoneTouch touch;
+		TouchPhoneTouch touch;
 #endif
 		int id;
 
-#if UNITY_3_0
+#if UNITY_3_1
 		numActivePointers = Input.touchCount;
 #else
 		numActivePointers = iPhoneInput.touchCount;
@@ -1337,7 +1337,7 @@ public class UIManager : MonoBehaviour
 		// Process our touches:
 		for(int i=0; i<numActivePointers; ++i)
 		{
-#if UNITY_3_0
+#if UNITY_3_1
 			touch = Input.GetTouch(i);
 #else
 			touch = iPhoneInput.GetTouch(i);
@@ -1351,7 +1351,7 @@ public class UIManager : MonoBehaviour
 			switch(touch.phase)
 			{
 				// Drag:
-#if UNITY_3_0
+#if UNITY_3_1
 				case TouchPhase.Moved:
 #else
 				case iPhoneTouchPhase.Moved:
@@ -1370,7 +1370,7 @@ public class UIManager : MonoBehaviour
 					break;
 
 				// Press:
-#if UNITY_3_0
+#if UNITY_3_1
 				case TouchPhase.Began:
 #else
 				case iPhoneTouchPhase.Began:
@@ -1384,7 +1384,7 @@ public class UIManager : MonoBehaviour
 					break;
 
 				// Release
-#if UNITY_3_0
+#if UNITY_3_1
 				case TouchPhase.Ended:
 				case TouchPhase.Canceled:
 #else
@@ -1401,7 +1401,7 @@ public class UIManager : MonoBehaviour
 					break;
 
 				// No change:
-#if UNITY_3_0
+#if UNITY_3_1
 				case TouchPhase.Stationary:
 #else
 				case iPhoneTouchPhase.Stationary:
