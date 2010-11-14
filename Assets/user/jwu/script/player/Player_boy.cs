@@ -152,6 +152,7 @@ public class Player_boy : Player_base {
 
     private void ProcessAnimation () {
         if ( moveDir.magnitude > 0.0f ) {
+            anim["moveforward"].normalizedSpeed = StepSpeed * controller.velocity.magnitude;
             anim.CrossFade("moveforward");
         }
         else {

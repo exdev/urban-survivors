@@ -34,7 +34,6 @@ public class Player_girl : Player_base {
 
     public float degreeToRot = 15.0f;
     public float rotTime = 1.0f;
-    public float stepSpeed = 1.0f;
     public float degreePlayMoveLeftRight = 60.0f;
 
     // Q: why don't we just use UpperBody in this game?
@@ -306,7 +305,7 @@ public class Player_girl : Player_base {
                 }
             }
             lowerBody.forward = aimDir;
-            anim[animName].normalizedSpeed = stepSpeed;
+            anim[animName].normalizedSpeed = StepSpeed * controller.velocity.magnitude;
             if ( anim.IsPlaying(animName) == false )
                 anim.CrossFade(animName,0.3f);
         }
