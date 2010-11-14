@@ -34,7 +34,6 @@ public class Player_girl : Player_base {
 
     public float degreeToRot = 15.0f;
     public float rotTime = 1.0f;
-    public float stepSpeed = 1.0f;
     public float degreePlayMoveLeftRight = 60.0f;
 
     // Q: why don't we just use UpperBody in this game?
@@ -214,16 +213,20 @@ public class Player_girl : Player_base {
             Vector3 destination = dir * followDistance + followTarget.transform.position;
             Vector3 delta = destination - transform.position;
 
+            // TODO: use Arrive algorithm { 
             // if we are from idle to move
             Vector3 curVelocity = controller.velocity; 
-            if ( curVelocity.magnitude < 0.2f ) {
+            if ( curVelocity.magnitude < 0.1f ) {
                 if ( delta.magnitude > 0.5f ) {
+                    delta.y = 0.0f;
                     moveDir = delta.normalized; 
                 }
             }
             else if ( delta.magnitude > 0.1f ) {
+                delta.y = 0.0f;
                 moveDir = delta.normalized; 
             }
+            // } TODO end 
 
             // DEBUG { 
             DebugHelper.DrawCircleY( followTarget.transform.position, followDistance, Color.yellow );
@@ -245,6 +248,10 @@ public class Player_girl : Player_base {
         if ( vel.magnitude > maxSpeed ) 
             vel = vel.normalized * maxSpeed;
 
+        // apply gravity
+        if ( controller.isGrounded == false )
+            vel.y = -10.0f;
+
         controller.Move(vel * Time.deltaTime);
     }
 
@@ -261,7 +268,7 @@ public class Player_girl : Player_base {
 
         // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
         // if ( vel_ubspace.sqrMagnitude < 0.2 )
-        if ( moveDir.magnitude == 0.0f ) {
+        if ( Mathf.Approximately(moveDir.magnitude, 0.0f) ) {
             // float fadeSpeed = 5.0f * Time.deltaTime;
             anim.CrossFade("idle");
         }
@@ -276,32 +283,34 @@ public class Player_girl : Player_base {
         // process lower-body rotation
         float angle = Vector3.Angle ( moveDir, aimDir );
         // DebugHelper.ScreenPrint("angle = " + angle); // DEBUG
-        lowerBody.forward = aimDir;
         string animName = "";
-        if ( moveDir.magnitude != 0.0f ) {
+        if ( Mathf.Approximately(moveDir.magnitude, 0.0f) == false ) {
             if ( angle > 180.0f - degreePlayMoveLeftRight ) {
-                lowerBody.forward = -moveDir;
+                // lowerBody.forward = -moveDir;
                 animName = "moveBackward";
             }
             else if ( angle < degreePlayMoveLeftRight ) {
-                lowerBody.forward = moveDir;
+                // lowerBody.forward = moveDir;
                 animName = "moveForward";
             }
             else {
                 Vector3 up = Vector3.Cross(moveDir,aimDir);
                 if ( up.y > 0.0f ) {
-                    lowerBody.forward = Quaternion.Euler(0,90,0) * moveDir;
-                    // Vector3 wanted_dir = Quaternion.Euler(0,90,0) * moveDir;
-                    // Vector3  = Quaternion.Euler(0,90,0) * moveDir;
+                    // lowerBody.forward = Quaternion.Euler(0,90,0) * moveDir;
                     animName = "moveLeft";
                 }
                 else {
-                    lowerBody.forward = Quaternion.Euler(0,-90,0) * moveDir;
+                    // lowerBody.forward = Quaternion.Euler(0,-90,0) * moveDir;
                     animName = "moveRight";
                 }
             }
-            anim[animName].normalizedSpeed = stepSpeed;
-            anim.CrossFade(animName,0.3f);
+            lowerBody.forward = aimDir;
+            anim[animName].normalizedSpeed = StepSpeed * controller.velocity.magnitude;
+            if ( anim.IsPlaying(animName) == false )
+                anim.CrossFade(animName,0.3f);
+        }
+        else {
+            lowerBody.forward = aimDir;
         }
 
         // TODO: smooth rotation

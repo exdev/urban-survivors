@@ -38,6 +38,7 @@ public class AI_generic : MonoBehaviour {
     private Vector3 wanted_pos;
     private Quaternion wanted_rot;
     private Transform target;
+    private CharacterController controller = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // defines
@@ -54,6 +55,8 @@ public class AI_generic : MonoBehaviour {
         //     BTSeq( [ BT_move() ] ) 
         // );
         // } DISABLE end 
+
+        controller = GetComponent<CharacterController>();
 
         DebugHelper.Assert(atkWrapper, "attack wrapper not assigned");
         DebugHelper.Assert(atkAttachedBone, "attack attached bone not assigned");
@@ -130,14 +133,20 @@ public class AI_generic : MonoBehaviour {
         Vector3 delta = target.position - transform.position;
         if ( delta.magnitude >= 1.5f ) {
             // transform.position += delta.normalized * move_speed * Time.deltaTime;
-            transform.position += transform.forward * move_speed * Time.deltaTime;
-
+            // transform.position += transform.forward * move_speed * Time.deltaTime;
             state_move = true;
         }
         else {
             state_move = false;
             state_attack = true;
         }
+
+        // apply gravity
+        Vector3 vel = transform.forward * move_speed;
+        if ( controller.isGrounded == false ) {
+            vel.y = -10.0f;
+        }
+        controller.Move(vel * Time.deltaTime);
 
         // rotate ai
         wanted_rot = Quaternion.LookRotation( target.position - transform.position );
