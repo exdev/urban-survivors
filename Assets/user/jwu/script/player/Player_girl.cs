@@ -218,10 +218,12 @@ public class Player_girl : Player_base {
             Vector3 curVelocity = controller.velocity; 
             if ( curVelocity.magnitude < 0.2f ) {
                 if ( delta.magnitude > 0.5f ) {
+                    delta.y = 0.0f;
                     moveDir = delta.normalized; 
                 }
             }
             else if ( delta.magnitude > 0.1f ) {
+                delta.y = 0.0f;
                 moveDir = delta.normalized; 
             }
 
@@ -244,6 +246,10 @@ public class Player_girl : Player_base {
         vel += moveDir * maxSpeed * Time.deltaTime;
         if ( vel.magnitude > maxSpeed ) 
             vel = vel.normalized * maxSpeed;
+
+        // apply gravity
+        if ( controller.isGrounded == false )
+            vel.y = -10.0f;
 
         controller.Move(vel * Time.deltaTime);
     }
@@ -283,7 +289,8 @@ public class Player_girl : Player_base {
                 animName = "moveBackward";
             }
             else if ( angle < degreePlayMoveLeftRight ) {
-                lowerBody.forward = moveDir;
+                // lowerBody.forward = moveDir;
+                transform.forward = moveDir;
                 animName = "moveForward";
             }
             else {

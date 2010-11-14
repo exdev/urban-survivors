@@ -126,6 +126,10 @@ public class Player_boy : Player_base {
         if ( vel.magnitude > maxSpeed ) 
             vel = vel.normalized * maxSpeed;
 
+        // apply gravity
+        if ( controller.isGrounded == false )
+            vel.y = -10.0f;
+
         controller.Move(vel * Time.deltaTime);
 
         if ( moveDir.magnitude > 0.0f )
