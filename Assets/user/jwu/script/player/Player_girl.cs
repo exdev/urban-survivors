@@ -214,9 +214,10 @@ public class Player_girl : Player_base {
             Vector3 destination = dir * followDistance + followTarget.transform.position;
             Vector3 delta = destination - transform.position;
 
+            // TODO: use Arrive algorithm { 
             // if we are from idle to move
             Vector3 curVelocity = controller.velocity; 
-            if ( curVelocity.magnitude < 0.2f ) {
+            if ( curVelocity.magnitude < 0.1f ) {
                 if ( delta.magnitude > 0.5f ) {
                     delta.y = 0.0f;
                     moveDir = delta.normalized; 
@@ -226,6 +227,7 @@ public class Player_girl : Player_base {
                 delta.y = 0.0f;
                 moveDir = delta.normalized; 
             }
+            // } TODO end 
 
             // DEBUG { 
             DebugHelper.DrawCircleY( followTarget.transform.position, followDistance, Color.yellow );
@@ -285,27 +287,28 @@ public class Player_girl : Player_base {
         string animName = "";
         if ( Mathf.Approximately(moveDir.magnitude, 0.0f) == false ) {
             if ( angle > 180.0f - degreePlayMoveLeftRight ) {
-                lowerBody.forward = -moveDir;
+                // lowerBody.forward = -moveDir;
                 animName = "moveBackward";
             }
             else if ( angle < degreePlayMoveLeftRight ) {
                 // lowerBody.forward = moveDir;
-                transform.forward = moveDir;
                 animName = "moveForward";
             }
             else {
                 Vector3 up = Vector3.Cross(moveDir,aimDir);
                 if ( up.y > 0.0f ) {
-                    lowerBody.forward = Quaternion.Euler(0,90,0) * moveDir;
+                    // lowerBody.forward = Quaternion.Euler(0,90,0) * moveDir;
                     animName = "moveLeft";
                 }
                 else {
-                    lowerBody.forward = Quaternion.Euler(0,-90,0) * moveDir;
+                    // lowerBody.forward = Quaternion.Euler(0,-90,0) * moveDir;
                     animName = "moveRight";
                 }
             }
+            lowerBody.forward = aimDir;
             anim[animName].normalizedSpeed = stepSpeed;
-            anim.CrossFade(animName,0.3f);
+            if ( anim.IsPlaying(animName) == false )
+                anim.CrossFade(animName,0.3f);
         }
         else {
             lowerBody.forward = aimDir;
