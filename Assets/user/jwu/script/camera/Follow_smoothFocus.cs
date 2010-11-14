@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : Follow_smooth.cs
+// File         : Follow_smoothFocus.cs
 // Author       : Wu Jie 
-// Last Change  : 09/27/2010 | 23:04:16 PM | Monday,September
+// Last Change  : 11/14/2010 | 11:55:08 AM | Sunday,November
 // Description  : 
 // ======================================================================================
 
@@ -18,18 +18,18 @@ using System.Collections;
 
 // Place the script in the Camera-Control group in the component menu
 [AddComponentMenu("Camera-Control/Topdown Smooth Follow")]
-public class Follow_smooth: MonoBehaviour {
+public class Follow_smoothFocus: MonoBehaviour {
 
     ///////////////////////////////////////////////////////////////////////////////
     // public properties
     ///////////////////////////////////////////////////////////////////////////////
 
     // The target we are following
-    public Transform Target;
+    public Transform target;
 
     // the height we want the camera to be above the target
-    public float Height = 5.0f;
-    public float Pitch = 70.0f; 
+    public float Height = 10.0f;
+    public float HorizontalOffset = 3.0f;
     public float Yaw = -90.0f;
 
     // damping
@@ -38,7 +38,7 @@ public class Follow_smooth: MonoBehaviour {
     public float RotationDamping = 3.0f;
 
     //
-    private bool ZoomIn = false;
+    private bool zoomIn = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // defines
@@ -50,8 +50,31 @@ public class Follow_smooth: MonoBehaviour {
 
     void LateUpdate () {
         // Early out if we don't have a target
-        if (!Target)
+        if (!target)
             return;
+
+        // ======================================================== 
+        // translation
+        // ======================================================== 
+
+        // smooth update current height
+        float wantedHeight = target.position.y + Height;
+        float curHeight = transform.position.y;
+        curHeight = Mathf.Lerp (curHeight, wantedHeight, HeightDamping * Time.deltaTime);
+
+        // Set the height of the camera
+        Vector3 curPos = transform.position;
+        // Vector3 wantedPos = target.position + Vector3.right * HorizontalOffset;
+
+        Quaternion rot = Quaternion.identity;
+        rot.eulerAngles = new Vector3(0.0f, Yaw + 90.0f, 0.0f);
+        Vector3 dir = rot * Vector3.right;
+        Vector3 wantedPos = target.position + dir * HorizontalOffset;
+
+        // smooth update location
+        curPos.x = Mathf.Lerp (curPos.x, wantedPos.x, HorizontalDamping * Time.deltaTime);
+        curPos.y = curHeight;
+        curPos.z = Mathf.Lerp (curPos.z, wantedPos.z, HorizontalDamping * Time.deltaTime);
 
         // ======================================================== 
         // rotation 
@@ -59,39 +82,16 @@ public class Follow_smooth: MonoBehaviour {
 
         // smooth update rotation
         Quaternion wanted_rot = Quaternion.identity;
-        wanted_rot.eulerAngles = new Vector3( Pitch, Yaw, 0.0f );
-        transform.rotation = Quaternion.Slerp( transform.rotation, wanted_rot, RotationDamping * Time.deltaTime );
-
-        // ======================================================== 
-        // translation
-        // ======================================================== 
-
-        // smooth update current height
-        float wantedHeight = Target.position.y + Height;
-        float currentHeight = transform.position.y;
-        currentHeight = Mathf.Lerp (currentHeight, wantedHeight, HeightDamping * Time.deltaTime);
-
-        // Set the height of the camera
-        Vector3 currentLocation = transform.position;
-
-        // center the camera to target
-        float cos_theta = Vector3.Dot( Vector3.up, transform.forward );
-        float distance = cos_theta * currentHeight;
-        Vector3 wantedLocation = Target.position + transform.forward * distance;
-
-        // smooth update location
-        currentLocation.x = Mathf.Lerp (currentLocation.x, wantedLocation.x, HorizontalDamping * Time.deltaTime);
-        currentLocation.z = Mathf.Lerp (currentLocation.z, wantedLocation.z, HorizontalDamping * Time.deltaTime);
+        wanted_rot = Quaternion.LookRotation( target.position - curPos );
+        wanted_rot.eulerAngles = new Vector3( wanted_rot.eulerAngles.x, Yaw, 0.0f );
 
         // ======================================================== 
         // do real transform 
         // ======================================================== 
 
         // update the exact position
-        transform.position = new Vector3 ( currentLocation.x,
-                                           currentHeight,
-                                           currentLocation.z
-                                         );
+        transform.rotation = Quaternion.Slerp( transform.rotation, wanted_rot, RotationDamping * Time.deltaTime );
+        transform.position = curPos;
 
         // process zomming
         AdjustZooming ();
@@ -104,7 +104,7 @@ public class Follow_smooth: MonoBehaviour {
     void AdjustZooming () {
         Camera cam = GetComponent( typeof(Camera) ) as Camera;
         float wantedFov = 60.0f;
-        if ( ZoomIn ) {
+        if ( zoomIn ) {
             wantedFov = 40.0f;
         }
         cam.fieldOfView = Mathf.Lerp (cam.fieldOfView, wantedFov, 8.0f * Time.deltaTime);

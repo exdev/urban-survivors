@@ -261,7 +261,7 @@ public class Player_girl : Player_base {
 
         // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
         // if ( vel_ubspace.sqrMagnitude < 0.2 )
-        if ( moveDir.magnitude == 0.0f ) {
+        if ( Mathf.Approximately(moveDir.magnitude, 0.0f) ) {
             // float fadeSpeed = 5.0f * Time.deltaTime;
             anim.CrossFade("idle");
         }
@@ -276,9 +276,8 @@ public class Player_girl : Player_base {
         // process lower-body rotation
         float angle = Vector3.Angle ( moveDir, aimDir );
         // DebugHelper.ScreenPrint("angle = " + angle); // DEBUG
-        lowerBody.forward = aimDir;
         string animName = "";
-        if ( moveDir.magnitude != 0.0f ) {
+        if ( Mathf.Approximately(moveDir.magnitude, 0.0f) == false ) {
             if ( angle > 180.0f - degreePlayMoveLeftRight ) {
                 lowerBody.forward = -moveDir;
                 animName = "moveBackward";
@@ -291,8 +290,6 @@ public class Player_girl : Player_base {
                 Vector3 up = Vector3.Cross(moveDir,aimDir);
                 if ( up.y > 0.0f ) {
                     lowerBody.forward = Quaternion.Euler(0,90,0) * moveDir;
-                    // Vector3 wanted_dir = Quaternion.Euler(0,90,0) * moveDir;
-                    // Vector3  = Quaternion.Euler(0,90,0) * moveDir;
                     animName = "moveLeft";
                 }
                 else {
@@ -302,6 +299,9 @@ public class Player_girl : Player_base {
             }
             anim[animName].normalizedSpeed = stepSpeed;
             anim.CrossFade(animName,0.3f);
+        }
+        else {
+            lowerBody.forward = aimDir;
         }
 
         // TODO: smooth rotation
