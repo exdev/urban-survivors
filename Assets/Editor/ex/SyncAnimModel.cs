@@ -31,12 +31,10 @@ public class SyncAnimModel
     static void CopyTagAndLayerRecursively ( string _path, Transform _src, Transform _destRoot ) {
         Transform destChildTrans = null;
 
-        if ( _path == "" ) {
+        if ( _path == "" )
             destChildTrans = _destRoot;
-        }
-        else {
+        else
             destChildTrans = _destRoot.Find(_path);
-        }
 
         if ( destChildTrans == null )
             return;
@@ -50,6 +48,39 @@ public class SyncAnimModel
             else
                 child_path = child.gameObject.name + "/" + _path;
             CopyTagAndLayerRecursively ( child_path, child, _destRoot );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static void CopyMissingGORecursively( string _path, Transform _destRoot, Transform _src, Transform _dest ) {
+        Transform destChildTrans = null;
+
+        if ( _path == "" )
+            destChildTrans = _destRoot;
+        else
+            destChildTrans = _destRoot.Find(_path);
+
+        // if we don't have the child in dest GameObject, copy it from source.
+        if ( destChildTrans == null ) {
+            GameObject old_GO = _src.gameObject;
+            GameObject new_GO = Object.Instantiate( old_GO, Vector3.zero, Quaternion.identity ) as GameObject;
+            new_GO.name = old_GO.name;
+
+            // destChildTrans = new_GO.transform;
+            new_GO.transform.parent = _dest;
+            return;
+        }
+
+        foreach ( Transform child in _src ) {
+            string child_path = "";
+            if ( _path == "" )
+                child_path = child.gameObject.name;
+            else
+                child_path = child.gameObject.name + "/" + _path;
+            CopyMissingGORecursively ( child_path, _destRoot, child, destChildTrans );
         }
     }
 
@@ -91,11 +122,16 @@ public class SyncAnimModel
         EditorUtility.ReplacePrefab( curSelection, new_prefab );
 
         // create new prefab GO 
-        GameObject new_prefabGO = AssetDatabase.LoadAssetAtPath(new_prefabPath, typeof(GameObject)) as GameObject;
+        // NOTE: without instantiating, Unity3D not allowed adding new GO in the prefab (since it will break up the prefab). { 
+        // NOTE: you must call GameObject.DestroyImmediate(new_prefabGO); after you create the prefab.
+        GameObject new_prefabGO_tmp = AssetDatabase.LoadAssetAtPath(new_prefabPath, typeof(GameObject)) as GameObject;
+        GameObject new_prefabGO = EditorUtility.InstantiatePrefab ( new_prefabGO_tmp ) as GameObject;  
+        // } NOTE end 
         DebugHelper.Assert( new_prefabGO, "Can't find prefab: " + new_prefabPath );
 
         // copy GO tag & layer
         CopyTagAndLayerRecursively( "", old_prefabGO.transform, new_prefabGO.transform );
+        CopyMissingGORecursively( "", new_prefabGO.transform, old_prefabGO.transform, new_prefabGO.transform );
 
         // copy the components from the old prefab.
         Component[] old_comps = old_prefabGO.GetComponents<Component>();
@@ -112,6 +148,7 @@ public class SyncAnimModel
         // replace the old prefab with the new one
         EditorUtility.ReplacePrefab( new_prefabGO, old_prefabGO );
         AssetDatabase.DeleteAsset(new_prefabPath);
+        GameObject.DestroyImmediate(new_prefabGO);
 
         //
         Debug.Log("Animation mesh synced.");
