@@ -78,9 +78,17 @@
      <Compile Include="Assets\Editor\Wizards\SpriteSizer.cs" />
      <None Include="Assets\Editor\backup\CopyComponents.js" />
      <Compile Include="Assets\Editor\ex\DrawGizmos.cs" />
+     <Compile Include="Assets\Editor\ex\SuperDuplicateEditor.cs" />
      <Compile Include="Assets\Editor\ex\SyncAnimModel.cs" />
+     <Compile Include="Assets\Editor\ex\TestEditor.cs" />
+     <Compile Include="Assets\Editor\ex\TestWindow.cs" />
+     <Compile Include="Assets\Editor\ex\TransformUtilitiesWindow.cs" />
      <Compile Include="Assets\Editor\CurvesTransferer.cs" />
      <None Include="Assets\Font\Hoefler text.txt" />
+     <Compile Include="Assets\Plugins\CSI\CSharpInterpreter.cs" />
+     <None Include="Assets\Plugins\CSI\CSharpInterpreter_Include.txt" />
+     <Compile Include="Assets\Plugins\CSI\interpreter.cs" />
+     <Compile Include="Assets\Plugins\CSI\prepro.cs" />
      <Compile Include="Assets\Plugins\EZ\GUI\Controls\UIActionBtn.cs" />
      <Compile Include="Assets\Plugins\EZ\GUI\Controls\UIBtnChangePanel.cs" />
      <Compile Include="Assets\Plugins\EZ\GUI\Controls\UIBtnLoadScene.cs" />
@@ -156,6 +164,7 @@
      <Compile Include="Assets\share\script\debug\DetectLeaks.cs" />
      <Compile Include="Assets\share\script\global\Constant.cs" />
      <Compile Include="Assets\share\script\helper\CompHelper.cs" />
+     <Compile Include="Assets\share\script\helper\SuperDuplicateHelper.cs" />
      <Compile Include="Assets\user\jwu\script\ai\AI_generic.cs" />
      <Compile Include="Assets\user\jwu\script\ai\Anim_zombie.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Follow.cs" />
