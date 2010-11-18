@@ -44,20 +44,27 @@ class SuperDuplicateEditor : Editor {
 
         // create an empty gameobject with SuperDuplicateHelper
         GameObject helperGO = new GameObject("SuperDuplicateHelper");
-        helperGO.transform.position = Vector3.zero;
-        helperGO.transform.rotation = Quaternion.identity;
-        SuperDuplicateHelper helper = helperGO.AddComponent<SuperDuplicateHelper>();
-        helper.Position = helperGO.transform.position; 
-        helper.Rotation = helperGO.transform.eulerAngles; 
+        helperGO.AddComponent<SuperDuplicateHelper>();
 
-        // now duplicate our selection game objects, and set their parents to the SuperDuplicateHelper
+        // now duplicate our selection game objects, and calculate the center
+        Vector3 center = Vector3.zero;
         GameObject[] GOs = new GameObject[count]; 
         for ( int i = 0; i < count; ++i ) {
             GameObject go = transforms[i].gameObject;
             GOs[i] = Object.Instantiate ( go, go.transform.position, go.transform.rotation ) as GameObject; 
-            GOs[i].transform.parent = helperGO.transform;
+            GOs[i].name = go.name;
+            center += GOs[i].transform.position; 
+        }
+        center /= count;
+
+        //  set their parents to the SuperDuplicateHelper
+        helperGO.transform.position = center;
+        helperGO.transform.rotation = Quaternion.identity;
+        foreach ( GameObject go in GOs ) {
+            go.transform.parent = helperGO.transform;
         }
 
+        //
         Selection.activeObject = helperGO;
     }
 
@@ -66,11 +73,56 @@ class SuperDuplicateEditor : Editor {
     // ------------------------------------------------------------------ 
 
     public override void OnInspectorGUI () {
-        SuperDuplicateHelper helper = (SuperDuplicateHelper)target;
-        helper.Position = EditorGUILayout.Vector3Field ("Position", helper.Position);
-        helper.Rotation = EditorGUILayout.Vector3Field ("Rotation", helper.Rotation);
-
+        // SuperDuplicateHelper helper = (SuperDuplicateHelper)target;
         if (GUI.changed)
             EditorUtility.SetDirty (target);
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void OnSceneGUI () {
+        SuperDuplicateHelper helper = (SuperDuplicateHelper)target;
+        Transform go_trans = helper.gameObject.transform;
+
+        // prevent editor select other object when editing SuperDuplicateHelper
+        if (Event.current.type == EventType.Layout) {
+            HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+        }
+
+        // if MouseMove (in move model)
+        if ( Event.current.type == EventType.MouseMove ) {
+            Ray ray = HandleUtility.GUIPointToWorldRay (Event.current.mousePosition); 
+
+            // DISABLE { 
+            // Plane plane = new Plane ( Vector3.up, 0.0f );
+            // float dist = 0.0f;
+            // plane.Raycast( ray, out dist );
+            // Vector3 pos = ray.origin + ray.direction * dist;
+            // } DISABLE end 
+
+            Vector3 pos = ray.origin + ray.direction * 500.0f;
+
+            int layerMask = 1 << Layer.ground;
+            RaycastHit hit;
+            if ( Physics.Raycast (ray.origin, ray.direction, out hit, 10000.0f, layerMask ) ) {
+                pos = hit.point;
+            }
+            go_trans.position = pos;
+
+            return;
+        }
+
+        // if MouseUp (finish the job)
+        if ( Event.current.type == EventType.MouseUp ) {
+            foreach ( Transform child in go_trans ) {
+                child.parent = null;
+            }
+            GameObject.DestroyImmediate(go_trans);
+            Selection.activeObject = null;
+            return;
+        }
+    }
 }
+        

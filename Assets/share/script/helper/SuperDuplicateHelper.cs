@@ -17,6 +17,4 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 public class SuperDuplicateHelper : MonoBehaviour {
-    public Vector3 Position;
-    public Vector3 Rotation;
 }
