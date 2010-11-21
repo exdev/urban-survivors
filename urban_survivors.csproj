@@ -165,12 +165,15 @@
      <Compile Include="Assets\share\script\global\Constant.cs" />
      <Compile Include="Assets\share\script\helper\CompHelper.cs" />
      <Compile Include="Assets\share\script\helper\SuperDuplicateHelper.cs" />
+     <Compile Include="Assets\user\jwu\script\ai\AI_ZombieNormal.cs" />
      <Compile Include="Assets\user\jwu\script\ai\AI_generic.cs" />
      <Compile Include="Assets\user\jwu\script\ai\Anim_zombie.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Follow.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Follow_smooth.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Follow_smoothFocus.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Obstacle_transparent.cs" />
+     <Compile Include="Assets\user\jwu\script\fsm\BasicActions.cs" />
+     <Compile Include="Assets\user\jwu\script\fsm\FSM.cs" />
      <Compile Include="Assets\user\jwu\script\gameplay\GameRules.cs" />
      <Compile Include="Assets\user\jwu\script\gameplay\StartPoint.cs" />
      <Compile Include="Assets\user\jwu\script\player\HUD_noused.cs" />
