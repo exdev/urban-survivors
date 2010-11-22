@@ -66,6 +66,8 @@ class DrawGizmos {
     static void DrawPeriodicSource ( Response_listSpawn _c, GizmoType _gizmoType ) {
         Gizmos.color = Color.yellow;
         foreach ( GameObject go in _c.Spawners ) {
+            if ( go == null )
+                continue;
             Vector3 position = _c.transform.position;
             Gizmos.DrawLine (position, go.transform.position);
         }
