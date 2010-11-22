@@ -42,6 +42,44 @@ public class FSM {
         }
     } 
 
+    public class Action_periodic : Action {
+        private bool FirstTick = false;
+        private float LastTick = 0.0f;
+
+        public float Delay = 0.0f;
+        public float Interval = 0.0f;
+
+        public void initTimer ( float _initTime ) { 
+            LastTick = _initTime; 
+            FirstTick = true;
+        }
+
+        public bool tickTimer () {
+            float deltaTime = Time.time - LastTick;
+
+            // if we are first time tick, and have Delay
+            if ( FirstTick && Delay > 0.0f ) {
+                FirstTick = false;
+                if ( deltaTime >= Delay ) {
+                    LastTick = Time.time;
+                    return true;
+                }
+                return false;
+            }
+
+            // check interval time 
+            if ( deltaTime >= Interval ) {
+                LastTick = Time.time;
+                return true;
+            }
+            return false;
+        }
+
+        public override void exec () {
+            Debug.LogWarning("Action::exec not implemented, default exec been called.");
+        }
+    }
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
@@ -57,8 +95,8 @@ public class FSM {
         public State ( string _name, Action _entry, Action _step, Action _exit ) {
             name = _name;
             entry_action = _entry;
-            exit_action = _step;
-            step_action = _exit;
+            step_action = _step;
+            exit_action = _exit;
         }
 
         public void AddTransition ( Transition _trans ) {
@@ -68,7 +106,7 @@ public class FSM {
                 return;
                 
             transition_list[transition_count] = _trans;
-            transition_count++;
+            ++transition_count;
         }
     } 
 
@@ -77,7 +115,7 @@ public class FSM {
     // ------------------------------------------------------------------ 
 
     public class Transition {
-        public State src_state = null;
+        // public State src_state = null;
         public State dest_state = null;
         public Action action = null;
 
@@ -141,17 +179,28 @@ public class FSM {
                 if ( nextState.entry_action != null )
                     cur_actions.Add ( nextState.entry_action );
                 cur_state = nextState;
+
+                // if the action is periodic action
+                Action_periodic action = nextState.step_action as Action_periodic;
+                if ( action != null ) {
+                    action.initTimer(Time.time); // we set the lastTick so that Action periodic can check by itself.
+                }
             }
             // otherwise, just perform current state's action 
             else {
-                if ( cur_state.step_action != null )
+                if ( cur_state.step_action != null ) {
                     cur_actions.Add ( cur_state.step_action );
+                }
             }
         }
 
         // perform the actions
         foreach ( Action act in cur_actions ) {
-            act.exec ();
+            Action_periodic act_p = act as Action_periodic;
+            if ( act_p != null && act_p.tickTimer() )
+                act_p.exec ();
+            else
+                act.exec ();
         }
 	}
 }

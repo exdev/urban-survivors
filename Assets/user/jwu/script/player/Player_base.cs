@@ -19,6 +19,7 @@ using System.Collections;
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
+[RequireComponent(typeof(CharacterController))]
 public class Player_base : MonoBehaviour {
 
     protected ScreenPad screenPad = null;
