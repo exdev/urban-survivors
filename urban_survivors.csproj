@@ -18,7 +18,7 @@
 	<DebugType>full</DebugType>
 	<Optimize>false</Optimize>
 	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_3_1_0;UNITY_3_1;UNITY_EDITOR;ENABLE_PROFILER;UNITY_STANDALONE_WIN;ENABLE_GENERICS;ENABLE_DUCK_TYPING;ENABLE_TERRAIN;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CLOTH;ENABLE_WWW</DefineConstants>
+	<DefineConstants>DEBUG;TRACE;UNITY_3_1_0;UNITY_3_1;UNITY_EDITOR;ENABLE_PROFILER;UNITY_WEBPLAYER;ENABLE_GENERICS;ENABLE_DUCK_TYPING;ENABLE_TERRAIN;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CLOTH;ENABLE_WWW</DefineConstants>
 	<ErrorReport>prompt</ErrorReport>
 	<WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -35,22 +35,31 @@
     <Reference Include="System.XML" />
 	<Reference Include="System.Core" />
 	<Reference Include="UnityEngine">
-	  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
 	<Reference Include="Boo.Lang">
-	  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/unity/Boo.Lang.dll</HintPath>
+	  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Mono/lib/mono/unity/Boo.Lang.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityScript">
-	  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Mono/lib/mono/unity/UnityScript.dll</HintPath>
+	  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Mono/lib/mono/unity/UnityScript.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\backup\scripts\Player_boy_rigid.cs" />
+     <Compile Include="Assets\backup\scripts\Player_girl_rigid.cs" />
+     <None Include="Assets\Editor\backup\CopyComponents.js" />
      <Compile Include="Assets\Editor\Editors\SpriteTimelineEditor.cs" />
      <Compile Include="Assets\Editor\Editors\UICtlEditor.cs" />
      <Compile Include="Assets\Editor\Editors\UIPanelEditor.cs" />
+     <Compile Include="Assets\Editor\ex\DrawGizmos.cs" />
+     <Compile Include="Assets\Editor\ex\SuperDuplicateEditor.cs" />
+     <Compile Include="Assets\Editor\ex\SyncAnimModel.cs" />
+     <Compile Include="Assets\Editor\ex\TestEditor.cs" />
+     <Compile Include="Assets\Editor\ex\TestWindow.cs" />
+     <Compile Include="Assets\Editor\ex\TransformUtilitiesWindow.cs" />
      <Compile Include="Assets\Editor\Inspectors\UIActionBtnInspector.cs" />
      <Compile Include="Assets\Editor\Inspectors\UIBistateInteractivePanelInspector.cs" />
      <Compile Include="Assets\Editor\Inspectors\UIBtnChangePanelInspector.cs" />
@@ -76,14 +85,15 @@
      <Compile Include="Assets\Editor\Wizards\CopyControl.cs" />
      <Compile Include="Assets\Editor\Wizards\CopyTransitions.cs" />
      <Compile Include="Assets\Editor\Wizards\SpriteSizer.cs" />
-     <None Include="Assets\Editor\backup\CopyComponents.js" />
-     <Compile Include="Assets\Editor\ex\DrawGizmos.cs" />
-     <Compile Include="Assets\Editor\ex\SuperDuplicateEditor.cs" />
-     <Compile Include="Assets\Editor\ex\SyncAnimModel.cs" />
-     <Compile Include="Assets\Editor\ex\TestEditor.cs" />
-     <Compile Include="Assets\Editor\ex\TestWindow.cs" />
-     <Compile Include="Assets\Editor\ex\TransformUtilitiesWindow.cs" />
      <Compile Include="Assets\Editor\CurvesTransferer.cs" />
+     <None Include="Assets\external\Animation\Scripts\AnimationBlender.js" />
+     <None Include="Assets\external\Animation\Scripts\MoveBouncer.js" />
+     <None Include="Assets\external\DrawLines\src\BlackLine.shader" />
+     <Compile Include="Assets\external\DrawLines\src\LinesGL.cs" />
+     <Compile Include="Assets\external\DrawLines\src\LinesGR.cs" />
+     <Compile Include="Assets\external\DrawLines\src\LinesLR.cs" />
+     <None Include="Assets\external\Shaders\Sprite Cutout.shader" />
+     <None Include="Assets\external\Shaders\Transparent Vertex Colored.shader" />
      <None Include="Assets\Font\Hoefler text.txt" />
      <Compile Include="Assets\Plugins\CSI\CSharpInterpreter.cs" />
      <None Include="Assets\Plugins\CSI\CSharpInterpreter_Include.txt" />
@@ -138,26 +148,9 @@
      <Compile Include="Assets\Plugins\Sprite Scripts\SpriteText.cs" />
      <Compile Include="Assets\Plugins\Sprite Scripts\SuperSprite.cs" />
      <Compile Include="Assets\Plugins\CollisionIgnoreManager.cs" />
-     <Compile Include="Assets\Plugins\SpawnManager.cs" />
      <Compile Include="Assets\Plugins\iTween.cs" />
+     <Compile Include="Assets\Plugins\SpawnManager.cs" />
      <None Include="Assets\Shaders\Text Shader - Z tested.shader" />
-     <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />
-     <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Multiply.shader" />
-     <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
-     <None Include="Assets\Standard Assets\Toon Shading\Sources\Shaders\Toony-Basic.shader" />
-     <None Include="Assets\Standard Assets\Toon Shading\Sources\Shaders\Toony-BasicOutline.shader" />
-     <None Include="Assets\Standard Assets\Toon Shading\Sources\Shaders\Toony-Lighted.shader" />
-     <None Include="Assets\Standard Assets\Toon Shading\Sources\Shaders\Toony-LightedOutline.shader" />
-     <Compile Include="Assets\backup\scripts\Player_boy_rigid.cs" />
-     <Compile Include="Assets\backup\scripts\Player_girl_rigid.cs" />
-     <None Include="Assets\external\Animation\Scripts\AnimationBlender.js" />
-     <None Include="Assets\external\Animation\Scripts\MoveBouncer.js" />
-     <None Include="Assets\external\DrawLines\src\BlackLine.shader" />
-     <Compile Include="Assets\external\DrawLines\src\LinesGL.cs" />
-     <Compile Include="Assets\external\DrawLines\src\LinesGR.cs" />
-     <Compile Include="Assets\external\DrawLines\src\LinesLR.cs" />
-     <None Include="Assets\external\Shaders\Sprite Cutout.shader" />
-     <None Include="Assets\external\Shaders\Transparent Vertex Colored.shader" />
      <Compile Include="Assets\share\basic\shapes.cs" />
      <None Include="Assets\share\script\btree\Btree.js" />
      <Compile Include="Assets\share\script\debug\DebugHelper.cs" />
@@ -165,9 +158,17 @@
      <Compile Include="Assets\share\script\global\Constant.cs" />
      <Compile Include="Assets\share\script\helper\CompHelper.cs" />
      <Compile Include="Assets\share\script\helper\SuperDuplicateHelper.cs" />
+     <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />
+     <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Multiply.shader" />
+     <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
+     <None Include="Assets\Standard Assets\Skyboxes\ skybox info.txt" />
+     <None Include="Assets\Standard Assets\Toon Shading\Sources\Shaders\Toony-Basic.shader" />
+     <None Include="Assets\Standard Assets\Toon Shading\Sources\Shaders\Toony-BasicOutline.shader" />
+     <None Include="Assets\Standard Assets\Toon Shading\Sources\Shaders\Toony-Lighted.shader" />
+     <None Include="Assets\Standard Assets\Toon Shading\Sources\Shaders\Toony-LightedOutline.shader" />
      <None Include="Assets\user\jwu\backup\CopyComponents.js" />
-     <Compile Include="Assets\user\jwu\script\ai\AI_ZombieNormal.cs" />
      <Compile Include="Assets\user\jwu\script\ai\AI_generic.cs" />
+     <Compile Include="Assets\user\jwu\script\ai\AI_ZombieNormal.cs" />
      <Compile Include="Assets\user\jwu\script\ai\Anim_zombie.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Follow.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Follow_smooth.cs" />
@@ -199,14 +200,14 @@
      <Compile Include="Assets\user\jwu\script\trigger\source\Source_periodic.cs" />
      <Compile Include="Assets\user\jwu\script\weapon\Bullet.cs" />
      <Compile Include="Assets\user\jwu\script\weapon\Emitter.cs" />
-     <Compile Include="Assets\user\jwu\script\weapon\Emitter_S.cs" />
      <Compile Include="Assets\user\jwu\script\weapon\Emitter_default.cs" />
+     <Compile Include="Assets\user\jwu\script\weapon\Emitter_S.cs" />
      <Compile Include="Assets\user\jwu\script\weapon\Fire.cs" />
      <Compile Include="Assets\user\jwu\script\weapon\Fire_auto.cs" />
      <Compile Include="Assets\user\jwu\script\weapon\Infrared.cs" />
      <None Include="Assets\user\nantas\script\AnimationTest.js" />
-     <None Include="Assets\user\nantas\script\MoveControl_Rotation.js" />
      <None Include="Assets\user\nantas\script\iconTest.js" />
+     <None Include="Assets\user\nantas\script\MoveControl_Rotation.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
