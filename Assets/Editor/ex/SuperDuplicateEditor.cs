@@ -116,11 +116,23 @@ class SuperDuplicateEditor : Editor {
 
         // if MouseUp (finish the job)
         if ( Event.current.type == EventType.MouseUp ) {
+            GameObject firstGO = null;
             foreach ( Transform child in go_trans ) {
                 child.parent = null;
+                if ( firstGO == null )
+                    firstGO = child.gameObject;
             }
             GameObject.DestroyImmediate(go_trans);
-            Selection.activeObject = null;
+
+            // FIXME: there have an error message in Unity3D: 
+            // Stored Snapshot does not match same set of objects that are in the active set of snapshotted objects
+            // UnityEditor.DockArea:OnGUI() 
+            // { 
+            // re-select the game object
+            // Selection.activeObject = null;
+            Selection.activeObject = firstGO; 
+            // } FIXME end 
+
             return;
         }
     }

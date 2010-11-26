@@ -144,6 +144,7 @@
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Multiply.shader" />
      <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
+     <None Include="Assets\Standard Assets\Skyboxes\ skybox info.txt" />
      <None Include="Assets\Standard Assets\Toon Shading\Sources\Shaders\Toony-Basic.shader" />
      <None Include="Assets\Standard Assets\Toon Shading\Sources\Shaders\Toony-BasicOutline.shader" />
      <None Include="Assets\Standard Assets\Toon Shading\Sources\Shaders\Toony-Lighted.shader" />
@@ -165,8 +166,12 @@
      <Compile Include="Assets\share\script\global\Constant.cs" />
      <Compile Include="Assets\share\script\helper\CompHelper.cs" />
      <Compile Include="Assets\share\script\helper\SuperDuplicateHelper.cs" />
+     <Compile Include="Assets\user\jwu\script\ai\AI_ZombieNormal.cs" />
      <Compile Include="Assets\user\jwu\script\ai\AI_generic.cs" />
      <Compile Include="Assets\user\jwu\script\ai\Anim_zombie.cs" />
+     <Compile Include="Assets\user\jwu\script\aicore\fsm\BasicActions.cs" />
+     <Compile Include="Assets\user\jwu\script\aicore\fsm\FSM.cs" />
+     <Compile Include="Assets\user\jwu\script\aicore\Steer.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Follow.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Follow_smooth.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Follow_smoothFocus.cs" />
