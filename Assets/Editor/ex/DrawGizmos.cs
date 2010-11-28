@@ -24,6 +24,8 @@ class DrawGizmos {
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void DrawPeriodicSource ( Source_periodic _c, GizmoType _gizmoType ) {
+        if ( EditorApplication.isPlaying ) return;
+
         Vector3 position = _c.transform.position;
         Gizmos.DrawIcon (position, "Adobe.ico");
     }
@@ -34,6 +36,8 @@ class DrawGizmos {
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void DrawPeriodicSource ( Source_collider _c, GizmoType _gizmoType ) {
+        if ( EditorApplication.isPlaying ) return;
+
         Vector3 position = _c.transform.position;
         Gizmos.DrawIcon (position, "Desktop.ico");
 
@@ -54,6 +58,8 @@ class DrawGizmos {
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void DrawPeriodicSource ( Spawner_point _c, GizmoType _gizmoType ) {
+        if ( EditorApplication.isPlaying ) return;
+
         Vector3 position = _c.transform.position;
         Gizmos.DrawIcon (position, "Blender.ico");
     }
@@ -64,6 +70,8 @@ class DrawGizmos {
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void DrawPeriodicSource ( Response_listSpawn _c, GizmoType _gizmoType ) {
+        if ( EditorApplication.isPlaying ) return;
+
         Gizmos.color = Color.yellow;
         foreach ( GameObject go in _c.Spawners ) {
             if ( go == null )
@@ -79,6 +87,8 @@ class DrawGizmos {
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void DrawPeriodicSource ( StartPoint _c, GizmoType _gizmoType ) {
+        if ( EditorApplication.isPlaying ) return;
+
         Vector3 position = _c.transform.position;
         Gizmos.DrawIcon (position, "Napster.ico");
     }

@@ -26,15 +26,15 @@ public class SteerTest_Simple : Steer {
 
     protected override void Start () {
         base.Start();
-        DestPos = transform.position;
-        // DestPos = new Vector3 ( 
-        //                         Random.Range(-10.0f,10.0f) 
-        //                       , 0.0f 
-        //                       , Random.Range(-10.0f,10.0f)
-        //                       );
+        DestPos = new Vector3 ( 
+                                Random.Range(-10.0f,10.0f) 
+                              , 0.0f 
+                              , Random.Range(-10.0f,10.0f)
+                              );
+        // DestPos = transform.position + Vector3.forward * 2.0f;
 
-        // base.curSpeed = 1.5f;
-        // base.controller.Move ( transform.forward * base.curSpeed * Time.deltaTime );
+        base.curSpeed = 2.0f;
+        base.controller.Move ( transform.forward * base.curSpeed * Time.deltaTime );
     }
 
     // ------------------------------------------------------------------ 
@@ -42,19 +42,33 @@ public class SteerTest_Simple : Steer {
     // ------------------------------------------------------------------ 
 
     void Update () {
-        Vector3 force = GetSteering_Seek_LimitByMaxSpeed ( DestPos );
-        // Vector3 force = GetSteering_Seek ( DestPos );
-        force.y = 0.0f;
+        Vector3 force = Vector3.zero;
+        Vector3 force_seek = GetSteering_Seek_LimitByMaxSpeed ( DestPos );
 
-        force = Vector3.Lerp ( force, 10.0f * GetSteering_Wander(), 0.2f );
+        float distance = (transform.position - DestPos).magnitude;
+        if ( distance < 5.0f ) {
+            ApplyBrakingForce(1.0f);
+        }
+        else {
+            force = force_seek;
+            force.y = 0.0f;
+            ApplySteeringForce(force);
+        }
 
-        ApplySteeringForce(force);
+        if ( base.curSpeed == 0.0f ) {
+            DestPos = new Vector3 ( 
+                                   Random.Range(-10.0f,10.0f) 
+                                   , 0.0f 
+                                   , Random.Range(-10.0f,10.0f)
+                                  );
+
+        }
 
         // DEBUG { 
         // draw destination
         DebugHelper.DrawDestination ( this.DestPos );
         // draw velocity
-        Vector3 vel = base.controller.velocity; 
+        Vector3 vel = base.Velocity(); 
         DebugHelper.DrawLine ( transform.position, 
                                transform.position + vel * 3.0f, 
                                new Color(0.0f,1.0f,0.0f) );

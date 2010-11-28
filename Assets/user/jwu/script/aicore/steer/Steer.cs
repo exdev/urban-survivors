@@ -30,6 +30,7 @@ public class Steer : MonoBehaviour {
 
     public float maxSpeed = 1.0f;
     public float maxForce = 0.1f;
+    public float maxBrakingForce = 1.0f;
     public float mass = 1.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -84,10 +85,51 @@ public class Steer : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    // NOTE: bullet hit controller will change its velocity { 
+    // public Vector3 Velocity () { return this.controller.velocity; }
+    // } NOTE end 
+    public Vector3 Velocity () { return transform.forward * this.curSpeed; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool IsAhead ( Vector3 _targetPos, float _cosThreshold = 0.707f ) {
+        Vector3 targetDir = (_targetPos - transform.position).normalized;
+        return Vector3.Dot ( transform.forward, targetDir ) > _cosThreshold;
+    } 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool IsAside ( Vector3 _targetPos, float _cosThreshold = 0.707f ) {
+        Vector3 targetDir = (_targetPos - transform.position).normalized;
+        float dp = Vector3.Dot ( transform.forward, targetDir );
+        return (dp < _cosThreshold) && (dp > -_cosThreshold);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool IsBehind ( Vector3 _targetPos, float _cosThreshold = -0.707f ) {
+        Vector3 targetDir = (_targetPos - transform.position).normalized;
+        return Vector3.Dot ( transform.forward, targetDir ) < _cosThreshold;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // steering functions
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public Vector3 GetSteering_Seek_LimitByMaxSpeed ( Vector3 _pos ) {
         Vector3 offset = _pos - transform.position;
         Vector3 desiredVelocity = Vector3.ClampMagnitude ( offset, this.maxSpeed );
-        return desiredVelocity - this.controller.velocity;
+        return desiredVelocity - this.Velocity();
     }
 
     // ------------------------------------------------------------------ 
@@ -96,7 +138,26 @@ public class Steer : MonoBehaviour {
 
     public Vector3 GetSteering_Seek ( Vector3 _pos ) {
         Vector3 desiredVelocity = _pos - transform.position;
-        return desiredVelocity - this.controller.velocity;
+        return desiredVelocity - this.Velocity();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Vector3 GetSteering_Flee_LimitByMaxSpeed ( Vector3 _pos ) {
+        Vector3 offset = transform.position - _pos;
+        Vector3 desiredVelocity = Vector3.ClampMagnitude ( offset, this.maxSpeed );
+        return desiredVelocity - this.Velocity();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Vector3 GetSteering_Flee ( Vector3 _pos ) {
+        Vector3 desiredVelocity = transform.position - _pos;
+        return desiredVelocity - this.Velocity();
     }
 
     // ------------------------------------------------------------------ 
@@ -110,6 +171,10 @@ public class Steer : MonoBehaviour {
         return transform.right * this.wanderSide;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////
+    // movement functions
+    ///////////////////////////////////////////////////////////////////////////////
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
@@ -122,7 +187,7 @@ public class Steer : MonoBehaviour {
 
         // compute acceleration and velocity
         Vector3 newAcceleration = (clippedForce / this.mass);
-        Vector3 newVelocity = this.controller.velocity;
+        Vector3 newVelocity = this.Velocity();
 
         // damp out abrupt changes and oscillations in steering acceleration
         // (rate is proportional to time step, then clipped into useful range)
@@ -144,9 +209,16 @@ public class Steer : MonoBehaviour {
         // update Speed
         this.curSpeed = newVelocity.magnitude;
 
+        // TODO: add properties useGravity ? { 
+        // apply gravity
+        Vector3 gravity = Vector3.zero;
+        if ( controller.isGrounded == false ) {
+            gravity.y = -10.0f;
+        }
+        // } TODO end 
+
         // Euler integrate (per frame) velocity into position
-        // DELME: setPosition (position() + (newVelocity * Time.deltaTime));
-        this.controller.Move (newVelocity * Time.deltaTime);
+        this.controller.Move ( (gravity + newVelocity) * Time.deltaTime);
 
         // regenerate local space (by default: align vehicle's forward axis with
         // new velocity, but this behavior may be overridden by derived classes.)
@@ -161,5 +233,65 @@ public class Steer : MonoBehaviour {
         //                       position (),
         //                       _smoothedPosition);
         // } TODO end 
+    }
+
+    // KEEPME { 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    // public void ApplyBrakingForce ( float _brakingRate ) {
+    //     float rawBraking = this.curSpeed * _brakingRate;
+    //     float clipBraking = Mathf.Clamp( rawBraking, 0.0f, this.maxForce );
+    //     this.curSpeed -= clipBraking * Time.deltaTime;
+    // }
+    // } KEEPME end 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void ApplyBrakingForce ( float _brakingRate = 1.0f ) {
+        // if we already break the target, skip process this.
+        if ( this.curSpeed == 0.0f )
+            return;
+
+        // compute acceleration and velocity
+        float brakingForce = this.maxBrakingForce * _brakingRate;
+        Vector3 curVelocity = this.Velocity();
+        Vector3 newAcceleration = ( -curVelocity.normalized * brakingForce / this.mass);
+
+        // damp out abrupt changes and oscillations in steering acceleration
+        // (rate is proportional to time step, then clipped into useful range)
+        if ( Time.deltaTime > 0.0f ) {
+            float smoothRate = Mathf.Clamp (9.0f * Time.deltaTime, 0.15f, 0.4f);
+            smoothRate = Mathf.Clamp01(smoothRate);
+            this.smoothedAcceleration = Vector3.Lerp ( this.smoothedAcceleration, 
+                                                       newAcceleration, 
+                                                       smoothRate );
+        }
+
+        // Euler integrate (per frame) acceleration into velocity
+        Vector3 newVelocity = curVelocity;
+        newVelocity += this.smoothedAcceleration * Time.deltaTime;
+        newVelocity.y = 0.0f;
+        float cosTheta = Vector3.Dot( curVelocity.normalized, newVelocity.normalized );
+        // if newVelocity and curVelocity are not in same direction.
+        if ( cosTheta < -0.707f ) {
+            newVelocity = Vector3.zero;
+            this.smoothedAcceleration = Vector3.zero;
+        }
+
+        // update Speed
+        this.curSpeed = newVelocity.magnitude;
+
+        // apply gravity
+        Vector3 gravity = Vector3.zero;
+        if ( controller.isGrounded == false ) {
+            gravity.y = -10.0f;
+        }
+
+        //
+        this.controller.Move ( (gravity + newVelocity) * Time.deltaTime);
     }
 }

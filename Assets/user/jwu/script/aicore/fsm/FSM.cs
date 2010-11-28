@@ -37,7 +37,7 @@ public class FSM {
     // ------------------------------------------------------------------ 
 
     public class Action {
-        public virtual void exec () {
+        public virtual void exec ( GameObject _self ) {
             Debug.LogWarning("Action::exec not implemented, default exec been called.");
         }
     } 
@@ -75,7 +75,7 @@ public class FSM {
             return false;
         }
 
-        public override void exec () {
+        public override void exec ( GameObject _self ) {
             Debug.LogWarning("Action::exec not implemented, default exec been called.");
         }
     }
@@ -119,7 +119,7 @@ public class FSM {
         public State dest_state = null;
         public Action action = null;
 
-        public virtual bool check () { return false; } 
+        public virtual bool check ( GameObject _self ) { return false; } 
     } 
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -129,6 +129,7 @@ public class FSM {
     State init_state = null;
     State cur_state = null;
     List<Action> cur_actions = new List<Action>();
+    GameObject self = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -138,9 +139,16 @@ public class FSM {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	public void init ( State _initState ) {
+    public State CurrentState () { return this.cur_state; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	public void init ( GameObject _self, State _initState ) {
+        this.self = _self;
         DebugHelper.Assert( _initState != null, "init state can't be null, pls set it before using the state machine" );
-        init_state = _initState;
+        this.init_state = _initState;
 	}
 	
     // ------------------------------------------------------------------ 
@@ -149,21 +157,21 @@ public class FSM {
 
 	public void tick () {
         // clear the action list
-        cur_actions.Clear();
+        this.cur_actions.Clear();
 
         // if we don't have any state, begin with init state.
-        if ( cur_state == null ) {
-            if ( init_state != null ) {
-                cur_state = init_state;
-                cur_actions.Add ( cur_state.entry_action );
+        if ( this.cur_state == null ) {
+            if ( this.init_state != null ) {
+                this.cur_state = this.init_state;
+                this.cur_actions.Add ( this.cur_state.entry_action );
             }
         }
         else {
             // check if we have any transition satisfied the condition
             Transition triggeredTrans = null;
-            for ( uint i = 0; i < cur_state.transition_count; ++i ) {
-                Transition trans = cur_state.transition_list[i];
-                if ( trans.check() ) {
+            for ( uint i = 0; i < this.cur_state.transition_count; ++i ) {
+                Transition trans = this.cur_state.transition_list[i];
+                if ( trans.check(self) ) {
                     triggeredTrans = trans;
                     break;
                 }
@@ -172,13 +180,13 @@ public class FSM {
             // if we have transition triggered
             if ( triggeredTrans != null ) {
                 State nextState = triggeredTrans.dest_state;
-                if ( cur_state.exit_action != null )
-                    cur_actions.Add ( cur_state.exit_action );
+                if ( this.cur_state.exit_action != null )
+                    this.cur_actions.Add ( this.cur_state.exit_action );
                 if ( triggeredTrans.action != null )
-                    cur_actions.Add ( triggeredTrans.action );
+                    this.cur_actions.Add ( triggeredTrans.action );
                 if ( nextState.entry_action != null )
-                    cur_actions.Add ( nextState.entry_action );
-                cur_state = nextState;
+                    this.cur_actions.Add ( nextState.entry_action );
+                this.cur_state = nextState;
 
                 // if the action is periodic action
                 Action_periodic action = nextState.step_action as Action_periodic;
@@ -188,19 +196,19 @@ public class FSM {
             }
             // otherwise, just perform current state's action 
             else {
-                if ( cur_state.step_action != null ) {
-                    cur_actions.Add ( cur_state.step_action );
+                if ( this.cur_state.step_action != null ) {
+                    this.cur_actions.Add ( this.cur_state.step_action );
                 }
             }
         }
 
         // perform the actions
-        foreach ( Action act in cur_actions ) {
+        foreach ( Action act in this.cur_actions ) {
             Action_periodic act_p = act as Action_periodic;
             if ( act_p != null && act_p.tickTimer() )
-                act_p.exec ();
+                act_p.exec (self);
             else
-                act.exec ();
+                act.exec (self);
         }
 	}
 }

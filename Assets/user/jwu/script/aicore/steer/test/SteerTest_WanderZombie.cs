@@ -54,7 +54,7 @@ public class SteerTest_WanderZombie : Steer {
         // draw destination
         DebugHelper.DrawDestination ( this.DestPos );
         // draw velocity
-        Vector3 vel = base.controller.velocity; 
+        Vector3 vel = base.Velocity(); 
         DebugHelper.DrawLine ( transform.position, 
                                transform.position + vel * 3.0f, 
                                new Color(0.0f,1.0f,0.0f) );
