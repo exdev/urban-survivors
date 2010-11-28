@@ -16,6 +16,26 @@ using System.Collections;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+// class Line 
+// 
+// Purpose: 
+// 
+///////////////////////////////////////////////////////////////////////////////
+
+public class Line {
+    public Vector3 start;
+    public Vector3 end;
+    public Color color;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// class DebugHelper
+// 
+// Purpose: 
+// 
+///////////////////////////////////////////////////////////////////////////////
+
 public class DebugHelper : MonoBehaviour {
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -146,10 +166,19 @@ public class DebugHelper : MonoBehaviour {
         //
         for ( int i = 1; i <= segments; ++i ) {
             Vector3 cur = _center + _rot * ( _radius * new Vector3( Mathf.Cos(theta), 0.0f, Mathf.Sin(theta) ) );
-            Debug.DrawLine ( last, cur, _color );
+            DebugHelper.DrawLine ( last, cur, _color );
             last = cur;
             theta += step;
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static void DrawLine ( Vector3 _start, Vector3 _end, Color _color ) {
+        Debug.DrawLine ( _start, _end, _color );
+        // TODO: use LinesGR.cs method!
     }
 
     // ------------------------------------------------------------------ 
