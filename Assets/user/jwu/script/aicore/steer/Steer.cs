@@ -22,6 +22,7 @@ public class Steer : MonoBehaviour {
     protected CharacterController controller = null;
     protected float curSpeed = 0.0f;
     protected Vector3 smoothedAcceleration = Vector3.zero;
+    float wanderSide = 0.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -96,6 +97,17 @@ public class Steer : MonoBehaviour {
     public Vector3 GetSteering_Seek ( Vector3 _pos ) {
         Vector3 desiredVelocity = _pos - transform.position;
         return desiredVelocity - this.controller.velocity;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Vector3 GetSteering_Wander () {
+        float speed = 12.0f * Time.deltaTime;
+        this.wanderSide = this.wanderSide + speed * Random.Range(-1.0f,1.0f); 
+        this.wanderSide = Mathf.Clamp ( this.wanderSide, -1.0f, 1.0f );
+        return transform.right * this.wanderSide;
     }
 
     // ------------------------------------------------------------------ 

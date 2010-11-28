@@ -206,6 +206,16 @@ public class DebugHelper : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public static void DrawDestination ( Vector3 _dest ) {
+        DebugHelper.DrawCircleY ( _dest, 0.5f, new Color(1.0f,0.0f,0.0f) );
+        DebugHelper.DrawCircleY ( _dest, 0.1f, new Color(1.0f,1.0f,0.0f) );
+        DebugHelper.DrawLine ( _dest, _dest + Vector3.up * 2.0f, new Color(1.0f,1.0f,0.0f) );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     public static void Assert(bool _comparison, string _message)
     {
