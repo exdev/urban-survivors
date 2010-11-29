@@ -24,7 +24,7 @@ public class SteerTest_WanderZombie : Steer {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    protected override void Start () {
+    protected new void Start () {
         base.Start();
         DestPos = transform.position;
         // DestPos = new Vector3 ( 

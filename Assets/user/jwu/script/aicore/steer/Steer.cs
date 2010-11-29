@@ -41,7 +41,7 @@ public class Steer : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	protected virtual void Start () {
+	protected void Start () {
         this.controller = GetComponent<CharacterController>();
 	}
 
@@ -72,7 +72,7 @@ public class Steer : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void AdjustOrientation ( Vector3 _newVelocity ) {
-        if ( this.curSpeed > 0 ) {
+        if ( this.curSpeed > 0.001f ) {
             transform.forward = _newVelocity.normalized;
         }
     }
@@ -240,58 +240,62 @@ public class Steer : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    // public void ApplyBrakingForce ( float _brakingRate ) {
-    //     float rawBraking = this.curSpeed * _brakingRate;
-    //     float clipBraking = Mathf.Clamp( rawBraking, 0.0f, this.maxForce );
-    //     this.curSpeed -= clipBraking * Time.deltaTime;
-    // }
+    public void ApplyBrakingForce ( float _brakingRate ) {
+        float rawBraking = this.curSpeed * _brakingRate;
+        float clipBraking = Mathf.Clamp( rawBraking, 0.0f, this.maxForce );
+        this.curSpeed -= clipBraking * Time.deltaTime;
+    }
     // } KEEPME end 
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void ApplyBrakingForce ( float _brakingRate = 1.0f ) {
-        // if we already break the target, skip process this.
-        if ( this.curSpeed == 0.0f )
-            return;
+    // public void ApplyBrakingForce ( float _brakingRate = 1.0f ) {
+    //     // if we already break the target, skip process this.
+    //     if ( this.curSpeed == 0.0f )
+    //         return;
 
-        // compute acceleration and velocity
-        float brakingForce = this.maxBrakingForce * _brakingRate;
-        Vector3 curVelocity = this.Velocity();
-        Vector3 newAcceleration = ( -curVelocity.normalized * brakingForce / this.mass);
+    //     // compute acceleration and velocity
+    //     float brakingForce = this.maxBrakingForce * _brakingRate;
+    //     Vector3 curVelocity = this.Velocity();
+    //     Vector3 newAcceleration = ( -curVelocity.normalized * brakingForce / this.mass);
 
-        // damp out abrupt changes and oscillations in steering acceleration
-        // (rate is proportional to time step, then clipped into useful range)
-        if ( Time.deltaTime > 0.0f ) {
-            float smoothRate = Mathf.Clamp (9.0f * Time.deltaTime, 0.15f, 0.4f);
-            smoothRate = Mathf.Clamp01(smoothRate);
-            this.smoothedAcceleration = Vector3.Lerp ( this.smoothedAcceleration, 
-                                                       newAcceleration, 
-                                                       smoothRate );
-        }
+    //     // damp out abrupt changes and oscillations in steering acceleration
+    //     // (rate is proportional to time step, then clipped into useful range)
+    //     if ( Time.deltaTime > 0.0f ) {
+    //         float smoothRate = Mathf.Clamp (9.0f * Time.deltaTime, 0.15f, 0.4f);
+    //         smoothRate = Mathf.Clamp01(smoothRate);
+    //         this.smoothedAcceleration = Vector3.Lerp ( this.smoothedAcceleration, 
+    //                                                    newAcceleration, 
+    //                                                    smoothRate );
+    //     }
 
-        // Euler integrate (per frame) acceleration into velocity
-        Vector3 newVelocity = curVelocity;
-        newVelocity += this.smoothedAcceleration * Time.deltaTime;
-        newVelocity.y = 0.0f;
-        float cosTheta = Vector3.Dot( curVelocity.normalized, newVelocity.normalized );
-        // if newVelocity and curVelocity are not in same direction.
-        if ( cosTheta < -0.707f ) {
-            newVelocity = Vector3.zero;
-            this.smoothedAcceleration = Vector3.zero;
-        }
+    //     // Euler integrate (per frame) acceleration into velocity
+    //     Vector3 newVelocity = curVelocity;
+    //     newVelocity += this.smoothedAcceleration * Time.deltaTime;
+    //     newVelocity.y = 0.0f;
 
-        // update Speed
-        this.curSpeed = newVelocity.magnitude;
+    //     // NOTE: this will prevent character move fast when braking (could be happend when using maxForce more bigger than maxBrakingForce)
+    //     newVelocity = Vector3.ClampMagnitude (newVelocity,this.maxSpeed);
 
-        // apply gravity
-        Vector3 gravity = Vector3.zero;
-        if ( controller.isGrounded == false ) {
-            gravity.y = -10.0f;
-        }
+    //     float cosTheta = Vector3.Dot( curVelocity.normalized, newVelocity.normalized );
+    //     // if newVelocity and curVelocity are not in same direction.
+    //     if ( cosTheta < -0.707f ) {
+    //         newVelocity = Vector3.zero;
+    //         this.smoothedAcceleration = Vector3.zero;
+    //     }
 
-        //
-        this.controller.Move ( (gravity + newVelocity) * Time.deltaTime);
-    }
+    //     // update Speed
+    //     this.curSpeed = newVelocity.magnitude;
+
+    //     // apply gravity
+    //     Vector3 gravity = Vector3.zero;
+    //     if ( controller.isGrounded == false ) {
+    //         gravity.y = -10.0f;
+    //     }
+
+    //     //
+    //     this.controller.Move ( (gravity + newVelocity) * Time.deltaTime);
+    // }
 }

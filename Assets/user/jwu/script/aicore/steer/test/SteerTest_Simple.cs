@@ -24,7 +24,7 @@ public class SteerTest_Simple : Steer {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    protected override void Start () {
+    protected new void Start () {
         base.Start();
         DestPos = new Vector3 ( 
                                 Random.Range(-10.0f,10.0f) 

@@ -300,7 +300,7 @@ public class AI_ZombieNormal : Steer {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    protected override void Start () {
+    protected new void Start () {
         base.Start();
 
         this.targetPos = transform.position;
@@ -317,10 +317,11 @@ public class AI_ZombieNormal : Steer {
         fsm.tick();
 
         // handle steering
+        Vector3 force = Vector3.zero;
         if ( this.steeringState == SteeringState.seeking ) {
             float distance = (transform.position - this.targetPos).magnitude;
             if ( distance < 2.0f ) {
-                ApplyBrakingForce(1.0f);
+                ApplyBrakingForce(10.0f);
 
                 // face the target
                 float rot_speed = 2.0f; // TEMP
@@ -334,18 +335,16 @@ public class AI_ZombieNormal : Steer {
                                                       );
             }
             else {
-                Vector3 force = GetSteering_Seek_LimitByMaxSpeed ( this.targetPos );
+                force = GetSteering_Seek_LimitByMaxSpeed ( this.targetPos );
                 force.y = 0.0f;
-                ApplySteeringForce(force);
             }
         }
         else if ( this.steeringState == SteeringState.braking ) {
-            ApplyBrakingForce(1.0f);
+            ApplyBrakingForce(10.0f);
         }
+        ApplySteeringForce(force);
 
         // DEBUG { 
-        DebugHelper.DrawDestination ( this.targetPos );
-        DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
         // draw velocity
         Vector3 vel = base.Velocity(); 
         DebugHelper.DrawLine ( transform.position, 
@@ -356,7 +355,11 @@ public class AI_ZombieNormal : Steer {
         DebugHelper.DrawLine ( transform.position, 
                                transform.position + acc * 3.0f, 
                                new Color(1.0f,0.0f,1.0f) );
+        // draw target pos
+        DebugHelper.DrawDestination ( this.targetPos );
+        DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
 
+        // debug info
         DebugHelper.ScreenPrint ( "steering state: " + this.steeringState );
         DebugHelper.ScreenPrint ( "current state: " + fsm.CurrentState().name );
 

@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : Player_girl.cs
+// File         : Player_girl_old.cs
 // Author       : Wu Jie 
-// Last Change  : 10/12/2010 | 00:44:29 AM | Tuesday,October
+// Last Change  : 11/29/2010 | 21:25:03 PM | Monday,November
 // Description  : 
 // ======================================================================================
 
@@ -20,7 +20,7 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 [RequireComponent (typeof (Animation))]
-public class Player_girl : Player_base {
+public class Player_girl_old : Player_base_old {
 
     // private
     private Vector3 moveDir;
@@ -54,7 +54,7 @@ public class Player_girl : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	protected new void Start () {
+	new void Start () {
         base.Start();
         DebugHelper.Assert( degreePlayMoveLeftRight <= 90.0f, "the degree can't larger than 90.0" );
         initAnim ();
@@ -73,21 +73,9 @@ public class Player_girl : Player_base {
 
         //
         HandleInput ();
+        ProcessFollowing ();
         ProcessMovement ();
         ProcessAnimation ();
-
-        // DEBUG { 
-        // draw velocity
-        Vector3 vel = base.Velocity(); 
-        DebugHelper.DrawLine ( transform.position, 
-                               transform.position + vel,
-                               new Color(0.0f,1.0f,0.0f) );
-        // draw smoothed acceleration
-        Vector3 acc = base.smoothedAcceleration;
-        DebugHelper.DrawLine ( transform.position, 
-                               transform.position + acc,
-                               new Color(1.0f,0.0f,1.0f) );
-        // } DEBUG end 
 	}
 
     // ------------------------------------------------------------------ 
@@ -142,16 +130,16 @@ public class Player_girl : Player_base {
 
     private void HandleInput() {
         // get move direction
-        this.moveDir = Vector3.zero; 
+        moveDir = Vector3.zero; 
         if ( followTarget == null ) {
             Vector2 screen_dir = screenPad.GetMoveDirection();
             if ( screen_dir.magnitude >= 0.0f ) {
-                this.moveDir.x = screen_dir.x;
-                this.moveDir.y = screen_dir.y;
+                moveDir.x = screen_dir.x;
+                moveDir.y = screen_dir.y;
                 Transform mainCamera = Camera.main.transform;
-                this.moveDir = mainCamera.TransformDirection(this.moveDir.normalized); 
-                this.moveDir.y = 0.0f;
-                this.moveDir = this.moveDir.normalized;
+                moveDir = mainCamera.TransformDirection(moveDir.normalized); 
+                moveDir.y = 0.0f;
+                moveDir = moveDir.normalized;
             }
         }
 
@@ -219,30 +207,52 @@ public class Player_girl : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    private void ProcessMovement () {
+    private void ProcessFollowing () {
         if (followTarget != null) {
             Vector3 dir = (transform.position - followTarget.transform.position).normalized;
-            // DISABLE: Vector3 dir = -followTarget.transform.forward;
             Vector3 destination = dir * followDistance + followTarget.transform.position;
             Vector3 delta = destination - transform.position;
 
-            if ( delta.magnitude < 0.5f ) {
-                ApplyBrakingForce(10.0f);
+            // TODO: use Arrive algorithm { 
+            // if we are from idle to move
+            Vector3 curVelocity = controller.velocity; 
+            if ( curVelocity.magnitude < 0.1f ) {
+                if ( delta.magnitude > 0.5f ) {
+                    delta.y = 0.0f;
+                    moveDir = delta.normalized; 
+                }
             }
-            else {
-                this.moveDir = delta.normalized; 
+            else if ( delta.magnitude > 0.1f ) {
+                delta.y = 0.0f;
+                moveDir = delta.normalized; 
             }
+            // } TODO end 
 
             // DEBUG { 
             DebugHelper.DrawCircleY( followTarget.transform.position, followDistance, Color.yellow );
             DebugHelper.DrawBall( destination, 0.2f, Color.green );
             // } DEBUG end 
         }
+    }
 
-        //
-        if ( Mathf.Approximately(this.moveDir.magnitude, 0.0f) )
-            ApplyBrakingForce(10.0f);
-        ApplySteeringForce( this.moveDir * base.maxForce );
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    private void ProcessMovement () {
+        float f = Mathf.Pow(drag, Time.deltaTime);
+
+        Vector3 vel = controller.velocity;
+        vel *= f;
+        vel += moveDir * maxSpeed * Time.deltaTime;
+        if ( vel.magnitude > maxSpeed ) 
+            vel = vel.normalized * maxSpeed;
+
+        // apply gravity
+        if ( controller.isGrounded == false )
+            vel.y = -10.0f;
+
+        controller.Move(vel * Time.deltaTime);
     }
 
     // ------------------------------------------------------------------ 
@@ -258,7 +268,7 @@ public class Player_girl : Player_base {
 
         // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
         // if ( vel_ubspace.sqrMagnitude < 0.2 )
-        if ( this.curSpeed < 0.1  ) {
+        if ( Mathf.Approximately(moveDir.magnitude, 0.0f) ) {
             // float fadeSpeed = 5.0f * Time.deltaTime;
             anim.CrossFade("idle");
         }
