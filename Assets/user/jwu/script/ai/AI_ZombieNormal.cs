@@ -21,53 +21,176 @@ using System.Collections;
 // ------------------------------------------------------------------ 
 
 class Action_MoveToNearestPlayer : FSM.Action_periodic {
-    public GameObject self = null;
-
-    public Action_MoveToNearestPlayer ( GameObject _self, float _interval ) {
-        self = _self;
+    public Action_MoveToNearestPlayer ( float _interval ) {
         base.Interval = _interval;
     }
 
-    public override void exec () {
+    public override void exec ( GameObject _self ) {
         Vector3 targetPos = Vector3.zero;
         GameObject[] players = GameRules.Instance().GetPlayers();
         float nearest = 999.0f;
         foreach( GameObject player in players ) {
-            float len = (player.transform.position - self.transform.position).magnitude;
+            float len = (player.transform.position - _self.transform.position).magnitude;
             if ( len < nearest ) {
                 nearest = len;
                 targetPos = player.transform.position;
             }
         }
 
-        AI_ZombieNormal zombieNormal = self.GetComponent<AI_ZombieNormal>();
+        AI_ZombieNormal zombieNormal = _self.GetComponent<AI_ZombieNormal>();
         zombieNormal.Seek(targetPos);
     }
 }
 
 // ------------------------------------------------------------------ 
-// Desc: Transition_Idle_to_Move 
+// Desc: Action_Attack 
 // ------------------------------------------------------------------ 
 
-class Transition_Idle_to_Move : FSM.Transition {
-    public GameObject self = null;
+class Action_Attack : FSM.Action_periodic {
+    public Action_Attack ( float _interval ) {
+        base.Interval = _interval;
+    }
+
+    public override void exec ( GameObject _self ) {
+        Animation anim_comp = _self.GetComponent<Animation>();
+        anim_comp.CrossFade("attack1");
+    }
+}
+
+// ------------------------------------------------------------------ 
+// Desc: Action_StopMoving 
+// ------------------------------------------------------------------ 
+
+class Action_StopMoving : FSM.Action {
+    public Action_StopMoving () {
+    }
+
+    public override void exec ( GameObject _self ) {
+        AI_ZombieNormal zombieNormal = _self.GetComponent<AI_ZombieNormal>();
+        zombieNormal.Stop();
+    }
+}
+
+// ------------------------------------------------------------------ 
+// Desc: Transition_Idle_to_Seek 
+// ------------------------------------------------------------------ 
+
+class Transition_Idle_to_Seek : FSM.Transition {
     float range = 5.0f;
 
-    public Transition_Idle_to_Move ( FSM.State _dest, GameObject _self, float _range ) {
+    public Transition_Idle_to_Seek ( FSM.State _dest, float _range ) {
         base.dest_state = _dest;
-        self = _self;
         range = _range;
     }
 
-    public override bool check () { 
+    public override bool check ( GameObject _self ) { 
         GameObject[] players = GameRules.Instance().GetPlayers();
         foreach( GameObject player in players ) {
-            float len = (player.transform.position - self.transform.position).magnitude;
+            float len = (player.transform.position - _self.transform.position).magnitude;
             if ( len < range ) {
                 return true;
             }
         }
         return false; 
+    } 
+}
+
+// ------------------------------------------------------------------ 
+// Desc: Transition_Seek_to_Idle 
+// ------------------------------------------------------------------ 
+
+class Transition_Seek_to_Idle : FSM.Transition {
+    float range = 10.0f;
+
+    public Transition_Seek_to_Idle ( FSM.State _dest, float _range ) {
+        base.dest_state = _dest;
+        range = _range;
+    }
+
+    public override bool check ( GameObject _self ) { 
+        GameObject[] players = GameRules.Instance().GetPlayers();
+        foreach( GameObject player in players ) {
+            float len = (player.transform.position - _self.transform.position).magnitude;
+            if ( len < range ) {
+                return false;
+            }
+        }
+        return true; 
+    } 
+}
+
+// ------------------------------------------------------------------ 
+// Desc: Transition_Seek_to_Attack 
+// ------------------------------------------------------------------ 
+
+class Transition_Seek_to_Attack : FSM.Transition {
+    float range = 1.0f;
+
+    public Transition_Seek_to_Attack ( FSM.State _dest, float _range ) {
+        base.dest_state = _dest;
+        range = _range;
+    }
+
+    public override bool check ( GameObject _self ) { 
+        GameObject targetGO = null;
+        GameObject[] players = GameRules.Instance().GetPlayers();
+        float nearest = 999.0f;
+        foreach( GameObject player in players ) {
+            float len = (player.transform.position - _self.transform.position).magnitude;
+            if ( len < nearest ) {
+                nearest = len;
+                targetGO = player;
+            }
+        }
+        if ( nearest > range ) 
+            return false;
+
+        // if we near target, check if we face it.
+        AI_ZombieNormal zombieNormal = _self.GetComponent<AI_ZombieNormal>();
+        bool result = zombieNormal.IsAhead( targetGO.transform.position, Mathf.Cos(30.0f*Mathf.Deg2Rad) );
+        return result;
+    } 
+}
+
+// ------------------------------------------------------------------ 
+// Desc: Transition_Attack_to_Seek
+// ------------------------------------------------------------------ 
+
+class Transition_Attack_to_Seek : FSM.Transition {
+    float range = 1.0f;
+
+    public Transition_Attack_to_Seek ( FSM.State _dest, float _range ) {
+        base.dest_state = _dest;
+        range = _range;
+    }
+
+    public override bool check ( GameObject _self ) { 
+        // TODO: add end event for attacking { 
+        // we still attacking
+        // Animation anim_comp = _self.GetComponent<Animation>();
+        // if ( anim_comp.IsPlaying("attack1") )
+        //     return false;
+        // } TODO end 
+
+        GameObject targetGO = null;
+        GameObject[] players = GameRules.Instance().GetPlayers();
+        float nearest = 999.0f;
+        foreach( GameObject player in players ) {
+            float len = (player.transform.position - _self.transform.position).magnitude;
+            if ( len < nearest ) {
+                nearest = len;
+                targetGO = player;
+            }
+        }
+
+        // if we don't have any (range) near player
+        if ( nearest > range ) 
+            return true;
+
+        // if we got near target, check if we face it.
+        AI_ZombieNormal zombieNormal = _self.GetComponent<AI_ZombieNormal>();
+        bool result = zombieNormal.IsAhead( targetGO.transform.position, Mathf.Cos(30.0f*Mathf.Deg2Rad) );
+        return !result;
     } 
 }
 
@@ -78,14 +201,16 @@ class Transition_Idle_to_Move : FSM.Transition {
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
-[RequireComponent(typeof(CharacterController))]
-public class AI_ZombieNormal : MonoBehaviour {
+public class AI_ZombieNormal : Steer {
+    public enum SteeringState {
+        seeking,
+        braking,
+    };
 
     protected Animation anim;
-    protected CharacterController controller = null;
     protected FSM fsm = new FSM();
-
     protected Vector3 targetPos;
+    protected SteeringState steeringState = SteeringState.braking;
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -93,6 +218,11 @@ public class AI_ZombieNormal : MonoBehaviour {
 
     public void Seek ( Vector3 _pos ) {
         targetPos = _pos;
+        steeringState = SteeringState.seeking;
+    }
+
+    public void Stop () {
+        steeringState = SteeringState.braking;
     }
 
     // ------------------------------------------------------------------ 
@@ -128,28 +258,52 @@ public class AI_ZombieNormal : MonoBehaviour {
 
     void InitFSM () {
         // init states
-        FSM.State State_Idle = new FSM.State( "Idle", new Action_PlayAnim(anim,"idle1"), null, null );
-        FSM.State State_MoveTowardsPlayer = new FSM.State( "MoveTowardsPlayer", 
-                                                           new Action_PlayAnim(anim,"moveForward"), 
-                                                           new Action_MoveToNearestPlayer(gameObject,1.0f), 
-                                                           null );
+        FSM.State State_Idle = new FSM.State( "Idle", 
+                                              new Action_PlayAnim(anim,"idle1"), 
+                                              null, 
+                                              null );
+        FSM.State State_SeekPlayers = new FSM.State( "SeekPlayers", 
+                                                     new Action_PlayAnim(anim,"moveForward"), 
+                                                     new Action_MoveToNearestPlayer(1.0f), 
+                                                     new Action_StopMoving() );
+        FSM.State State_Attack = new FSM.State( "Attack", 
+                                                null, 
+                                                new Action_Attack(0.5f), 
+                                                null );
 
-        // connect transitions
-        Transition_Idle_to_Move trans = new Transition_Idle_to_Move( State_MoveTowardsPlayer, gameObject, 5.0f);
-        State_Idle.AddTransition(trans);
+        // connect idle transitions
+        {
+            Transition_Idle_to_Seek trans1 = new Transition_Idle_to_Seek( State_SeekPlayers, 5.0f);
+            State_Idle.AddTransition(trans1);
+        }
+
+        // connect move towards players transitions
+        {
+            Transition_Seek_to_Idle trans1 = new Transition_Seek_to_Idle( State_Idle, 7.0f);
+            Transition_Seek_to_Attack trans2 = new Transition_Seek_to_Attack( State_Attack, 2.0f);
+
+            State_SeekPlayers.AddTransition(trans1);
+            State_SeekPlayers.AddTransition(trans2);
+        }
+
+        // connect attack transitions
+        {
+            Transition_Attack_to_Seek trans1 = new Transition_Attack_to_Seek( State_SeekPlayers, 2.0f );
+            State_Attack.AddTransition(trans1);
+        }
 
         // init fsm
-        fsm.init(State_Idle);
+        fsm.init(gameObject,State_Idle);
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Start () {
-        controller = GetComponent<CharacterController>();
-        targetPos = transform.position;
+    protected new void Start () {
+        base.Start();
 
+        this.targetPos = transform.position;
         InitAnim();
         InitFSM();
     }
@@ -159,35 +313,70 @@ public class AI_ZombieNormal : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Update () {
-        // DEBUG { 
-        DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
-        // } DEBUG end 
-
+        // update state machine
         fsm.tick();
 
-        //
-        float move_speed = 1.0f;
-        float rot_speed = 0.5f;
+        // handle steering
+        Vector3 force = Vector3.zero;
+        if ( this.steeringState == SteeringState.seeking ) {
+            float distance = (transform.position - this.targetPos).magnitude;
+            if ( distance < 2.0f ) {
+                ApplyBrakingForce(10.0f);
 
-        // 
-        // DebugHelper.ScreenPrint("targetPos: " + targetPos);
-        Vector3 delta = targetPos - transform.position;
-        if ( delta.magnitude >= 1.5f ) {
-            // apply gravity
-            Vector3 vel = transform.forward * move_speed;
-            if ( controller.isGrounded == false ) {
-                vel.y = -10.0f;
+                // face the target
+                float rot_speed = 2.0f; // TEMP
+                Vector3 dir = targetPos - transform.position;
+                Quaternion wanted_rot = Quaternion.LookRotation(dir);
+                wanted_rot.x = 0.0f; wanted_rot.z = 0.0f;
+                transform.rotation = Quaternion.Slerp ( 
+                                                       transform.rotation, 
+                                                       wanted_rot, 
+                                                       rot_speed * Time.deltaTime
+                                                      );
             }
-            controller.Move(vel * Time.deltaTime);
-
-            // rotate ai
-            Quaternion wanted_rot = Quaternion.LookRotation(delta);
-            wanted_rot.x = 0.0f; wanted_rot.z = 0.0f;
-            transform.rotation = Quaternion.Slerp ( 
-                                                   transform.rotation, 
-                                                   wanted_rot, 
-                                                   rot_speed * Time.deltaTime
-                                                  );
+            else {
+                force = GetSteering_Seek_LimitByMaxSpeed ( this.targetPos );
+                force.y = 0.0f;
+            }
         }
+        else if ( this.steeringState == SteeringState.braking ) {
+            ApplyBrakingForce(10.0f);
+        }
+        ApplySteeringForce(force);
+
+        // DEBUG { 
+        // draw velocity
+        Vector3 vel = base.Velocity(); 
+        DebugHelper.DrawLine ( transform.position, 
+                               transform.position + vel * 3.0f, 
+                               new Color(0.0f,1.0f,0.0f) );
+        // draw smoothed acceleration
+        Vector3 acc = base.smoothedAcceleration;
+        DebugHelper.DrawLine ( transform.position, 
+                               transform.position + acc * 3.0f, 
+                               new Color(1.0f,0.0f,1.0f) );
+        // draw target pos
+        DebugHelper.DrawDestination ( this.targetPos );
+        DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
+
+        // debug info
+        DebugHelper.ScreenPrint ( "steering state: " + this.steeringState );
+        DebugHelper.ScreenPrint ( "current state: " + fsm.CurrentState().name );
+
+        // Vector3 targetDir = (this.targetPos - transform.position).normalized;
+        // float cosTheta = Vector3.Dot ( transform.forward, targetDir );
+        // DebugHelper.ScreenPrint ( "angle: " + Mathf.Acos(cosTheta) * Mathf.Rad2Deg );
+        // DebugHelper.ScreenPrint ( "target pos: " + this.targetPos );
+        // } DEBUG end 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnCollisionEnter ( Collision _other ) {
+        transform.forward = -_other.transform.forward;
+        anim.Rewind("hit2");
+        anim.CrossFade("hit2");
     }
 }

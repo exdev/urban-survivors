@@ -16,6 +16,26 @@ using System.Collections;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+// class Line 
+// 
+// Purpose: 
+// 
+///////////////////////////////////////////////////////////////////////////////
+
+public class Line {
+    public Vector3 start;
+    public Vector3 end;
+    public Color color;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// class DebugHelper
+// 
+// Purpose: 
+// 
+///////////////////////////////////////////////////////////////////////////////
+
 public class DebugHelper : MonoBehaviour {
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -146,10 +166,19 @@ public class DebugHelper : MonoBehaviour {
         //
         for ( int i = 1; i <= segments; ++i ) {
             Vector3 cur = _center + _rot * ( _radius * new Vector3( Mathf.Cos(theta), 0.0f, Mathf.Sin(theta) ) );
-            Debug.DrawLine ( last, cur, _color );
+            DebugHelper.DrawLine ( last, cur, _color );
             last = cur;
             theta += step;
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static void DrawLine ( Vector3 _start, Vector3 _end, Color _color ) {
+        Debug.DrawLine ( _start, _end, _color );
+        // TODO: use LinesGR.cs method!
     }
 
     // ------------------------------------------------------------------ 
@@ -171,6 +200,16 @@ public class DebugHelper : MonoBehaviour {
         DebugHelper.DrawCircleX ( _center, _radius, _color );
         DebugHelper.DrawCircleY ( _center, _radius, _color );
         DebugHelper.DrawCircleZ ( _center, _radius, _color );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static void DrawDestination ( Vector3 _dest ) {
+        DebugHelper.DrawCircleY ( _dest, 0.5f, new Color(1.0f,0.0f,0.0f) );
+        DebugHelper.DrawCircleY ( _dest, 0.1f, new Color(1.0f,1.0f,0.0f) );
+        DebugHelper.DrawLine ( _dest, _dest + Vector3.up * 2.0f, new Color(1.0f,1.0f,0.0f) );
     }
 
     // ------------------------------------------------------------------ 

@@ -26,8 +26,9 @@ public class Player_boy : Player_base {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    private Vector3 moveDir;
-    private Animation anim;
+    protected Vector3 moveDir;
+    protected Animation anim;
+    protected FSM fsm = new FSM();
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -37,9 +38,9 @@ public class Player_boy : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	new void Start () {
+	protected new void Start () {
         base.Start();
-        initAnim ();
+        this.InitAnim ();
 	}
 	
     // ------------------------------------------------------------------ 
@@ -47,23 +48,29 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
 	void Update () {
-        // DEBUG { 
-        Vector3 velocity = controller.velocity;
-        // DebugHelper.ScreenPrint( "velocity: " + velocity );
-        Debug.DrawLine ( transform.position, transform.position + velocity, Color.white );
-        // } DEBUG end 
-
-        //
         HandleInput();
         ProcessMovement ();
         ProcessAnimation();
+
+        // DEBUG { 
+        // draw velocity
+        Vector3 vel = base.Velocity(); 
+        DebugHelper.DrawLine ( transform.position, 
+                               transform.position + vel,
+                               new Color(0.0f,1.0f,0.0f) );
+        // draw smoothed acceleration
+        Vector3 acc = base.smoothedAcceleration;
+        DebugHelper.DrawLine ( transform.position, 
+                               transform.position + acc,
+                               new Color(1.0f,0.0f,1.0f) );
+        // } DEBUG end 
 	}
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    private void initAnim () {
+    void InitAnim () {
         // get the animation component
         anim = gameObject.GetComponent(typeof(Animation)) as Animation;
 
@@ -118,32 +125,9 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     private void ProcessMovement () {
-        float f = Mathf.Pow(drag, Time.deltaTime);
-
-        Vector3 vel = controller.velocity;
-        vel *= f;
-        vel += moveDir * maxSpeed * Time.deltaTime;
-        if ( vel.magnitude > maxSpeed ) 
-            vel = vel.normalized * maxSpeed;
-
-        // apply gravity
-        if ( controller.isGrounded == false )
-            vel.y = -10.0f;
-
-        controller.Move(vel * Time.deltaTime);
-
-        if ( moveDir.magnitude > 0.0f )
-            transform.forward = moveDir;
-
-        // TODO { 
-        // Quaternion rot = Quaternion.identity;
-        // rot.SetLookRotation(moveDir);
-        // iTween.RotateTo( gameObject, iTween.Hash (
-        //                  "rotation", rot.eulerAngles,
-        //                  "time", 0.2f,
-        //                  "easeType", iTween.EaseType.easeOutCubic
-        //                  ) );
-        // } TODO end 
+        if ( Mathf.Approximately(this.moveDir.magnitude, 0.0f) )
+            ApplyBrakingForce(10.0f);
+        ApplySteeringForce( this.moveDir * base.maxForce );
     }
 
     // ------------------------------------------------------------------ 
@@ -151,7 +135,7 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     private void ProcessAnimation () {
-        if ( moveDir.magnitude > 0.0f ) {
+        if ( this.moveDir.magnitude > 0.0f ) {
             anim["moveforward"].normalizedSpeed = StepSpeed * controller.velocity.magnitude;
             anim.CrossFade("moveforward");
         }

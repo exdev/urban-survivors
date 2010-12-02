@@ -54,7 +54,7 @@ public class Player_girl : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	new void Start () {
+	protected new void Start () {
         base.Start();
         DebugHelper.Assert( degreePlayMoveLeftRight <= 90.0f, "the degree can't larger than 90.0" );
         initAnim ();
@@ -73,9 +73,21 @@ public class Player_girl : Player_base {
 
         //
         HandleInput ();
-        ProcessFollowing ();
         ProcessMovement ();
         ProcessAnimation ();
+
+        // DEBUG { 
+        // draw velocity
+        Vector3 vel = base.Velocity(); 
+        DebugHelper.DrawLine ( transform.position, 
+                               transform.position + vel,
+                               new Color(0.0f,1.0f,0.0f) );
+        // draw smoothed acceleration
+        Vector3 acc = base.smoothedAcceleration;
+        DebugHelper.DrawLine ( transform.position, 
+                               transform.position + acc,
+                               new Color(1.0f,0.0f,1.0f) );
+        // } DEBUG end 
 	}
 
     // ------------------------------------------------------------------ 
@@ -130,16 +142,16 @@ public class Player_girl : Player_base {
 
     private void HandleInput() {
         // get move direction
-        moveDir = Vector3.zero; 
+        this.moveDir = Vector3.zero; 
         if ( followTarget == null ) {
             Vector2 screen_dir = screenPad.GetMoveDirection();
             if ( screen_dir.magnitude >= 0.0f ) {
-                moveDir.x = screen_dir.x;
-                moveDir.y = screen_dir.y;
+                this.moveDir.x = screen_dir.x;
+                this.moveDir.y = screen_dir.y;
                 Transform mainCamera = Camera.main.transform;
-                moveDir = mainCamera.TransformDirection(moveDir.normalized); 
-                moveDir.y = 0.0f;
-                moveDir = moveDir.normalized;
+                this.moveDir = mainCamera.TransformDirection(this.moveDir.normalized); 
+                this.moveDir.y = 0.0f;
+                this.moveDir = this.moveDir.normalized;
             }
         }
 
@@ -207,52 +219,30 @@ public class Player_girl : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    private void ProcessFollowing () {
+    private void ProcessMovement () {
         if (followTarget != null) {
             Vector3 dir = (transform.position - followTarget.transform.position).normalized;
+            // DISABLE: Vector3 dir = -followTarget.transform.forward;
             Vector3 destination = dir * followDistance + followTarget.transform.position;
             Vector3 delta = destination - transform.position;
 
-            // TODO: use Arrive algorithm { 
-            // if we are from idle to move
-            Vector3 curVelocity = controller.velocity; 
-            if ( curVelocity.magnitude < 0.1f ) {
-                if ( delta.magnitude > 0.5f ) {
-                    delta.y = 0.0f;
-                    moveDir = delta.normalized; 
-                }
+            if ( delta.magnitude < 0.5f ) {
+                ApplyBrakingForce(10.0f);
             }
-            else if ( delta.magnitude > 0.1f ) {
-                delta.y = 0.0f;
-                moveDir = delta.normalized; 
+            else {
+                this.moveDir = delta.normalized; 
             }
-            // } TODO end 
 
             // DEBUG { 
             DebugHelper.DrawCircleY( followTarget.transform.position, followDistance, Color.yellow );
             DebugHelper.DrawBall( destination, 0.2f, Color.green );
             // } DEBUG end 
         }
-    }
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    private void ProcessMovement () {
-        float f = Mathf.Pow(drag, Time.deltaTime);
-
-        Vector3 vel = controller.velocity;
-        vel *= f;
-        vel += moveDir * maxSpeed * Time.deltaTime;
-        if ( vel.magnitude > maxSpeed ) 
-            vel = vel.normalized * maxSpeed;
-
-        // apply gravity
-        if ( controller.isGrounded == false )
-            vel.y = -10.0f;
-
-        controller.Move(vel * Time.deltaTime);
+        //
+        if ( Mathf.Approximately(this.moveDir.magnitude, 0.0f) )
+            ApplyBrakingForce(10.0f);
+        ApplySteeringForce( this.moveDir * base.maxForce );
     }
 
     // ------------------------------------------------------------------ 
@@ -268,7 +258,7 @@ public class Player_girl : Player_base {
 
         // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
         // if ( vel_ubspace.sqrMagnitude < 0.2 )
-        if ( Mathf.Approximately(moveDir.magnitude, 0.0f) ) {
+        if ( this.curSpeed < 0.1  ) {
             // float fadeSpeed = 5.0f * Time.deltaTime;
             anim.CrossFade("idle");
         }
