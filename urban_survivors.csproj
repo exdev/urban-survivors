@@ -48,7 +48,12 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\backup\scripts\HUD_noused.cs" />
+     <Compile Include="Assets\backup\scripts\Player.cs" />
+     <Compile Include="Assets\backup\scripts\Player_base_old.cs" />
+     <Compile Include="Assets\backup\scripts\Player_boy_old.cs" />
      <Compile Include="Assets\backup\scripts\Player_boy_rigid.cs" />
+     <Compile Include="Assets\backup\scripts\Player_girl_old.cs" />
      <Compile Include="Assets\backup\scripts\Player_girl_rigid.cs" />
      <None Include="Assets\Editor\backup\CopyComponents.js" />
      <Compile Include="Assets\Editor\Editors\SpriteTimelineEditor.cs" />
@@ -151,12 +156,13 @@
      <Compile Include="Assets\Plugins\iTween.cs" />
      <Compile Include="Assets\Plugins\SpawnManager.cs" />
      <None Include="Assets\Shaders\Text Shader - Z tested.shader" />
-     <Compile Include="Assets\share\basic\shapes.cs" />
+     <Compile Include="Assets\share\script\basic\shapes.cs" />
      <None Include="Assets\share\script\btree\Btree.js" />
      <Compile Include="Assets\share\script\debug\DebugHelper.cs" />
      <Compile Include="Assets\share\script\debug\DetectLeaks.cs" />
      <Compile Include="Assets\share\script\global\Constant.cs" />
      <Compile Include="Assets\share\script\helper\CompHelper.cs" />
+     <Compile Include="Assets\share\script\helper\MathHelper.cs" />
      <Compile Include="Assets\share\script\helper\SuperDuplicateHelper.cs" />
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Multiply.shader" />
@@ -171,15 +177,15 @@
      <Compile Include="Assets\user\jwu\script\ai\Anim_zombie.cs" />
      <Compile Include="Assets\user\jwu\script\aicore\fsm\BasicActions.cs" />
      <Compile Include="Assets\user\jwu\script\aicore\fsm\FSM.cs" />
-     <Compile Include="Assets\user\jwu\script\aicore\Steer.cs" />
+     <Compile Include="Assets\user\jwu\script\aicore\steer\test\SteerTest_Simple.cs" />
+     <Compile Include="Assets\user\jwu\script\aicore\steer\test\SteerTest_WanderZombie.cs" />
+     <Compile Include="Assets\user\jwu\script\aicore\steer\Steer.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Follow.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Follow_smooth.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Follow_smoothFocus.cs" />
      <Compile Include="Assets\user\jwu\script\camera\Obstacle_transparent.cs" />
      <Compile Include="Assets\user\jwu\script\gameplay\GameRules.cs" />
      <Compile Include="Assets\user\jwu\script\gameplay\StartPoint.cs" />
-     <Compile Include="Assets\user\jwu\script\player\HUD_noused.cs" />
-     <Compile Include="Assets\user\jwu\script\player\Player.cs" />
      <Compile Include="Assets\user\jwu\script\player\Player_base.cs" />
      <Compile Include="Assets\user\jwu\script\player\Player_boy.cs" />
      <Compile Include="Assets\user\jwu\script\player\Player_girl.cs" />
