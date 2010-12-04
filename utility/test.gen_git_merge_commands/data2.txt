@@ -1,0 +1,57 @@
+nantas@NantasMBP:~/exdev (master *+|MERGING)$git status
+# On branch master
+# Your branch is ahead of 'origin/master' by 7 commits.
+#
+# Changes to be committed:
+#
+#	modified:   Assets/user/jwu/scene/test.zombie.sm.unity
+#	new file:   Assets/user/porky/LevelAssets/Props/Materials/stair-material_0_1_0id.mat
+#	new file:   Assets/user/porky/LevelAssets/Props/stair.dae
+#	modified:   Library/InspectorExpandedItems.asset
+#	new file:   Library/cache/07/077586c17debf3244ab47450d9bedbc9
+#	new file:   Library/cache/09/0917be2aa9be74045a14bf2952e7072d
+#	renamed:    Library/cache/87/870dc98f12d9b4581a29ea8415e3e336 -> Library/cache/22/225882652b83a0140adadc1faafc3476
+#	renamed:    Library/cache/a7/a7b3f2f96bb85443dbdaa136f64d29ad -> Library/cache/2a/2a188adc1bb1e3940a54a3a3bfe1d175
+#	new file:   Library/cache/62/627c07f78c4b1444691117c060c17f4c
+#	renamed:    Library/cache/d7/d78bf1566cd3e4d58bbf798b621615c4 -> Library/cache/78/784100f7362c421459b0a07143456bda
+#	renamed:    Library/cache/93/93c2dcdea91534ffc9df2dac1e357009 -> Library/cache/98/983a6047212235943b038ee31d4c9255
+#	new file:   Library/cache/a6/a6ab69bcf3046254183a257326028b53
+#	new file:   Library/cache/e0/e07e18c1318305744a5868b08b1e762e
+#	new file:   Library/cache/e1/e180f26db3a13d749a4d384e7031a7bc
+#	renamed:    Library/cache/39/39b24380ab2ad9c4f8df946ba2eb0d47 -> Library/cache/f9/f9a1a48af38de0045a16ea270e7261e5
+#	renamed:    Library/metadata/74/74ded05347bf143d18efffb39d22ff90 -> Library/metadata/04/04d8c3502ec8cf84592d6312c5f0c208
+#	renamed:    Library/metadata/0b/0b1db8fc30e8647e39b0621b67ffc4de -> Library/metadata/5c/5c923c36bf9c15449843f6cc57b70d2d
+#	renamed:    Library/metadata/10/10bebf635ba7c4f5baf498cbc4a83ec3 -> Library/metadata/84/8476bd209cd4ce4479251d462adf4894
+#	renamed:    Library/metadata/78/784100f7362c421459b0a07143456bda -> Library/metadata/e4/e484406c4345a02408b8727f0a7edbc6
+#
+# Unmerged paths:
+#   (use "git add/rm <file>..." as appropriate to mark resolution)
+#
+#	both modified:      Assets/user/nantas/prefabs/PlayerBoy.prefab
+#	both modified:      Assets/user/nantas/prefabs/PlayerGirl.prefab
+#	both modified:      Assets/user/porky/Scenes/DemoLevel.unity
+#	both modified:      Library/MonoManager.asset
+#	both modified:      Library/assetDatabase3
+#	both modified:      Library/cache/02/02e1b54cb9e32470ba100a528a1bad1c
+#	both deleted:       Library/cache/02/02e53a093afe84f9180de843c7dcfcb5
+#	both deleted:       Library/cache/03/032c53734672d43e5bc191893992b879
+#	added by them:      Library/cache/06/066d02d23273b2940a92bdbda0648f35
+#	added by us:        Library/cache/07/07c992efeecd14803a91223bf738a8bb
+#	both modified:      Library/cache/0b/0b03a07ead49f48e191fb54a30b1bd13
+#	both deleted:       Library/cache/1a/1a29da96432f0404691fb576d1e42a02
+#	both deleted:       Library/cache/1b/1b004dc865b5f49959f798b1e58f4ada
+#	both deleted:       Library/cache/23/23f481ba9ecaa4bdfa356b807c3ad63b
+#	added by us:        Library/cache/36/3629b0c7bb2e345358e13adba876a6cb
+#	both deleted:       Library/metadata/e4/e4d92423f13c546d0bb3e357c12d7f7e
+#	both deleted:       Library/metadata/e7/e764c4fd250cb4383a16c980247aebd7
+#	added by them:      Library/metadata/e9/e9e740ff23b61044090915904c3bf28c
+#	both deleted:       Library/metadata/eb/eb1dfbda140644ccd93387fb00cda85b
+#	added by them:      Library/metadata/ee/eee6875f1ec9c114f82a0112a9fba51c
+#	added by them:      Library/metadata/f6/f6d0fab42824e5b42bcccf328926997e
+#	both modified:      Library/metadata/f7/f774af501c6a244c2a03ab045b3ab97f
+#	both deleted:       Library/metadata/f8/f8fbfc23f09ba4ab0b26117aa4498259
+#	added by them:      Library/metadata/f9/f9a1a48af38de0045a16ea270e7261e5
+#	added by us:        Library/metadata/fd/fd5fd788c271940c685a90c6e07b4cad
+#	deleted by us:      urban_survivors.csproj
+#
+

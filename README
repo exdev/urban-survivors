@@ -1,3 +1,9 @@
 Title: urban survivors
 Home Page: http://studio.ex-dev.com/projects/urban
 Studio Page: http://studio.ex-dev.com
+
+== How to merge complex branches? == 
+just run "sh output_git_merge_cmds.sh", it will generate a command 
+file named git_merges.sh, check this file, edit as you need then execute it by
+type "sh git_merges.sh". 
+
