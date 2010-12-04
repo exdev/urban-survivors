@@ -1,0 +1,190 @@
+nantas@NantasMBP:~/exdev (master *+|MERGING)$git status
+# On branch master
+# Your branch is ahead of 'origin/master' by 7 commits.
+#
+# Changes to be committed:
+#
+#	modified:   Assets/user/jwu/scene/test.zombie.sm.unity
+#	new file:   Assets/user/porky/LevelAssets/Props/Materials/stair-material_0_1_0id.mat
+#	new file:   Assets/user/porky/LevelAssets/Props/stair.dae
+#	modified:   Library/InspectorExpandedItems.asset
+#	new file:   Library/cache/07/077586c17debf3244ab47450d9bedbc9
+#	new file:   Library/cache/09/0917be2aa9be74045a14bf2952e7072d
+#	renamed:    Library/cache/87/870dc98f12d9b4581a29ea8415e3e336 -> Library/cache/22/225882652b83a0140adadc1faafc3476
+#	renamed:    Library/cache/a7/a7b3f2f96bb85443dbdaa136f64d29ad -> Library/cache/2a/2a188adc1bb1e3940a54a3a3bfe1d175
+#	new file:   Library/cache/62/627c07f78c4b1444691117c060c17f4c
+#	renamed:    Library/cache/d7/d78bf1566cd3e4d58bbf798b621615c4 -> Library/cache/78/784100f7362c421459b0a07143456bda
+#	renamed:    Library/cache/93/93c2dcdea91534ffc9df2dac1e357009 -> Library/cache/98/983a6047212235943b038ee31d4c9255
+#	new file:   Library/cache/a6/a6ab69bcf3046254183a257326028b53
+#	new file:   Library/cache/e0/e07e18c1318305744a5868b08b1e762e
+#	new file:   Library/cache/e1/e180f26db3a13d749a4d384e7031a7bc
+#	renamed:    Library/cache/39/39b24380ab2ad9c4f8df946ba2eb0d47 -> Library/cache/f9/f9a1a48af38de0045a16ea270e7261e5
+#	renamed:    Library/metadata/74/74ded05347bf143d18efffb39d22ff90 -> Library/metadata/04/04d8c3502ec8cf84592d6312c5f0c208
+#	renamed:    Library/metadata/0b/0b1db8fc30e8647e39b0621b67ffc4de -> Library/metadata/5c/5c923c36bf9c15449843f6cc57b70d2d
+#	renamed:    Library/metadata/10/10bebf635ba7c4f5baf498cbc4a83ec3 -> Library/metadata/84/8476bd209cd4ce4479251d462adf4894
+#	renamed:    Library/metadata/78/784100f7362c421459b0a07143456bda -> Library/metadata/e4/e484406c4345a02408b8727f0a7edbc6
+#
+# Unmerged paths:
+#   (use "git add/rm <file>..." as appropriate to mark resolution)
+#
+#	both modified:      Assets/user/nantas/prefabs/PlayerBoy.prefab
+#	both modified:      Assets/user/nantas/prefabs/PlayerGirl.prefab
+#	both modified:      Assets/user/porky/Scenes/DemoLevel.unity
+#	both modified:      Library/MonoManager.asset
+#	both modified:      Library/assetDatabase3
+#	both modified:      Library/cache/02/02e1b54cb9e32470ba100a528a1bad1c
+#	both deleted:       Library/cache/02/02e53a093afe84f9180de843c7dcfcb5
+#	both deleted:       Library/cache/03/032c53734672d43e5bc191893992b879
+#	added by them:      Library/cache/06/066d02d23273b2940a92bdbda0648f35
+#	added by us:        Library/cache/07/07c992efeecd14803a91223bf738a8bb
+#	both modified:      Library/cache/0b/0b03a07ead49f48e191fb54a30b1bd13
+#	both deleted:       Library/cache/1a/1a29da96432f0404691fb576d1e42a02
+#	both deleted:       Library/cache/1b/1b004dc865b5f49959f798b1e58f4ada
+#	both deleted:       Library/cache/23/23f481ba9ecaa4bdfa356b807c3ad63b
+#	added by us:        Library/cache/36/3629b0c7bb2e345358e13adba876a6cb
+#	both modified:      Library/cache/44/442308f64af96470eb5fa6f00fc347ee
+#	both modified:      Library/cache/4b/4b7ed19f5cd324460b1e471a6ecbe63d
+#	added by us:        Library/cache/59/59c5f6660214a40bab1c6ff89dda44a9
+#	added by them:      Library/cache/5c/5c923c36bf9c15449843f6cc57b70d2d
+#	added by us:        Library/cache/5f/5fa651a4cb454487891d5ca74bb55ef2
+#	added by us:        Library/cache/61/6103c111dbf1e4792b5ea68796faec65
+#	both modified:      Library/cache/71/71d80d4d6f6f944fa8d9856670fa0c4f
+#	added by us:        Library/cache/83/83ee97dd312af4943b22bfbeded1e9ae
+#	added by us:        Library/cache/85/852fd6ad268044c039153fcdc6ba0637
+#	both deleted:       Library/cache/85/854f00027f12f47d3a3d87ed92b95fcb
+#	added by them:      Library/cache/91/911bbb3ba5ebb894bb1e5739c1fa7aa2
+#	added by us:        Library/cache/92/9289f0cd0321e4d7390aa15a16311334
+#	added by them:      Library/cache/9a/9ad5f91aeee09a249ad0384269de9373
+#	both deleted:       Library/cache/a1/a13b61c11797240768e17b38666ed6e1
+#	both modified:      Library/cache/a2/a28c7bb9097474065868301b229b9d2e
+#	both modified:      Library/cache/a4/a4242666875ac4520b2660cefd4f6b25
+#	both deleted:       Library/cache/ae/aea370fe81d0a42fab27a385fc470390
+#	both modified:      Library/cache/b1/b136f05314b254c90a016f86cb831fbc
+#	added by us:        Library/cache/b3/b3d0e015fb217466b9329f542adb8b1c
+#	both modified:      Library/cache/b8/b8a16a2a177fc46dd9b2914abb8def17
+#	added by them:      Library/cache/b8/b8f7685a31eb32d47951a85ff82e4560
+#	both modified:      Library/cache/c2/c2e811e26f7b949bfab789ee76e1662b
+#	both modified:      Library/cache/cd/cdccf56e94d4c4b7bae0566188a71fc2
+#	both modified:      Library/cache/cd/cdf306a7d2ad34164abdcf56be60f8bd
+#	both modified:      Library/cache/cf/cf6b0ff6207ec43dcb40c4e4e62f3347
+#	added by them:      Library/cache/d5/d561a7da8d407f74cbe59430cac13fcc
+#	added by us:        Library/cache/dd/ddbef631ac0d84511b79065a0e4b9827
+#	added by us:        Library/cache/e4/e4150b9c2c28b47b885b693707c8a20c
+#	added by them:      Library/cache/e4/e484406c4345a02408b8727f0a7edbc6
+#	both deleted:       Library/cache/e4/e4d92423f13c546d0bb3e357c12d7f7e
+#	both modified:      Library/cache/e5/e56890deabe7741c0921d829ef80ac08
+#	added by them:      Library/cache/ee/eee6875f1ec9c114f82a0112a9fba51c
+#	added by them:      Library/cache/f6/f6d0fab42824e5b42bcccf328926997e
+#	both deleted:       Library/cache/f8/f8fbfc23f09ba4ab0b26117aa4498259
+#	both modified:      Library/expandedItems
+#	both modified:      Library/guidmapper
+#	both modified:      Library/metadata/01/01dfcea0692db4f75966e6b830089608
+#	both deleted:       Library/metadata/01/01f9f819fc693490884365a8efa28494
+#	both deleted:       Library/metadata/02/02e53a093afe84f9180de843c7dcfcb5
+#	both modified:      Library/metadata/03/0328bb9dd5b464d41b417f2f4bf54d00
+#	both deleted:       Library/metadata/03/032c53734672d43e5bc191893992b879
+#	added by them:      Library/metadata/06/066d02d23273b2940a92bdbda0648f35
+#	added by them:      Library/metadata/07/077586c17debf3244ab47450d9bedbc9
+#	added by us:        Library/metadata/07/07c992efeecd14803a91223bf738a8bb
+#	added by them:      Library/metadata/09/0917be2aa9be74045a14bf2952e7072d
+#	both modified:      Library/metadata/11/11b26e8102b704d4b9d7042b4029a52e
+#	both deleted:       Library/metadata/1a/1a29da96432f0404691fb576d1e42a02
+#	both deleted:       Library/metadata/1b/1b004dc865b5f49959f798b1e58f4ada
+#	added by them:      Library/metadata/22/225882652b83a0140adadc1faafc3476
+#	both deleted:       Library/metadata/23/23f481ba9ecaa4bdfa356b807c3ad63b
+#	added by us:        Library/metadata/25/25154f1eeb6ef4932b0583d91d075f33
+#	both modified:      Library/metadata/25/25ba8b76d875e4c759b87768d0543ba8
+#	both modified:      Library/metadata/26/26034269e71804110a0b80e97585d3b0
+#	added by them:      Library/metadata/2a/2a188adc1bb1e3940a54a3a3bfe1d175
+#	added by us:        Library/metadata/30/30d575d153f8d40bd9860c8fc631b58b
+#	both modified:      Library/metadata/33/337ef1a2aa2cc4a0bbc1886c06b82f76
+#	added by us:        Library/metadata/36/3629b0c7bb2e345358e13adba876a6cb
+#	added by them:      Library/metadata/39/39b24380ab2ad9c4f8df946ba2eb0d47
+#	added by them:      Library/metadata/3d/3db72805fb0d1064c89d9ef2e0d98cc5
+#	added by them:      Library/metadata/40/40a514c4a81532f4898c672f73a168ec
+#	both deleted:       Library/metadata/41/41dc61bf2d4ef4e248ea4d73c9388c87
+#	both modified:      Library/metadata/42/42840215cf6ec4d809789550c884d2af
+#	both deleted:       Library/metadata/47/47512b429542e46bf887f57b47123972
+#	both modified:      Library/metadata/4a/4aceaea72625a4293a58b9773715ccef
+#	added by us:        Library/metadata/4e/4e68ec2546547438f847507e0a7efd83
+#	both modified:      Library/metadata/4e/4ee092fda789c468e8b8ff1ab14a93d8
+#	added by us:        Library/metadata/53/535358f57dd1a46018e2d09615a91a70
+#	added by us:        Library/metadata/59/59c5f6660214a40bab1c6ff89dda44a9
+#	added by them:      Library/metadata/5a/5a2feb8d8a2f0f54dbfeda6e53b28f5c
+#	both modified:      Library/metadata/5a/5a53b9e538ab6434a8e3ecf1353df846
+#	both modified:      Library/metadata/5a/5a656d96a8727445b8c776ddd74e48e0
+#	both deleted:       Library/metadata/5c/5c85cf429f9a048a3ba229bbfb61d7e6
+#	added by us:        Library/metadata/5e/5ef2ba5ce47f742a5aa90d5b26890dc8
+#	both modified:      Library/metadata/5e/5efb33f12042b4ee99129df15289423b
+#	added by us:        Library/metadata/61/6103c111dbf1e4792b5ea68796faec65
+#	added by them:      Library/metadata/62/627c07f78c4b1444691117c060c17f4c
+#	both modified:      Library/metadata/67/67dc48236b82e44ef992389f9326a936
+#	added by them:      Library/metadata/6a/6aab59c30c2f091489f40cfe221a2ae7
+#	both modified:      Library/metadata/6a/6adce6683901043d3a3c25aeb1f49892
+#	both deleted:       Library/metadata/6e/6e714e7303c9845a6be25006691490ae
+#	both modified:      Library/metadata/72/72c7b13c7ad2f4332aaf994b2211b61a
+#	added by them:      Library/metadata/77/77f4528c03cb1314c88960f4d1a2ae23
+#	added by us:        Library/metadata/85/852fd6ad268044c039153fcdc6ba0637
+#	both deleted:       Library/metadata/85/854f00027f12f47d3a3d87ed92b95fcb
+#	both modified:      Library/metadata/86/86159afee6a76b644b4d79e39c0981cb
+#	both modified:      Library/metadata/86/86e4ad3cb0c9c4e37a5978664f8935a4
+#	added by us:        Library/metadata/87/870dc98f12d9b4581a29ea8415e3e336
+#	both deleted:       Library/metadata/8b/8bb6633d805314b17b1899ea79c50c57
+#	both modified:      Library/metadata/8c/8c98b540e1c96b04eb6a25c9c65d0a24
+#	both modified:      Library/metadata/90/901960d3b7dde4f87a4ff0cc1d057b1a
+#	added by them:      Library/metadata/91/911bbb3ba5ebb894bb1e5739c1fa7aa2
+#	added by us:        Library/metadata/92/9289f0cd0321e4d7390aa15a16311334
+#	added by us:        Library/metadata/93/93c2dcdea91534ffc9df2dac1e357009
+#	added by them:      Library/metadata/98/983a6047212235943b038ee31d4c9255
+#	both modified:      Library/metadata/9a/9a19b83e129af4c79a7b3b016e800e52
+#	added by them:      Library/metadata/9a/9ad5f91aeee09a249ad0384269de9373
+#	added by us:        Library/metadata/9d/9d57bbd1ec2ef48d2998e1e91b2b567e
+#	both deleted:       Library/metadata/a1/a13b61c11797240768e17b38666ed6e1
+#	both modified:      Library/metadata/a4/a4688cd8c3c0042ada5f1d79270abe08
+#	added by them:      Library/metadata/a6/a6ab69bcf3046254183a257326028b53
+#	added by us:        Library/metadata/a7/a7b3f2f96bb85443dbdaa136f64d29ad
+#	both modified:      Library/metadata/ab/ab546108ad72f4b4ea84422ff1baa71a
+#	both deleted:       Library/metadata/ae/aea370fe81d0a42fab27a385fc470390
+#	added by us:        Library/metadata/b3/b3d0e015fb217466b9329f542adb8b1c
+#	both modified:      Library/metadata/b5/b5125237e67264fe9aa04efb2e8fa129
+#	both modified:      Library/metadata/b6/b65bd5d4f59d24aa4a3a86ecba27ed39
+#	added by them:      Library/metadata/b8/b8f7685a31eb32d47951a85ff82e4560
+#	both modified:      Library/metadata/b9/b974b77745f2e824e974e9ef01a8b958
+#	both modified:      Library/metadata/bb/bb3f0bf655a0a4341aa12b03cf347fcc
+#	both deleted:       Library/metadata/c0/c0161c515033b4d5d8192b4c74a65216
+#	added by us:        Library/metadata/c7/c72beeda19eba436e9c0cf1b61b9bd64
+#	both deleted:       Library/metadata/c7/c79b415bf11b24d2bbeb0930b01a5cec
+#	both modified:      Library/metadata/c8/c8ae0d4e35e6f4bed87ab24fededce7f
+#	both modified:      Library/metadata/c9/c98d7e1068b8ab04fa101b37e0714b3d
+#	both modified:      Library/metadata/ca/ca1a926fe1683489483a0019814cd7a9
+#	both modified:      Library/metadata/ca/ca2b9be5d138d4b52aac48b32d88f2bf
+#	both deleted:       Library/metadata/cf/cff328f55a76e44918ef071eadd62a2b
+#	added by us:        Library/metadata/d2/d203519a45295418b981e8816b58808a
+#	both deleted:       Library/metadata/d3/d398fcd8f40be4e2683bfa7d0d1cf15b
+#	both modified:      Library/metadata/d4/d471d5e01c10b432398fcb55f29be492
+#	added by them:      Library/metadata/d5/d561a7da8d407f74cbe59430cac13fcc
+#	both deleted:       Library/metadata/d7/d730e25e8fb8e41608f90b3364a4a69b
+#	both deleted:       Library/metadata/d9/d9d004046a45e4ac0bc00c7832df0fe3
+#	both modified:      Library/metadata/db/dbb9661d1b7204b75bd8163dc717a6ae
+#	added by us:        Library/metadata/dd/ddbef631ac0d84511b79065a0e4b9827
+#	both modified:      Library/metadata/dd/dded8c68e94584076b9bceec47b0fb87
+#	added by them:      Library/metadata/e0/e07e18c1318305744a5868b08b1e762e
+#	both deleted:       Library/metadata/e0/e0a531b806e134f97997d19d56b6de3f
+#	added by us:        Library/metadata/e1/e147a35ca00044265a29f754420f5207
+#	added by them:      Library/metadata/e1/e180f26db3a13d749a4d384e7031a7bc
+#	both modified:      Library/metadata/e1/e1ff536587bce4dfeb96357dc9872248
+#	added by us:        Library/metadata/e2/e2a3c739bd3db41cbabfd0c96e7380b7
+#	added by us:        Library/metadata/e4/e4150b9c2c28b47b885b693707c8a20c
+#	both deleted:       Library/metadata/e4/e4d92423f13c546d0bb3e357c12d7f7e
+#	both deleted:       Library/metadata/e7/e764c4fd250cb4383a16c980247aebd7
+#	added by them:      Library/metadata/e9/e9e740ff23b61044090915904c3bf28c
+#	both deleted:       Library/metadata/eb/eb1dfbda140644ccd93387fb00cda85b
+#	added by them:      Library/metadata/ee/eee6875f1ec9c114f82a0112a9fba51c
+#	added by them:      Library/metadata/f6/f6d0fab42824e5b42bcccf328926997e
+#	both modified:      Library/metadata/f7/f774af501c6a244c2a03ab045b3ab97f
+#	both deleted:       Library/metadata/f8/f8fbfc23f09ba4ab0b26117aa4498259
+#	added by them:      Library/metadata/f9/f9a1a48af38de0045a16ea270e7261e5
+#	added by us:        Library/metadata/fd/fd5fd788c271940c685a90c6e07b4cad
+#	deleted by us:      urban_survivors.csproj
+#
+
