@@ -25,20 +25,33 @@ if file then
 
             -- unmerged
             if merge_type == "added by them" then
-                io.write( "git checkout --theirs " .. path .. "\n" ) 
-                io.write( "git add " .. path .. "\n" ) 
+                io.write ( "echo added by them: git add " .. path .. "\n" )
+                io.write( "git checkout --theirs " .. '"' .. path .. '"' .. "\n" ) 
+                io.write( "git add " .. '"' .. path .. '"' .. "\n" ) 
             elseif merge_type == "added by us" then 
-                io.write( "git checkout --ours " .. path .. "\n" ) 
-                io.write( "git add " .. path .. "\n" ) 
+                io.write ( "echo added by us: git add " .. path .. "\n" )
+                io.write( "git checkout --ours " .. '"' .. path .. '"' .. "\n" ) 
+                io.write( "git add " .. '"' .. path .. '"' .. "\n" ) 
+            elseif merge_type == "deleted by us" then 
+                io.write ( "echo deleted by us: git rm " .. path .. "\n" )
+                io.write( "git rm " .. '"' .. path .. '"' .. "\n" ) 
+            elseif merge_type == "deleted by theirs" then 
+                io.write ( "echo deleted by theirs: git rm " .. path .. "\n" )
+                io.write( "git rm " .. '"' .. path .. '"' .. "\n" ) 
             elseif merge_type == "both deleted" then 
-                io.write( "git rm " .. path .. "\n" ) 
+                io.write ( "echo both deleted: git rm " .. path .. "\n" )
+                io.write( "git rm " .. '"' .. path .. '"' .. "\n" ) 
+            elseif merge_type == "both added" then 
+                io.write ( "echo both added: git add " .. path .. "\n" )
+                io.write( "git checkout --theirs " .. '"' .. path .. '"' .. "\n" ) 
+                io.write( "git add " .. '"' .. path .. '"' .. "\n" ) 
             elseif merge_type == "both modified" then 
-                io.write( "git checkout --theirs " .. path .. "\n" ) 
-                io.write( "git add " .. path .. "\n" ) 
+                io.write ( "echo both modified: git add " .. path .. "\n" )
+                io.write( "git checkout --theirs " .. '"' .. path .. '"' .. "\n" ) 
+                io.write( "git add " .. '"' .. path .. '"' .. "\n" ) 
             end
         end
     end
-    io.write( "git add .\n" ) 
 else
     assert ( false, "failed to open file data.txt" )
 end
