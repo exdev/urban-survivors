@@ -79,7 +79,7 @@ public class SyncAnimModel
             if ( _path == "" )
                 child_path = child.gameObject.name;
             else
-                child_path = child.gameObject.name + "/" + _path;
+                child_path = _path + "/" + child.gameObject.name;
             CopyMissingGORecursively ( child_path, _destRoot, child, destChildTrans );
         }
     }
