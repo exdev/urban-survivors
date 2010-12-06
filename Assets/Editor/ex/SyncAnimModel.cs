@@ -97,7 +97,7 @@ public class SyncAnimModel
         // if we don't have the child in dest GameObject, copy it from source.
         if ( destChildTrans == null ) {
             GameObject old_GO = _src.gameObject;
-            GameObject new_GO = Object.Instantiate( old_GO, Vector3.zero, Quaternion.identity ) as GameObject;
+            GameObject new_GO = Object.Instantiate( old_GO, _src.localPosition, _src.localRotation ) as GameObject;
             new_GO.name = old_GO.name;
 
             // destChildTrans = new_GO.transform;
@@ -184,7 +184,8 @@ public class SyncAnimModel
         }
 
         // replace the old prefab with the new one
-        EditorUtility.ReplacePrefab( new_prefabGO, old_prefabGO );
+        // NOTE: use ReplacePrefabOptions.ReplaceNameBased, this will never change the position of the prefab-instances in the Scene.
+        EditorUtility.ReplacePrefab( new_prefabGO, old_prefabGO, ReplacePrefabOptions.ReplaceNameBased );
         AssetDatabase.DeleteAsset(new_prefabPath);
         GameObject.DestroyImmediate(new_prefabGO);
 

@@ -33,27 +33,39 @@ public class CompHelper {
         if ( _src.GetType() == typeof(Animation) ) {
             return CopyAnimation ( _src as Animation, _dest as Animation );
         } 
+        // Rigidbody
         else if ( _src.GetType() == typeof(Rigidbody) ) {
             return CopyRigidbody ( _src as Rigidbody, _dest as Rigidbody );
         }
+        // BoxCollider
         else if ( _src.GetType() == typeof(BoxCollider) ) {
             return CopyBoxCollider ( _src as BoxCollider, _dest as BoxCollider );
         }
+        // CapsuleCollider
         else if ( _src.GetType() == typeof(CapsuleCollider) ) {
             return CopyCapsuleCollider ( _src as CapsuleCollider, _dest as CapsuleCollider );
         }
+        // CharacterController
         else if ( _src.GetType() == typeof(CharacterController) ) {
             return CopyCharacterController ( _src as CharacterController, _dest as CharacterController );
         }
+        // CharacterJoint
         else if ( _src.GetType() == typeof(CharacterJoint) ) {
             return CopyCharacterJoint ( _src as CharacterJoint, _dest as CharacterJoint );
         }
+        // MeshCollider
         else if ( _src.GetType() == typeof(MeshCollider) ) {
             return CopyMeshCollider ( _src as MeshCollider, _dest as MeshCollider );
         }
+        // SphereCollider
         else if ( _src.GetType() == typeof(SphereCollider) ) {
             return CopySphereCollider ( _src as SphereCollider, _dest as SphereCollider );
         }
+        // Transform
+        else if ( _src.GetType() == typeof(Transform) ) {
+            return CopyTransform ( _src as Transform, _dest as Transform );
+        }
+        // WheelCollider
         else if ( _src.GetType() == typeof(WheelCollider) ) {
             return CopyWheelCollider ( _src as WheelCollider, _dest as WheelCollider );
         }
@@ -283,6 +295,17 @@ public class CompHelper {
         _dest.mass=_src.mass;
         _dest.forwardFriction=_src.forwardFriction;
         _dest.sidewaysFriction=_src.sidewaysFriction;
+        return true;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static bool CopyTransform ( Transform _src, Transform _dest ) {
+        _dest.localPosition =_src.localPosition;
+        _dest.localRotation =_src.localRotation;
+        _dest.localScale =_src.localScale;
         return true;
     }
 
