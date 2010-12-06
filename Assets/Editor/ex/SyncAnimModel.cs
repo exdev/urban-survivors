@@ -12,6 +12,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
@@ -24,6 +25,36 @@ using System.Reflection;
 
 public class SyncAnimModel
 {
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static void RemovedUnusedGO( Transform _src ) {
+        // NOTE: you can't detach and destroy child directly when iterate the child list 
+        List<Transform> removeList = new List<Transform>();
+
+        // get unused child list
+        foreach ( Transform child in _src ) {
+            string child_name = child.gameObject.name;
+            // HARDCODE { 
+            // skip the unsued GO
+            if ( child_name == "Camera"
+              || child_name == "Lamp"
+              || child_name == "Lamp.001" 
+              ) {
+                removeList.Add (child);
+            }
+            // } HARDCODE end 
+        }
+
+        //
+        foreach ( Transform trans in removeList ) {
+            trans.parent = null;
+            GameObject.DestroyImmediate(trans.gameObject);
+        }
+    }
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
@@ -76,10 +107,14 @@ public class SyncAnimModel
 
         foreach ( Transform child in _src ) {
             string child_path = "";
+            string child_name = child.gameObject.name;
+
+            //
             if ( _path == "" )
-                child_path = child.gameObject.name;
+                child_path = child_name;
             else
-                child_path = _path + "/" + child.gameObject.name;
+                child_path = _path + "/" + child_name;
+
             CopyMissingGORecursively ( child_path, _destRoot, child, destChildTrans );
         }
     }
@@ -130,18 +165,21 @@ public class SyncAnimModel
         DebugHelper.Assert( new_prefabGO, "Can't find prefab: " + new_prefabPath );
 
         // copy GO tag & layer
+        RemovedUnusedGO( new_prefabGO.transform );
         CopyTagAndLayerRecursively( "", old_prefabGO.transform, new_prefabGO.transform );
         CopyMissingGORecursively( "", new_prefabGO.transform, old_prefabGO.transform, new_prefabGO.transform );
 
         // copy the components from the old prefab.
         Component[] old_comps = old_prefabGO.GetComponents<Component>();
         foreach ( Component old_comp in old_comps ) {
-            // if we have the component in new prefab, don't do anything.
-            if ( new_prefabGO.GetComponent( old_comp.GetType() ) != null )
-                continue;
+            Component new_comp = new_prefabGO.GetComponent( old_comp.GetType() );  
+
+            // if we don't have the component in new prefab, create one.
+            if ( new_comp == null ) {
+                new_comp = new_prefabGO.AddComponent(old_comp.GetType());
+            }
 
             // clone the component in old prefab to the new one.
-            Component new_comp = new_prefabGO.AddComponent(old_comp.GetType());
             CompHelper.Copy ( old_comp, new_comp );
         }
 

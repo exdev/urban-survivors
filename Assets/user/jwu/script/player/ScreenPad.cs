@@ -28,9 +28,11 @@ public class ScreenPad : MonoBehaviour {
 
     //
     private Vector2 move_dir;
+#if UNITY_IPHONE
     private int moveID = -1;
-    private Vector2 aiming_dir = Vector2.up;
     private int aimingID = -1;
+#endif
+    private Vector2 aiming_dir = Vector2.up;
     private bool canFire = false;
     private List<Touch> available_touches = new List<Touch>();
 

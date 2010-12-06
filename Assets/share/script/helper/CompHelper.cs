@@ -45,14 +45,17 @@ public class CompHelper {
         else if ( _src.GetType() == typeof(CharacterController) ) {
             return CopyCharacterController ( _src as CharacterController, _dest as CharacterController );
         }
+        else if ( _src.GetType() == typeof(CharacterJoint) ) {
+            return CopyCharacterJoint ( _src as CharacterJoint, _dest as CharacterJoint );
+        }
         else if ( _src.GetType() == typeof(MeshCollider) ) {
             return CopyMeshCollider ( _src as MeshCollider, _dest as MeshCollider );
         }
         else if ( _src.GetType() == typeof(SphereCollider) ) {
             return CopySphereCollider ( _src as SphereCollider, _dest as SphereCollider );
         }
-        else if ( _src.GetType() == typeof(CharacterJoint) ) {
-            return CopyCharacterJoint ( _src as CharacterJoint, _dest as CharacterJoint );
+        else if ( _src.GetType() == typeof(WheelCollider) ) {
+            return CopyWheelCollider ( _src as WheelCollider, _dest as WheelCollider );
         }
 
         // if the component is not the type above.
@@ -198,6 +201,7 @@ public class CompHelper {
         _dest.isKinematic=_src.isKinematic;
         _dest.interpolation=_src.interpolation;
         _dest.freezeRotation=_src.freezeRotation;
+        _dest.collisionDetectionMode=_src.collisionDetectionMode;
         return true;
     }
 
@@ -236,6 +240,8 @@ public class CompHelper {
         _dest.radius=_src.radius;
         _dest.slopeLimit=_src.slopeLimit;
         _dest.stepOffset=_src.stepOffset;
+        // _dest.skinWidth=_src.skinWidth;
+        // _dest.minMoveDistance=_src.minMoveDistance;
         _dest.center=_src.center;
         return true;
     }
@@ -245,6 +251,11 @@ public class CompHelper {
     // ------------------------------------------------------------------ 
 
     static bool CopyMeshCollider ( MeshCollider _src, MeshCollider _dest ) {
+        _dest.material=_src.material;
+        _dest.isTrigger=_src.isTrigger;
+        _dest.smoothSphereCollisions=_src.smoothSphereCollisions;
+        _dest.convex=_src.convex;
+        _dest.sharedMesh=_src.sharedMesh;
         return true;
     }
 
@@ -257,6 +268,21 @@ public class CompHelper {
         _dest.isTrigger=_src.isTrigger;
         _dest.radius=_src.radius;
         _dest.center=_src.center;
+        return true;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static bool CopyWheelCollider ( WheelCollider _src, WheelCollider _dest ) {
+        _dest.center=_src.center;
+        _dest.radius=_src.radius;
+        _dest.suspensionDistance=_src.suspensionDistance;
+        _dest.suspensionSpring=_src.suspensionSpring;
+        _dest.mass=_src.mass;
+        _dest.forwardFriction=_src.forwardFriction;
+        _dest.sidewaysFriction=_src.sidewaysFriction;
         return true;
     }
 
