@@ -61,9 +61,14 @@ public class CompHelper {
         else if ( _src.GetType() == typeof(SphereCollider) ) {
             return CopySphereCollider ( _src as SphereCollider, _dest as SphereCollider );
         }
-        // Transform
+        // SkinnedMeshRenderer
+        else if ( _src.GetType() == typeof(SkinnedMeshRenderer) ) {
+            return CopySkinnedMeshRenderer ( _src as SkinnedMeshRenderer, _dest as SkinnedMeshRenderer );
+        }
+        // Transform NOTE: I don't think we need to copy this in most of the time.
         else if ( _src.GetType() == typeof(Transform) ) {
-            return CopyTransform ( _src as Transform, _dest as Transform );
+            // return CopyTransform ( _src as Transform, _dest as Transform );
+            return true;
         }
         // WheelCollider
         else if ( _src.GetType() == typeof(WheelCollider) ) {
@@ -280,6 +285,21 @@ public class CompHelper {
         _dest.isTrigger=_src.isTrigger;
         _dest.radius=_src.radius;
         _dest.center=_src.center;
+        return true;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static bool CopySkinnedMeshRenderer ( SkinnedMeshRenderer _src, SkinnedMeshRenderer _dest ) {
+        _dest.castShadows =_src.castShadows;
+        _dest.receiveShadows =_src.receiveShadows;
+        _dest.sharedMaterials = _src.sharedMaterials;
+        _dest.quality = _src.quality;
+        _dest.updateWhenOffscreen = _src.updateWhenOffscreen;
+        _dest.skinNormals = _src.skinNormals;
+        _dest.sharedMesh = _src.sharedMesh;
         return true;
     }
 

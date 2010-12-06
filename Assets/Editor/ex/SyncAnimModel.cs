@@ -70,8 +70,26 @@ public class SyncAnimModel
         if ( destChildTrans == null )
             return;
 
-        destChildTrans.gameObject.tag = _src.gameObject.tag;
-        destChildTrans.gameObject.layer = _src.gameObject.layer;
+        GameObject srcGO = _src.gameObject;
+        GameObject destGO = destChildTrans.gameObject;
+
+        // copy the tag and layer
+        destGO.tag = srcGO.tag;
+        destGO.layer = srcGO.layer;
+
+        // copy the components
+        Component[] old_comps = srcGO.GetComponents<Component>();
+        foreach ( Component old_comp in old_comps ) {
+            Component new_comp = destGO.GetComponent( old_comp.GetType() );  
+
+            // if we don't have the component in new prefab, create one.
+            if ( new_comp == null )
+                new_comp = destGO.AddComponent(old_comp.GetType());
+
+            // clone the component in old prefab to the new one.
+            CompHelper.Copy ( old_comp, new_comp );
+        }
+
         foreach ( Transform child in _src ) {
             string child_path = "";
             if ( _path == "" )
@@ -81,6 +99,45 @@ public class SyncAnimModel
             CopyTagAndLayerRecursively ( child_path, child, _destRoot );
         }
     }
+
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
+
+    // static void CopyComponentsRecursively ( string _path, Transform _src, Transform _destRoot ) {
+    //     Transform destChildTrans = null;
+
+    //     if ( _path == "" )
+    //         destChildTrans = _destRoot;
+    //     else
+    //         destChildTrans = _destRoot.Find(_path);
+
+    //     if ( destChildTrans == null )
+    //         return;
+
+    //     // copy the components from the old prefab.
+    //     Component[] old_comps = _src.gameObject.GetComponents<Component>();
+    //     foreach ( Component old_comp in old_comps ) {
+    //         Component new_comp = destChildTrans.gameObject.GetComponent( old_comp.GetType() );  
+
+    //         // if we don't have the component in new prefab, create one.
+    //         if ( new_comp == null )
+    //             new_comp = destChildTrans.gameObject.AddComponent(old_comp.GetType());
+
+    //         // clone the component in old prefab to the new one.
+    //         CompHelper.Copy ( old_comp, new_comp );
+    //     }
+
+    //     //
+    //     foreach ( Transform child in _src ) {
+    //         string child_path = "";
+    //         if ( _path == "" )
+    //             child_path = child.gameObject.name;
+    //         else
+    //             child_path = child.gameObject.name + "/" + _path;
+    //         CopyComponentsRecursively ( child_path, child, _destRoot );
+    //     }
+    // }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -169,19 +226,20 @@ public class SyncAnimModel
         CopyTagAndLayerRecursively( "", old_prefabGO.transform, new_prefabGO.transform );
         CopyMissingGORecursively( "", new_prefabGO.transform, old_prefabGO.transform, new_prefabGO.transform );
 
-        // copy the components from the old prefab.
-        Component[] old_comps = old_prefabGO.GetComponents<Component>();
-        foreach ( Component old_comp in old_comps ) {
-            Component new_comp = new_prefabGO.GetComponent( old_comp.GetType() );  
+        // DELME { 
+        // // copy the components from the old prefab.
+        // Component[] old_comps = old_prefabGO.GetComponents<Component>();
+        // foreach ( Component old_comp in old_comps ) {
+        //     Component new_comp = new_prefabGO.GetComponent( old_comp.GetType() );  
 
-            // if we don't have the component in new prefab, create one.
-            if ( new_comp == null ) {
-                new_comp = new_prefabGO.AddComponent(old_comp.GetType());
-            }
+        //     // if we don't have the component in new prefab, create one.
+        //     if ( new_comp == null )
+        //         new_comp = new_prefabGO.AddComponent(old_comp.GetType());
 
-            // clone the component in old prefab to the new one.
-            CompHelper.Copy ( old_comp, new_comp );
-        }
+        //     // clone the component in old prefab to the new one.
+        //     CompHelper.Copy ( old_comp, new_comp );
+        // }
+        // } DELME end 
 
         // replace the old prefab with the new one
         // NOTE: use ReplacePrefabOptions.ReplaceNameBased, this will never change the position of the prefab-instances in the Scene.
