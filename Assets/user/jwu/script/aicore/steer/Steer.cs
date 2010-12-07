@@ -94,6 +94,12 @@ public class Steer : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public float CurSpeed () { return this.curSpeed; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public bool IsAhead ( Vector3 _targetPos, float _cosThreshold = 0.707f ) {
         Vector3 targetDir = (_targetPos - transform.position).normalized;
         return Vector3.Dot ( transform.forward, targetDir ) > _cosThreshold;

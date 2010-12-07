@@ -145,7 +145,7 @@ public class Player_girl : Player_base {
         this.moveDir = Vector3.zero; 
         if ( followTarget == null ) {
             Vector2 screen_dir = screenPad.GetMoveDirection();
-            if ( screen_dir.magnitude >= 0.0f ) {
+            if ( screen_dir.sqrMagnitude >= 0.0f ) {
                 this.moveDir.x = screen_dir.x;
                 this.moveDir.y = screen_dir.y;
                 Transform mainCamera = Camera.main.transform;
@@ -240,7 +240,7 @@ public class Player_girl : Player_base {
         }
 
         //
-        if ( Mathf.Approximately(this.moveDir.magnitude, 0.0f) )
+        if ( MathHelper.IsZerof(this.moveDir.sqrMagnitude) )
             ApplyBrakingForce(10.0f);
         ApplySteeringForce( this.moveDir * base.maxForce );
     }
@@ -274,7 +274,7 @@ public class Player_girl : Player_base {
         float angle = Vector3.Angle ( moveDir, aimDir );
         // DebugHelper.ScreenPrint("angle = " + angle); // DEBUG
         string animName = "";
-        if ( Mathf.Approximately(moveDir.magnitude, 0.0f) == false ) {
+        if ( MathHelper.IsZerof(moveDir.sqrMagnitude) == false ) {
             if ( angle > 180.0f - degreePlayMoveLeftRight ) {
                 // lowerBody.forward = -moveDir;
                 animName = "moveBackward";
@@ -317,7 +317,7 @@ public class Player_girl : Player_base {
         //     //                  "oncomplete", "onRotateEnd",
         //     //                  "oncompletetarget", gameObject
         //     //                  ) );
-        //     // if ( moveDir.magnitude == 0.0f ) {
+        //     // if ( MathHelper.IsZerof(moveDir.sqrMagnitude) ) {
         //     //     Vector3 cross_product = Vector3.Cross(upperBody.forward,lowerBody.forward);
         //     //     Animation anim = GetComponent( typeof(Animation) ) as Animation;
         //     //     if ( cross_product.y > 0.0 )

@@ -13,7 +13,7 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// defines
+// actions, transitions
 ///////////////////////////////////////////////////////////////////////////////
 
 // ------------------------------------------------------------------ 
@@ -304,8 +304,8 @@ public class AI_ZombieNormal : Steer {
         base.Start();
 
         this.targetPos = transform.position;
-        InitAnim();
-        InitFSM();
+        this.InitAnim();
+        this.InitFSM();
     }
 
     // ------------------------------------------------------------------ 
@@ -360,8 +360,8 @@ public class AI_ZombieNormal : Steer {
         DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
 
         // debug info
-        DebugHelper.ScreenPrint ( "steering state: " + this.steeringState );
-        DebugHelper.ScreenPrint ( "current state: " + fsm.CurrentState().name );
+        DebugHelper.ScreenPrint ( "AI_ZombieNormal steering state: " + this.steeringState );
+        DebugHelper.ScreenPrint ( "AI_ZombieNormal current state: " + fsm.CurrentState().name );
 
         // Vector3 targetDir = (this.targetPos - transform.position).normalized;
         // float cosTheta = Vector3.Dot ( transform.forward, targetDir );

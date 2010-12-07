@@ -268,7 +268,7 @@ public class Player_girl_old : Player_base_old {
 
         // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
         // if ( vel_ubspace.sqrMagnitude < 0.2 )
-        if ( Mathf.Approximately(moveDir.magnitude, 0.0f) ) {
+        if ( MathHelper.IsZerof(moveDir.magnitude) ) {
             // float fadeSpeed = 5.0f * Time.deltaTime;
             anim.CrossFade("idle");
         }
@@ -284,7 +284,7 @@ public class Player_girl_old : Player_base_old {
         float angle = Vector3.Angle ( moveDir, aimDir );
         // DebugHelper.ScreenPrint("angle = " + angle); // DEBUG
         string animName = "";
-        if ( Mathf.Approximately(moveDir.magnitude, 0.0f) == false ) {
+        if ( MathHelper.IsZerof(moveDir.magnitude) == false ) {
             if ( angle > 180.0f - degreePlayMoveLeftRight ) {
                 // lowerBody.forward = -moveDir;
                 animName = "moveBackward";

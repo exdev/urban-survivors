@@ -105,7 +105,7 @@ public class Player_boy_rigid : Player_base {
     private void HandleInput() {
         moveDir = Vector3.zero; 
         Vector2 screen_dir = screenPad ? screenPad.GetMoveDirection() : Vector2.zero;
-        if ( screen_dir.magnitude >= 0.0f ) {
+        if ( screen_dir.sqrMagnitude >= 0.0f ) {
             moveDir.x = screen_dir.x;
             moveDir.y = screen_dir.y;
             Transform mainCamera = Camera.main.GetComponent( typeof(Transform) ) as Transform;
@@ -125,7 +125,7 @@ public class Player_boy_rigid : Player_base {
     // ------------------------------------------------------------------ 
 
     private void ProcessMovement () {
-        if ( moveDir.magnitude > 0.0f ) {
+        if ( moveDir.sqrMagnitude > 0.0f ) {
             rigidbody.AddForce ( moveDir * maxSpeed, ForceMode.Acceleration );
             // DISABLE: transform.position = new Vector3( transform.position.x, 0.0f, transform.position.z );
             transform.forward = moveDir;
@@ -147,7 +147,7 @@ public class Player_boy_rigid : Player_base {
     // ------------------------------------------------------------------ 
 
     private void ProcessAnimation () {
-        if ( moveDir.magnitude > 0.0f ) {
+        if ( moveDir.sqrMagnitude > 0.0f ) {
             anim.CrossFade("moveforward");
         }
         else {

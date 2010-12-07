@@ -186,7 +186,7 @@ public class ScreenPad : MonoBehaviour {
         } // end if ( useKeyboardAndMouse == false )
 
         // if there is no move, keep the analog at the center of the move_zone. 
-        if ( move_dir.magnitude == 0.0f ) {
+        if ( MathHelper.IsZerof(move_dir.sqrMagnitude) ) {
             Vector3 worldpos = hud_camera.ScreenToWorldPoint( new Vector3( move_zone.center.x, move_zone.center.y, 1 ) );
             // analog.transform.position = new Vector3( worldpos.x, worldpos.y, analog.transform.position.z ); 
 

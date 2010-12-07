@@ -98,7 +98,7 @@ public class Player_boy_old : Player_base_old {
     private void HandleInput() {
         moveDir = Vector3.zero; 
         Vector2 screen_dir = screenPad ? screenPad.GetMoveDirection() : Vector2.zero;
-        if ( screen_dir.magnitude >= 0.0f ) {
+        if ( screen_dir.sqrMagnitude >= 0.0f ) {
             moveDir.x = screen_dir.x;
             moveDir.y = screen_dir.y;
             Transform mainCamera = Camera.main.GetComponent( typeof(Transform) ) as Transform;
@@ -132,7 +132,7 @@ public class Player_boy_old : Player_base_old {
 
         controller.Move(vel * Time.deltaTime);
 
-        if ( moveDir.magnitude > 0.0f )
+        if ( moveDir.sqrMagnitude > 0.0f )
             transform.forward = moveDir;
 
         // TODO { 
@@ -151,7 +151,7 @@ public class Player_boy_old : Player_base_old {
     // ------------------------------------------------------------------ 
 
     private void ProcessAnimation () {
-        if ( moveDir.magnitude > 0.0f ) {
+        if ( moveDir.sqrMagnitude > 0.0f ) {
             anim["moveforward"].normalizedSpeed = StepSpeed * controller.velocity.magnitude;
             anim.CrossFade("moveforward");
         }

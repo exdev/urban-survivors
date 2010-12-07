@@ -265,7 +265,7 @@ public class Player_girl_rigid : Player_base {
 
         // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
         // if ( vel_ubspace.sqrMagnitude < 0.2 )
-        if ( moveDir.magnitude == 0.0f ) {
+        if ( MathHelper.IsZerof(moveDir.magnitude) ) {
             // float fadeSpeed = 5.0f * Time.deltaTime;
             anim.CrossFade("idle");
         }

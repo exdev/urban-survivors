@@ -25,6 +25,16 @@ using System.Collections;
 
 public class MathHelper : MonoBehaviour {
 
+    const float float_epsilon = 1e-06f; 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static public bool IsZerof ( float _value, float _eps = MathHelper.float_epsilon ) {
+        return Mathf.Abs(_value) <= _eps;
+    }
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
