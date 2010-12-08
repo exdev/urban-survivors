@@ -102,6 +102,7 @@ public class Player_boy : Player_base {
     protected Animation anim;
     protected FSM fsm = new FSM();
     protected bool meleeButtonTriggered = false;
+    protected Player_info info = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -113,6 +114,7 @@ public class Player_boy : Player_base {
 
 	protected new void Start () {
         base.Start();
+        info = gameObject.GetComponent<Player_info>();
         this.InitAnim ();
         this.InitFSM();
 	}
