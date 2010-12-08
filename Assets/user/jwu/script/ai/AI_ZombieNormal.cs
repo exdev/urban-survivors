@@ -13,188 +13,6 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// actions, transitions
-///////////////////////////////////////////////////////////////////////////////
-
-// ------------------------------------------------------------------ 
-// Desc: Action_MoveToNearestPlayer 
-// ------------------------------------------------------------------ 
-
-class Action_MoveToNearestPlayer : FSM.Action_periodic {
-    public Action_MoveToNearestPlayer ( float _interval ) {
-        base.Interval = _interval;
-    }
-
-    public override void exec ( GameObject _self ) {
-        Vector3 targetPos = Vector3.zero;
-        GameObject[] players = GameRules.Instance().GetPlayers();
-        float nearest = 999.0f;
-        foreach( GameObject player in players ) {
-            float len = (player.transform.position - _self.transform.position).magnitude;
-            if ( len < nearest ) {
-                nearest = len;
-                targetPos = player.transform.position;
-            }
-        }
-
-        AI_ZombieNormal zombieNormal = _self.GetComponent<AI_ZombieNormal>();
-        zombieNormal.Seek(targetPos);
-    }
-}
-
-// ------------------------------------------------------------------ 
-// Desc: Action_Attack 
-// ------------------------------------------------------------------ 
-
-class Action_Attack : FSM.Action_periodic {
-    public Action_Attack ( float _interval ) {
-        base.Interval = _interval;
-    }
-
-    public override void exec ( GameObject _self ) {
-        Animation anim_comp = _self.GetComponent<Animation>();
-        anim_comp.CrossFade("attack1");
-    }
-}
-
-// ------------------------------------------------------------------ 
-// Desc: Action_StopMoving 
-// ------------------------------------------------------------------ 
-
-class Action_StopMoving : FSM.Action {
-    public Action_StopMoving () {
-    }
-
-    public override void exec ( GameObject _self ) {
-        AI_ZombieNormal zombieNormal = _self.GetComponent<AI_ZombieNormal>();
-        zombieNormal.Stop();
-    }
-}
-
-// ------------------------------------------------------------------ 
-// Desc: Transition_Idle_to_Seek 
-// ------------------------------------------------------------------ 
-
-class Transition_Idle_to_Seek : FSM.Transition {
-    float range = 5.0f;
-
-    public Transition_Idle_to_Seek ( FSM.State _dest, float _range ) {
-        base.dest_state = _dest;
-        range = _range;
-    }
-
-    public override bool check ( GameObject _self ) { 
-        GameObject[] players = GameRules.Instance().GetPlayers();
-        foreach( GameObject player in players ) {
-            float len = (player.transform.position - _self.transform.position).magnitude;
-            if ( len < range ) {
-                return true;
-            }
-        }
-        return false; 
-    } 
-}
-
-// ------------------------------------------------------------------ 
-// Desc: Transition_Seek_to_Idle 
-// ------------------------------------------------------------------ 
-
-class Transition_Seek_to_Idle : FSM.Transition {
-    float range = 10.0f;
-
-    public Transition_Seek_to_Idle ( FSM.State _dest, float _range ) {
-        base.dest_state = _dest;
-        range = _range;
-    }
-
-    public override bool check ( GameObject _self ) { 
-        GameObject[] players = GameRules.Instance().GetPlayers();
-        foreach( GameObject player in players ) {
-            float len = (player.transform.position - _self.transform.position).magnitude;
-            if ( len < range ) {
-                return false;
-            }
-        }
-        return true; 
-    } 
-}
-
-// ------------------------------------------------------------------ 
-// Desc: Transition_Seek_to_Attack 
-// ------------------------------------------------------------------ 
-
-class Transition_Seek_to_Attack : FSM.Transition {
-    float range = 1.0f;
-
-    public Transition_Seek_to_Attack ( FSM.State _dest, float _range ) {
-        base.dest_state = _dest;
-        range = _range;
-    }
-
-    public override bool check ( GameObject _self ) { 
-        GameObject targetGO = null;
-        GameObject[] players = GameRules.Instance().GetPlayers();
-        float nearest = 999.0f;
-        foreach( GameObject player in players ) {
-            float len = (player.transform.position - _self.transform.position).magnitude;
-            if ( len < nearest ) {
-                nearest = len;
-                targetGO = player;
-            }
-        }
-        if ( nearest > range ) 
-            return false;
-
-        // if we near target, check if we face it.
-        AI_ZombieNormal zombieNormal = _self.GetComponent<AI_ZombieNormal>();
-        bool result = zombieNormal.IsAhead( targetGO.transform.position, Mathf.Cos(30.0f*Mathf.Deg2Rad) );
-        return result;
-    } 
-}
-
-// ------------------------------------------------------------------ 
-// Desc: Transition_Attack_to_Seek
-// ------------------------------------------------------------------ 
-
-class Transition_Attack_to_Seek : FSM.Transition {
-    float range = 1.0f;
-
-    public Transition_Attack_to_Seek ( FSM.State _dest, float _range ) {
-        base.dest_state = _dest;
-        range = _range;
-    }
-
-    public override bool check ( GameObject _self ) { 
-        // TODO: add end event for attacking { 
-        // we still attacking
-        // Animation anim_comp = _self.GetComponent<Animation>();
-        // if ( anim_comp.IsPlaying("attack1") )
-        //     return false;
-        // } TODO end 
-
-        GameObject targetGO = null;
-        GameObject[] players = GameRules.Instance().GetPlayers();
-        float nearest = 999.0f;
-        foreach( GameObject player in players ) {
-            float len = (player.transform.position - _self.transform.position).magnitude;
-            if ( len < nearest ) {
-                nearest = len;
-                targetGO = player;
-            }
-        }
-
-        // if we don't have any (range) near player
-        if ( nearest > range ) 
-            return true;
-
-        // if we got near target, check if we face it.
-        AI_ZombieNormal zombieNormal = _self.GetComponent<AI_ZombieNormal>();
-        bool result = zombieNormal.IsAhead( targetGO.transform.position, Mathf.Cos(30.0f*Mathf.Deg2Rad) );
-        return !result;
-    } 
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // class AI_ZombieNormal
 // 
 // Purpose: 
@@ -202,6 +20,124 @@ class Transition_Attack_to_Seek : FSM.Transition {
 ///////////////////////////////////////////////////////////////////////////////
 
 public class AI_ZombieNormal : Steer {
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // actions, conditions
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_MoveToNearestPlayer 
+    // ------------------------------------------------------------------ 
+
+    class Action_MoveToNearestPlayer : FSM.Action_periodic {
+        AI_ZombieNormal zombieNormal = null;
+
+        public Action_MoveToNearestPlayer ( float _interval, AI_ZombieNormal _zombieNormal ) {
+            base.Interval = _interval;
+            this.zombieNormal = _zombieNormal;
+        }
+
+        public override void exec () {
+            float dist = 0.0f;
+            Transform player = null;
+            GameRules.Instance().GetNearestPlayer( this.zombieNormal.transform,
+                                                   out player,
+                                                   out dist );
+            this.zombieNormal.Seek(player.position);
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_Attack 
+    // ------------------------------------------------------------------ 
+
+    class Action_Attack : FSM.Action_periodic {
+        Animation anim = null;
+        public Action_Attack ( float _interval, Animation _anim ) {
+            base.Interval = _interval;
+            this.anim = _anim;
+        }
+
+        public override void exec () {
+            this.anim.CrossFade("attack1");
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_StopMoving 
+    // ------------------------------------------------------------------ 
+
+    class Action_StopMoving : FSM.Action {
+        AI_ZombieNormal zombieNormal = null;
+
+        public Action_StopMoving ( AI_ZombieNormal _zombieNormal ) {
+            this.zombieNormal = _zombieNormal;
+        }
+
+        public override void exec () {
+            this.zombieNormal.Stop();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Condition_playerInRange 
+    // ------------------------------------------------------------------ 
+
+    class Condition_playerInRange : FSM.Condition {
+        float range = 5.0f;
+        Transform trans = null;
+
+        public Condition_playerInRange ( Transform _trans, float _range ) {
+            this.range = _range;
+            this.trans = _trans;
+        }
+
+        public override bool exec () { 
+            GameObject[] players = GameRules.Instance().GetPlayers();
+            foreach( GameObject player in players ) {
+                float len = (player.transform.position - this.trans.position).magnitude;
+                if ( len < range ) {
+                    return true;
+                }
+            }
+            return false; 
+        } 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Condition_isPlayerInAttackRange
+    // ------------------------------------------------------------------ 
+
+    class Condition_isPlayerInAttackRange : FSM.Condition {
+        AI_ZombieNormal zombieNormal = null;
+        float degrees = 30.0f;
+
+        public Condition_isPlayerInAttackRange ( AI_ZombieNormal _zombieNormal, float _degrees ) {
+            this.zombieNormal = _zombieNormal;
+            this.degrees = _degrees;
+        }
+
+        public override bool exec () {
+            float dist = 0.0f;
+            Transform player = null;
+            GameRules.Instance().GetNearestPlayer( this.zombieNormal.transform,
+                                                   out player,
+                                                   out dist );
+            if ( dist > 2.0f ) // not in distance 
+                return false;
+
+            // if we near target, check if we face it.
+            bool result = this.zombieNormal.IsAhead( player.position, 
+                                                     Mathf.Cos(this.degrees*Mathf.Deg2Rad) );
+            return result;
+        }
+
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // properties
+    ///////////////////////////////////////////////////////////////////////////////
+
     public enum SteeringState {
         seeking,
         braking,
@@ -211,6 +147,10 @@ public class AI_ZombieNormal : Steer {
     protected FSM fsm = new FSM();
     protected Vector3 targetPos;
     protected SteeringState steeringState = SteeringState.braking;
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // function defines
+    ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -257,43 +197,57 @@ public class AI_ZombieNormal : Steer {
     // ------------------------------------------------------------------ 
 
     void InitFSM () {
-        // init states
-        FSM.State State_Idle = new FSM.State( "Idle", 
-                                              new Action_PlayAnim(anim,"idle1"), 
+
+        // ======================================================== 
+        // setup states
+        // ======================================================== 
+
+        // idle
+        FSM.State state_idle = new FSM.State( "Idle", 
+                                              new Action_PlayAnim(this.anim,"idle1"), 
                                               null, 
                                               null );
-        FSM.State State_SeekPlayers = new FSM.State( "SeekPlayers", 
-                                                     new Action_PlayAnim(anim,"moveForward"), 
-                                                     new Action_MoveToNearestPlayer(1.0f), 
-                                                     new Action_StopMoving() );
-        FSM.State State_Attack = new FSM.State( "Attack", 
+        // seekPlayers
+        FSM.State state_seekPlayers = new FSM.State( "SeekPlayers", 
+                                                     new Action_PlayAnim(this.anim,"moveForward"), 
+                                                     new Action_MoveToNearestPlayer(1.0f,this), 
+                                                     new Action_StopMoving(this) );
+        // attack
+        FSM.State state_attack = new FSM.State( "Attack", 
                                                 null, 
-                                                new Action_Attack(0.5f), 
+                                                new Action_Attack(0.5f,this.anim), 
                                                 null );
 
-        // connect idle transitions
-        {
-            Transition_Idle_to_Seek trans1 = new Transition_Idle_to_Seek( State_SeekPlayers, 5.0f);
-            State_Idle.AddTransition(trans1);
-        }
+        // ======================================================== 
+        // condition 
+        // ======================================================== 
 
-        // connect move towards players transitions
-        {
-            Transition_Seek_to_Idle trans1 = new Transition_Seek_to_Idle( State_Idle, 7.0f);
-            Transition_Seek_to_Attack trans2 = new Transition_Seek_to_Attack( State_Attack, 2.0f);
+        FSM.Condition cond_isPlayerInAttackRange = new Condition_isPlayerInAttackRange(this,30.0f);
 
-            State_SeekPlayers.AddTransition(trans1);
-            State_SeekPlayers.AddTransition(trans2);
-        }
+        // ======================================================== 
+        // setup transitions
+        // ======================================================== 
 
-        // connect attack transitions
-        {
-            Transition_Attack_to_Seek trans1 = new Transition_Attack_to_Seek( State_SeekPlayers, 2.0f );
-            State_Attack.AddTransition(trans1);
-        }
+        // idle to ...
+        state_idle.AddTransition( new FSM.Transition( state_seekPlayers, 
+                                                      new Condition_playerInRange( this.transform, 5.0f ), 
+                                                      null ) );
+
+        // seekPlayers to ...
+        state_seekPlayers.AddTransition( new FSM.Transition( state_idle, 
+                                                             new FSM.Condition_not( new Condition_playerInRange( this.transform, 7.0f ) ), 
+                                                             null ) );
+        state_seekPlayers.AddTransition( new FSM.Transition( state_attack,
+                                                             cond_isPlayerInAttackRange,
+                                                             null ) );
+
+        // attack to ...
+        state_attack.AddTransition( new FSM.Transition ( state_seekPlayers, 
+                                                         new FSM.Condition_not(cond_isPlayerInAttackRange),
+                                                         null ) );
 
         // init fsm
-        fsm.init(gameObject,State_Idle);
+        fsm.init(state_idle);
     }
 
     // ------------------------------------------------------------------ 

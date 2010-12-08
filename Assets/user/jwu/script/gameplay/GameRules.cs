@@ -114,4 +114,25 @@ public class GameRules : MonoBehaviour {
         enemies.AddRange ( GameObject.FindGameObjectsWithTag("zombie") ); 
         return enemies;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void GetNearestPlayer ( Transform _self, out Transform _player, out float _dist ) { 
+        Transform target = null;
+        float nearest = 999.0f;
+
+        GameObject[] players = GameRules.Instance().GetPlayers();
+        foreach( GameObject player in players ) {
+            float len = (player.transform.position - _self.position).magnitude;
+            if ( len < nearest ) {
+                nearest = len;
+                target = player.transform;
+            }
+        }
+
+        _player = target;
+        _dist = nearest;
+    }
 }

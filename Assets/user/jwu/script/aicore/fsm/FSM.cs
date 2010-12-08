@@ -37,7 +37,7 @@ public class FSM {
     // ------------------------------------------------------------------ 
 
     public class Action {
-        public virtual void exec ( GameObject _self ) {
+        public virtual void exec () {
             Debug.LogWarning("Action::exec not implemented, default exec been called.");
         }
     } 
@@ -75,9 +75,43 @@ public class FSM {
             return false;
         }
 
-        public override void exec ( GameObject _self ) {
+        public override void exec () {
             Debug.LogWarning("Action::exec not implemented, default exec been called.");
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public class Condition {
+        public virtual bool exec () {
+            Debug.LogWarning("Condition::exec not implemented, default exec been called.");
+            return false;
+        } 
+    }
+    public class Condition_not : Condition {
+        Condition cond = null; 
+        public Condition_not ( Condition _cond ) { this.cond = _cond; }
+        public override bool exec () { return !this.cond.exec(); }
+    }
+    public class Condition_and : Condition {
+        Condition cond1 = null; 
+        Condition cond2 = null; 
+        public Condition_and ( Condition _cond1, Condition _cond2 ) { 
+            this.cond1 = _cond1; 
+            this.cond2 = _cond2; 
+        }
+        public override bool exec () { return this.cond1.exec() && this.cond2.exec(); }
+    }
+    public class Condition_or : Condition {
+        Condition cond1 = null; 
+        Condition cond2 = null; 
+        public Condition_or ( Condition _cond1, Condition _cond2 ) { 
+            this.cond1 = _cond1; 
+            this.cond2 = _cond2; 
+        }
+        public override bool exec () { return this.cond1.exec() || this.cond2.exec(); }
     }
 
     // ------------------------------------------------------------------ 
@@ -115,11 +149,19 @@ public class FSM {
     // ------------------------------------------------------------------ 
 
     public class Transition {
-        // public State src_state = null;
         public State dest_state = null;
+        public Condition condition = null;
         public Action action = null;
 
-        public virtual bool check ( GameObject _self ) { return false; } 
+        public Transition ( State _dest, Condition _cond, Action _act ) {
+            this.dest_state = _dest;
+            this.condition = _cond;
+            this.action = _act;
+        }
+
+        public bool check () { 
+            return condition.exec(); 
+        }
     } 
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -129,7 +171,6 @@ public class FSM {
     State init_state = null;
     State cur_state = null;
     List<Action> cur_actions = new List<Action>();
-    GameObject self = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -145,8 +186,7 @@ public class FSM {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	public void init ( GameObject _self, State _initState ) {
-        this.self = _self;
+	public void init ( State _initState ) {
         DebugHelper.Assert( _initState != null, "init state can't be null, pls set it before using the state machine" );
         this.init_state = _initState;
 	}
@@ -171,7 +211,7 @@ public class FSM {
             Transition triggeredTrans = null;
             for ( uint i = 0; i < this.cur_state.transition_count; ++i ) {
                 Transition trans = this.cur_state.transition_list[i];
-                if ( trans.check(self) ) {
+                if ( trans.check() ) {
                     triggeredTrans = trans;
                     break;
                 }
@@ -206,9 +246,9 @@ public class FSM {
         foreach ( Action act in this.cur_actions ) {
             Action_periodic act_p = act as Action_periodic;
             if ( act_p != null && act_p.tickTimer() )
-                act_p.exec (self);
+                act_p.exec ();
             else
-                act.exec (self);
+                act.exec ();
         }
 	}
 }

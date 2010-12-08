@@ -30,7 +30,7 @@ class Action_PlayAnim : FSM.Action {
         anim_name = _name;
     }
 
-    public override void exec ( GameObject _self ) {
+    public override void exec () {
         anim_comp.CrossFade(anim_name);
     }
 }
