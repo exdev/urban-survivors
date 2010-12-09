@@ -360,7 +360,7 @@ public class Player_boy : Player_base {
         this.curWeapon.transform.localPosition = Vector3.zero;
         this.curWeapon.transform.localRotation = Quaternion.identity;
         // TEMP HACK { 
-        this.curWeapon.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 90.0f);
+        // this.curWeapon.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 90.0f);
         // } TEMP HACK end 
         this.SetCurWeaponOwner();
     }
@@ -432,6 +432,7 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     private void StartMeleeAttack () {
+        // this.curWeapon.GetComponent
     }
 
     // ------------------------------------------------------------------ 

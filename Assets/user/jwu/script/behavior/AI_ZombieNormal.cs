@@ -321,6 +321,11 @@ public class AI_ZombieNormal : Actor {
         state_onHit.AddTransition( new FSM.Transition ( state_idle, 
                                                         new FSM.Condition_not(cond_isOnHit),
                                                         null ) );
+        // TODO { 
+        // state_onHit.AddTransition( new FSM.Transition ( state_onHit, 
+        //                                                 cond_isOnHit,
+        //                                                 null ) );
+        // } TODO end 
 
         // init fsm
         fsm.init(state_idle);
