@@ -165,9 +165,9 @@ public class SpawnManager : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public static SpawnManager spawnManager = null;
     public GameObjectPool[] pools;
 
+    protected static SpawnManager spawnManager = null;
     private Dictionary<GameObject,GameObjectPool> gameobjLookupTable = new Dictionary<GameObject,GameObjectPool>(); 
 
     ///////////////////////////////////////////////////////////////////////////////

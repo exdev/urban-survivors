@@ -11,7 +11,6 @@
 
 using UnityEngine;
 using System.Collections;
-// using FSM;
 
 ///////////////////////////////////////////////////////////////////////////////
 // class Player_boy
@@ -98,11 +97,16 @@ public class Player_boy : Player_base {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    protected Vector3 moveDir = Vector3.zero;
-    protected Animation anim;
+    public Player_info info = new Player_info();
+    public Transform weaponAnchor = null;
+
+    protected Animation anim = null;
     protected FSM fsm = new FSM();
+    protected Vector3 moveDir = Vector3.zero;
     protected bool meleeButtonTriggered = false;
-    protected Player_info info = null;
+    protected GameObject curWeapon = null;
+    protected GameObject weapon1 = null;
+    protected GameObject weapon2 = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -114,8 +118,14 @@ public class Player_boy : Player_base {
 
 	protected new void Start () {
         base.Start();
-        info = gameObject.GetComponent<Player_info>();
-        this.InitAnim ();
+
+        // init the player basic values.
+        this.anim = gameObject.GetComponent(typeof(Animation)) as Animation;
+        DebugHelper.Assert( this.weaponAnchor, "can't find WeaponAnchor");
+
+        //
+        this.InitInfo();
+        this.InitAnim();
         this.InitFSM();
 	}
 	
@@ -128,7 +138,7 @@ public class Player_boy : Player_base {
         HandleInput();
 
         // update state machine
-        fsm.tick();
+        this.fsm.tick();
 
         // handle steering
         ProcessMovement ();
@@ -150,7 +160,7 @@ public class Player_boy : Player_base {
                                new Color(1.0f,0.0f,1.0f) );
 
         // debug info
-        DebugHelper.ScreenPrint ( "Player_boy current state: " + fsm.CurrentState().name );
+        DebugHelper.ScreenPrint ( "Player_boy current state: " + this.fsm.CurrentState().name );
         // } DEBUG end 
 	}
 
@@ -158,28 +168,46 @@ public class Player_boy : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void InitAnim () {
-        // get the animation component
-        anim = gameObject.GetComponent(typeof(Animation)) as Animation;
+    void InitInfo () {
+        // TODO: we should load info from saved data or check point.
+        // info.serialize();
 
+        // we first instantiate weapon from player info
+        // GameObject obj = (GameObject)GameObject.Instantiate(prefab,Vector3.zero, Quaternion.identity);
+        // if ( this.info.weapon1 ) {
+        //     this.weapon1 = GameObject.Instantiate( this.info.weapon1,  )
+        // }
+
+        if ( this.info.weapon1 != WeaponBase.WeaponID.unknown )
+            this.ChangeWeapon(this.info.weapon1);
+        else if ( this.info.weapon2 != WeaponBase.WeaponID.unknown )
+            this.ChangeWeapon(this.info.weapon2);
+        DebugHelper.Assert( this.curWeapon, "can't find any valid weapon" );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void InitAnim () {
         // setup the animation state
         AnimationState state;
         string[] anim_keys = { "moveforward" };
         foreach (string key in anim_keys) {
-            state = anim[key];
+            state = this.anim[key];
             state.layer = 0;
             state.wrapMode = WrapMode.Loop;
             state.weight = 1.0f;
             state.enabled = false;
         }
 
-        state = anim["melee1_copy"];
+        state = this.anim["melee1_copy"];
         state.layer = 0;
         state.wrapMode = WrapMode.Once;
         state.weight = 1.0f;
         state.enabled = false;
 
-        state = anim["idle"];
+        state = this.anim["idle"];
         state.wrapMode = WrapMode.Loop;
         state.layer = 0;
         state.weight = 1.0f;
@@ -198,17 +226,17 @@ public class Player_boy : Player_base {
 
         // idle
         FSM.State state_idle = new FSM.State( "Idle", 
-                                              new Action_PlayAnim(anim,"idle"), 
+                                              new Action_PlayAnim(this.anim,"idle"), 
                                               null, 
                                               null );
         // walk
         FSM.State state_walk = new FSM.State( "Walk", 
-                                              new Action_PlayAnim(anim,"moveforward"), 
-                                              new Action_AdjustMoveSpeed(anim,this),
+                                              new Action_PlayAnim(this.anim,"moveforward"), 
+                                              new Action_AdjustMoveSpeed(this.anim,this),
                                               null );
         // melee
         FSM.State state_melee = new FSM.State( "Melee", 
-                                               new Action_PlayAnim(anim,"melee1_copy"), 
+                                               new Action_PlayAnim(this.anim,"melee1_copy"), 
                                                null,
                                                null );
 
@@ -243,7 +271,7 @@ public class Player_boy : Player_base {
                                                        null ) );
 
         // init fsm
-        fsm.init(state_idle);
+        this.fsm.init(state_idle);
     }
 
     // ------------------------------------------------------------------ 
@@ -273,7 +301,7 @@ public class Player_boy : Player_base {
 
     private void ProcessMovement () {
         // stop moving when in melee attack state.
-        if ( fsm.CurrentState().name == "Melee" ) {
+        if ( this.fsm.CurrentState().name == "Melee" ) {
             ApplyBrakingForce(10.0f);
             ApplySteeringForce(Vector3.zero);
         }
@@ -283,6 +311,19 @@ public class Player_boy : Player_base {
             }
             ApplySteeringForce( this.moveDir * base.maxForce );
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void ChangeWeapon( WeaponBase.WeaponID _id ) {
+        GameObject weaponGO = WeaponBase.Instance().GetWeapon(_id); 
+        weaponGO.SetActiveRecursively(true);
+        this.curWeapon = weaponGO; 
+        this.curWeapon.transform.parent = this.weaponAnchor;
+        this.curWeapon.transform.localPosition = Vector3.zero;
+        this.curWeapon.transform.localRotation = Quaternion.identity;
     }
 
     // ------------------------------------------------------------------ 
@@ -302,7 +343,7 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     public bool IsPlayingAnim ( string _animName, float _percentage = 1.0f ) { 
-        AnimationState state = anim[_animName];
+        AnimationState state = this.anim[_animName];
         DebugHelper.Assert( state != null, "can't find animation state: " + _animName );
         return state.enabled && state.time/state.length <= _percentage;
     }
