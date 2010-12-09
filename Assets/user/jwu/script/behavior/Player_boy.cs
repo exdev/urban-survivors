@@ -88,28 +88,52 @@ public class Player_boy : Player_base {
         }
 
         public override bool exec () {
-            Attack_info info = playerBoy.GetAttackInfo();
-            foreach ( Combo_info combo in info.combo_list ) {
-                bool attacking = this.playerBoy.IsPlayingAnim( combo.animName, combo.endTime );
-                if ( attacking )
-                    return true;
-            }
-            return false;
+            Attack_info atk_info = playerBoy.GetAttackInfo();
+            if ( atk_info.curCombo == null )
+                return false;
+            return this.playerBoy.IsPlayingAnim( atk_info.curCombo.animName, 
+                                                 atk_info.curCombo.endTime );
+
+            // DELME { 
+            // Combo_info combo = atk_info.combo_entry;
+            // while ( combo != null ) {
+            //     bool attacking = this.playerBoy.IsPlayingAnim( combo.animName, combo.endTime );
+            //     if ( attacking )
+            //         return true;
+            //     combo = combo.next;
+            // }
+            // return false;
+            // } DELME end 
         }
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: Action_Attack 
+    // Desc: Action_StartCombo 
     // ------------------------------------------------------------------ 
 
-    class Action_Attack : FSM.Action {
+    class Action_StartCombo : FSM.Action {
         Player_boy playerBoy = null;
-        public Action_Attack ( Player_boy _playerBoy ) {
+        public Action_StartCombo ( Player_boy _playerBoy ) {
             this.playerBoy = _playerBoy;
         }
 
         public override void exec () {
-            this.playerBoy.Attack();
+            this.playerBoy.StartCombo();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Action_NextCombo : FSM.Action {
+        Player_boy playerBoy = null;
+        public Action_NextCombo ( Player_boy _playerBoy ) {
+            this.playerBoy = _playerBoy;
+        }
+
+        public override void exec () {
+            this.playerBoy.NextCombo();
         }
     }
 
@@ -117,7 +141,7 @@ public class Player_boy : Player_base {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public Player_info info = new Player_info();
+    public Player_info player_info = new Player_info();
     public Transform weaponAnchor = null;
 
     protected Vector3 moveDir = Vector3.zero;
@@ -189,16 +213,10 @@ public class Player_boy : Player_base {
         // TODO: we should load info from saved data or check point.
         // info.serialize();
 
-        // we first instantiate weapon from player info
-        // GameObject obj = (GameObject)GameObject.Instantiate(prefab,Vector3.zero, Quaternion.identity);
-        // if ( this.info.weapon1 ) {
-        //     this.weapon1 = GameObject.Instantiate( this.info.weapon1,  )
-        // }
-
-        if ( this.info.weapon1 != WeaponBase.WeaponID.unknown )
-            this.ChangeWeapon(this.info.weapon1);
-        else if ( this.info.weapon2 != WeaponBase.WeaponID.unknown )
-            this.ChangeWeapon(this.info.weapon2);
+        if ( this.player_info.weapon1 != WeaponBase.WeaponID.unknown )
+            this.ChangeWeapon(this.player_info.weapon1);
+        else if ( this.player_info.weapon2 != WeaponBase.WeaponID.unknown )
+            this.ChangeWeapon(this.player_info.weapon2);
         DebugHelper.Assert( this.curWeapon, "can't find any valid weapon" );
     }
 
@@ -253,8 +271,8 @@ public class Player_boy : Player_base {
                                               null );
         // melee
         FSM.State state_melee = new FSM.State( "Melee", 
-                                               new Action_Attack(this), 
-                                               null,
+                                               new Action_StartCombo(this), 
+                                               new Action_NextCombo(this), 
                                                null );
 
         // ======================================================== 
@@ -337,27 +355,55 @@ public class Player_boy : Player_base {
     public void ChangeWeapon( WeaponBase.WeaponID _id ) {
         GameObject weaponGO = WeaponBase.Instance().GetWeapon(_id); 
         weaponGO.SetActiveRecursively(true);
-        Attack_info attackInfo = weaponGO.GetComponent<Attack_info>();
-        attackInfo.setOwnerInfo(this.info);
-
         this.curWeapon = weaponGO; 
         this.curWeapon.transform.parent = this.weaponAnchor;
         this.curWeapon.transform.localPosition = Vector3.zero;
         this.curWeapon.transform.localRotation = Quaternion.identity;
         // TEMP HACK { 
-        this.curWeapon.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 90.0f);
+        // this.curWeapon.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 90.0f);
         // } TEMP HACK end 
+
+        Attack_info attackInfo = this.GetAttackInfo();
+        attackInfo.setOwnerInfo(this.player_info);
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void Attack () {
-        // TODO { 
-        this.anim.Rewind("melee1_copy");
-        this.anim.CrossFade("melee1_copy");
-        // } TODO end 
+    public void StartCombo () {
+        Attack_info atk_info = this.GetAttackInfo();
+        Combo_info first_combo = atk_info.combo_entry;
+        atk_info.curCombo = first_combo;
+        this.anim.Rewind(first_combo.animName);
+        this.anim.CrossFade(first_combo.animName);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void NextCombo () {
+        Attack_info atk_info = this.GetAttackInfo();
+        if ( atk_info.curCombo == null )
+            return;
+
+        // if we have input
+        if ( this.meleeButtonTriggered ) {
+            AnimationState curAnim = this.anim[atk_info.curCombo.animName];
+            Combo_info nextCombo = atk_info.curCombo.next;
+            if ( nextCombo == null )
+                return;
+
+            // if we are in the valid input range
+            if ( curAnim.time >= atk_info.curCombo.validInputTime.x 
+                 && curAnim.time <= atk_info.curCombo.validInputTime.y )
+            {
+                this.anim.Rewind(atk_info.curCombo.animName);
+                this.anim.CrossFade(nextCombo.animName);
+                atk_info.curCombo = nextCombo;
+            }
+        }
     }
 
     // ------------------------------------------------------------------ 

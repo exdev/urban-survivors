@@ -1,0 +1,15 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" ctype="Workspace" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/user/jwu/script/system/WeaponBase.cs" ctype="Workbench">
+    <Files>
+      <File FileName="Assets/user/jwu/script/system/WeaponBase.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/Users/Johnny/dev/projects/urban_survivors/Assets/Editor/ex/SyncAnimModel.cs" line="73" />
+      <Breakpoint file="/Users/Johnny/dev/projects/urban_survivors/Assets/user/jwu/script/system/WeaponBase.cs" line="71" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />
+</Properties>

@@ -214,6 +214,7 @@ public class SpawnManager : MonoBehaviour {
                 pools[i].init();
                 gameobjLookupTable[pools[i].prefab] = pools[i];
             }
+            pools = null;
         }
     }
 

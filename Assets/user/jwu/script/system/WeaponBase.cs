@@ -75,6 +75,7 @@ public class WeaponBase : MonoBehaviour {
                                     "Are you insane? the weaponID is unknown!" );
                 this.weaponLookupTable[prefabInfo.id] = weaponGO;
             }
+            this.weaponList = null; // after we init Dictionary, we don't need the array.
         }
     }
 
