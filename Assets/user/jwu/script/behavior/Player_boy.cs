@@ -19,7 +19,6 @@ using System.Collections;
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
-[RequireComponent (typeof (Animation))]
 public class Player_boy : Player_base {
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -89,7 +88,28 @@ public class Player_boy : Player_base {
         }
 
         public override bool exec () {
-            return this.playerBoy.IsPlayingAnim("melee1_copy", 0.5f) == false;
+            Attack_info info = playerBoy.GetAttackInfo();
+            foreach ( Combo_info combo in info.combo_list ) {
+                bool attacking = this.playerBoy.IsPlayingAnim( combo.animName, combo.endTime );
+                if ( attacking )
+                    return true;
+            }
+            return false;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_Attack 
+    // ------------------------------------------------------------------ 
+
+    class Action_Attack : FSM.Action {
+        Player_boy playerBoy = null;
+        public Action_Attack ( Player_boy _playerBoy ) {
+            this.playerBoy = _playerBoy;
+        }
+
+        public override void exec () {
+            this.playerBoy.Attack();
         }
     }
 
@@ -100,8 +120,6 @@ public class Player_boy : Player_base {
     public Player_info info = new Player_info();
     public Transform weaponAnchor = null;
 
-    protected Animation anim = null;
-    protected FSM fsm = new FSM();
     protected Vector3 moveDir = Vector3.zero;
     protected bool meleeButtonTriggered = false;
     protected GameObject curWeapon = null;
@@ -120,7 +138,6 @@ public class Player_boy : Player_base {
         base.Start();
 
         // init the player basic values.
-        this.anim = gameObject.GetComponent(typeof(Animation)) as Animation;
         DebugHelper.Assert( this.weaponAnchor, "can't find WeaponAnchor");
 
         //
@@ -236,7 +253,7 @@ public class Player_boy : Player_base {
                                               null );
         // melee
         FSM.State state_melee = new FSM.State( "Melee", 
-                                               new Action_PlayAnim(this.anim,"melee1_copy"), 
+                                               new Action_Attack(this), 
                                                null,
                                                null );
 
@@ -263,11 +280,11 @@ public class Player_boy : Player_base {
         // melee to ...
         state_melee.AddTransition( new FSM.Transition( state_idle, 
                                                        new FSM.Condition_and(new FSM.Condition_not(cond_isMoving),
-                                                                             cond_isAttacking), 
+                                                                             new FSM.Condition_not(cond_isAttacking)), 
                                                        null ) );
         state_melee.AddTransition( new FSM.Transition( state_walk, 
                                                        new FSM.Condition_and(cond_isMoving,
-                                                                             cond_isAttacking), 
+                                                                             new FSM.Condition_not(cond_isAttacking)), 
                                                        null ) );
 
         // init fsm
@@ -320,6 +337,9 @@ public class Player_boy : Player_base {
     public void ChangeWeapon( WeaponBase.WeaponID _id ) {
         GameObject weaponGO = WeaponBase.Instance().GetWeapon(_id); 
         weaponGO.SetActiveRecursively(true);
+        Attack_info attackInfo = weaponGO.GetComponent<Attack_info>();
+        attackInfo.setOwnerInfo(this.info);
+
         this.curWeapon = weaponGO; 
         this.curWeapon.transform.parent = this.weaponAnchor;
         this.curWeapon.transform.localPosition = Vector3.zero;
@@ -327,6 +347,17 @@ public class Player_boy : Player_base {
         // TEMP HACK { 
         this.curWeapon.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 90.0f);
         // } TEMP HACK end 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Attack () {
+        // TODO { 
+        this.anim.Rewind("melee1_copy");
+        this.anim.CrossFade("melee1_copy");
+        // } TODO end 
     }
 
     // ------------------------------------------------------------------ 
@@ -345,11 +376,7 @@ public class Player_boy : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public bool IsPlayingAnim ( string _animName, float _percentage = 1.0f ) { 
-        AnimationState state = this.anim[_animName];
-        DebugHelper.Assert( state != null, "can't find animation state: " + _animName );
-        return state.enabled && state.time/state.length <= _percentage;
-    }
+    public Attack_info GetAttackInfo () { return this.curWeapon.GetComponent<Attack_info>(); }
 
     // ------------------------------------------------------------------ 
     // Desc: 

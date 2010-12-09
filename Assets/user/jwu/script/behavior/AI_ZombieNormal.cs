@@ -19,7 +19,7 @@ using System.Collections;
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
-public class AI_ZombieNormal : Steer {
+public class AI_ZombieNormal : Actor {
 
     ///////////////////////////////////////////////////////////////////////////////
     // actions, conditions
@@ -51,14 +51,15 @@ public class AI_ZombieNormal : Steer {
     // Desc: Action_Attack 
     // ------------------------------------------------------------------ 
 
-    class Action_Attack : FSM.Action_periodic {
+    // class Action_Attack : FSM.Action_periodic {
+    class Action_Attack : FSM.Action {
         Animation anim = null;
-        public Action_Attack ( float _interval, Animation _anim ) {
-            base.Interval = _interval;
+        public Action_Attack ( Animation _anim ) {
             this.anim = _anim;
         }
 
         public override void exec () {
+            this.anim.Rewind("attack1");
             this.anim.CrossFade("attack1");
         }
     }
@@ -134,6 +135,22 @@ public class AI_ZombieNormal : Steer {
 
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: Condition_isAttacking 
+    // ------------------------------------------------------------------ 
+
+    class Condition_isAttacking : FSM.Condition {
+        AI_ZombieNormal zombieNormal = null;
+
+        public Condition_isAttacking ( AI_ZombieNormal _zombieNormal ) {
+            this.zombieNormal = _zombieNormal;
+        }
+
+        public override bool exec () {
+            return this.zombieNormal.IsPlayingAnim("attack1");
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -143,8 +160,6 @@ public class AI_ZombieNormal : Steer {
         braking,
     };
 
-    protected Animation anim;
-    protected FSM fsm = new FSM();
     protected Vector3 targetPos;
     protected SteeringState steeringState = SteeringState.braking;
 
@@ -214,8 +229,8 @@ public class AI_ZombieNormal : Steer {
                                                      new Action_StopMoving(this) );
         // attack
         FSM.State state_attack = new FSM.State( "Attack", 
-                                                null, 
-                                                new Action_Attack(0.5f,this.anim), 
+                                                new Action_Attack(this.anim), 
+                                                null,
                                                 null );
 
         // ======================================================== 
@@ -223,6 +238,7 @@ public class AI_ZombieNormal : Steer {
         // ======================================================== 
 
         FSM.Condition cond_isPlayerInAttackRange = new Condition_isPlayerInAttackRange(this,30.0f);
+        FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
 
         // ======================================================== 
         // setup transitions
@@ -242,8 +258,8 @@ public class AI_ZombieNormal : Steer {
                                                              null ) );
 
         // attack to ...
-        state_attack.AddTransition( new FSM.Transition ( state_seekPlayers, 
-                                                         new FSM.Condition_not(cond_isPlayerInAttackRange),
+        state_attack.AddTransition( new FSM.Transition ( state_idle, 
+                                                         new FSM.Condition_not(cond_isAttacking),
                                                          null ) );
 
         // init fsm
@@ -328,9 +344,12 @@ public class AI_ZombieNormal : Steer {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnCollisionEnter ( Collision _other ) {
-        transform.forward = -_other.transform.forward;
-        anim.Rewind("hit2");
-        anim.CrossFade("hit2");
+    void OnTriggerEnter ( Collider _other ) {
+        anim.Rewind("hit1");
+        anim.CrossFade("hit1");
+
+        // transform.forward = -_other.transform.forward;
+        // anim.Rewind("hit2");
+        // anim.CrossFade("hit2");
     }
 }

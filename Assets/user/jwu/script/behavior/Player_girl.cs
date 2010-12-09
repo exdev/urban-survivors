@@ -24,7 +24,6 @@ public class Player_girl : Player_base {
 
     // private
     private Vector3 moveDir;
-    private Animation anim;
     private Vector3 aimDir = Vector3.forward;
     // TEMP DISABLE: private bool rotating = false;
 

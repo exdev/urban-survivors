@@ -25,6 +25,7 @@ using System.Collections.Generic;
 public class Combo_info {
     public string animName = "unknown";
     public Vector2 validInputTime = new Vector2(0.0f,1.0f);
+    public float endTime = -1.0f; 
     public bool canCharge = false;
     // TODO: public collision info 
 }
@@ -40,18 +41,22 @@ public class Attack_info : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     public Combo_info[] combo_list;
+    protected Actor_info owner_info = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
     ///////////////////////////////////////////////////////////////////////////////
 
+    public void setOwnerInfo ( Actor_info _info ) {
+        this.owner_info = _info;
+    }
+
 	// Use this for initialization
 	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+        foreach ( Combo_info combo in this.combo_list ) {
+            DebugHelper.Assert(combo.endTime!=-1.0f, "endTime can't be minus!");
+            DebugHelper.Assert(combo.animName!="unknown", "animName can't be unknown!");
+            DebugHelper.Assert(combo.validInputTime.x < combo.validInputTime.y, "input time is invalid!");
+        }
 	}
 }

@@ -20,7 +20,7 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 [RequireComponent (typeof (Animation))]
-public class Player_girl_rigid : Player_base {
+public class Player_girl_rigid : Player_base_old {
 
     // private
     private Vector3 moveDir;

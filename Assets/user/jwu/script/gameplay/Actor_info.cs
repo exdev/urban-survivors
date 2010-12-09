@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : Player_info.cs
+// File         : Actor_info.cs
 // Author       : Wu Jie 
-// Last Change  : 12/08/2010 | 15:16:49 PM | Wednesday,December
+// Last Change  : 12/09/2010 | 16:32:35 PM | Thursday,December
 // Description  : 
 // ======================================================================================
 
@@ -13,14 +13,18 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// class Player_info
+// defines
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// class Actor_info
 // 
 // Purpose: 
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
 [System.Serializable]
-public class Player_info {
+public class Actor_info {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -28,6 +32,23 @@ public class Player_info {
 
     public float curHP = 60.0f;
     public float maxHP = 100.0f;
+    public bool isBerserk = false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// class Player_info
+// 
+// Purpose: 
+// 
+///////////////////////////////////////////////////////////////////////////////
+
+[System.Serializable]
+public class Player_info : Actor_info {
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // properties
+    ///////////////////////////////////////////////////////////////////////////////
+
     public WeaponBase.WeaponID weapon1 = WeaponBase.WeaponID.unknown;
     public WeaponBase.WeaponID weapon2 = WeaponBase.WeaponID.unknown;
 
