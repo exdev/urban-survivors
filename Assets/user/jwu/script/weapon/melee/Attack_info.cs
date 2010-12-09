@@ -42,18 +42,12 @@ public class Attack_info : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     public Combo_info[] combo_list;
-    protected Actor_info owner_info = null;
     [System.NonSerialized] public Combo_info combo_entry = null;
     [System.NonSerialized] public Combo_info curCombo = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
     ///////////////////////////////////////////////////////////////////////////////
-
-    //
-    public void setOwnerInfo ( Actor_info _info ) {
-        this.owner_info = _info;
-    }
 
 	// Use this for initialization
 	void Start () {

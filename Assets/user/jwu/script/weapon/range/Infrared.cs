@@ -55,8 +55,8 @@ public class Infrared : MonoBehaviour {
         LineRenderer lr = GetComponent(typeof(LineRenderer)) as LineRenderer;
         if ( lr ) {
             // This would cast rays only against colliders in layer x.
-            // ignore layer: player_bullet, player, trigger
-            int layerMask = 1 << Layer.player_bullet 
+            // ignore layer: bullet_player, player, trigger
+            int layerMask = 1 << Layer.bullet_player 
                 | 1 << Layer.player 
                 | 1 << Layer.trigger;
 

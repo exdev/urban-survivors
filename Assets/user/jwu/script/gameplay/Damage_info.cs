@@ -16,7 +16,7 @@ using System.Collections;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
-[System.Serializable]
-public class Damage_info {
+public class Damage_info : MonoBehaviour {
+    [System.NonSerialized] public Actor_info owner_info = null;
     public float DP = 20.0f;
 }

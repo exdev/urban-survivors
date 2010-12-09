@@ -360,11 +360,9 @@ public class Player_boy : Player_base {
         this.curWeapon.transform.localPosition = Vector3.zero;
         this.curWeapon.transform.localRotation = Quaternion.identity;
         // TEMP HACK { 
-        // this.curWeapon.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 90.0f);
+        this.curWeapon.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 90.0f);
         // } TEMP HACK end 
-
-        Attack_info attackInfo = this.GetAttackInfo();
-        attackInfo.setOwnerInfo(this.player_info);
+        this.SetCurWeaponOwner();
     }
 
     // ------------------------------------------------------------------ 
@@ -423,6 +421,11 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     public Attack_info GetAttackInfo () { return this.curWeapon.GetComponent<Attack_info>(); }
+    public Damage_info GetDamageInfo () { return this.curWeapon.GetComponent<Damage_info>(); }
+    protected void SetCurWeaponOwner () { 
+        Damage_info dmgInfo = this.GetDamageInfo();
+        dmgInfo.owner_info = this.player_info; 
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 

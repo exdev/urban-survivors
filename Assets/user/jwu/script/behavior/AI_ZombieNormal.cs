@@ -81,6 +81,22 @@ public class AI_ZombieNormal : Actor {
     }
 
     // ------------------------------------------------------------------ 
+    // Desc: Action_ActOnHit 
+    // ------------------------------------------------------------------ 
+
+    class Action_ActOnHit : FSM.Action {
+        AI_ZombieNormal zombieNormal = null;
+
+        public Action_ActOnHit ( AI_ZombieNormal _zombieNormal ) {
+            this.zombieNormal = _zombieNormal;
+        }
+
+        public override void exec () {
+            this.zombieNormal.ActOnHit();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     // Desc: Condition_playerInRange 
     // ------------------------------------------------------------------ 
 
@@ -151,6 +167,22 @@ public class AI_ZombieNormal : Actor {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Condition_isOnHit : FSM.Condition {
+        AI_ZombieNormal zombieNormal = null;
+
+        public Condition_isOnHit ( AI_ZombieNormal _zombieNormal ) {
+            this.zombieNormal = _zombieNormal;
+        }
+
+        public override bool exec () {
+            return this.zombieNormal.isOnHit();
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -160,8 +192,17 @@ public class AI_ZombieNormal : Actor {
         braking,
     };
 
+    public enum HitState {
+        none,
+        light,
+        normal,
+        backoff,
+    };
+
+    public Actor_info zombie_info = new Actor_info();
     protected Vector3 targetPos;
     protected SteeringState steeringState = SteeringState.braking;
+    protected HitState hitState = HitState.none;
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
@@ -232,6 +273,11 @@ public class AI_ZombieNormal : Actor {
                                                 new Action_Attack(this.anim), 
                                                 null,
                                                 null );
+        // get hit
+        FSM.State state_onHit = new FSM.State( "OnHit", 
+                                               new Action_ActOnHit(this), 
+                                               null,
+                                               null );
 
         // ======================================================== 
         // condition 
@@ -239,6 +285,7 @@ public class AI_ZombieNormal : Actor {
 
         FSM.Condition cond_isPlayerInAttackRange = new Condition_isPlayerInAttackRange(this,30.0f);
         FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
+        FSM.Condition cond_isOnHit = new Condition_isOnHit(this);
 
         // ======================================================== 
         // setup transitions
@@ -248,6 +295,9 @@ public class AI_ZombieNormal : Actor {
         state_idle.AddTransition( new FSM.Transition( state_seekPlayers, 
                                                       new Condition_playerInRange( this.transform, 5.0f ), 
                                                       null ) );
+        state_idle.AddTransition( new FSM.Transition( state_onHit,
+                                                      cond_isOnHit,
+                                                      null ) );
 
         // seekPlayers to ...
         state_seekPlayers.AddTransition( new FSM.Transition( state_idle, 
@@ -256,11 +306,21 @@ public class AI_ZombieNormal : Actor {
         state_seekPlayers.AddTransition( new FSM.Transition( state_attack,
                                                              cond_isPlayerInAttackRange,
                                                              null ) );
+        state_seekPlayers.AddTransition( new FSM.Transition( state_onHit,
+                                                             cond_isOnHit,
+                                                             null ) );
 
         // attack to ...
         state_attack.AddTransition( new FSM.Transition ( state_idle, 
                                                          new FSM.Condition_not(cond_isAttacking),
                                                          null ) );
+        state_attack.AddTransition( new FSM.Transition( state_onHit,
+                                                        cond_isOnHit,
+                                                        null ) );
+        // on hit to ...
+        state_onHit.AddTransition( new FSM.Transition ( state_idle, 
+                                                        new FSM.Condition_not(cond_isOnHit),
+                                                        null ) );
 
         // init fsm
         fsm.init(state_idle);
@@ -314,6 +374,17 @@ public class AI_ZombieNormal : Actor {
         }
         ApplySteeringForce(force);
 
+        // update hit state
+        // TODO: refine the code { 
+        bool result = false;
+        if ( this.hitState == HitState.normal )
+            result = this.IsPlayingAnim("hit1");
+        else if ( this.hitState == HitState.light )
+            result = this.IsPlayingAnim("hit2");
+        if ( result == false )
+            this.hitState = HitState.none;
+        // } TODO end 
+
         // DEBUG { 
         // draw velocity
         Vector3 vel = base.Velocity(); 
@@ -344,12 +415,47 @@ public class AI_ZombieNormal : Actor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    // void OnCollisionEnter ( Collision _other ) {
     void OnTriggerEnter ( Collider _other ) {
-        anim.Rewind("hit1");
-        anim.CrossFade("hit1");
+        Debug.Log("trigger enter");
+        if ( _other.gameObject.layer == Layer.melee_player 
+          || _other.gameObject.layer == Layer.bullet_player ) 
+        {
+            Damage_info dmgInfo = _other.gameObject.GetComponent<Damage_info>();
+            Actor_info actorInfo = dmgInfo.owner_info;
+            // this.zombie_info
+            // TODO: calculate damage
 
-        // transform.forward = -_other.transform.forward;
-        // anim.Rewind("hit2");
-        // anim.CrossFade("hit2");
+            this.hitState = HitState.normal;
+
+            // TODO: should we use hitInfo??? { 
+            // TODO: if hit light, face it { 
+            // transform.forward = -_other.transform.forward;
+            // } TODO end 
+            // } TODO end 
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void ActOnHit () {
+        // TODO: may be use data-driven
+        anim.Rewind();
+        if ( this.hitState == HitState.normal ) {
+            anim.CrossFade("hit1");
+        }
+        else if ( this.hitState == HitState.light ) {
+            anim.CrossFade("hit2");
+        }
+    } 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool isOnHit () {
+        return this.hitState != HitState.none;
     }
 }
