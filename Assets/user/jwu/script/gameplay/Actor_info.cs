@@ -26,10 +26,22 @@ using System.Collections;
 [System.Serializable]
 public class Actor_info {
 
+    public enum ActorType {
+        unknown,
+        player_boy,
+        player_girl,
+        zombie_normal,
+        zombie_aimless,
+        zombie_fat,
+        zombie_swat,
+        zombie_spider
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    public ActorType actorType = ActorType.unknown; 
     public float curHP = 60.0f;
     public float maxHP = 100.0f;
     public bool isBerserk = false;

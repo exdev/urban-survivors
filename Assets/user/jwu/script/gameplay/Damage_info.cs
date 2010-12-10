@@ -17,6 +17,15 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 public class Damage_info : MonoBehaviour {
-    [System.NonSerialized] public Actor_info owner_info = null;
+    public enum DamageType {
+        none,
+        solid_melee,
+        energy_melee,
+        solid_bullet,
+        energy_bullet,
+    }
+
+    public DamageType damageType = DamageType.none;
     public float DP = 20.0f;
+    [System.NonSerialized] public Actor_info owner_info = null;
 }

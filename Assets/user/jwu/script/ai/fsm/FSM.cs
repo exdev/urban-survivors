@@ -43,33 +43,38 @@ public class FSM {
     } 
 
     public class Action_periodic : Action {
-        private bool FirstTick = false;
-        private float LastTick = 0.0f;
+        private bool firstTick = false;
+        private float lastTick = 0.0f;
 
-        public float Delay = 0.0f;
-        public float Interval = 0.0f;
+        public float delay = 0.0f;
+        public float interval = 0.0f;
+
+        public Action_periodic ( float _delay, float _interval ) {
+            this.delay = _delay;
+            this.interval = _interval;
+        }
 
         public void initTimer ( float _initTime ) { 
-            LastTick = _initTime; 
-            FirstTick = true;
+            this.lastTick = _initTime; 
+            this.firstTick = true;
         }
 
         public bool tickTimer () {
-            float deltaTime = Time.time - LastTick;
+            float deltaTime = Time.time - this.lastTick;
 
             // if we are first time tick, and have Delay
-            if ( FirstTick && Delay > 0.0f ) {
-                FirstTick = false;
-                if ( deltaTime >= Delay ) {
-                    LastTick = Time.time;
+            if ( this.firstTick && this.delay > 0.0f ) {
+                this.firstTick = false;
+                if ( deltaTime >= this.delay ) {
+                    this.lastTick = Time.time;
                     return true;
                 }
                 return false;
             }
 
             // check interval time 
-            if ( deltaTime >= Interval ) {
-                LastTick = Time.time;
+            if ( deltaTime >= this.interval ) {
+                this.lastTick = Time.time;
                 return true;
             }
             return false;
@@ -245,10 +250,12 @@ public class FSM {
         // perform the actions
         foreach ( Action act in this.cur_actions ) {
             Action_periodic act_p = act as Action_periodic;
-            if ( act_p != null && act_p.tickTimer() )
-                act_p.exec ();
-            else
-                act.exec ();
+            if ( act_p != null ) {
+                if ( act_p.tickTimer() )
+                    act_p.exec ();
+                continue;
+            }
+            act.exec ();
         }
 	}
 }

@@ -32,8 +32,9 @@ public class AI_ZombieNormal : Actor {
     class Action_MoveToNearestPlayer : FSM.Action_periodic {
         AI_ZombieNormal zombieNormal = null;
 
-        public Action_MoveToNearestPlayer ( float _interval, AI_ZombieNormal _zombieNormal ) {
-            base.Interval = _interval;
+        public Action_MoveToNearestPlayer ( float _interval, AI_ZombieNormal _zombieNormal ) 
+            : base ( 0.0f, _interval )
+        {
             this.zombieNormal = _zombieNormal;
         }
 
@@ -97,6 +98,23 @@ public class AI_ZombieNormal : Actor {
     }
 
     // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Action_ActDead : FSM.Action {
+        AI_ZombieNormal zombieNormal = null;
+
+        public Action_ActDead ( AI_ZombieNormal _zombieNormal ) {
+            this.zombieNormal = _zombieNormal;
+        }
+
+        public override void exec () {
+            // this.zombieNormal.ActOnHit();
+            // TODO: on dead
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     // Desc: Condition_playerInRange 
     // ------------------------------------------------------------------ 
 
@@ -120,6 +138,20 @@ public class AI_ZombieNormal : Actor {
             return false; 
         } 
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Condition_arriveDestination : FSM.Condition {
+        AI_ZombieNormal zombieNormal = null;
+        public Condition_arriveDestination ( AI_ZombieNormal _zombieNormal ) {
+            this.zombieNormal = _zombieNormal;
+        }
+        public override bool exec () {
+            return this.zombieNormal.arriveDestination();
+        }
+    } 
 
     // ------------------------------------------------------------------ 
     // Desc: Condition_isPlayerInAttackRange
@@ -213,12 +245,12 @@ public class AI_ZombieNormal : Actor {
     // ------------------------------------------------------------------ 
 
     public void Seek ( Vector3 _pos ) {
-        targetPos = _pos;
-        steeringState = SteeringState.seeking;
+        this.targetPos = _pos;
+        this.steeringState = SteeringState.seeking;
     }
 
     public void Stop () {
-        steeringState = SteeringState.braking;
+        this.steeringState = SteeringState.braking;
     }
 
     // ------------------------------------------------------------------ 
@@ -261,7 +293,7 @@ public class AI_ZombieNormal : Actor {
         // idle
         FSM.State state_idle = new FSM.State( "Idle", 
                                               new Action_PlayAnim(this.anim,"idle1"), 
-                                              null, 
+                                              new Action_RandomAnim(4.0f, 4.0f, this.anim, new string[]{"idle1","idle2"} ),
                                               null );
         // seekPlayers
         FSM.State state_seekPlayers = new FSM.State( "SeekPlayers", 
@@ -276,6 +308,11 @@ public class AI_ZombieNormal : Actor {
         // get hit
         FSM.State state_onHit = new FSM.State( "OnHit", 
                                                new Action_ActOnHit(this), 
+                                               null,
+                                               null );
+        // dead
+        FSM.State state_Dead = new FSM.State( "Dead", 
+                                               new Action_ActDead(this), 
                                                null,
                                                null );
 
@@ -301,7 +338,7 @@ public class AI_ZombieNormal : Actor {
 
         // seekPlayers to ...
         state_seekPlayers.AddTransition( new FSM.Transition( state_idle, 
-                                                             new FSM.Condition_not( new Condition_playerInRange( this.transform, 7.0f ) ), 
+                                                             new FSM.Condition_not( new Condition_playerInRange( this.transform, 7.0f ) ) , 
                                                              null ) );
         state_seekPlayers.AddTransition( new FSM.Transition( state_attack,
                                                              cond_isPlayerInAttackRange,
@@ -309,7 +346,6 @@ public class AI_ZombieNormal : Actor {
         state_seekPlayers.AddTransition( new FSM.Transition( state_onHit,
                                                              cond_isOnHit,
                                                              null ) );
-
         // attack to ...
         state_attack.AddTransition( new FSM.Transition ( state_idle, 
                                                          new FSM.Condition_not(cond_isAttacking),
@@ -351,6 +387,11 @@ public class AI_ZombieNormal : Actor {
         // update state machine
         fsm.tick();
 
+        // stop if we arrive target position
+        if ( (this.targetPos - transform.position).magnitude < 0.1f ) {
+            this.Stop();
+        }
+
         // handle steering
         Vector3 force = Vector3.zero;
         if ( this.steeringState == SteeringState.seeking ) {
@@ -360,7 +401,7 @@ public class AI_ZombieNormal : Actor {
 
                 // face the target
                 float rot_speed = 2.0f; // TEMP
-                Vector3 dir = targetPos - transform.position;
+                Vector3 dir = this.targetPos - transform.position;
                 Quaternion wanted_rot = Quaternion.LookRotation(dir);
                 wanted_rot.x = 0.0f; wanted_rot.z = 0.0f;
                 transform.rotation = Quaternion.Slerp ( 
@@ -413,6 +454,9 @@ public class AI_ZombieNormal : Actor {
         // float cosTheta = Vector3.Dot ( transform.forward, targetDir );
         // DebugHelper.ScreenPrint ( "angle: " + Mathf.Acos(cosTheta) * Mathf.Rad2Deg );
         // DebugHelper.ScreenPrint ( "target pos: " + this.targetPos );
+        foreach ( AnimationState animS in this.anim ) {
+            DebugHelper.ScreenPrint ( animS.name + ": " + animS.enabled );
+        }
         // } DEBUG end 
     }
 
@@ -422,17 +466,14 @@ public class AI_ZombieNormal : Actor {
 
     // void OnCollisionEnter ( Collision _other ) {
     void OnTriggerEnter ( Collider _other ) {
-        Debug.Log("trigger enter");
         if ( _other.gameObject.layer == Layer.melee_player 
           || _other.gameObject.layer == Layer.bullet_player ) 
         {
             Damage_info dmgInfo = _other.gameObject.GetComponent<Damage_info>();
-            Actor_info actorInfo = dmgInfo.owner_info;
-            // this.zombie_info
-            // TODO: calculate damage
+            DamageRule.Instance().CalculateDamage( this.zombie_info, dmgInfo );
 
+            // TODO:::::::
             this.hitState = HitState.normal;
-
             // TODO: should we use hitInfo??? { 
             // TODO: if hit light, face it { 
             // transform.forward = -_other.transform.forward;
@@ -462,5 +503,13 @@ public class AI_ZombieNormal : Actor {
 
     public bool isOnHit () {
         return this.hitState != HitState.none;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool arriveDestination () {
+        return (this.targetPos - transform.position).magnitude < 0.1f;
     }
 }

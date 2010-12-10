@@ -24,10 +24,6 @@ public class GameRules : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    ///////////////////////////////////////////////////////////////////////////////
-    // members
-    ///////////////////////////////////////////////////////////////////////////////
-
     protected static GameRules instance  = null;
     protected GameObject playerBoy = null;
     protected GameObject playerGirl = null;
@@ -41,9 +37,7 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public static GameRules Instance() {
-        return instance;
-    }
+    public static GameRules Instance() { return instance; }
 
     // ------------------------------------------------------------------ 
     // Desc: 
