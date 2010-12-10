@@ -1,5 +1,5 @@
 // ======================================================================================
-// File         : Actor_info.cs
+// File         : ActorInfo.cs
 // Author       : Wu Jie 
 // Last Change  : 12/09/2010 | 16:32:35 PM | Thursday,December
 // Description  : 
@@ -17,14 +17,14 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// class Actor_info
+// class ActorInfo
 // 
 // Purpose: 
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
 [System.Serializable]
-public class Actor_info {
+public class ActorInfo {
 
     public enum ActorType {
         unknown,
@@ -55,7 +55,7 @@ public class Actor_info {
 ///////////////////////////////////////////////////////////////////////////////
 
 [System.Serializable]
-public class Player_info : Actor_info {
+public class Player_info : ActorInfo {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties

@@ -27,6 +27,12 @@ public class DamageRule : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    public float[] hitBackForceList;
+    protected Dictionary<DamageInfo.HitBackType,float> hitBackTypeToForce = new Dictionary<DamageInfo.HitBackType,float>();
+
+    public string[] hitAnimList;
+    protected Dictionary<HitInfo.HitType,string> hitTypeToAnim = new Dictionary<HitInfo.HitType,string>(); 
+
     protected static DamageRule instance  = null;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -47,38 +53,69 @@ public class DamageRule : MonoBehaviour {
         if( instance == null ) {
             instance = this;
         }
+
+        //
+        for ( int i = 0; i < this.hitBackForceList.Length; ++i ) {
+            this.hitBackTypeToForce[(DamageInfo.HitBackType)i] = this.hitBackForceList[i];
+        }
+        this.hitBackForceList = null;
+
+        //
+        for ( int i = 0; i < this.hitAnimList.Length; ++i ) {
+            this.hitTypeToAnim[(HitInfo.HitType)i] = this.hitAnimList[i];
+        }
+        this.hitAnimList = null;
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void CalculateDamage ( Actor_info _defender, Damage_info _dmgInfo ) 
-    {
-        if ( _dmgInfo.damageType == Damage_info.DamageType.solid_melee ) {
-            SolidMeleeDamage(_defender,_dmgInfo);
-        }
-        else if ( _dmgInfo.damageType == Damage_info.DamageType.energy_melee ) {
-            // TODO:
-        }
-        else if ( _dmgInfo.damageType == Damage_info.DamageType.solid_bullet ) {
-            // TODO:
-        }
-        else if ( _dmgInfo.damageType == Damage_info.DamageType.energy_bullet ) {
-            // TODO:
-        }
+    public float HitBackForce ( DamageInfo.HitBackType _type ) {
+        return this.hitBackTypeToForce[_type]; 
+    } 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public string HitAnim ( HitInfo.HitType _type ) {
+        return this.hitTypeToAnim[_type]; 
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void SolidMeleeDamage ( Actor_info _defender, Damage_info _dmgInfo ) 
+    public float CalculateDamage ( ActorInfo _defender, DamageInfo _dmgInfo ) 
     {
-        Actor_info attacker = _dmgInfo.owner_info;
+        if ( _dmgInfo.damageType == DamageInfo.DamageType.solid_melee ) {
+            return SolidMeleeDamage(_defender,_dmgInfo);
+        }
+        else if ( _dmgInfo.damageType == DamageInfo.DamageType.energy_melee ) {
+            // TODO:
+        }
+        else if ( _dmgInfo.damageType == DamageInfo.DamageType.solid_bullet ) {
+            // TODO:
+        }
+        else if ( _dmgInfo.damageType == DamageInfo.DamageType.energy_bullet ) {
+            // TODO:
+        }
+        return 0.0f;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    float SolidMeleeDamage ( ActorInfo _defender, DamageInfo _dmgInfo ) 
+    {
+        ActorInfo attacker = _dmgInfo.owner_info;
         if ( attacker.isBerserk ) {
             // TODO: there is no document about boy's damage in berserk state
         }
-        _defender.curHP -= _dmgInfo.DP;
+        float dmgOutput = _dmgInfo.DP;
+        _defender.curHP -= dmgOutput;
+        return dmgOutput;
     }
 }

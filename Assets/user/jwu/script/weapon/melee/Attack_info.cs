@@ -42,6 +42,7 @@ public class Attack_info : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     public Combo_info[] combo_list;
+    public float speed = 2.0f;
     [System.NonSerialized] public Combo_info combo_entry = null;
     [System.NonSerialized] public Combo_info curCombo = null;
 

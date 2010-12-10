@@ -93,17 +93,6 @@ public class Player_boy : Player_base {
                 return false;
             return this.playerBoy.IsPlayingAnim( atk_info.curCombo.animName, 
                                                  atk_info.curCombo.endTime );
-
-            // DELME { 
-            // Combo_info combo = atk_info.combo_entry;
-            // while ( combo != null ) {
-            //     bool attacking = this.playerBoy.IsPlayingAnim( combo.animName, combo.endTime );
-            //     if ( attacking )
-            //         return true;
-            //     combo = combo.next;
-            // }
-            // return false;
-            // } DELME end 
         }
     }
 
@@ -175,14 +164,9 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
 	void Update () {
-        //
         HandleInput();
-
-        // update state machine
-        this.fsm.tick();
-
-        // handle steering
-        ProcessMovement ();
+        this.fsm.tick(); // update state machine
+        ProcessMovement (); // handle steering
 
         // reset the internal state.
         this.meleeButtonTriggered = false;
@@ -370,6 +354,7 @@ public class Player_boy : Player_base {
         Attack_info atk_info = this.GetAttackInfo();
         Combo_info first_combo = atk_info.combo_entry;
         atk_info.curCombo = first_combo;
+        this.anim[first_combo.animName].normalizedSpeed = atk_info.speed;
         this.anim.Rewind(first_combo.animName);
         this.anim.CrossFade(first_combo.animName);
     }
@@ -394,6 +379,7 @@ public class Player_boy : Player_base {
             if ( curAnim.time >= atk_info.curCombo.validInputTime.x 
                  && curAnim.time <= atk_info.curCombo.validInputTime.y )
             {
+                this.anim[nextCombo.animName].normalizedSpeed = atk_info.speed;
                 this.anim.Rewind(atk_info.curCombo.animName);
                 this.anim.CrossFade(nextCombo.animName);
                 atk_info.curCombo = nextCombo;
@@ -418,9 +404,9 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     public Attack_info GetAttackInfo () { return this.curWeapon.GetComponent<Attack_info>(); }
-    public Damage_info GetDamageInfo () { return this.curWeapon.GetComponent<Damage_info>(); }
+    public DamageInfo GetDamageInfo () { return this.curWeapon.GetComponent<DamageInfo>(); }
     protected void SetCurWeaponOwner () { 
-        Damage_info dmgInfo = this.GetDamageInfo();
+        DamageInfo dmgInfo = this.GetDamageInfo();
         dmgInfo.owner_info = this.player_info; 
     }
 

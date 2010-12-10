@@ -51,11 +51,15 @@ public class Actor : Steer {
 
     public bool IsPlayingAnim ( string _animName, float _endTime = -1.0f ) { 
         AnimationState state = this.anim[_animName];
-        DebugHelper.Assert( state != null, "can't find animation state: " + _animName );
+        if ( state == null )
+            return false;
         float endTime = _endTime;
+        bool result = this.anim.IsPlaying(_animName);
+
         if ( endTime < 0.0f )
-            endTime = state.length;
-        return state.enabled && state.time <= endTime;
+            return result;
+
+        return result && state.time <= endTime;
     }
 }
 
