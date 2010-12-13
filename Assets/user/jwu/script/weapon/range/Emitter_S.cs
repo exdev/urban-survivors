@@ -35,22 +35,19 @@ public class Emitter_S : Emitter {
 
     public override void Emit ( GameObject _bullet ) {
         // create a bullet, and rotate it based on the vector inputRotation
-
         float half_ang = this.angle * 0.5f;
 
         for ( int i = 0; i < this.max_bullet; ++i ) {
-            Quaternion rot = transform.rotation;
+            Quaternion rot = this.anchor.rotation;
             rot.eulerAngles = new Vector3( rot.eulerAngles.x, 
                                            rot.eulerAngles.y + Random.Range(-half_ang, half_ang),  
                                            rot.eulerAngles.z 
                                            );
 
-            // KEEPME: var spawn_bullet:GameObject = Instantiate(_bullet, transform.position, rot );
-            GameObject spawn_bullet = SpawnManager.Instance().Spawn(_bullet, transform.position, rot );
-            if ( spawn_bullet == null ) {
-                Debug.Log("failed to spawn bullet");
-            }
-            spawn_bullet.transform.position += Random.Range(0.0f,3.0f) * spawn_bullet.transform.forward;
+            // KEEPME: var spawn_bullet:GameObject = Instantiate(_bullet, this.anchor.position, rot );
+            GameObject spawn_bullet = SpawnManager.Instance().Spawn(_bullet, this.anchor.position, rot );
+            DebugHelper.Assert( spawn_bullet, "failed to spawn bullet" );
+            // DELME: spawn_bullet.transform.position += Random.Range(0.0f,3.0f) * spawn_bullet.transform.forward;
         }
     }
 }

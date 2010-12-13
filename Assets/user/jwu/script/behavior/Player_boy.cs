@@ -158,10 +158,6 @@ public class Player_boy : Player_base {
         this.fsm.tick(); // update state machine
         ProcessMovement (); // handle steering
 
-        // reset the internal state.
-        this.meleeButtonTriggered = false;
-        this.moveDir = Vector3.zero; 
-
         // DEBUG { 
         // draw velocity
         Vector3 vel = base.Velocity(); 
@@ -178,6 +174,16 @@ public class Player_boy : Player_base {
         DebugHelper.ScreenPrint ( "Player_boy current state: " + this.fsm.CurrentState().name );
         // } DEBUG end 
 	}
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void LateUpdate () {
+        // reset the internal state.
+        this.meleeButtonTriggered = false;
+        this.moveDir = Vector3.zero; 
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 

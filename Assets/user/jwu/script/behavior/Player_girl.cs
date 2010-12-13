@@ -23,16 +23,14 @@ using System.Collections;
 public class Player_girl : Player_base {
 
     // private
-    private Vector3 moveDir;
+    private Vector3 moveDir = Vector3.zero;
     private Vector3 aimDir = Vector3.forward;
-    // TEMP DISABLE: private bool rotating = false;
+    // DISABLE: private bool rotating = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public float degreeToRot = 15.0f;
-    public float rotTime = 1.0f;
     public float degreePlayMoveLeftRight = 60.0f;
 
     // Q: why don't we just use UpperBody in this game?
@@ -55,7 +53,8 @@ public class Player_girl : Player_base {
 	protected new void Start () {
         base.Start();
         DebugHelper.Assert( degreePlayMoveLeftRight <= 90.0f, "the degree can't larger than 90.0" );
-        initAnim ();
+        InitAnim ();
+        InitFSM ();
 	}
 	
     // ------------------------------------------------------------------ 
@@ -63,16 +62,11 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
 	void Update () {
-        // DEBUG { 
-        Vector3 velocity = controller.velocity;
-        DebugHelper.ScreenPrint( "velocity: " + velocity );
-        Debug.DrawLine ( transform.position, transform.position + velocity, Color.white );
-        // } DEBUG end 
-
-        //
         HandleInput ();
-        ProcessMovement ();
-        ProcessAnimation ();
+        // TODO: this.fsm.tick(); // update state machine
+        ProcessMovement (); // handle steering
+
+        ProcessAnimation (); // DELME
 
         // DEBUG { 
         // draw velocity
@@ -85,6 +79,9 @@ public class Player_girl : Player_base {
         DebugHelper.DrawLine ( transform.position, 
                                transform.position + acc,
                                new Color(1.0f,0.0f,1.0f) );
+
+        // debug info
+        // DebugHelper.ScreenPrint ( "Player_girl current state: " + this.fsm.CurrentState().name );
         // } DEBUG end 
 	}
 
@@ -94,13 +91,16 @@ public class Player_girl : Player_base {
 
     void LateUpdate () {
         PostAnim ();
+
+        // reset the internal state.
+        this.moveDir = Vector3.zero; 
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    private void initAnim () {
+    private void InitAnim () {
         // get the animation component
         anim = gameObject.GetComponent(typeof(Animation)) as Animation;
 
@@ -138,10 +138,69 @@ public class Player_girl : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    void InitFSM () {
+
+        // // ======================================================== 
+        // // setup states
+        // // ======================================================== 
+
+        // // idle
+        // FSM.State state_idle = new FSM.State( "Idle", 
+        //                                       new Action_PlayAnim(this.anim,"idle"), 
+        //                                       null, 
+        //                                       null );
+        // // walk
+        // FSM.State state_walk = new FSM.State( "Walk", 
+        //                                       new Action_PlayAnim(this.anim,"moveforward"), 
+        //                                       new Action_AdjustMoveSpeed(this.anim,this),
+        //                                       null );
+        // // melee
+        // FSM.State state_melee = new FSM.State( "Melee", 
+        //                                        new Action_StartCombo(this), 
+        //                                        new Action_NextCombo(this), 
+        //                                        null );
+
+        // // ======================================================== 
+        // // condition 
+        // // ======================================================== 
+
+        // FSM.Condition cond_isMoving = new Condition_isMoving(this);
+        // FSM.Condition cond_isMeleeButtonTriggered = new Condition_isMeleeButtonTriggered(this);
+        // FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
+
+        // // ======================================================== 
+        // // setup transitions
+        // // ======================================================== 
+
+        // // idle to ...
+        // state_idle.AddTransition( new FSM.Transition( state_walk, cond_isMoving, null ) );
+        // state_idle.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonTriggered, null ) );
+
+        // // walk to ...
+        // state_walk.AddTransition( new FSM.Transition( state_idle, new FSM.Condition_not(cond_isMoving), null ) );
+        // state_walk.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonTriggered, null ) );
+
+        // // melee to ...
+        // state_melee.AddTransition( new FSM.Transition( state_idle, 
+        //                                                new FSM.Condition_and(new FSM.Condition_not(cond_isMoving),
+        //                                                                      new FSM.Condition_not(cond_isAttacking)), 
+        //                                                null ) );
+        // state_melee.AddTransition( new FSM.Transition( state_walk, 
+        //                                                new FSM.Condition_and(cond_isMoving,
+        //                                                                      new FSM.Condition_not(cond_isAttacking)), 
+        //                                                null ) );
+
+        // init fsm
+        // this.fsm.init(state_idle);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     private void HandleInput() {
         // get move direction
-        this.moveDir = Vector3.zero; 
-        if ( followTarget == null ) {
+        if ( this.followTarget == null ) {
             Vector2 screen_dir = screenPad.GetMoveDirection();
             if ( screen_dir.sqrMagnitude >= 0.0f ) {
                 this.moveDir.x = screen_dir.x;
@@ -170,47 +229,6 @@ public class Player_girl : Player_base {
                 }
             }
         }
-
-//         // process aiming
-// #if UNITY_IPHONE
-//         if ( screenPad.AvailableTouches().Count != 0 ) {
-//             Touch lastTouch = screenPad.GetLastTouch();
-//             Ray ray = Camera.main.ScreenPointToRay (lastTouch.position); 
-// #else
-//             Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition); 
-// #endif
-//             Plane plane = new Plane ( Vector3.up, -upperBody.position.y );
-//             float dist = 0.0f;
-//             plane.Raycast( ray, out dist );
-//             Vector3 aimPos = ray.origin + ray.direction * dist;
-
-//             aimDir = aimPos - upperBody.position; 
-//             aimDir.y = 0.0f;
-//             aimDir.Normalize();
-
-//             // DEBUG { 
-//             // Debug.DrawRay ( ray.origin, ray.direction * 100, Color.yellow ); // camera look-foward ray
-//             DebugHelper.DrawBall ( aimPos, 0.2f, Color.red ); // player aiming position
-//             Debug.DrawLine ( upperBody.position, aimPos, Color.red ); // player aiming direction
-//             // } DEBUG end 
-
-//             // handle fire 
-// #if UNITY_IPHONE
-//             if ( lastTouch.phase != TouchPhase.Ended ) {
-// #else
-//             if ( Input.GetButton("Fire") ) {
-// #endif
-//                 // if we have weapon in hand.
-//                 if ( curWeapon ) {
-//                     Fire fire = curWeapon.GetComponent(typeof(Fire)) as Fire;
-//                     if (fire) {
-//                         fire.Trigger();
-//                     }
-//                 }
-//             }
-// #if UNITY_IPHONE
-//         }
-// #endif
     }
 
     // ------------------------------------------------------------------ 
@@ -218,10 +236,10 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     private void ProcessMovement () {
-        if (followTarget != null) {
-            Vector3 dir = (transform.position - followTarget.transform.position).normalized;
-            // DISABLE: Vector3 dir = -followTarget.transform.forward;
-            Vector3 destination = dir * followDistance + followTarget.transform.position;
+        if ( this.followTarget != null ) {
+            Vector3 dir = (transform.position - this.followTarget.transform.position).normalized;
+            // DISABLE: Vector3 dir = -this.followTarget.transform.forward;
+            Vector3 destination = dir * this.followDistance + this.followTarget.transform.position;
             Vector3 delta = destination - transform.position;
 
             if ( delta.magnitude < 0.5f ) {
@@ -232,7 +250,7 @@ public class Player_girl : Player_base {
             }
 
             // DEBUG { 
-            DebugHelper.DrawCircleY( followTarget.transform.position, followDistance, Color.yellow );
+            DebugHelper.DrawCircleY( this.followTarget.transform.position, this.followDistance, Color.yellow );
             DebugHelper.DrawBall( destination, 0.2f, Color.green );
             // } DEBUG end 
         }
@@ -301,45 +319,8 @@ public class Player_girl : Player_base {
             lowerBody.forward = aimDir;
         }
 
-        // TODO: smooth rotation
-        // TEMP DISABLE { 
-        // if ( Vector3.Dot ( upperBody.forward, lowerBody.forward ) )
-        // float angle = Quaternion.Angle ( upperBody.rotation, lowerBody.rotation );
-        // if ( angle > degreeToRot ) {
-        //     DebugHelper.ScreenPrint("rotating");
-        //     // iTween.Stop (lowerBody.gameObject,"rotate");
-        //     // iTween.RotateTo( lowerBody.gameObject, iTween.Hash (
-        //     //                  "rotation", upperBody.eulerAngles,
-        //     //                  "time", rotTime,
-        //     //                  "easeType", iTween.EaseType.easeOutCubic,
-        //     //                  "oncomplete", "onRotateEnd",
-        //     //                  "oncompletetarget", gameObject
-        //     //                  ) );
-        //     // if ( MathHelper.IsZerof(moveDir.sqrMagnitude) ) {
-        //     //     Vector3 cross_product = Vector3.Cross(upperBody.forward,lowerBody.forward);
-        //     //     Animation anim = GetComponent( typeof(Animation) ) as Animation;
-        //     //     if ( cross_product.y > 0.0 )
-        //     //         anim.CrossFade("turnRight");
-        //     //     else if ( cross_product.y < 0.0 )
-        //     //         anim.CrossFade("turnLeft");
-        //     // }
-        //     rotating = true;
-        // }
-        // } TEMP DISABLE end 
-
         // NOTE: upper-body rotation must be calculate after lower-body.
         // process upper-body rotation
         upperBody.forward = aimDir;
     }
-
-    // TODO: smooth rotation
-    // TEMP DISABLE { 
-    // // ------------------------------------------------------------------ 
-    // // Desc: 
-    // // ------------------------------------------------------------------ 
-
-    // private void onRotateEnd () {
-    //     rotating = false;
-    // }
-    // } TEMP DISABLE end 
 }
