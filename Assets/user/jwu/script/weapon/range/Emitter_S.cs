@@ -36,9 +36,9 @@ public class Emitter_S : Emitter {
     public override void Emit ( GameObject _bullet ) {
         // create a bullet, and rotate it based on the vector inputRotation
 
-        float half_ang = angle * 0.5f;
+        float half_ang = this.angle * 0.5f;
 
-        for ( int i = 0; i < max_bullet; ++i ) {
+        for ( int i = 0; i < this.max_bullet; ++i ) {
             Quaternion rot = transform.rotation;
             rot.eulerAngles = new Vector3( rot.eulerAngles.x, 
                                            rot.eulerAngles.y + Random.Range(-half_ang, half_ang),  

@@ -25,6 +25,7 @@ public class WeaponBase : MonoBehaviour {
     public enum WeaponID {
         unknown,
         melee_baseballbat,
+        range_smg_starter,
     };
 
     [System.Serializable]

@@ -36,11 +36,10 @@ public class Player_girl : Player_base {
     public float degreePlayMoveLeftRight = 60.0f;
 
     // Q: why don't we just use UpperBody in this game?
-    // A: this metho will make sure the 'upper-body' is specific by user regardless the name of the entity, 
+    // A: this method will make sure the 'upper-body' is specific by user regardless the name of the entity, 
     //    so it can be flexiable enough for different game.
     public Transform upperBody;
     public Transform lowerBody;
-    public GameObject curWeapon;
 
     public GameObject followTarget;
     public float followDistance = 1.5f;

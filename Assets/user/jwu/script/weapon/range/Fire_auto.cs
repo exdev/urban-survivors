@@ -38,8 +38,8 @@ public class Fire_auto : Fire {
 
 	new void Start () {
         base.Start();
-        lastFireTime = Time.time;
-        emitter = GetComponent( typeof(Emitter) ) as Emitter;
+        this.lastFireTime = Time.time;
+        this.emitter = GetComponent( typeof(Emitter) ) as Emitter;
 	}
 	
     // ------------------------------------------------------------------ 
@@ -47,10 +47,10 @@ public class Fire_auto : Fire {
     // ------------------------------------------------------------------ 
 
     public override void Trigger () {
-        if ( Time.time - lastFireTime >= freq ) {
-            lastFireTime = Time.time;
-            if ( emitter ) {
-                emitter.Emit(bullet);
+        if ( Time.time - this.lastFireTime >= this.freq ) {
+            this.lastFireTime = Time.time;
+            if ( this.emitter ) {
+                this.emitter.Emit(this.bullet);
             }
             else {
                 Debug.Log("warning: your weapon don't have emitter!");

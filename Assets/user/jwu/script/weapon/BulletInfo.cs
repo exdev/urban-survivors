@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : Bullet.cs
+// File         : BulletInfo.cs
 // Author       : Wu Jie 
-// Last Change  : 09/27/2010 | 21:50:25 PM | Monday,September
+// Last Change  : 12/13/2010 | 16:28:07 PM | Monday,December
 // Description  : 
 // ======================================================================================
 
@@ -16,7 +16,7 @@ using System.Collections;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
-public class Bullet : MonoBehaviour {
+public class BulletInfo : MonoBehaviour {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties

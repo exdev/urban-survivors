@@ -88,7 +88,7 @@ public class Player_boy : Player_base {
         }
 
         public override bool exec () {
-            Attack_info atk_info = playerBoy.GetAttackInfo();
+            AttackInfo atk_info = playerBoy.GetAttackInfo();
             if ( atk_info.curCombo == null )
                 return false;
             return this.playerBoy.IsPlayingAnim( atk_info.curCombo.animName, 
@@ -130,14 +130,8 @@ public class Player_boy : Player_base {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public Player_info player_info = new Player_info();
-    public Transform weaponAnchor = null;
-
     protected Vector3 moveDir = Vector3.zero;
     protected bool meleeButtonTriggered = false;
-    protected GameObject curWeapon = null;
-    protected GameObject weapon1 = null;
-    protected GameObject weapon2 = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -150,11 +144,7 @@ public class Player_boy : Player_base {
 	protected new void Start () {
         base.Start();
 
-        // init the player basic values.
-        DebugHelper.Assert( this.weaponAnchor, "can't find WeaponAnchor");
-
         //
-        this.InitInfo();
         this.InitAnim();
         this.InitFSM();
 	}
@@ -188,21 +178,6 @@ public class Player_boy : Player_base {
         DebugHelper.ScreenPrint ( "Player_boy current state: " + this.fsm.CurrentState().name );
         // } DEBUG end 
 	}
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void InitInfo () {
-        // TODO: we should load info from saved data or check point.
-        // info.serialize();
-
-        if ( this.player_info.weapon1 != WeaponBase.WeaponID.unknown )
-            this.ChangeWeapon(this.player_info.weapon1);
-        else if ( this.player_info.weapon2 != WeaponBase.WeaponID.unknown )
-            this.ChangeWeapon(this.player_info.weapon2);
-        DebugHelper.Assert( this.curWeapon, "can't find any valid weapon" );
-    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -336,22 +311,8 @@ public class Player_boy : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void ChangeWeapon( WeaponBase.WeaponID _id ) {
-        GameObject weaponGO = WeaponBase.Instance().GetWeapon(_id); 
-        weaponGO.SetActiveRecursively(true);
-        this.curWeapon = weaponGO; 
-        this.curWeapon.transform.parent = this.weaponAnchor;
-        this.curWeapon.transform.localPosition = Vector3.zero;
-        this.curWeapon.transform.localRotation = Quaternion.identity;
-        this.SetCurWeaponOwner();
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
     public void StartCombo () {
-        Attack_info atk_info = this.GetAttackInfo();
+        AttackInfo atk_info = this.GetAttackInfo();
         Combo_info first_combo = atk_info.combo_entry;
         atk_info.curCombo = first_combo;
         this.anim[first_combo.animName].normalizedSpeed = atk_info.speed;
@@ -364,7 +325,7 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     public void NextCombo () {
-        Attack_info atk_info = this.GetAttackInfo();
+        AttackInfo atk_info = this.GetAttackInfo();
         if ( atk_info.curCombo == null )
             return;
 
@@ -403,19 +364,8 @@ public class Player_boy : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public Attack_info GetAttackInfo () { return this.curWeapon.GetComponent<Attack_info>(); }
-    public DamageInfo GetDamageInfo () { return this.curWeapon.GetComponent<DamageInfo>(); }
-    protected void SetCurWeaponOwner () { 
-        DamageInfo dmgInfo = this.GetDamageInfo();
-        dmgInfo.owner_info = this.player_info; 
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
     private void StartMeleeAttack () {
-        Attack_info atk_info = this.GetAttackInfo();
+        AttackInfo atk_info = this.GetAttackInfo();
         atk_info.curCombo.attack_shape.active = true;
     }
 
@@ -424,7 +374,7 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     private void EndMeleeAttack () {
-        Attack_info atk_info = this.GetAttackInfo();
+        AttackInfo atk_info = this.GetAttackInfo();
         atk_info.curCombo.attack_shape.active = false;
     }
 }

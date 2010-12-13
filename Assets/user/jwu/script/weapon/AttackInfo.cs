@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : Attack_info.cs
+// File         : AttackInfo.cs
 // Author       : Wu Jie 
-// Last Change  : 12/08/2010 | 21:13:45 PM | Wednesday,December
+// Last Change  : 12/13/2010 | 15:01:30 PM | Monday,December
 // Description  : 
 // ======================================================================================
 
@@ -33,10 +33,10 @@ public class Combo_info {
 }
 
 // ------------------------------------------------------------------ 
-// Desc: Attack_info
+// Desc: AttackInfo
 // ------------------------------------------------------------------ 
 
-public class Attack_info : MonoBehaviour {
+public class AttackInfo : MonoBehaviour {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
