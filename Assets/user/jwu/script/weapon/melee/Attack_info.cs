@@ -27,6 +27,7 @@ public class Combo_info {
     public Vector2 validInputTime = new Vector2(0.0f,1.0f);
     public float endTime = -1.0f; 
     public bool canCharge = false;
+    public GameObject attack_shape = null;
     [System.NonSerialized] public Combo_info next = null;
     // TODO: public collision info 
 }
@@ -58,7 +59,9 @@ public class Attack_info : MonoBehaviour {
             DebugHelper.Assert(combo.endTime!=-1.0f, "endTime can't be minus!");
             DebugHelper.Assert(combo.animName!="unknown", "animName can't be unknown!");
             DebugHelper.Assert(combo.validInputTime.x < combo.validInputTime.y, "input time is invalid!");
+            DebugHelper.Assert(combo.attack_shape, "please define attack shape!");
 
+            combo.attack_shape.active = false;
             int next = i+1;
             if ( next != combo_count )
                 combo.next = this.combo_list[next];

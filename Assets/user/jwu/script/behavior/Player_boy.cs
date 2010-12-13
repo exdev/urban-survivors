@@ -415,7 +415,8 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     private void StartMeleeAttack () {
-        // this.curWeapon.GetComponent
+        Attack_info atk_info = this.GetAttackInfo();
+        atk_info.curCombo.attack_shape.active = true;
     }
 
     // ------------------------------------------------------------------ 
@@ -423,5 +424,7 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     private void EndMeleeAttack () {
+        Attack_info atk_info = this.GetAttackInfo();
+        atk_info.curCombo.attack_shape.active = false;
     }
 }

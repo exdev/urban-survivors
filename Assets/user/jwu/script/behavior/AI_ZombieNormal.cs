@@ -485,31 +485,48 @@ public class AI_ZombieNormal : Actor {
     // ------------------------------------------------------------------ 
 
     void OnTriggerEnter ( Collider _other ) {
-        if ( _other.gameObject.layer == Layer.melee_player 
-          || _other.gameObject.layer == Layer.bullet_player ) 
-        {
-            DamageInfo dmgInfo = _other.gameObject.GetComponent<DamageInfo>();
-            float dmgOutput = DamageRule.Instance().CalculateDamage( this.zombie_info, dmgInfo );
-
-            // TODO { 
-            // if ( dmgOutput < 20.0f )
-            //     this.lastHit.hitType = HitInfo.HitType.light;
-            // else if ( dmgOutput >= 20.0f )
-            //     this.lastHit.hitType = HitInfo.HitType.normal;
-            this.lastHit.hitType = HitInfo.HitType.normal;
-            // } TODO end 
-
-            this.lastHit.position = _other.transform.position;
-            this.lastHit.normal = _other.transform.right;
-            Vector3 dir = _other.transform.position - transform.position;
-            dir.y = 0.0f;
-            dir.Normalize();
-            this.lastHit.hitBackForce = dir * DamageRule.Instance().HitBackForce(dmgInfo.hitBackType);  
-
-            // TODO: if hit light, face it { 
-            // transform.forward = -_other.transform.forward;
-            // } TODO end 
+        DamageInfo dmgInfo = null;
+        if ( _other.gameObject.layer == Layer.melee_player ) {
+            Transform parent = _other.transform.parent;
+            DebugHelper.Assert( parent, "melee collider's parent is null" );
+            if ( parent == null ) {
+                return;
+            }
+            dmgInfo = parent.gameObject.GetComponent<DamageInfo>();
         }
+        else if ( _other.gameObject.layer == Layer.bullet_player ) {
+            dmgInfo = _other.gameObject.GetComponent<DamageInfo>();
+        }
+        else {
+            return;
+        }
+
+        // if we don't get damage info, just return
+        DebugHelper.Assert( dmgInfo, "can't find damage info for given layer" );
+        if ( dmgInfo == null ) {
+            return;
+        }
+
+        float dmgOutput = DamageRule.Instance().CalculateDamage( this.zombie_info, dmgInfo );
+
+        // TODO { 
+        // if ( dmgOutput < 20.0f )
+        //     this.lastHit.hitType = HitInfo.HitType.light;
+        // else if ( dmgOutput >= 20.0f )
+        //     this.lastHit.hitType = HitInfo.HitType.normal;
+        this.lastHit.hitType = HitInfo.HitType.normal;
+        // } TODO end 
+
+        this.lastHit.position = _other.transform.position;
+        this.lastHit.normal = _other.transform.right;
+        Vector3 dir = _other.transform.position - transform.position;
+        dir.y = 0.0f;
+        dir.Normalize();
+        this.lastHit.hitBackForce = dir * DamageRule.Instance().HitBackForce(dmgInfo.hitBackType);  
+
+        // TODO: if hit light, face it { 
+        // transform.forward = -_other.transform.forward;
+        // } TODO end 
     }
 
     // ------------------------------------------------------------------ 
