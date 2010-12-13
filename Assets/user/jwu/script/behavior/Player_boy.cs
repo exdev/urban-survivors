@@ -30,7 +30,7 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     class Action_AdjustMoveSpeed : FSM.Action {
-        public Animation anim_comp;
+        Animation anim_comp;
         Player_boy playerBoy = null;
 
         public Action_AdjustMoveSpeed ( Animation _anim, Player_boy _playerBoy ) {
@@ -319,7 +319,7 @@ public class Player_boy : Player_base {
 
     public void StartCombo () {
         AttackInfo atk_info = this.GetAttackInfo();
-        Combo_info first_combo = atk_info.combo_entry;
+        ComboInfo first_combo = atk_info.combo_entry;
         atk_info.curCombo = first_combo;
         this.anim[first_combo.animName].normalizedSpeed = atk_info.speed;
         this.anim.Rewind(first_combo.animName);
@@ -338,7 +338,7 @@ public class Player_boy : Player_base {
         // if we have input
         if ( this.meleeButtonTriggered ) {
             AnimationState curAnim = this.anim[atk_info.curCombo.animName];
-            Combo_info nextCombo = atk_info.curCombo.next;
+            ComboInfo nextCombo = atk_info.curCombo.next;
             if ( nextCombo == null )
                 return;
 

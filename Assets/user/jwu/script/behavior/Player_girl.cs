@@ -22,10 +22,61 @@ using System.Collections;
 [RequireComponent (typeof (Animation))]
 public class Player_girl : Player_base {
 
-    // private
-    private Vector3 moveDir = Vector3.zero;
-    private Vector3 aimDir = Vector3.forward;
-    // DISABLE: private bool rotating = false;
+    ///////////////////////////////////////////////////////////////////////////////
+    // actions, conditions
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_FollowTarget 
+    // ------------------------------------------------------------------ 
+
+    class Action_FollowTarget : FSM.Action {
+        Player_girl playerGirl; 
+
+        public Action_FollowTarget ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override void exec () {
+            this.playerGirl.Act_Movement();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_Shoot 
+    // ------------------------------------------------------------------ 
+
+    class Action_Shoot : FSM.Action {
+        Player_girl playerGirl; 
+
+        public Action_Shoot ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override void exec () {
+            // TODO: this.playerGirl.Act_Movement();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Condition_TargetInRange 
+    // ------------------------------------------------------------------ 
+
+    class Condition_TargetInRange : FSM.Condition {
+        Transform girl = null;
+        Transform target = null;
+        float dist = 1.0f;
+
+        public Condition_TargetInRange ( Transform _girl, Transform _target, float _dist ) {
+            this.girl = _girl;
+            this.target = _target;
+            this.dist = _dist;
+        }
+
+        public override bool exec () {
+            return (this.girl.position - this.target.position).magnitude <= dist;
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -42,6 +93,10 @@ public class Player_girl : Player_base {
     public GameObject followTarget;
     public float followDistance = 1.5f;
 
+    // protected
+    protected Vector3 moveDir = Vector3.zero;
+    protected Vector3 aimDir = Vector3.forward;
+
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -52,6 +107,7 @@ public class Player_girl : Player_base {
 
 	protected new void Start () {
         base.Start();
+
         DebugHelper.Assert( degreePlayMoveLeftRight <= 90.0f, "the degree can't larger than 90.0" );
         InitAnim ();
         InitFSM ();
@@ -63,10 +119,14 @@ public class Player_girl : Player_base {
 
 	void Update () {
         HandleInput ();
-        // TODO: this.fsm.tick(); // update state machine
-        ProcessMovement (); // handle steering
+        this.fsm.tick(); // update state machine
 
-        ProcessAnimation (); // DELME
+        // TODO: 
+        ProcessMovement (); // handle steering
+        // TODO { 
+        if ( MathHelper.IsZerof(moveDir.sqrMagnitude) == false )
+            Act_Movement();
+        // } TODO end 
 
         // DEBUG { 
         // draw velocity
@@ -81,7 +141,7 @@ public class Player_girl : Player_base {
                                new Color(1.0f,0.0f,1.0f) );
 
         // debug info
-        // DebugHelper.ScreenPrint ( "Player_girl current state: " + this.fsm.CurrentState().name );
+        DebugHelper.ScreenPrint ( "Player_girl current state: " + this.fsm.CurrentState().name );
         // } DEBUG end 
 	}
 
@@ -90,7 +150,9 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     void LateUpdate () {
-        PostAnim ();
+        // NOTE: upper-body rotation must be calculate after lower-body.
+        this.lowerBody.forward = this.aimDir;
+        this.upperBody.forward = this.aimDir;
 
         // reset the internal state.
         this.moveDir = Vector3.zero; 
@@ -102,36 +164,43 @@ public class Player_girl : Player_base {
 
     private void InitAnim () {
         // get the animation component
-        anim = gameObject.GetComponent(typeof(Animation)) as Animation;
+        this.anim = gameObject.GetComponent(typeof(Animation)) as Animation;
 
         // animation
         AnimationState state;
-        string[] anim_keys = { "moveForward", "moveBackward", "moveRight", "moveLeft" };
+        string[] anim_keys = { 
+            "idle",
+            "moveForward", 
+            "moveBackward", 
+            "moveRight", 
+            "moveLeft" 
+        };
         foreach (string key in anim_keys) {
-            state = anim[key];
+            state = this.anim[key];
             state.layer = 0;
             state.wrapMode = WrapMode.Loop;
             state.weight = 1.0f;
             state.enabled = true;
         }
 
-        state = anim["turnRight"];
+        // DISABLE { 
+        // state = this.anim["turnRight"];
+        // state.wrapMode = WrapMode.Once;
+        // state.layer = 0;
+        // state.weight = 1.0f;
+
+        // state = this.anim["turnLeft"];
+        // state.wrapMode = WrapMode.Once;
+        // state.layer = 0;
+        // state.weight = 1.0f;
+        // } DISABLE end 
+
+        state = this.anim["shootSMG"];
         state.wrapMode = WrapMode.Once;
-        state.layer = 0;
+        state.layer = 1;
         state.weight = 1.0f;
 
-        state = anim["turnLeft"];
-        state.wrapMode = WrapMode.Once;
-        state.layer = 0;
-        state.weight = 1.0f;
-
-        state = anim["idle"];
-        state.wrapMode = WrapMode.Loop;
-        state.layer = 0;
-        state.weight = 1.0f;
-        state.enabled = true;
-
-        anim.SyncLayer(0);
+        this.anim.SyncLayer(0);
     }
 
     // ------------------------------------------------------------------ 
@@ -140,58 +209,63 @@ public class Player_girl : Player_base {
 
     void InitFSM () {
 
-        // // ======================================================== 
-        // // setup states
-        // // ======================================================== 
+        // ======================================================== 
+        // setup states
+        // ======================================================== 
 
-        // // idle
-        // FSM.State state_idle = new FSM.State( "Idle", 
-        //                                       new Action_PlayAnim(this.anim,"idle"), 
-        //                                       null, 
-        //                                       null );
-        // // walk
-        // FSM.State state_walk = new FSM.State( "Walk", 
-        //                                       new Action_PlayAnim(this.anim,"moveforward"), 
-        //                                       new Action_AdjustMoveSpeed(this.anim,this),
-        //                                       null );
-        // // melee
-        // FSM.State state_melee = new FSM.State( "Melee", 
-        //                                        new Action_StartCombo(this), 
-        //                                        new Action_NextCombo(this), 
-        //                                        null );
+        // idle
+        FSM.State state_idle = new FSM.State( "idle", 
+                                              new Action_PlayAnim(this.anim,"idle"), 
+                                              null, 
+                                              null );
+        // following
+        FSM.State state_following = new FSM.State( "following", 
+                                                   new Action_FollowTarget(this), 
+                                                   new Action_FollowTarget(this), 
+                                                   null );
+        // shooting
+        FSM.State state_shooting = new FSM.State( "shooting", 
+                                                  new Action_Shoot(this), 
+                                                  null,
+                                                  null );
 
-        // // ======================================================== 
-        // // condition 
-        // // ======================================================== 
+        // ======================================================== 
+        // condition 
+        // ======================================================== 
 
-        // FSM.Condition cond_isMoving = new Condition_isMoving(this);
+        FSM.Condition cond_isNearTarget = new Condition_TargetInRange( this.transform,
+                                                                       this.followTarget.transform,
+                                                                       this.followDistance );
+        FSM.Condition cond_isFarAwayTarget = new FSM.Condition_not(new Condition_TargetInRange( this.transform,
+                                                                                                this.followTarget.transform,
+                                                                                                this.followDistance ));
         // FSM.Condition cond_isMeleeButtonTriggered = new Condition_isMeleeButtonTriggered(this);
         // FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
 
-        // // ======================================================== 
-        // // setup transitions
-        // // ======================================================== 
+        // ======================================================== 
+        // setup transitions
+        // ======================================================== 
 
-        // // idle to ...
-        // state_idle.AddTransition( new FSM.Transition( state_walk, cond_isMoving, null ) );
+        // idle to ...
+        // state_idle.AddTransition( new FSM.Transition( state_following, cond_isFarAwayTarget, null ) );
         // state_idle.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonTriggered, null ) );
 
-        // // walk to ...
-        // state_walk.AddTransition( new FSM.Transition( state_idle, new FSM.Condition_not(cond_isMoving), null ) );
+        // following to ...
+        // state_following.AddTransition( new FSM.Transition( state_idle, cond_isNearTarget, null ) );
         // state_walk.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonTriggered, null ) );
 
-        // // melee to ...
-        // state_melee.AddTransition( new FSM.Transition( state_idle, 
-        //                                                new FSM.Condition_and(new FSM.Condition_not(cond_isMoving),
-        //                                                                      new FSM.Condition_not(cond_isAttacking)), 
-        //                                                null ) );
+        // shooting to ...
+        // state_shooting.AddTransition( new FSM.Transition( state_idle, 
+        //                                                   new FSM.Condition_and(new FSM.Condition_not(cond_isMoving),
+        //                                                                         new FSM.Condition_not(cond_isAttacking)), 
+        //                                                   null ) );
         // state_melee.AddTransition( new FSM.Transition( state_walk, 
         //                                                new FSM.Condition_and(cond_isMoving,
         //                                                                      new FSM.Condition_not(cond_isAttacking)), 
         //                                                null ) );
 
         // init fsm
-        // this.fsm.init(state_idle);
+        this.fsm.init(state_idle);
     }
 
     // ------------------------------------------------------------------ 
@@ -214,16 +288,17 @@ public class Player_girl : Player_base {
 
         // get direction by screenPad
         Vector2 aimDir2D = screenPad.GetAimingDirection();
-        aimDir = Vector3.zero; 
-        aimDir.x = aimDir2D.x; aimDir.y = aimDir2D.y; 
-        aimDir = Camera.main.transform.TransformDirection(aimDir);
-        aimDir.y = 0.0f;
-        aimDir = aimDir.normalized;
+        this.aimDir = Vector3.zero; 
+        this.aimDir.x = aimDir2D.x; 
+        this.aimDir.y = aimDir2D.y; 
+        this.aimDir = Camera.main.transform.TransformDirection(this.aimDir);
+        this.aimDir.y = 0.0f;
+        this.aimDir = this.aimDir.normalized;
 
         // if we have weapon in hand.
         if ( screenPad.CanFire() ) {
-            if ( curWeapon ) {
-                Fire fire = curWeapon.GetComponent(typeof(Fire)) as Fire;
+            if ( this.curWeapon ) {
+                Fire fire = this.curWeapon.GetComponent<Fire>();
                 if (fire) {
                     fire.Trigger();
                 }
@@ -265,62 +340,24 @@ public class Player_girl : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    private void ProcessAnimation () {
-        // get the animation forward,right so that we can pickup the proper animation.
-        Vector3 curVelocity = controller.velocity; 
-        Vector3 vel_ubspace = upperBody.worldToLocalMatrix * curVelocity;
-        vel_ubspace.y = 0.0f;
-        vel_ubspace.Normalize();
-
-        // TODO: if nothings move, crossfade to idle... so rotate, movement no need for idle. { 
-        // if ( vel_ubspace.sqrMagnitude < 0.2 )
-        if ( this.curSpeed < 0.1  ) {
-            // float fadeSpeed = 5.0f * Time.deltaTime;
-            anim.CrossFade("idle");
-        }
-        // } TODO end 
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    private void PostAnim () {
+    public void Act_Movement () {
         // process lower-body rotation
-        float angle = Vector3.Angle ( moveDir, aimDir );
+        float angle = Vector3.Angle ( this.moveDir, this.aimDir );
         // DebugHelper.ScreenPrint("angle = " + angle); // DEBUG
         string animName = "";
-        if ( MathHelper.IsZerof(moveDir.sqrMagnitude) == false ) {
-            if ( angle > 180.0f - degreePlayMoveLeftRight ) {
-                // lowerBody.forward = -moveDir;
-                animName = "moveBackward";
-            }
-            else if ( angle < degreePlayMoveLeftRight ) {
-                // lowerBody.forward = moveDir;
-                animName = "moveForward";
-            }
-            else {
-                Vector3 up = Vector3.Cross(moveDir,aimDir);
-                if ( up.y > 0.0f ) {
-                    // lowerBody.forward = Quaternion.Euler(0,90,0) * moveDir;
-                    animName = "moveLeft";
-                }
-                else {
-                    // lowerBody.forward = Quaternion.Euler(0,-90,0) * moveDir;
-                    animName = "moveRight";
-                }
-            }
-            lowerBody.forward = aimDir;
-            anim[animName].normalizedSpeed = StepSpeed * controller.velocity.magnitude;
-            if ( anim.IsPlaying(animName) == false )
-                anim.CrossFade(animName,0.3f);
+        if ( angle > 180.0f - degreePlayMoveLeftRight ) {
+            animName = "moveBackward";
+        } else if ( angle < degreePlayMoveLeftRight ) {
+            animName = "moveForward";
+        } else {
+            Vector3 up = Vector3.Cross(moveDir,aimDir);
+            if ( up.y > 0.0f )
+                animName = "moveLeft";
+            else
+                animName = "moveRight";
         }
-        else {
-            lowerBody.forward = aimDir;
-        }
-
-        // NOTE: upper-body rotation must be calculate after lower-body.
-        // process upper-body rotation
-        upperBody.forward = aimDir;
+        this.anim[animName].normalizedSpeed = this.StepSpeed * this.controller.velocity.magnitude;
+        if ( this.anim.IsPlaying(animName) == false )
+            this.anim.CrossFade(animName,0.3f);
     }
 }

@@ -18,17 +18,17 @@ using System.Collections.Generic;
 ///////////////////////////////////////////////////////////////////////////////
 
 // ------------------------------------------------------------------ 
-// Desc: Combo_info 
+// Desc: ComboInfo 
 // ------------------------------------------------------------------ 
 
 [System.Serializable]
-public class Combo_info {
+public class ComboInfo {
     public string animName = "unknown";
     public Vector2 validInputTime = new Vector2(0.0f,1.0f);
     public float endTime = -1.0f; 
     public bool canCharge = false;
     public GameObject attack_shape = null;
-    [System.NonSerialized] public Combo_info next = null;
+    [System.NonSerialized] public ComboInfo next = null;
     // TODO: public collision info 
 }
 
@@ -42,10 +42,10 @@ public class AttackInfo : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public Combo_info[] combo_list;
+    public ComboInfo[] comboList;
     public float speed = 2.0f;
-    [System.NonSerialized] public Combo_info combo_entry = null;
-    [System.NonSerialized] public Combo_info curCombo = null;
+    [System.NonSerialized] public ComboInfo combo_entry = null;
+    [System.NonSerialized] public ComboInfo curCombo = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
@@ -53,9 +53,9 @@ public class AttackInfo : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        int combo_count = this.combo_list.Length;
+        int combo_count = this.comboList.Length;
         for ( int i = 0; i < combo_count; ++i ) {
-            Combo_info combo = this.combo_list[i];
+            ComboInfo combo = this.comboList[i];
             DebugHelper.Assert(combo.endTime!=-1.0f, "endTime can't be minus!");
             DebugHelper.Assert(combo.animName!="unknown", "animName can't be unknown!");
             DebugHelper.Assert(combo.validInputTime.x < combo.validInputTime.y, "input time is invalid!");
@@ -64,9 +64,9 @@ public class AttackInfo : MonoBehaviour {
             combo.attack_shape.active = false;
             int next = i+1;
             if ( next != combo_count )
-                combo.next = this.combo_list[next];
+                combo.next = this.comboList[next];
         }
-        this.combo_entry = this.combo_list[0];
-        this.combo_list = null;
+        this.combo_entry = this.comboList[0];
+        this.comboList = null;
 	}
 }

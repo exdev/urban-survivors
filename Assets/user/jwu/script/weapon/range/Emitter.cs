@@ -33,7 +33,7 @@ public class Emitter : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
 	protected void Start () {
-        DebugHelper.Assert( anchor, "weapon's anchor not set" );
+        DebugHelper.Assert( this.anchor, "weapon's anchor not set" );
 	}
 
     // ------------------------------------------------------------------ 
