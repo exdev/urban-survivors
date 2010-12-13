@@ -25,6 +25,7 @@ public class Infrared : MonoBehaviour {
     public Material material;
     public float lineSize = 0.2f;
     public Color lineColor;
+    public Transform anchor = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -35,9 +36,11 @@ public class Infrared : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Start () {
-        LineRenderer lr = GetComponent(typeof(LineRenderer)) as LineRenderer;
+        DebugHelper.Assert( anchor, "weapon's anchor not set" );
+
+        LineRenderer lr = this.anchor.GetComponent<LineRenderer>();
         if ( lr == null ) {
-            lr = gameObject.AddComponent(typeof(LineRenderer)) as LineRenderer;
+            lr = this.anchor.gameObject.AddComponent<LineRenderer>();
             lr.useWorldSpace = false;
             lr.SetWidth(lineSize, lineSize);
             lr.material = material;
@@ -52,7 +55,7 @@ public class Infrared : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Update () {
-        LineRenderer lr = GetComponent(typeof(LineRenderer)) as LineRenderer;
+        LineRenderer lr = this.anchor.gameObject.GetComponent<LineRenderer>();
         if ( lr ) {
             // This would cast rays only against colliders in layer x.
             // ignore layer: bullet_player, player, trigger
@@ -66,11 +69,11 @@ public class Infrared : MonoBehaviour {
 
             float dist = 100.0f;
             RaycastHit hit;
-            Vector3 fwd = transform.TransformDirection (Vector3.forward);
-            if ( Physics.Raycast (transform.position, fwd, out hit, 100.0f, layerMask ) ) {
+            Vector3 fwd = Vector3.forward;
+            if ( Physics.Raycast (this.anchor.position, fwd, out hit, 100.0f, layerMask ) ) {
                 dist = hit.distance;
             }
-            lr.SetPosition( 1, Vector3.forward * dist );
+            lr.SetPosition( 1, fwd * dist );
         }
     }
 }
