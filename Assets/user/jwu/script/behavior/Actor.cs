@@ -26,10 +26,17 @@ public class Actor : Steer {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    public enum SteeringState {
+        seeking,
+        braking,
+    };
+
     public float StepSpeed = 0.5f;
 
     protected Animation anim = null;
     protected FSM fsm = new FSM();
+    protected Vector3 targetPos;
+    protected SteeringState steeringState = SteeringState.braking;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -60,6 +67,23 @@ public class Actor : Steer {
             return result;
 
         return result && state.time <= endTime;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Seek ( Vector3 _pos ) {
+        this.targetPos = _pos;
+        this.steeringState = SteeringState.seeking;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Stop () {
+        this.steeringState = SteeringState.braking;
     }
 }
 

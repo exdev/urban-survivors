@@ -37,15 +37,14 @@ public class Infrared : MonoBehaviour {
 
     void Start () {
         DebugHelper.Assert( anchor, "weapon's anchor not set" );
-
-        LineRenderer lr = this.anchor.GetComponent<LineRenderer>();
+        LineRenderer lr = this.anchor.gameObject.GetComponent<LineRenderer>();
         if ( lr == null ) {
             lr = this.anchor.gameObject.AddComponent<LineRenderer>();
             lr.useWorldSpace = false;
             lr.SetWidth(lineSize, lineSize);
             lr.material = material;
             lr.SetPosition(0, Vector3.zero );
-            lr.SetPosition(1, Vector3.forward * 10.0f );
+            lr.SetPosition(1, Vector3.forward * 0.0f );
             lr.SetColors(lineColor,lineColor);
         }
     }
@@ -60,6 +59,7 @@ public class Infrared : MonoBehaviour {
             // This would cast rays only against colliders in layer x.
             // ignore layer: bullet_player, player, trigger
             int layerMask = 1 << Layer.bullet_player 
+                | 1 << Layer.melee_player
                 | 1 << Layer.player 
                 | 1 << Layer.trigger;
 
@@ -69,11 +69,11 @@ public class Infrared : MonoBehaviour {
 
             float dist = 100.0f;
             RaycastHit hit;
-            Vector3 fwd = Vector3.forward;
-            if ( Physics.Raycast (this.anchor.position, fwd, out hit, 100.0f, layerMask ) ) {
+            Vector3 fwd = this.anchor.forward;
+            if ( Physics.Raycast ( this.anchor.position, fwd, out hit, 100.0f, layerMask ) ) {
                 dist = hit.distance;
             }
-            lr.SetPosition( 1, fwd * dist );
+            lr.SetPosition( 1, Vector3.forward * dist );
         }
     }
 }

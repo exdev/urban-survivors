@@ -36,12 +36,27 @@ public class FSM {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    // Action
     public class Action {
         public virtual void exec () {
             Debug.LogWarning("Action::exec not implemented, default exec been called.");
         }
     } 
 
+    // Action_list
+    public class Action_list : Action {
+        Action[] actions;
+        public Action_list ( Action[] _actions ) {
+            this.actions = _actions;
+        }
+        public override void exec () {
+            for ( int i = 0; i < actions.Length; ++i ) {
+                this.actions[i].exec();
+            }
+        }
+    }
+
+    // Action_periodic
     public class Action_periodic : Action {
         private bool firstTick = false;
         private float lastTick = 0.0f;
@@ -89,17 +104,22 @@ public class FSM {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    // Condition
     public class Condition {
         public virtual bool exec () {
             Debug.LogWarning("Condition::exec not implemented, default exec been called.");
             return false;
         } 
     }
+
+    // Condition_not
     public class Condition_not : Condition {
         Condition cond = null; 
         public Condition_not ( Condition _cond ) { this.cond = _cond; }
         public override bool exec () { return !this.cond.exec(); }
     }
+
+    // Condition_and
     public class Condition_and : Condition {
         Condition cond1 = null; 
         Condition cond2 = null; 
@@ -109,6 +129,8 @@ public class FSM {
         }
         public override bool exec () { return this.cond1.exec() && this.cond2.exec(); }
     }
+
+    // Condition_or
     public class Condition_or : Condition {
         Condition cond1 = null; 
         Condition cond2 = null; 

@@ -87,6 +87,7 @@ public class Player_base : Actor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    protected ShootInfo GetShootInfo () { return this.curWeapon.GetComponent<ShootInfo>(); }
     protected AttackInfo GetAttackInfo () { return this.curWeapon.GetComponent<AttackInfo>(); }
     protected DamageInfo GetDamageInfo () { return this.curWeapon.GetComponent<DamageInfo>(); }
     protected void SetCurWeaponOwner () { 

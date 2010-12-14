@@ -236,32 +236,12 @@ public class AI_ZombieNormal : Actor {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public enum SteeringState {
-        seeking,
-        braking,
-    };
-
     public ActorInfo zombie_info = new ActorInfo();
-    protected Vector3 targetPos;
-    protected SteeringState steeringState = SteeringState.braking;
     protected HitInfo lastHit = new HitInfo();
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
     ///////////////////////////////////////////////////////////////////////////////
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public void Seek ( Vector3 _pos ) {
-        this.targetPos = _pos;
-        this.steeringState = SteeringState.seeking;
-    }
-
-    public void Stop () {
-        this.steeringState = SteeringState.braking;
-    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -408,39 +388,7 @@ public class AI_ZombieNormal : Actor {
 
     void Update () {
         this.fsm.tick(); // update state machine
-
-        // stop if we arrive target position
-        if ( (this.targetPos - transform.position).magnitude < 0.1f ) {
-            this.Stop();
-        }
-
-        // handle steering
-        Vector3 force = Vector3.zero;
-        if ( this.steeringState == SteeringState.seeking ) {
-            float distance = (transform.position - this.targetPos).magnitude;
-            if ( distance < 2.0f ) {
-                ApplyBrakingForce(10.0f);
-
-                // face the target
-                float rot_speed = 2.0f; // TEMP
-                Vector3 dir = this.targetPos - transform.position;
-                Quaternion wanted_rot = Quaternion.LookRotation(dir);
-                wanted_rot.x = 0.0f; wanted_rot.z = 0.0f;
-                transform.rotation = Quaternion.Slerp ( 
-                                                       transform.rotation, 
-                                                       wanted_rot, 
-                                                       rot_speed * Time.deltaTime
-                                                      );
-            }
-            else {
-                force = GetSteering_Seek_LimitByMaxSpeed ( this.targetPos );
-                force.y = 0.0f;
-            }
-        }
-        else if ( this.steeringState == SteeringState.braking ) {
-            ApplyBrakingForce(10.0f);
-        }
-        ApplySteeringForce(force);
+        ProcessMovement();
 
         // reset values
         this.lastHit.hitType = HitInfo.HitType.none;
@@ -478,6 +426,40 @@ public class AI_ZombieNormal : Actor {
         //     DebugHelper.ScreenPrint ( animS.name + ": " + animS.enabled );
         // }
         // } DEBUG end 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void ProcessMovement () {
+        // handle steering
+        Vector3 force = Vector3.zero;
+        if ( this.steeringState == SteeringState.seeking ) {
+            float distance = (transform.position - this.targetPos).magnitude;
+            if ( distance < 2.0f ) {
+                ApplyBrakingForce(10.0f);
+
+                // face the target
+                float rot_speed = 2.0f; // TEMP
+                Vector3 dir = this.targetPos - transform.position;
+                Quaternion wanted_rot = Quaternion.LookRotation(dir);
+                wanted_rot.x = 0.0f; wanted_rot.z = 0.0f;
+                transform.rotation = Quaternion.Slerp ( 
+                                                       transform.rotation, 
+                                                       wanted_rot, 
+                                                       rot_speed * Time.deltaTime
+                                                      );
+            }
+            else {
+                force = GetSteering_Seek_LimitByMaxSpeed ( this.targetPos );
+                force.y = 0.0f;
+            }
+        }
+        else if ( this.steeringState == SteeringState.braking ) {
+            ApplyBrakingForce(10.0f);
+        }
+        ApplySteeringForce(force);
     }
 
     // ------------------------------------------------------------------ 

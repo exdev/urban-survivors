@@ -47,7 +47,7 @@ public class Emitter_S : Emitter {
             // KEEPME: var spawn_bullet:GameObject = Instantiate(_bullet, this.anchor.position, rot );
             GameObject spawn_bullet = SpawnManager.Instance().Spawn(_bullet, this.anchor.position, rot );
             DebugHelper.Assert( spawn_bullet, "failed to spawn bullet" );
-            // DELME: spawn_bullet.transform.position += Random.Range(0.0f,3.0f) * spawn_bullet.transform.forward;
+            // spawn_bullet.transform.position += Random.Range(0.0f,3.0f) * spawn_bullet.transform.forward;
         }
     }
 }

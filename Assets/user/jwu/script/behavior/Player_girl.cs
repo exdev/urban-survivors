@@ -32,29 +32,48 @@ public class Player_girl : Player_base {
 
     class Action_FollowTarget : FSM.Action {
         Player_girl playerGirl; 
+        Transform target;
 
-        public Action_FollowTarget ( Player_girl _playerGirl ) {
+        public Action_FollowTarget ( Player_girl _playerGirl, Transform _target ) {
             this.playerGirl = _playerGirl;
+            this.target = _target;
         }
 
         public override void exec () {
+            this.playerGirl.Seek(this.target.position);
             this.playerGirl.Act_Movement();
         }
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: Action_Shoot 
+    // Desc: Action_StopMoving 
     // ------------------------------------------------------------------ 
 
-    class Action_Shoot : FSM.Action {
-        Player_girl playerGirl; 
+    class Action_StopMoving : FSM.Action {
+        Player_girl playerGirl = null;
 
-        public Action_Shoot ( Player_girl _playerGirl ) {
+        public Action_StopMoving ( Player_girl _playerGirl ) {
             this.playerGirl = _playerGirl;
         }
 
         public override void exec () {
-            // TODO: this.playerGirl.Act_Movement();
+            this.playerGirl.Stop();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_Shooting 
+    // ------------------------------------------------------------------ 
+
+    class Action_Shooting : FSM.Action {
+        Player_girl playerGirl; 
+
+        public Action_Shooting ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override void exec () {
+            this.playerGirl.Act_Shooting();
         }
     }
 
@@ -78,6 +97,61 @@ public class Player_girl : Player_base {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Condition_isShootButtonTriggered : FSM.Condition {
+        Player_girl playerGirl = null;
+
+        public Condition_isShootButtonTriggered ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        } 
+
+        public override bool exec () {
+            return this.playerGirl.ShootButtonTriggered();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Condition_isShooting 
+    // ------------------------------------------------------------------ 
+
+    class Condition_isShooting : FSM.Condition {
+        Player_girl playerGirl = null;
+
+        public Condition_isShooting ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override bool exec () {
+            // TODO { 
+            // AttackInfo atk_info = playerBoy.GetAttackInfo();
+            // if ( atk_info.curCombo == null )
+            //     return false;
+            // return this.playerBoy.IsPlayingAnim( atk_info.curCombo.animName, 
+            //                                      atk_info.curCombo.endTime );
+            // } TODO end 
+            return this.playerGirl.IsPlayingAnim( "shootSMG" );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Condition_isMoving : FSM.Condition {
+        Player_girl playerGirl = null;
+
+        public Condition_isMoving ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override bool exec () {
+            return this.playerGirl.IsMoving();
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -94,8 +168,8 @@ public class Player_girl : Player_base {
     public float followDistance = 1.5f;
 
     // protected
-    protected Vector3 moveDir = Vector3.zero;
     protected Vector3 aimDir = Vector3.forward;
+    protected bool shootButtonTriggered = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -120,13 +194,7 @@ public class Player_girl : Player_base {
 	void Update () {
         HandleInput ();
         this.fsm.tick(); // update state machine
-
-        // TODO: 
         ProcessMovement (); // handle steering
-        // TODO { 
-        if ( MathHelper.IsZerof(moveDir.sqrMagnitude) == false )
-            Act_Movement();
-        // } TODO end 
 
         // DEBUG { 
         // draw velocity
@@ -155,7 +223,7 @@ public class Player_girl : Player_base {
         this.upperBody.forward = this.aimDir;
 
         // reset the internal state.
-        this.moveDir = Vector3.zero; 
+        this.shootButtonTriggered = false;
     }
 
     // ------------------------------------------------------------------ 
@@ -168,19 +236,19 @@ public class Player_girl : Player_base {
 
         // animation
         AnimationState state;
-        string[] anim_keys = { 
+        string[] anim_keys0 = { 
             "idle",
             "moveForward", 
             "moveBackward", 
             "moveRight", 
             "moveLeft" 
         };
-        foreach (string key in anim_keys) {
+        foreach (string key in anim_keys0) {
             state = this.anim[key];
             state.layer = 0;
             state.wrapMode = WrapMode.Loop;
             state.weight = 1.0f;
-            state.enabled = true;
+            state.enabled = false;
         }
 
         // DISABLE { 
@@ -195,11 +263,18 @@ public class Player_girl : Player_base {
         // state.weight = 1.0f;
         // } DISABLE end 
 
-        state = this.anim["shootSMG"];
-        state.wrapMode = WrapMode.Once;
-        state.layer = 1;
-        state.weight = 1.0f;
-
+        string[] anim_keys1 = { 
+            "shootSMG",
+            "reload_smg"
+        };
+        foreach (string key in anim_keys1) {
+            state = this.anim[key];
+            state.wrapMode = WrapMode.Once;
+            state.layer = 1;
+            state.weight = 1.0f;
+            state.AddMixingTransform(this.upperBody);
+            state.enabled = false;
+        }
         this.anim.SyncLayer(0);
     }
 
@@ -220,14 +295,24 @@ public class Player_girl : Player_base {
                                               null );
         // following
         FSM.State state_following = new FSM.State( "following", 
-                                                   new Action_FollowTarget(this), 
-                                                   new Action_FollowTarget(this), 
-                                                   null );
-        // shooting
-        FSM.State state_shooting = new FSM.State( "shooting", 
-                                                  new Action_Shoot(this), 
-                                                  null,
-                                                  null );
+                                                   new Action_FollowTarget(this,this.followTarget.transform), 
+                                                   new Action_FollowTarget(this,this.followTarget.transform), 
+                                                   new Action_StopMoving(this) );
+        // idle shooting
+        FSM.State state_idleShooting = new FSM.State( "idle_shooting", 
+                                                      new Action_Shooting(this), 
+                                                      null,
+                                                      null );
+        // walk shooting
+        FSM.Action action_walkAndShoot = new FSM.Action_list( new FSM.Action[] {
+                                                                new Action_FollowTarget(this,this.followTarget.transform),
+                                                                new Action_Shooting(this) 
+                                                              }
+                                                            );
+        FSM.State state_walkShooting = new FSM.State( "walk_shooting", 
+                                                      action_walkAndShoot, 
+                                                      new Action_FollowTarget(this,this.followTarget.transform), 
+                                                      new Action_StopMoving(this) );
 
         // ======================================================== 
         // condition 
@@ -238,31 +323,33 @@ public class Player_girl : Player_base {
                                                                        this.followDistance );
         FSM.Condition cond_isFarAwayTarget = new FSM.Condition_not(new Condition_TargetInRange( this.transform,
                                                                                                 this.followTarget.transform,
-                                                                                                this.followDistance ));
-        // FSM.Condition cond_isMeleeButtonTriggered = new Condition_isMeleeButtonTriggered(this);
-        // FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
+                                                                                                this.followDistance * 1.2f ));
+        FSM.Condition cond_isShootButtonTriggered = new Condition_isShootButtonTriggered(this);
+        FSM.Condition cond_isNotShooting = new FSM.Condition_not( new Condition_isShooting(this) );
+        // DELME { 
+        // FSM.Condition cond_isMoving = new Condition_isMoving(this);
+        // FSM.Condition cond_isShooting = new Condition_isShooting(this);
+        // } DELME end 
 
         // ======================================================== 
         // setup transitions
         // ======================================================== 
 
         // idle to ...
-        // state_idle.AddTransition( new FSM.Transition( state_following, cond_isFarAwayTarget, null ) );
-        // state_idle.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonTriggered, null ) );
+        state_idle.AddTransition( new FSM.Transition( state_following, cond_isFarAwayTarget, null ) );
+        state_idle.AddTransition( new FSM.Transition( state_idleShooting, cond_isShootButtonTriggered, null ) );
 
         // following to ...
-        // state_following.AddTransition( new FSM.Transition( state_idle, cond_isNearTarget, null ) );
-        // state_walk.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonTriggered, null ) );
+        state_following.AddTransition( new FSM.Transition( state_idle, cond_isNearTarget, null ) );
+        state_following.AddTransition( new FSM.Transition( state_walkShooting, cond_isShootButtonTriggered, null ) );
 
-        // shooting to ...
-        // state_shooting.AddTransition( new FSM.Transition( state_idle, 
-        //                                                   new FSM.Condition_and(new FSM.Condition_not(cond_isMoving),
-        //                                                                         new FSM.Condition_not(cond_isAttacking)), 
-        //                                                   null ) );
-        // state_melee.AddTransition( new FSM.Transition( state_walk, 
-        //                                                new FSM.Condition_and(cond_isMoving,
-        //                                                                      new FSM.Condition_not(cond_isAttacking)), 
-        //                                                null ) );
+        // idle shooting to ...
+        state_idleShooting.AddTransition( new FSM.Transition( state_idle, cond_isNotShooting, null ) );
+        state_idleShooting.AddTransition( new FSM.Transition( state_walkShooting, cond_isFarAwayTarget, null ) );
+
+        // walk shooting to ...
+        state_walkShooting.AddTransition( new FSM.Transition( state_following, cond_isNotShooting, null ) );
+        state_walkShooting.AddTransition( new FSM.Transition( state_idleShooting, cond_isNearTarget, null ) );
 
         // init fsm
         this.fsm.init(state_idle);
@@ -273,18 +360,20 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     private void HandleInput() {
-        // get move direction
-        if ( this.followTarget == null ) {
-            Vector2 screen_dir = screenPad.GetMoveDirection();
-            if ( screen_dir.sqrMagnitude >= 0.0f ) {
-                this.moveDir.x = screen_dir.x;
-                this.moveDir.y = screen_dir.y;
-                Transform mainCamera = Camera.main.transform;
-                this.moveDir = mainCamera.TransformDirection(this.moveDir.normalized); 
-                this.moveDir.y = 0.0f;
-                this.moveDir = this.moveDir.normalized;
-            }
-        }
+        // DISABLE { 
+        // // get move direction
+        // if ( this.followTarget == null ) {
+        //     Vector2 screen_dir = screenPad.GetMoveDirection();
+        //     if ( screen_dir.sqrMagnitude >= 0.0f ) {
+        //         this.moveDir.x = screen_dir.x;
+        //         this.moveDir.y = screen_dir.y;
+        //         Transform mainCamera = Camera.main.transform;
+        //         this.moveDir = mainCamera.TransformDirection(this.moveDir.normalized); 
+        //         this.moveDir.y = 0.0f;
+        //         this.moveDir = this.moveDir.normalized;
+        //     }
+        // }
+        // } DISABLE end 
 
         // get direction by screenPad
         Vector2 aimDir2D = screenPad.GetAimingDirection();
@@ -297,12 +386,15 @@ public class Player_girl : Player_base {
 
         // if we have weapon in hand.
         if ( screenPad.CanFire() ) {
-            if ( this.curWeapon ) {
-                Fire fire = this.curWeapon.GetComponent<Fire>();
-                if (fire) {
-                    fire.Trigger();
-                }
-            }
+            this.shootButtonTriggered = true;
+            // TODO { 
+            // if ( this.curWeapon ) {
+            //     Fire fire = this.curWeapon.GetComponent<Fire>();
+            //     if (fire) {
+            //         fire.Trigger();
+            //     }
+            // }
+            // } TODO end 
         }
     }
 
@@ -310,30 +402,22 @@ public class Player_girl : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    private void ProcessMovement () {
-        if ( this.followTarget != null ) {
-            Vector3 dir = (transform.position - this.followTarget.transform.position).normalized;
-            // DISABLE: Vector3 dir = -this.followTarget.transform.forward;
-            Vector3 destination = dir * this.followDistance + this.followTarget.transform.position;
-            Vector3 delta = destination - transform.position;
-
-            if ( delta.magnitude < 0.5f ) {
-                ApplyBrakingForce(10.0f);
-            }
-            else {
-                this.moveDir = delta.normalized; 
-            }
-
-            // DEBUG { 
-            DebugHelper.DrawCircleY( this.followTarget.transform.position, this.followDistance, Color.yellow );
-            DebugHelper.DrawBall( destination, 0.2f, Color.green );
-            // } DEBUG end 
+    void ProcessMovement () {
+        // handle steering
+        Vector3 force = Vector3.zero;
+        if ( this.steeringState == SteeringState.seeking ) {
+            force = (this.targetPos - this.transform.position);
+            force.y = 0.0f;
+            force.Normalize();
         }
-
-        //
-        if ( MathHelper.IsZerof(this.moveDir.sqrMagnitude) )
+        else if ( this.steeringState == SteeringState.braking ) {
             ApplyBrakingForce(10.0f);
-        ApplySteeringForce( this.moveDir * base.maxForce );
+        }
+        ApplySteeringForce( force * base.maxForce );
+
+        // DEBUG { 
+        DebugHelper.DrawCircleY( this.followTarget.transform.position, this.followDistance, Color.yellow );
+        // } DEBUG end 
     }
 
     // ------------------------------------------------------------------ 
@@ -341,8 +425,10 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     public void Act_Movement () {
+        Vector3 dir = this.controller.velocity.normalized;
+
         // process lower-body rotation
-        float angle = Vector3.Angle ( this.moveDir, this.aimDir );
+        float angle = Vector3.Angle ( dir, this.aimDir );
         // DebugHelper.ScreenPrint("angle = " + angle); // DEBUG
         string animName = "";
         if ( angle > 180.0f - degreePlayMoveLeftRight ) {
@@ -350,7 +436,7 @@ public class Player_girl : Player_base {
         } else if ( angle < degreePlayMoveLeftRight ) {
             animName = "moveForward";
         } else {
-            Vector3 up = Vector3.Cross(moveDir,aimDir);
+            Vector3 up = Vector3.Cross(dir,aimDir);
             if ( up.y > 0.0f )
                 animName = "moveLeft";
             else
@@ -360,4 +446,33 @@ public class Player_girl : Player_base {
         if ( this.anim.IsPlaying(animName) == false )
             this.anim.CrossFade(animName,0.3f);
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Act_Shooting () {
+        // TODO { 
+        if ( this.curWeapon ) {
+            // TODO: ShootInfo shootInfo = this.curWeapon.GetComponent<ShootInfo>();
+            Fire fire = this.curWeapon.GetComponent<Fire>();
+            if (fire) {
+                this.anim.Play("shootSMG");
+                fire.Trigger();
+            }
+        }
+        // } TODO end 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool IsMoving () { return this.controller.velocity.sqrMagnitude > 0.0f; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool ShootButtonTriggered () { return this.shootButtonTriggered; }
 }
