@@ -46,22 +46,6 @@ public class Player_girl : Player_base {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: Action_StopMoving 
-    // ------------------------------------------------------------------ 
-
-    class Action_StopMoving : FSM.Action {
-        Player_girl playerGirl = null;
-
-        public Action_StopMoving ( Player_girl _playerGirl ) {
-            this.playerGirl = _playerGirl;
-        }
-
-        public override void exec () {
-            this.playerGirl.Stop();
-        }
-    }
-
-    // ------------------------------------------------------------------ 
     // Desc: Action_Shooting 
     // ------------------------------------------------------------------ 
 
@@ -231,9 +215,6 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     private void InitAnim () {
-        // get the animation component
-        this.anim = gameObject.GetComponent(typeof(Animation)) as Animation;
-
         // animation
         AnimationState state;
         string[] anim_keys0 = { 

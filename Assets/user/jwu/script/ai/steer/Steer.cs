@@ -151,6 +151,15 @@ public class Steer : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public Vector3 GetSteering_Seek_MaxForces ( Vector3 _pos ) {
+        Vector3 dir = (_pos - transform.position).normalized;
+        return dir * this.maxForce;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public Vector3 GetSteering_Flee_LimitByMaxSpeed ( Vector3 _pos ) {
         Vector3 offset = transform.position - _pos;
         Vector3 desiredVelocity = Vector3.ClampMagnitude ( offset, this.maxSpeed );

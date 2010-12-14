@@ -192,8 +192,11 @@ public class Player_boy : Player_base {
     void InitAnim () {
         // setup the animation state
         AnimationState state;
-        string[] anim_keys = { "moveforward" };
-        foreach (string key in anim_keys) {
+        string[] anim_keys0 = { 
+            "moveforward", 
+            "idle"
+        };
+        foreach (string key in anim_keys0) {
             state = this.anim[key];
             state.layer = 0;
             state.wrapMode = WrapMode.Loop;
@@ -206,12 +209,6 @@ public class Player_boy : Player_base {
         state.wrapMode = WrapMode.Once;
         state.weight = 1.0f;
         state.enabled = false;
-
-        state = this.anim["idle"];
-        state.wrapMode = WrapMode.Loop;
-        state.layer = 0;
-        state.weight = 1.0f;
-        state.enabled = true;
     }
 
     // ------------------------------------------------------------------ 

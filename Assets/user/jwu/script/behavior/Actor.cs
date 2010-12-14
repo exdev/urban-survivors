@@ -23,6 +23,80 @@ using System.Collections;
 public class Actor : Steer {
 
     ///////////////////////////////////////////////////////////////////////////////
+    // actions, conditions
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_MoveToNearestPlayer 
+    // ------------------------------------------------------------------ 
+
+    protected class Action_MoveToNearestPlayer : FSM.Action_periodic {
+        Actor actor = null;
+
+        public Action_MoveToNearestPlayer ( float _interval, Actor _actor ) 
+            : base ( 0.0f, _interval )
+        {
+            this.actor = _actor;
+        }
+
+        public override void exec () {
+            float dist = 0.0f;
+            Transform player = null;
+            GameRules.Instance().GetNearestPlayer( this.actor.transform,
+                                                   out player,
+                                                   out dist );
+            this.actor.Seek(player.position);
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_StopMoving 
+    // ------------------------------------------------------------------ 
+
+    protected class Action_StopMoving : FSM.Action {
+        Actor actor = null;
+
+        public Action_StopMoving ( Actor _actor ) {
+            this.actor = _actor;
+        }
+
+        public override void exec () {
+            this.actor.Stop();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Condition_isPlayerInAttackRange
+    // ------------------------------------------------------------------ 
+
+    protected class Condition_isPlayerInAttackRange : FSM.Condition {
+        Actor actor = null;
+        float degrees = 30.0f;
+        float distance = 2.0f;
+
+        public Condition_isPlayerInAttackRange ( Actor _actor, float _degrees, float _dist ) {
+            this.actor = _actor;
+            this.degrees = _degrees;
+            this.distance = _dist;
+        }
+
+        public override bool exec () {
+            float dist = 0.0f;
+            Transform player = null;
+            GameRules.Instance().GetNearestPlayer( this.actor.transform,
+                                                   out player,
+                                                   out dist );
+            if ( dist > this.distance ) // not in distance 
+                return false;
+
+            // if we near target, check if we face it.
+            bool result = this.actor.IsAhead( player.position, 
+                                              Mathf.Cos(this.degrees*Mathf.Deg2Rad) );
+            return result;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
@@ -50,6 +124,7 @@ public class Actor : Steer {
         base.Start();
         // init the player basic values.
         this.anim = gameObject.GetComponent(typeof(Animation)) as Animation;
+        this.targetPos = transform.position;
     }
 
     // ------------------------------------------------------------------ 

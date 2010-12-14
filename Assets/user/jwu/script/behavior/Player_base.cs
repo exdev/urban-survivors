@@ -21,7 +21,7 @@ using System.Collections;
 
 public class Player_base : Actor {
 
-    public Player_info player_info = new Player_info();
+    public PlayerInfo player_info = new PlayerInfo();
     public Transform weaponAnchor = null;
 
     protected ScreenPad screenPad = null;
