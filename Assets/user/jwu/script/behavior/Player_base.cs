@@ -21,7 +21,7 @@ using System.Collections;
 
 public class Player_base : Actor {
 
-    public PlayerInfo player_info = new PlayerInfo();
+    public PlayerInfo playerInfo = new PlayerInfo();
     public Transform weaponAnchor = null;
 
     protected ScreenPad screenPad = null;
@@ -62,11 +62,13 @@ public class Player_base : Actor {
         // TODO: we should load info from saved data or check point.
         // info.serialize();
 
-        if ( this.player_info.weapon1 != WeaponBase.WeaponID.unknown )
-            this.ChangeWeapon(this.player_info.weapon1);
-        else if ( this.player_info.weapon2 != WeaponBase.WeaponID.unknown )
-            this.ChangeWeapon(this.player_info.weapon2);
+        if ( this.playerInfo.weapon1 != WeaponBase.WeaponID.unknown )
+            this.ChangeWeapon(this.playerInfo.weapon1);
+        else if ( this.playerInfo.weapon2 != WeaponBase.WeaponID.unknown )
+            this.ChangeWeapon(this.playerInfo.weapon2);
         DebugHelper.Assert( this.curWeapon, "can't find any valid weapon" );
+
+        this.playerInfo.curHP = this.playerInfo.maxHP;
     }
 
     // ------------------------------------------------------------------ 
@@ -92,7 +94,7 @@ public class Player_base : Actor {
     protected DamageInfo GetDamageInfo () { return this.curWeapon.GetComponent<DamageInfo>(); }
     protected void SetCurWeaponOwner () { 
         DamageInfo dmgInfo = this.GetDamageInfo();
-        dmgInfo.owner_info = this.player_info; 
+        dmgInfo.owner_info = this.playerInfo; 
     }
 }
 

@@ -42,9 +42,9 @@ public class ActorInfo {
     ///////////////////////////////////////////////////////////////////////////////
 
     public ActorType actorType = ActorType.unknown; 
-    public float curHP = 60.0f;
     public float maxHP = 100.0f;
     public bool isBerserk = false;
+    [System.NonSerialized] public float curHP = 100.0f;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

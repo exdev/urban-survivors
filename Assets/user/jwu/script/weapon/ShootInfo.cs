@@ -17,21 +17,6 @@ using System.Collections.Generic;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
-// // ------------------------------------------------------------------ 
-// // Desc: ComboInfo 
-// // ------------------------------------------------------------------ 
-
-// [System.Serializable]
-// // public class ComboInfo {
-// //     public string animName = "unknown";
-// //     public Vector2 validInputTime = new Vector2(0.0f,1.0f);
-// //     public float endTime = -1.0f; 
-// //     public bool canCharge = false;
-// //     public GameObject attack_shape = null;
-// //     [System.NonSerialized] public ComboInfo next = null;
-// //     // TODO: public collision info 
-// // }
-
 // ------------------------------------------------------------------ 
 // Desc: ShootInfo
 // ------------------------------------------------------------------ 
@@ -45,21 +30,73 @@ public class ShootInfo : MonoBehaviour {
     public string shootAnim = "unknown";
     public string reloadAnim = "unknown";
     public Transform anchor = null;
+    public GameObject bullet = null;
     public float shootSpeed = 1.0f;
     public float reloadSpeed = 1.0f;
-    public float accuracy = 1.0f;
-    public uint maxBullets = 10;
+    // public float accuracy = 1.0f; // DELME: looks like accuracy is hardcoded in the Emitter.
+    public int capacity = 10;
 
-    protected uint curBullets = 10;
+    protected int bullets = 10;
+    protected Emitter emitter = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
     ///////////////////////////////////////////////////////////////////////////////
 
-    // Use this for initialization
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     void Start () {
         DebugHelper.Assert(this.shootAnim!="unknown", "shootAnim can't be unknown!");
         DebugHelper.Assert(this.reloadAnim!="unknown", "reloadAnim can't be unknown!");
-        DebugHelper.Assert(this.anchor, "weapon's anchor not set" );
+        DebugHelper.Assert(this.anchor, "anchor not set" );
+        DebugHelper.Assert(this.bullet, "bullet not set" );
+
+        this.emitter = GetComponent( typeof(Emitter) ) as Emitter;
+        DebugHelper.Assert(this.emitter, "can't find emitter" );
+        this.bullets = this.capacity;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void AdjustAnim ( Animation _anim ) {
+        AnimationState state = null;
+
+        // adjust shoot speed;
+        state = _anim[this.shootAnim];
+        state.normalizedSpeed = shootSpeed;
+
+        // adjust reload speed;
+        state = _anim[this.reloadAnim];
+        state.normalizedSpeed = reloadSpeed;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool OutOfAmmo () { return this.bullets <= 0; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Fire () {
+        if ( OutOfAmmo() == false ) {
+            // TODO: bullet consume.
+            this.emitter.Emit(this.bullet);
+            this.bullets -= 1;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Reload ( int _amount ) {
+        this.bullets = _amount;
     }
 }

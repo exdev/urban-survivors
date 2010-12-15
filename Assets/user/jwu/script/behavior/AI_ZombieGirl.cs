@@ -97,7 +97,7 @@ public class AI_ZombieGirl : Actor {
 
     void InitFSM () {
 
-        FSM.Condition cond_isPlayerInAttackRange = new Condition_isPlayerInAttackRange(this,30.0f,2.0f);
+        FSM.Condition cond_isPlayerInAttackRange = new Condition_isPlayerInAttackRange(this,60.0f,2.0f);
         FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
 
         // ======================================================== 

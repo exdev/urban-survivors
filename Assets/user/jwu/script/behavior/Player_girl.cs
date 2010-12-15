@@ -62,6 +62,22 @@ public class Player_girl : Player_base {
     }
 
     // ------------------------------------------------------------------ 
+    // Desc: Action_Reloading 
+    // ------------------------------------------------------------------ 
+
+    class Action_Reloading : FSM.Action {
+        Player_girl playerGirl; 
+
+        public Action_Reloading ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override void exec () {
+            this.playerGirl.Act_Reloading();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     // Desc: Condition_TargetInRange 
     // ------------------------------------------------------------------ 
 
@@ -109,14 +125,42 @@ public class Player_girl : Player_base {
         }
 
         public override bool exec () {
-            // TODO { 
-            // AttackInfo atk_info = playerBoy.GetAttackInfo();
-            // if ( atk_info.curCombo == null )
-            //     return false;
-            // return this.playerBoy.IsPlayingAnim( atk_info.curCombo.animName, 
-            //                                      atk_info.curCombo.endTime );
-            // } TODO end 
-            return this.playerGirl.IsPlayingAnim( "shootSMG" );
+            ShootInfo shootInfo = this.playerGirl.GetShootInfo();
+            return this.playerGirl.IsPlayingAnim( shootInfo.shootAnim );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Condition_isReloading 
+    // ------------------------------------------------------------------ 
+
+    class Condition_isReloading : FSM.Condition {
+        Player_girl playerGirl = null;
+
+        public Condition_isReloading ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override bool exec () {
+            ShootInfo shootInfo = this.playerGirl.GetShootInfo();
+            return this.playerGirl.IsPlayingAnim( shootInfo.reloadAnim );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Condition_isOutOfAmmo : FSM.Condition {
+        Player_girl playerGirl = null;
+
+        public Condition_isOutOfAmmo ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override bool exec () {
+            ShootInfo shootInfo = this.playerGirl.GetShootInfo();
+            return shootInfo.OutOfAmmo();
         }
     }
 
@@ -286,14 +330,29 @@ public class Player_girl : Player_base {
                                                       null );
         // walk shooting
         FSM.Action action_walkAndShoot = new FSM.Action_list( new FSM.Action[] {
-                                                                new Action_FollowTarget(this,this.followTarget.transform),
-                                                                new Action_Shooting(this) 
+                                                              new Action_FollowTarget(this,this.followTarget.transform),
+                                                              new Action_Shooting(this) 
                                                               }
                                                             );
         FSM.State state_walkShooting = new FSM.State( "walk_shooting", 
                                                       action_walkAndShoot, 
                                                       new Action_FollowTarget(this,this.followTarget.transform), 
                                                       new Action_StopMoving(this) );
+        // reloading
+        FSM.State state_idleReloading = new FSM.State( "idle_reloading", 
+                                                       new Action_Reloading(this), 
+                                                       null,
+                                                       null );
+        // walk reloading
+        FSM.Action action_walkAndReload = new FSM.Action_list( new FSM.Action[] {
+                                                               new Action_FollowTarget(this,this.followTarget.transform),
+                                                               new Action_Reloading(this) 
+                                                               }
+                                                             );
+        FSM.State state_walkReloading = new FSM.State( "walk_reloading", 
+                                                       action_walkAndReload, 
+                                                       new Action_FollowTarget(this,this.followTarget.transform), 
+                                                       new Action_StopMoving(this) );
 
         // ======================================================== 
         // condition 
@@ -307,6 +366,8 @@ public class Player_girl : Player_base {
                                                                                                 this.followDistance * 1.2f ));
         FSM.Condition cond_isShootButtonTriggered = new Condition_isShootButtonTriggered(this);
         FSM.Condition cond_isNotShooting = new FSM.Condition_not( new Condition_isShooting(this) );
+        FSM.Condition cond_isNotReloading = new FSM.Condition_not( new Condition_isReloading(this) );
+        FSM.Condition cond_isOutOfAmmo = new Condition_isOutOfAmmo(this);
         // DELME { 
         // FSM.Condition cond_isMoving = new Condition_isMoving(this);
         // FSM.Condition cond_isShooting = new Condition_isShooting(this);
@@ -325,12 +386,22 @@ public class Player_girl : Player_base {
         state_following.AddTransition( new FSM.Transition( state_walkShooting, cond_isShootButtonTriggered, null ) );
 
         // idle shooting to ...
+        state_idleShooting.AddTransition( new FSM.Transition( state_idleReloading, cond_isOutOfAmmo, null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_idle, cond_isNotShooting, null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_walkShooting, cond_isFarAwayTarget, null ) );
 
         // walk shooting to ...
+        state_walkShooting.AddTransition( new FSM.Transition( state_walkReloading, cond_isOutOfAmmo, null ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_following, cond_isNotShooting, null ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_idleShooting, cond_isNearTarget, null ) );
+
+        // idle reload to ...
+        state_idleReloading.AddTransition( new FSM.Transition( state_idle, cond_isNotReloading, null ) );
+        state_idleReloading.AddTransition( new FSM.Transition( state_walkReloading, cond_isFarAwayTarget, null ) );
+
+        // walk reload to ...
+        state_walkReloading.AddTransition( new FSM.Transition( state_following, cond_isNotReloading, null ) );
+        state_walkReloading.AddTransition( new FSM.Transition( state_idleReloading, cond_isNearTarget, null ) );
 
         // init fsm
         this.fsm.init(state_idle);
@@ -387,14 +458,13 @@ public class Player_girl : Player_base {
         // handle steering
         Vector3 force = Vector3.zero;
         if ( this.steeringState == SteeringState.seeking ) {
-            force = (this.targetPos - this.transform.position);
+            force = GetSteering_Seek_MaxForces ( this.targetPos );
             force.y = 0.0f;
-            force.Normalize();
         }
         else if ( this.steeringState == SteeringState.braking ) {
             ApplyBrakingForce(10.0f);
         }
-        ApplySteeringForce( force * base.maxForce );
+        ApplySteeringForce( force );
 
         // DEBUG { 
         DebugHelper.DrawCircleY( this.followTarget.transform.position, this.followDistance, Color.yellow );
@@ -433,16 +503,28 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     public void Act_Shooting () {
-        // TODO { 
-        if ( this.curWeapon ) {
-            // TODO: ShootInfo shootInfo = this.curWeapon.GetComponent<ShootInfo>();
-            Fire fire = this.curWeapon.GetComponent<Fire>();
-            if (fire) {
-                this.anim.Play("shootSMG");
-                fire.Trigger();
+        ShootInfo shootInfo = this.GetShootInfo();
+        if ( shootInfo ) {
+            if ( this.anim.IsPlaying(shootInfo.shootAnim) == false ) {
+                shootInfo.AdjustAnim(this.anim);
+                shootInfo.Fire();
+                this.anim.Play(shootInfo.shootAnim);
             }
         }
-        // } TODO end 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Act_Reloading () {
+        ShootInfo shootInfo = this.GetShootInfo();
+        if ( shootInfo ) {
+            shootInfo.AdjustAnim(this.anim);
+            this.anim.Play(shootInfo.reloadAnim);
+            // TODO: HACK
+            shootInfo.Reload(shootInfo.capacity);
+        }
     }
 
     // ------------------------------------------------------------------ 
