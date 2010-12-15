@@ -96,7 +96,7 @@ public class DamageRule : MonoBehaviour {
             // TODO:
         }
         else if ( _dmgInfo.damageType == DamageInfo.DamageType.solid_bullet ) {
-            // TODO:
+            return SolidBulletDamage(_defender,_dmgInfo);
         }
         else if ( _dmgInfo.damageType == DamageInfo.DamageType.energy_bullet ) {
             // TODO:
@@ -108,8 +108,21 @@ public class DamageRule : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    float SolidMeleeDamage ( ActorInfo _defender, DamageInfo _dmgInfo ) 
-    {
+    float SolidMeleeDamage ( ActorInfo _defender, DamageInfo _dmgInfo ) {
+        ActorInfo attacker = _dmgInfo.owner_info;
+        if ( attacker.isBerserk ) {
+            // TODO: there is no document about boy's damage in berserk state
+        }
+        float dmgOutput = _dmgInfo.DP;
+        _defender.curHP -= dmgOutput;
+        return dmgOutput;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    float SolidBulletDamage ( ActorInfo _defender, DamageInfo _dmgInfo ) {
         ActorInfo attacker = _dmgInfo.owner_info;
         if ( attacker.isBerserk ) {
             // TODO: there is no document about boy's damage in berserk state

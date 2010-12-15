@@ -19,28 +19,27 @@ using System.Collections;
 public class Emitter : MonoBehaviour {
 
     ///////////////////////////////////////////////////////////////////////////////
-    // properties
-    ///////////////////////////////////////////////////////////////////////////////
-
-    public Transform anchor = null;
-
-    ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
 
+    protected static GameObject fireEffect = null;
+    public GameObject prefab_FireEffect = null;
+
     // ------------------------------------------------------------------ 
-    // Desc: Use this for initialization
+    // Desc: 
     // ------------------------------------------------------------------ 
 
-	protected void Start () {
-        DebugHelper.Assert( this.anchor, "weapon's anchor not set" );
+	protected void Awake () {
+        if ( fireEffect == null && this.prefab_FireEffect ) {
+            fireEffect = (GameObject)Instantiate( this.prefab_FireEffect );
+        }
 	}
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public virtual void Emit ( GameObject _bullet ) {
+    public virtual void Emit ( Transform _anchor, GameObject _bullet ) {
         Debug.Log("warning! pls reimplement emitter in sub-class");
     }
 }

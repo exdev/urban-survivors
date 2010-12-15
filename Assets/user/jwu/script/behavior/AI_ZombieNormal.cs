@@ -395,10 +395,25 @@ public class AI_ZombieNormal : Actor {
             if ( parent == null ) {
                 return;
             }
-            dmgInfo = parent.gameObject.GetComponent<DamageInfo>();
+            dmgInfo = parent.GetComponent<DamageInfo>();
+
+            // show the melee hit effect
+            if ( meleeHitEffect != null ) {
+                meleeHitEffect.transform.position = _other.transform.position;
+                meleeHitEffect.transform.rotation = _other.transform.rotation;
+                meleeHitEffect.particleEmitter.Emit();
+            }
         }
         else if ( _other.gameObject.layer == Layer.bullet_player ) {
-            dmgInfo = _other.gameObject.GetComponent<DamageInfo>();
+            BulletInfo bulletInfo = _other.GetComponent<BulletInfo>();
+            dmgInfo = bulletInfo.ownerDamageInfo;
+
+            // show the bullet hit effect
+            if ( bulletHitEffect != null ) {
+                bulletHitEffect.transform.position = _other.transform.position;
+                bulletHitEffect.transform.rotation = _other.transform.rotation;
+                bulletHitEffect.particleEmitter.Emit();
+            }
         }
         else {
             return;

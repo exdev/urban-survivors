@@ -52,6 +52,8 @@ public class ShootInfo : MonoBehaviour {
         DebugHelper.Assert(this.reloadAnim!="unknown", "reloadAnim can't be unknown!");
         DebugHelper.Assert(this.anchor, "anchor not set" );
         DebugHelper.Assert(this.bullet, "bullet not set" );
+        BulletInfo bulletInfo = this.bullet.GetComponent<BulletInfo>();
+        bulletInfo.ownerDamageInfo = this.GetComponent<DamageInfo>();
 
         this.emitter = GetComponent( typeof(Emitter) ) as Emitter;
         DebugHelper.Assert(this.emitter, "can't find emitter" );
@@ -87,7 +89,7 @@ public class ShootInfo : MonoBehaviour {
     public void Fire () {
         if ( OutOfAmmo() == false ) {
             // TODO: bullet consume.
-            this.emitter.Emit(this.bullet);
+            this.emitter.Emit(this.anchor,this.bullet);
             this.bullets -= 1;
         }
     }

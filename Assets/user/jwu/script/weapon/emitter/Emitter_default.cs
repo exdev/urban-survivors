@@ -22,8 +22,8 @@ public class Emitter_default : Emitter {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public override void Emit ( GameObject _bullet ) {
+    public override void Emit ( Transform _anchor, GameObject _bullet ) {
         // create a bullet, and rotate it based on the vector inputRotation
-        Instantiate(_bullet, this.anchor.position, this.anchor.rotation );
+        Instantiate(_bullet, _anchor.position, _anchor.rotation );
     }
 }

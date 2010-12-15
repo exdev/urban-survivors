@@ -22,27 +22,15 @@ public class BulletInfo : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    static GameObject parBulletHit_inst = null;
-
     public float speed = 20.0f;
     public float lifeTime = 1.0f;
-    public GameObject parBulletHit = null;
+    public DamageInfo ownerDamageInfo = null; // NOTE: if we don't use public, Instantiate will not copy this. 
 
-    private float counter = 0.0f;
+    protected float counter = 0.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void Awake () {
-        if ( parBulletHit_inst == null ) {
-            parBulletHit_inst = (GameObject)Instantiate(parBulletHit, transform.position, transform.rotation );
-        }
-    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -68,35 +56,23 @@ public class BulletInfo : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnCollisionEnter ( Collision _other ) {
-        // DEBUG { 
-        // Debug.Log("touch: " + _other.gameObject.name );
-        // } DEBUG end 
-
-        // play particles
-        if ( parBulletHit_inst != null ) {
-            parBulletHit_inst.transform.position = transform.position;
-            parBulletHit_inst.transform.rotation = transform.rotation;
-            parBulletHit_inst.particleEmitter.Emit();
-        }
-        else {
-            Debug.Log( "warning: the particle instance not instantiate!" );
-        }
-
-        // HARDCODE { 
-        // DELME { 
-        // it is possible the collider already destroied 
-        // if ( _other.collider != null ) {
-        //     AI_generic ai = _other.collider.GetComponent( typeof(AI_generic) ) as AI_generic;
-        //     if ( ai != null ) {
-        //         ai.HP -= 10.0f;
-        //     }
+    void OnTriggerEnter ( Collider _other ) {
+        // TODO: play dead particle ??? { 
+        // // play particles
+        // if ( parBulletHit_inst != null ) {
+        //     parBulletHit_inst.transform.position = transform.position;
+        //     parBulletHit_inst.transform.rotation = transform.rotation;
+        //     parBulletHit_inst.particleEmitter.Emit();
         // }
-        // } DELME end 
-        // } HARDCODE end 
+        // else {
+        //     Debug.Log( "warning: the particle instance not instantiate!" );
+        // }
+        // } TODO end 
 
+        // TODO: bullet type, hit what? should get through or not. { 
         // destroy bullet
-        SpawnManager.Instance().Destroy(gameObject);
+        // DISABLE: SpawnManager.Instance().Destroy(gameObject);
+        GameObject.Destroy(gameObject);
+        // } TODO end 
     }
-
 }
