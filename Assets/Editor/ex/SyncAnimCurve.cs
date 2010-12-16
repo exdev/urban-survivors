@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : CurvesTransferer.cs
+// File         : SyncAnimCurve.cs
 // Author       : Wu Jie 
-// Last Change  : 10/20/2010 | 23:04:23 PM | Wednesday,October
+// Last Change  : 12/16/2010 | 15:20:51 PM | Thursday,December
 // Description  : 
 // ======================================================================================
 
@@ -14,13 +14,13 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// class CurvesTransferer 
+// class SyncAnimCurve 
 // 
 // Purpose: 
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
-public class CurvesTransferer
+public class SyncAnimCurve
 {
     const string duplicatePostfix = "_copy";
 
@@ -33,7 +33,7 @@ public class CurvesTransferer
         AssetDatabase.Refresh();
     }
 
-    [MenuItem("Assets/Transfer Clip Curves to Copy")]
+    [MenuItem("Assets/Sync Animation Curve")]
     static void CopyCurvesToDuplicate()
     {
         // Get selected AnimationClip

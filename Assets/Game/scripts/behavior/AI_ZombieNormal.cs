@@ -169,6 +169,7 @@ public class AI_ZombieNormal : Actor {
 
     public ActorInfo zombie_info = new ActorInfo();
     public float attackDistance = 1.5f;
+    public GameObject atkShape = null;
     protected HitInfo lastHit = new HitInfo();
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -316,6 +317,13 @@ public class AI_ZombieNormal : Actor {
     protected new void Start () {
         base.Start();
 
+        // HARDCODE { 
+        DebugHelper.Assert(this.atkShape, "attack shape not assigned");
+        this.atkShape.active = false;
+        DamageInfo dmgInfo = this.atkShape.GetComponent<DamageInfo>();
+        dmgInfo.owner_info = this.zombie_info;
+        // } HARDCODE end 
+
         this.InitAnim();
         this.InitFSM();
     }
@@ -398,10 +406,10 @@ public class AI_ZombieNormal : Actor {
             dmgInfo = parent.GetComponent<DamageInfo>();
 
             // show the melee hit effect
-            if ( meleeHitEffect != null ) {
-                meleeHitEffect.transform.position = _other.transform.position;
-                meleeHitEffect.transform.rotation = _other.transform.rotation;
-                meleeHitEffect.particleEmitter.Emit();
+            if ( fxHitMelee != null ) {
+                fxHitMelee.transform.position = _other.transform.position;
+                fxHitMelee.transform.rotation = _other.transform.rotation;
+                fxHitMelee.particleEmitter.Emit();
             }
         }
         else if ( _other.gameObject.layer == Layer.bullet_player ) {
@@ -409,10 +417,10 @@ public class AI_ZombieNormal : Actor {
             dmgInfo = bulletInfo.ownerDamageInfo;
 
             // show the bullet hit effect
-            if ( bulletHitEffect != null ) {
-                bulletHitEffect.transform.position = _other.transform.position;
-                bulletHitEffect.transform.rotation = _other.transform.rotation;
-                bulletHitEffect.particleEmitter.Emit();
+            if ( fxHitBullet != null ) {
+                fxHitBullet.transform.position = _other.transform.position;
+                fxHitBullet.transform.rotation = _other.transform.rotation;
+                fxHitBullet.particleEmitter.Emit();
             }
         }
         else {
@@ -488,4 +496,20 @@ public class AI_ZombieNormal : Actor {
     public bool arriveDestination () {
         return (this.targetPos - transform.position).magnitude < 0.1f;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	void AttackOn (){
+        this.atkShape.active = true;
+	}
+	
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	void AttackOff (){
+        this.atkShape.active = false;
+	}
 }

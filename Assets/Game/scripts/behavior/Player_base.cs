@@ -21,6 +21,9 @@ using System.Collections;
 
 public class Player_base : Actor {
 
+    protected static GameObject fxHitBite = null;
+
+    public GameObject FX_HIT_bite = null;
     public PlayerInfo playerInfo = new PlayerInfo();
     public Transform weaponAnchor = null;
 
@@ -33,6 +36,16 @@ public class Player_base : Actor {
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Awake () {
+        if ( fxHitBite == null && this.FX_HIT_bite ) {
+            fxHitBite = (GameObject)Instantiate( this.FX_HIT_bite );
+        }
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 

@@ -172,6 +172,7 @@ public class Player_boy : Player_base {
 
         // debug info
         DebugHelper.ScreenPrint ( "Player_boy current state: " + this.fsm.CurrentState().name );
+        // DebugHelper.ScreenPrint ( "Player_boy current HP: " + this.playerInfo.curHP );
         // } DEBUG end 
 	}
 
@@ -275,7 +276,7 @@ public class Player_boy : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    private void HandleInput() {
+    void HandleInput() {
         Vector2 screen_dir = screenPad ? screenPad.GetMoveDirection() : Vector2.zero;
         if ( screen_dir.sqrMagnitude >= 0.0f ) {
             this.moveDir.x = screen_dir.x;
@@ -296,7 +297,7 @@ public class Player_boy : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    private void ProcessMovement () {
+    void ProcessMovement () {
         // stop moving when in melee attack state.
         if ( this.fsm.CurrentState().name == "Melee" ) {
             ApplyBrakingForce(10.0f);
@@ -367,7 +368,7 @@ public class Player_boy : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    private void StartMeleeAttack () {
+    void StartMeleeAttack () {
         AttackInfo atk_info = this.GetAttackInfo();
         atk_info.curCombo.attack_shape.active = true;
     }
@@ -376,8 +377,57 @@ public class Player_boy : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    private void EndMeleeAttack () {
+    void EndMeleeAttack () {
         AttackInfo atk_info = this.GetAttackInfo();
         atk_info.curCombo.attack_shape.active = false;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnTriggerEnter ( Collider _other ) {
+        DamageInfo dmgInfo = null;
+        if ( _other.gameObject.layer == Layer.melee_enemy ) {
+            dmgInfo = _other.GetComponent<DamageInfo>();
+
+            if ( fxHitBite != null ) {
+                fxHitBite.transform.position = _other.transform.position;
+                fxHitBite.transform.rotation = _other.transform.rotation;
+                fxHitBite.particleEmitter.Emit();
+            }
+        }
+        else {
+            return;
+        }
+
+        // if we don't get damage info, just return
+        DebugHelper.Assert( dmgInfo, "can't find damage info for given layer" );
+        if ( dmgInfo == null ) {
+            return;
+        }
+
+        /*float dmgOutput =*/ DamageRule.Instance().CalculateDamage( this.playerInfo, dmgInfo );
+
+        // TODO { 
+        // // TODO { 
+        // // if ( dmgOutput < 20.0f )
+        // //     this.lastHit.hitType = HitInfo.HitType.light;
+        // // else if ( dmgOutput >= 20.0f )
+        // //     this.lastHit.hitType = HitInfo.HitType.normal;
+        // this.lastHit.hitType = HitInfo.HitType.normal;
+        // // } TODO end 
+
+        // this.lastHit.position = _other.transform.position;
+        // this.lastHit.normal = _other.transform.right;
+        // Vector3 dir = _other.transform.position - transform.position;
+        // dir.y = 0.0f;
+        // dir.Normalize();
+        // this.lastHit.hitBackForce = dir * DamageRule.Instance().HitBackForce(dmgInfo.hitBackType);  
+
+        // // TODO: if hit light, face it { 
+        // // transform.forward = -_other.transform.forward;
+        // // } TODO end 
+        // } TODO end 
     }
 }

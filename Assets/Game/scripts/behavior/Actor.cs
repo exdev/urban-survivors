@@ -100,8 +100,8 @@ public class Actor : Steer {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    protected static GameObject bulletHitEffect = null;
-    protected static GameObject meleeHitEffect = null;
+    protected static GameObject fxHitBullet = null;
+    protected static GameObject fxHitMelee = null;
 
     public enum SteeringState {
         seeking,
@@ -109,8 +109,8 @@ public class Actor : Steer {
     };
 
     public float StepSpeed = 0.5f;
-    public GameObject prefab_BulletHitEffect = null;
-    public GameObject prefab_MeleeHitEffect = null;
+    public GameObject FX_HIT_bullet = null;
+    public GameObject FX_HIT_melee = null;
 
     protected Animation anim = null;
     protected FSM fsm = new FSM();
@@ -126,11 +126,11 @@ public class Actor : Steer {
     // ------------------------------------------------------------------ 
 
     void Awake () {
-        if ( bulletHitEffect == null && this.prefab_BulletHitEffect ) {
-            bulletHitEffect = (GameObject)Instantiate( this.prefab_BulletHitEffect );
+        if ( fxHitBullet  == null && this.FX_HIT_bullet ) {
+            fxHitBullet = (GameObject)Instantiate( this.FX_HIT_bullet );
         }
-        if ( meleeHitEffect == null && this.prefab_MeleeHitEffect ) {
-            meleeHitEffect = (GameObject)Instantiate( this.prefab_MeleeHitEffect );
+        if ( fxHitMelee == null && this.FX_HIT_melee ) {
+            fxHitMelee = (GameObject)Instantiate( this.FX_HIT_melee );
         }
     }
 

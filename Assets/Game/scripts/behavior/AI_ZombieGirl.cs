@@ -61,7 +61,7 @@ public class AI_ZombieGirl : Actor {
     public ActorInfo zombie_info = new ActorInfo();
 
     // HACK { 
-    public Transform atkWrapper;
+    public GameObject atkShape;
     public Transform atkAttachedBone;
     // } HACK end 
 
@@ -143,10 +143,10 @@ public class AI_ZombieGirl : Actor {
         this.InitFSM();
 
         // HACK { 
-        DebugHelper.Assert(atkWrapper, "attack wrapper not assigned");
-        DebugHelper.Assert(atkAttachedBone, "attack attached bone not assigned");
-        atkWrapper.parent = atkAttachedBone;
-        atkWrapper.gameObject.active = false;
+        DebugHelper.Assert(this.atkShape, "attack shape not assigned");
+        DebugHelper.Assert(this.atkAttachedBone, "attack attached bone not assigned");
+        this.atkShape.transform.parent = atkAttachedBone;
+        this.atkShape.active = false;
         // } HACK end 
 
         // KEEPME { 
@@ -262,7 +262,7 @@ public class AI_ZombieGirl : Actor {
     // ------------------------------------------------------------------ 
 
 	void AttackOn (){
-        atkWrapper.gameObject.active = true;
+        this.atkShape.active = true;
 	}
 	
     // ------------------------------------------------------------------ 
@@ -270,7 +270,7 @@ public class AI_ZombieGirl : Actor {
     // ------------------------------------------------------------------ 
 
 	void AttackOff (){
-        atkWrapper.gameObject.active = false;
+        this.atkShape.active = false;
 	}
 	
 }

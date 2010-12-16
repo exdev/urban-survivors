@@ -238,6 +238,7 @@ public class Player_girl : Player_base {
 
         // debug info
         DebugHelper.ScreenPrint ( "Player_girl current state: " + this.fsm.CurrentState().name );
+        // DebugHelper.ScreenPrint ( "Player_girl current HP: " + this.playerInfo.curHP );
         // } DEBUG end 
 	}
 
@@ -538,4 +539,53 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     public bool ShootButtonTriggered () { return this.shootButtonTriggered; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnTriggerEnter ( Collider _other ) {
+        DamageInfo dmgInfo = null;
+        if ( _other.gameObject.layer == Layer.melee_enemy ) {
+            dmgInfo = _other.GetComponent<DamageInfo>();
+
+            if ( fxHitBite != null ) {
+                fxHitBite.transform.position = _other.transform.position;
+                fxHitBite.transform.rotation = _other.transform.rotation;
+                fxHitBite.particleEmitter.Emit();
+            }
+        }
+        else {
+            return;
+        }
+
+        // if we don't get damage info, just return
+        DebugHelper.Assert( dmgInfo, "can't find damage info for given layer" );
+        if ( dmgInfo == null ) {
+            return;
+        }
+
+        /*float dmgOutput =*/ DamageRule.Instance().CalculateDamage( this.playerInfo, dmgInfo );
+
+        // TODO { 
+        // // TODO { 
+        // // if ( dmgOutput < 20.0f )
+        // //     this.lastHit.hitType = HitInfo.HitType.light;
+        // // else if ( dmgOutput >= 20.0f )
+        // //     this.lastHit.hitType = HitInfo.HitType.normal;
+        // this.lastHit.hitType = HitInfo.HitType.normal;
+        // // } TODO end 
+
+        // this.lastHit.position = _other.transform.position;
+        // this.lastHit.normal = _other.transform.right;
+        // Vector3 dir = _other.transform.position - transform.position;
+        // dir.y = 0.0f;
+        // dir.Normalize();
+        // this.lastHit.hitBackForce = dir * DamageRule.Instance().HitBackForce(dmgInfo.hitBackType);  
+
+        // // TODO: if hit light, face it { 
+        // // transform.forward = -_other.transform.forward;
+        // // } TODO end 
+        // } TODO end 
+    }
 }
