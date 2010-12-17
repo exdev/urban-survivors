@@ -40,7 +40,7 @@ public class SyncAnimCurve
         AnimationClip imported = Selection.activeObject as AnimationClip;
         if (imported == null)
         {
-            Debug.Log("Selected object is not an AnimationClip");
+            EditorUtility.DisplayDialog ("Error", "the file you selected is is not an AnimationClip", "OK");
             return;
         }
 
@@ -59,9 +59,8 @@ public class SyncAnimCurve
 
         // now, check the copy again to ensure it exists.
         copy = AssetDatabase.LoadAssetAtPath(copyPath, typeof(AnimationClip)) as AnimationClip;
-        if (copy == null)
-        {
-            Debug.Log("No copy found at " + copyPath);
+        if (copy == null) {
+            EditorUtility.DisplayDialog ("Error", "No copy found at " + copyPath, "OK");
             return;
         }
         // Copy curves from imported to copy
@@ -98,6 +97,6 @@ public class SyncAnimCurve
         }
 
 
-        Debug.Log("Copying curves into " + copy.name + " is done");
+        Debug.Log("Animation Curve " + copy.name + " syncing successed!");
     }
 }

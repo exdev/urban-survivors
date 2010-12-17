@@ -195,8 +195,18 @@ public class SyncAnimModel
         string fileName = Path.GetFileNameWithoutExtension(selectionPath); 
 
         // get the prefab by selection path, if the prefab not exists, do nothing.
-        string prefabDir = Path.GetDirectoryName(Path.GetDirectoryName(selectionPath)) + "/prefabs"; 
-        string prefabPath = prefabDir + "/" + fileName + ".prefab";
+        string meshDir = Path.GetDirectoryName(selectionPath);
+        int idx = meshDir.IndexOf("meshes");
+        if ( idx == -1 ) {
+            EditorUtility.DisplayDialog ("Error", "the file you operate is not in meshes directory", "OK");
+            return;
+        }
+        string rootPath = meshDir.Substring(0,idx);
+        string relPath = meshDir.Substring( idx + ("meshes/").Length );
+
+        // setup prefab path
+        string prefabDir = Path.Combine( rootPath, "prefabs" );
+        string prefabPath = Path.Combine( prefabDir, Path.Combine(relPath,fileName+".prefab") );
         GameObject old_prefabGO = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
         if ( old_prefabGO == null ) {
             EditorUtility.DisplayDialog ("Error", "can't find prefab " + prefabPath, "OK");
