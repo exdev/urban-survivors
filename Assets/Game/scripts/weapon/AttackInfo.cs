@@ -51,7 +51,10 @@ public class AttackInfo : MonoBehaviour {
     // function defines
     ///////////////////////////////////////////////////////////////////////////////
 
-	// Use this for initialization
+    // ------------------------------------------------------------------ 
+    // Desc: Use this for initialization
+    // ------------------------------------------------------------------ 
+
 	void Start () {
         int combo_count = this.comboList.Length;
         for ( int i = 0; i < combo_count; ++i ) {
@@ -69,4 +72,17 @@ public class AttackInfo : MonoBehaviour {
         this.combo_entry = this.comboList[0];
         this.comboList = null;
 	}
+
+    // TODO: we should use SweepTestAll instead { 
+    // ------------------------------------------------------------------ 
+    // Desc: NOTE: we have to update physics by ourself. 
+    // ------------------------------------------------------------------ 
+
+    void FixedUpdate () {
+        if ( this.curCombo != null ) {
+            Rigidbody rb = this.curCombo.attack_shape.GetComponent<Rigidbody>();
+            rb.MovePosition(this.transform.position);
+        }
+    }
+    // } TODO end 
 }

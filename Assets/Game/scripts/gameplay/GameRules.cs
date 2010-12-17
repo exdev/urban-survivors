@@ -129,4 +129,31 @@ public class GameRules : MonoBehaviour {
         _player = target;
         _dist = nearest;
     }
+
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void GetNearestAlivedPlayer ( Transform _self, out Transform _player, out float _dist ) { 
+        Transform target = null;
+        float nearest = 9999.0f;
+
+        GameObject[] players = GameRules.Instance().GetPlayers();
+        foreach( GameObject player in players ) {
+            Player_base p = player.GetComponent<Player_base>();
+            if ( p.playerInfo.curHP <= 0.0f ) {
+                continue;
+            }
+
+            float len = (player.transform.position - _self.position).magnitude;
+            if ( len < nearest ) {
+                nearest = len;
+                target = player.transform;
+            }
+        }
+
+        _player = target;
+        _dist = nearest;
+    }
 }

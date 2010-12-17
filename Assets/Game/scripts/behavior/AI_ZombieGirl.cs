@@ -16,7 +16,7 @@ using System.Collections;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
-public class AI_ZombieGirl : Actor {
+public class AI_ZombieGirl : AI_ZombieBase {
 
     ///////////////////////////////////////////////////////////////////////////////
     // actions, conditions
@@ -57,8 +57,6 @@ public class AI_ZombieGirl : Actor {
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
-
-    public ActorInfo zombie_info = new ActorInfo();
 
     // HACK { 
     public GameObject atkShape;
@@ -107,7 +105,7 @@ public class AI_ZombieGirl : Actor {
         // seekPlayers
         FSM.State state_seekPlayers = new FSM.State( "SeekPlayers", 
                                                      new Action_PlayAnim(this.anim,"walk"), 
-                                                     new Action_MoveToNearestPlayer(0.01f,this), 
+                                                     new Action_MoveToNearestAlivedPlayer(0.01f,this), 
                                                      new Action_StopMoving(this) );
         // attack
         FSM.State state_attack = new FSM.State( "Attack", 

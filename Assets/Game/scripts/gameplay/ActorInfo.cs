@@ -61,6 +61,7 @@ public class PlayerInfo : ActorInfo {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    public float recoverTime = 5.0f;
     public WeaponBase.WeaponID weapon1 = WeaponBase.WeaponID.unknown;
     public WeaponBase.WeaponID weapon2 = WeaponBase.WeaponID.unknown;
 

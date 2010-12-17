@@ -20,7 +20,7 @@ using System.Collections.Generic;
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
-public class AI_ZombieNormal : Actor {
+public class AI_ZombieNormal : AI_ZombieBase {
 
     ///////////////////////////////////////////////////////////////////////////////
     // actions, conditions
@@ -146,28 +146,10 @@ public class AI_ZombieNormal : Actor {
         }
     }
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    class Condition_noHP : FSM.Condition {
-        AI_ZombieNormal zombieNormal = null;
-
-        public Condition_noHP ( AI_ZombieNormal _zombieNormal ) {
-            this.zombieNormal = _zombieNormal;
-        }
-
-        public override bool exec () {
-            ActorInfo actInfo = this.zombieNormal.zombie_info;
-            return actInfo.curHP <= 0.0f;
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public ActorInfo zombie_info = new ActorInfo();
     public float attackDistance = 1.5f;
     public GameObject atkShape = null;
     protected HitInfo lastHit = new HitInfo();
@@ -228,7 +210,7 @@ public class AI_ZombieNormal : Actor {
         // seekPlayers
         FSM.State state_seekPlayers = new FSM.State( "SeekPlayers", 
                                                      new Action_PlayAnim(this.anim,"moveForward"), 
-                                                     new Action_MoveToNearestPlayer(0.5f,this), 
+                                                     new Action_MoveToNearestAlivedPlayer(0.5f,this), 
                                                      new Action_StopMoving(this) );
         // attack
         FSM.State state_attack = new FSM.State( "Attack", 
@@ -253,7 +235,7 @@ public class AI_ZombieNormal : Actor {
         FSM.Condition cond_isPlayerInAttackRange = new Condition_isPlayerInAttackRange(this,30.0f,this.attackDistance);
         FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
         FSM.Condition cond_isOnHit = new Condition_isOnHit(this);
-        FSM.Condition cond_noHP = new Condition_noHP(this);
+        FSM.Condition cond_noHP = new Condition_noHP(this.zombieInfo);
 
         // ======================================================== 
         // setup transitions
@@ -321,7 +303,7 @@ public class AI_ZombieNormal : Actor {
         DebugHelper.Assert(this.atkShape, "attack shape not assigned");
         this.atkShape.active = false;
         DamageInfo dmgInfo = this.atkShape.GetComponent<DamageInfo>();
-        dmgInfo.owner_info = this.zombie_info;
+        dmgInfo.owner_info = this.zombieInfo;
         // } HARDCODE end 
 
         this.InitAnim();
@@ -355,8 +337,8 @@ public class AI_ZombieNormal : Actor {
         DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
 
         // debug info
-        DebugHelper.ScreenPrint ( "AI_ZombieNormal steering state: " + this.steeringState );
-        DebugHelper.ScreenPrint ( "AI_ZombieNormal current state: " + fsm.CurrentState().name );
+        // DebugHelper.ScreenPrint ( "AI_ZombieNormal steering state: " + this.steeringState );
+        // DebugHelper.ScreenPrint ( "AI_ZombieNormal current state: " + fsm.CurrentState().name );
 
         // Vector3 targetDir = (this.targetPos - transform.position).normalized;
         // float cosTheta = Vector3.Dot ( transform.forward, targetDir );
@@ -364,8 +346,7 @@ public class AI_ZombieNormal : Actor {
         // DebugHelper.ScreenPrint ( "target pos: " + this.targetPos );
 
         // DEBUG actorInfo
-        DebugHelper.ScreenPrint ( "curHP = " + this.zombie_info.curHP );
-        DebugHelper.ScreenPrint ( "maxHP = " + this.zombie_info.maxHP );
+        DebugHelper.ScreenPrint ( "AI_ZombieNormal curHP = " + this.zombieInfo.curHP );
 
         // DEBUG animation
         // foreach ( AnimationState animS in this.anim ) {
@@ -433,7 +414,7 @@ public class AI_ZombieNormal : Actor {
             return;
         }
 
-        /*float dmgOutput =*/ DamageRule.Instance().CalculateDamage( this.zombie_info, dmgInfo );
+        /*float dmgOutput =*/ DamageRule.Instance().CalculateDamage( this.zombieInfo, dmgInfo );
 
         // TODO { 
         // if ( dmgOutput < 20.0f )

@@ -27,29 +27,6 @@ public class Actor : Steer {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: Action_MoveToNearestPlayer 
-    // ------------------------------------------------------------------ 
-
-    protected class Action_MoveToNearestPlayer : FSM.Action_periodic {
-        Actor actor = null;
-
-        public Action_MoveToNearestPlayer ( float _interval, Actor _actor ) 
-            : base ( 0.0f, _interval )
-        {
-            this.actor = _actor;
-        }
-
-        public override void exec () {
-            float dist = 0.0f;
-            Transform player = null;
-            GameRules.Instance().GetNearestPlayer( this.actor.transform,
-                                                   out player,
-                                                   out dist );
-            this.actor.Seek(player.position);
-        }
-    }
-
-    // ------------------------------------------------------------------ 
     // Desc: Action_StopMoving 
     // ------------------------------------------------------------------ 
 
@@ -66,33 +43,38 @@ public class Actor : Steer {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: Condition_isPlayerInAttackRange
+    // Desc: 
     // ------------------------------------------------------------------ 
 
-    protected class Condition_isPlayerInAttackRange : FSM.Condition {
-        Actor actor = null;
-        float degrees = 30.0f;
-        float distance = 2.0f;
+    protected class Condition_noHP : FSM.Condition {
+        ActorInfo info = null;
 
-        public Condition_isPlayerInAttackRange ( Actor _actor, float _degrees, float _dist ) {
-            this.actor = _actor;
-            this.degrees = _degrees;
-            this.distance = _dist;
+        public Condition_noHP ( ActorInfo _info ) {
+            this.info = _info;
         }
 
         public override bool exec () {
-            float dist = 0.0f;
-            Transform player = null;
-            GameRules.Instance().GetNearestPlayer( this.actor.transform,
-                                                   out player,
-                                                   out dist );
-            if ( dist > this.distance ) // not in distance 
-                return false;
+            return info.curHP <= 0.0f;
+        }
+    }
 
-            // if we near target, check if we face it.
-            bool result = this.actor.IsAhead( player.position, 
-                                              Mathf.Cos(this.degrees*Mathf.Deg2Rad) );
-            return result;
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected class Condition_isPlayingAnim : FSM.Condition {
+        Actor actor = null;
+        string animName = "unknown";
+        float endTime = 0.0f;
+
+        public Condition_isPlayingAnim ( Actor _actor, string _animName, float _endTime = -1.0f ) {
+            this.actor = _actor;
+            this.animName = _animName;
+            this.endTime = _endTime;
+        }
+
+        public override bool exec () {
+            return this.actor.IsPlayingAnim(this.animName,this.endTime);
         }
     }
 
@@ -100,21 +82,18 @@ public class Actor : Steer {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    protected static GameObject fxHitBullet = null;
-    protected static GameObject fxHitMelee = null;
-
     public enum SteeringState {
+        moving,
         seeking,
         braking,
     };
 
     public float StepSpeed = 0.5f;
-    public GameObject FX_HIT_bullet = null;
-    public GameObject FX_HIT_melee = null;
 
     protected Animation anim = null;
     protected FSM fsm = new FSM();
     protected Vector3 targetPos;
+    protected Vector3 moveDir;
     protected SteeringState steeringState = SteeringState.braking;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -126,12 +105,6 @@ public class Actor : Steer {
     // ------------------------------------------------------------------ 
 
     void Awake () {
-        if ( fxHitBullet  == null && this.FX_HIT_bullet ) {
-            fxHitBullet = (GameObject)Instantiate( this.FX_HIT_bullet );
-        }
-        if ( fxHitMelee == null && this.FX_HIT_melee ) {
-            fxHitMelee = (GameObject)Instantiate( this.FX_HIT_melee );
-        }
     }
 
     // ------------------------------------------------------------------ 
@@ -160,6 +133,15 @@ public class Actor : Steer {
             return result;
 
         return result && state.time <= endTime;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Move ( Vector3 _dir ) {
+        this.moveDir = _dir;
+        this.steeringState = SteeringState.moving;
     }
 
     // ------------------------------------------------------------------ 

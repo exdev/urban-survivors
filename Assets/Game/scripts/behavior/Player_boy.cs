@@ -12,6 +12,7 @@
 using UnityEngine;
 using System.Collections;
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // class Player_boy
 // 
@@ -26,21 +27,34 @@ public class Player_boy : Player_base {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: Action_MoveToNearestPlayer 
+    // Desc: Action_Move 
     // ------------------------------------------------------------------ 
 
-    class Action_AdjustMoveSpeed : FSM.Action {
-        Animation anim_comp;
-        Player_boy playerBoy = null;
+    class Action_Move : FSM.Action {
+        Player_boy playerBoy; 
 
-        public Action_AdjustMoveSpeed ( Animation _anim, Player_boy _playerBoy ) {
-            this.anim_comp = _anim;
+        public Action_Move ( Player_boy _playerBoy ) {
             this.playerBoy = _playerBoy;
         }
 
         public override void exec () {
-            this.anim_comp["moveforward"].normalizedSpeed 
-                = Mathf.Max(this.playerBoy.StepSpeed * this.playerBoy.CurSpeed(),1.0f);
+            this.playerBoy.Act_Movement();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Action_FallDown : FSM.Action {
+        Player_boy playerBoy; 
+
+        public Action_FallDown ( Player_boy _playerBoy ) {
+            this.playerBoy = _playerBoy;
+        }
+
+        public override void exec () {
+            this.playerBoy.Act_FallDown();
         }
     }
 
@@ -130,7 +144,7 @@ public class Player_boy : Player_base {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    protected Vector3 moveDir = Vector3.zero;
+    public Vector3 screenDir = Vector3.zero;
     protected bool meleeButtonTriggered = false;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -195,7 +209,8 @@ public class Player_boy : Player_base {
         AnimationState state;
         string[] anim_keys0 = { 
             "moveforward", 
-            "idle"
+            "idle",
+            "downIdle"
         };
         foreach (string key in anim_keys0) {
             state = this.anim[key];
@@ -205,11 +220,19 @@ public class Player_boy : Player_base {
             state.enabled = false;
         }
 
-        state = this.anim["melee1_copy"];
-        state.layer = 0;
-        state.wrapMode = WrapMode.Once;
-        state.weight = 1.0f;
-        state.enabled = false;
+        //
+        string[] anim_keys0_once = { 
+            "melee1_copy", 
+            "fallDown",
+            "getUp"
+        };
+        foreach (string key in anim_keys0_once) {
+            state = this.anim[key];
+            state.layer = 0;
+            state.wrapMode = WrapMode.Once;
+            state.weight = 1.0f;
+            state.enabled = false;
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -230,12 +253,27 @@ public class Player_boy : Player_base {
         // walk
         FSM.State state_walk = new FSM.State( "Walk", 
                                               new Action_PlayAnim(this.anim,"moveforward"), 
-                                              new Action_AdjustMoveSpeed(this.anim,this),
-                                              null );
+                                              new Action_Move(this),
+                                              new Action_StopMoving(this) );
         // melee
         FSM.State state_melee = new FSM.State( "Melee", 
                                                new Action_StartCombo(this), 
                                                new Action_NextCombo(this), 
+                                               null );
+        // down
+        FSM.State state_down = new FSM.State( "Down", 
+                                               new Action_FallDown(this), 
+                                               null,
+                                               null );
+        // downIdle
+        FSM.State state_downIdle = new FSM.State( "DownIdle", 
+                                                  new Action_PlayAnim(this.anim,"downIdle"), 
+                                                  null,
+                                                  null );
+        // getUp
+        FSM.State state_getUp = new FSM.State( "GetUp", 
+                                               new Action_PlayAnim(this.anim,"getUp"), 
+                                               null,
                                                null );
 
         // ======================================================== 
@@ -251,14 +289,17 @@ public class Player_boy : Player_base {
         // ======================================================== 
 
         // idle to ...
+        state_idle.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
         state_idle.AddTransition( new FSM.Transition( state_walk, cond_isMoving, null ) );
         state_idle.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonTriggered, null ) );
 
         // walk to ...
+        state_walk.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
         state_walk.AddTransition( new FSM.Transition( state_idle, new FSM.Condition_not(cond_isMoving), null ) );
         state_walk.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonTriggered, null ) );
 
         // melee to ...
+        state_melee.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
         state_melee.AddTransition( new FSM.Transition( state_idle, 
                                                        new FSM.Condition_and(new FSM.Condition_not(cond_isMoving),
                                                                              new FSM.Condition_not(cond_isAttacking)), 
@@ -266,6 +307,21 @@ public class Player_boy : Player_base {
         state_melee.AddTransition( new FSM.Transition( state_walk, 
                                                        new FSM.Condition_and(cond_isMoving,
                                                                              new FSM.Condition_not(cond_isAttacking)), 
+                                                       null ) );
+        // down to ...
+        state_down.AddTransition( new FSM.Transition( state_downIdle, 
+                                                      new FSM.Condition_not( new Condition_isPlayingAnim( this, "fallDown" ) ), 
+                                                      null ) );
+        // downIdle to ...
+        state_downIdle.AddTransition( new FSM.Transition( state_getUp, 
+                                                          new FSM.Condition_not( new Condition_isDown(this) ), 
+                                                          null ) );
+        // getUp to ...
+        state_getUp.AddTransition( new FSM.Transition( state_down, 
+                                                       new Condition_noHP( this.playerInfo ),
+                                                       null ) );
+        state_getUp.AddTransition( new FSM.Transition( state_idle, 
+                                                       new FSM.Condition_not( new Condition_isPlayingAnim( this, "getUp" ) ), 
                                                        null ) );
 
         // init fsm
@@ -277,15 +333,7 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     void HandleInput() {
-        Vector2 screen_dir = screenPad ? screenPad.GetMoveDirection() : Vector2.zero;
-        if ( screen_dir.sqrMagnitude >= 0.0f ) {
-            this.moveDir.x = screen_dir.x;
-            this.moveDir.y = screen_dir.y;
-            Transform mainCamera = Camera.main.GetComponent( typeof(Transform) ) as Transform;
-            this.moveDir = mainCamera.TransformDirection(this.moveDir.normalized); 
-            this.moveDir.y = 0.0f;
-            this.moveDir = this.moveDir.normalized;
-        }
+        this.screenDir = this.screenPad ? this.screenPad.GetMoveDirection() : Vector2.zero;
         // TEMP: change to screenPad { 
         if ( Input.GetKeyDown(KeyCode.Space) ) {
             this.meleeButtonTriggered = true;
@@ -299,16 +347,27 @@ public class Player_boy : Player_base {
 
     void ProcessMovement () {
         // stop moving when in melee attack state.
-        if ( this.fsm.CurrentState().name == "Melee" ) {
+        // if ( this.fsm.CurrentState().name == "Melee" ) {
+        //     ApplyBrakingForce(10.0f);
+        //     ApplySteeringForce(Vector3.zero);
+        // }
+        // else {
+        //     if ( MathHelper.IsZerof(this.moveDir.sqrMagnitude) ) {
+        //         ApplyBrakingForce(10.0f);
+        //     }
+        //     ApplySteeringForce( this.moveDir * base.maxForce );
+        // }
+
+        // handle steering
+        Vector3 force = Vector3.zero;
+        if ( this.steeringState == SteeringState.moving ) {
+            force = this.moveDir * base.maxForce;
+            force.y = 0.0f;
+        }
+        else if ( this.steeringState == SteeringState.braking ) {
             ApplyBrakingForce(10.0f);
-            ApplySteeringForce(Vector3.zero);
         }
-        else {
-            if ( MathHelper.IsZerof(this.moveDir.sqrMagnitude) ) {
-                ApplyBrakingForce(10.0f);
-            }
-            ApplySteeringForce( this.moveDir * base.maxForce );
-        }
+        ApplySteeringForce( force );
     }
 
     // ------------------------------------------------------------------ 
@@ -356,7 +415,7 @@ public class Player_boy : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public bool IsMoving () { return this.moveDir.sqrMagnitude > 0.0f; }
+    public bool IsMoving () { return this.screenDir.sqrMagnitude > 0.0f; }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -387,6 +446,11 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     void OnTriggerEnter ( Collider _other ) {
+        // don't do anything if player is down
+        if ( this.isDown )
+            return;
+
+        //
         DamageInfo dmgInfo = null;
         if ( _other.gameObject.layer == Layer.melee_enemy ) {
             dmgInfo = _other.GetComponent<DamageInfo>();
@@ -429,5 +493,34 @@ public class Player_boy : Player_base {
         // // transform.forward = -_other.transform.forward;
         // // } TODO end 
         // } TODO end 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Act_Movement () {
+        this.screenDir = this.screenPad.GetMoveDirection();
+        Vector3 dir = Vector3.zero; 
+        dir.x = this.screenDir.x;
+        dir.y = this.screenDir.y;
+        dir.z = 0.0f;
+
+        Transform mainCamera = Camera.main.GetComponent( typeof(Transform) ) as Transform;
+        dir = mainCamera.TransformDirection(dir.normalized); 
+        this.Move(dir);
+
+        // adjust move animation speed
+        this.anim["moveforward"].normalizedSpeed = Mathf.Max(this.StepSpeed * this.CurSpeed(),1.0f);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Act_FallDown () {
+        this.isDown = true;
+        this.anim.CrossFade("fallDown");
+        StartCoroutine( WaitForRecover() );
     }
 }

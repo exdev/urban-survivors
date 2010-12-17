@@ -21,12 +21,37 @@ using System.Collections;
 
 public class Player_base : Actor {
 
+    ///////////////////////////////////////////////////////////////////////////////
+    // conditions, actions
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected class Condition_isDown : FSM.Condition {
+        Player_base player = null;
+
+        public Condition_isDown ( Player_base _player ) {
+            this.player = _player;
+        }
+
+        public override bool exec () {
+            return player.IsDown();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // properties
+    ///////////////////////////////////////////////////////////////////////////////
+
     protected static GameObject fxHitBite = null;
 
     public GameObject FX_HIT_bite = null;
     public PlayerInfo playerInfo = new PlayerInfo();
     public Transform weaponAnchor = null;
 
+    protected bool isDown = false;
     protected ScreenPad screenPad = null;
     protected GameObject curWeapon = null;
     protected GameObject weapon1 = null;
@@ -36,6 +61,21 @@ public class Player_base : Actor {
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected IEnumerator WaitForRecover () {
+        // Debug.Log("before recover time" + Time.time ); // DEBUG
+        yield return new WaitForSeconds (this.playerInfo.recoverTime);
+        // Debug.Log("after recover time" + Time.time ); // DEBUG
+
+        // it is possible that we use HP pack save the player
+        if ( this.IsDown() == true ) {
+            this.Recover();
+        }
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -109,5 +149,15 @@ public class Player_base : Actor {
         DamageInfo dmgInfo = this.GetDamageInfo();
         dmgInfo.owner_info = this.playerInfo; 
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool IsDown () { return this.isDown; } 
+    public void Recover ( float _hp = 0.0f ) { 
+        this.isDown = false; 
+        this.playerInfo.curHP = Mathf.Max( this.playerInfo.curHP + _hp, 10.0f );
+    } 
 }
 
