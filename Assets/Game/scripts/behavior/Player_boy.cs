@@ -173,20 +173,20 @@ public class Player_boy : Player_base {
         ProcessMovement (); // handle steering
 
         // DEBUG { 
-        // draw velocity
-        Vector3 vel = base.Velocity(); 
-        DebugHelper.DrawLine ( transform.position, 
-                               transform.position + vel,
-                               new Color(0.0f,1.0f,0.0f) );
-        // draw smoothed acceleration
-        Vector3 acc = base.smoothedAcceleration;
-        DebugHelper.DrawLine ( transform.position, 
-                               transform.position + acc,
-                               new Color(1.0f,0.0f,1.0f) );
+        // // draw velocity
+        // Vector3 vel = base.Velocity(); 
+        // DebugHelper.DrawLine ( transform.position, 
+        //                        transform.position + vel,
+        //                        new Color(0.0f,1.0f,0.0f) );
+        // // draw smoothed acceleration
+        // Vector3 acc = base.smoothedAcceleration;
+        // DebugHelper.DrawLine ( transform.position, 
+        //                        transform.position + acc,
+        //                        new Color(1.0f,0.0f,1.0f) );
 
-        // debug info
-        DebugHelper.ScreenPrint ( "Player_boy current state: " + this.fsm.CurrentState().name );
-        // DebugHelper.ScreenPrint ( "Player_boy current HP: " + this.playerInfo.curHP );
+        // // debug info
+        // DebugHelper.ScreenPrint ( "Player_boy current state: " + this.fsm.CurrentState().name );
+        // // DebugHelper.ScreenPrint ( "Player_boy current HP: " + this.playerInfo.curHP );
         // } DEBUG end 
 	}
 

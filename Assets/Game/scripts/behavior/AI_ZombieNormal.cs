@@ -249,7 +249,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
                                                       cond_isOnHit,
                                                       null ) );
         state_idle.AddTransition( new FSM.Transition( state_seekPlayers, 
-                                                      new Condition_playerInRange( this.transform, 5.0f ), 
+                                                      new Condition_playerInRange( this.transform, 20.0f ), 
                                                       null ) );
 
         // seekPlayers to ...
@@ -263,7 +263,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
                                                              cond_isPlayerInAttackRange,
                                                              null ) );
         state_seekPlayers.AddTransition( new FSM.Transition( state_idle, 
-                                                             new FSM.Condition_not( new Condition_playerInRange( this.transform, 7.0f ) ) , 
+                                                             new FSM.Condition_not( new Condition_playerInRange( this.transform, 40.0f ) ) , 
                                                              null ) );
         // attack to ...
         state_attack.AddTransition( new FSM.Transition( state_Dead,
@@ -322,19 +322,19 @@ public class AI_ZombieNormal : AI_ZombieBase {
         this.lastHit.hitType = HitInfo.HitType.none;
 
         // DEBUG { 
-        // draw velocity
-        Vector3 vel = base.Velocity(); 
-        DebugHelper.DrawLine ( transform.position, 
-                               transform.position + vel * 3.0f, 
-                               new Color(0.0f,1.0f,0.0f) );
-        // draw smoothed acceleration
-        Vector3 acc = base.smoothedAcceleration;
-        DebugHelper.DrawLine ( transform.position, 
-                               transform.position + acc * 3.0f, 
-                               new Color(1.0f,0.0f,1.0f) );
-        // draw target pos
-        DebugHelper.DrawDestination ( this.targetPos );
-        DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
+        // // draw velocity
+        // Vector3 vel = base.Velocity(); 
+        // DebugHelper.DrawLine ( transform.position, 
+        //                        transform.position + vel * 3.0f, 
+        //                        new Color(0.0f,1.0f,0.0f) );
+        // // draw smoothed acceleration
+        // Vector3 acc = base.smoothedAcceleration;
+        // DebugHelper.DrawLine ( transform.position, 
+        //                        transform.position + acc * 3.0f, 
+        //                        new Color(1.0f,0.0f,1.0f) );
+        // // draw target pos
+        // DebugHelper.DrawDestination ( this.targetPos );
+        // DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
 
         // debug info
         // DebugHelper.ScreenPrint ( "AI_ZombieNormal steering state: " + this.steeringState );
@@ -346,7 +346,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
         // DebugHelper.ScreenPrint ( "target pos: " + this.targetPos );
 
         // DEBUG actorInfo
-        DebugHelper.ScreenPrint ( "AI_ZombieNormal curHP = " + this.zombieInfo.curHP );
+        // DebugHelper.ScreenPrint ( "AI_ZombieNormal curHP = " + this.zombieInfo.curHP );
 
         // DEBUG animation
         // foreach ( AnimationState animS in this.anim ) {

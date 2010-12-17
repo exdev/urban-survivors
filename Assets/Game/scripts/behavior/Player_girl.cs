@@ -241,25 +241,25 @@ public class Player_girl : Player_base {
         ProcessMovement (); // handle steering
 
         // DEBUG { 
-        // draw velocity
-        Vector3 vel = base.Velocity(); 
-        DebugHelper.DrawLine ( transform.position, 
-                               transform.position + vel,
-                               new Color(0.0f,1.0f,0.0f) );
-        // draw smoothed acceleration
-        Vector3 acc = base.smoothedAcceleration;
-        DebugHelper.DrawLine ( transform.position, 
-                               transform.position + acc,
-                               new Color(1.0f,0.0f,1.0f) );
+        // // draw velocity
+        // Vector3 vel = base.Velocity(); 
+        // DebugHelper.DrawLine ( transform.position, 
+        //                        transform.position + vel,
+        //                        new Color(0.0f,1.0f,0.0f) );
+        // // draw smoothed acceleration
+        // Vector3 acc = base.smoothedAcceleration;
+        // DebugHelper.DrawLine ( transform.position, 
+        //                        transform.position + acc,
+        //                        new Color(1.0f,0.0f,1.0f) );
 
-        // debug info
-        DebugHelper.ScreenPrint ( "Player_girl current state: " + this.fsm.CurrentState().name );
-        DebugHelper.ScreenPrint ( "Player_girl current HP: " + this.playerInfo.curHP );
+        // // debug info
+        // DebugHelper.ScreenPrint ( "Player_girl current state: " + this.fsm.CurrentState().name );
+        // DebugHelper.ScreenPrint ( "Player_girl current HP: " + this.playerInfo.curHP );
 
-        // debug animation
-        foreach ( AnimationState animS in this.anim ) {
-            DebugHelper.ScreenPrint ( animS.name + ": " + animS.enabled );
-        }
+        // // debug animation
+        // foreach ( AnimationState animS in this.anim ) {
+        //     DebugHelper.ScreenPrint ( animS.name + ": " + animS.enabled );
+        // }
         // } DEBUG end 
 	}
 
@@ -528,7 +528,7 @@ public class Player_girl : Player_base {
         ApplySteeringForce( force );
 
         // DEBUG { 
-        DebugHelper.DrawCircleY( this.followTarget.transform.position, this.followDistance, Color.yellow );
+        // DebugHelper.DrawCircleY( this.followTarget.transform.position, this.followDistance, Color.yellow );
         // } DEBUG end 
     }
 

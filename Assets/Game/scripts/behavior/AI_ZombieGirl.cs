@@ -218,23 +218,23 @@ public class AI_ZombieGirl : AI_ZombieBase {
         // } TODO end 
 
         // DEBUG { 
-        // draw velocity
-        Vector3 vel = base.Velocity(); 
-        DebugHelper.DrawLine ( transform.position, 
-                               transform.position + vel * 3.0f, 
-                               new Color(0.0f,1.0f,0.0f) );
-        // draw smoothed acceleration
-        Vector3 acc = base.smoothedAcceleration;
-        DebugHelper.DrawLine ( transform.position, 
-                               transform.position + acc * 3.0f, 
-                               new Color(1.0f,0.0f,1.0f) );
-        // draw target pos
-        DebugHelper.DrawDestination ( this.targetPos );
-        DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
+        // // draw velocity
+        // Vector3 vel = base.Velocity(); 
+        // DebugHelper.DrawLine ( transform.position, 
+        //                        transform.position + vel * 3.0f, 
+        //                        new Color(0.0f,1.0f,0.0f) );
+        // // draw smoothed acceleration
+        // Vector3 acc = base.smoothedAcceleration;
+        // DebugHelper.DrawLine ( transform.position, 
+        //                        transform.position + acc * 3.0f, 
+        //                        new Color(1.0f,0.0f,1.0f) );
+        // // draw target pos
+        // DebugHelper.DrawDestination ( this.targetPos );
+        // DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
 
-        // debug info
-        DebugHelper.ScreenPrint ( "AI_ZombieGirl steering state: " + this.steeringState );
-        DebugHelper.ScreenPrint ( "AI_ZombieGirl current state: " + fsm.CurrentState().name );
+        // // debug info
+        // DebugHelper.ScreenPrint ( "AI_ZombieGirl steering state: " + this.steeringState );
+        // DebugHelper.ScreenPrint ( "AI_ZombieGirl current state: " + fsm.CurrentState().name );
         // } DEBUG end 
     }
 
