@@ -34,5 +34,5 @@ public class HitInfo {
     public HitType hitType = HitType.none;
     public Vector3 position = Vector3.zero; 
     public Vector3 normal = Vector3.up; 
-    public Vector3 hitBackForce = Vector3.zero; 
+    public Vector3 knockBackForce = Vector3.zero; 
 }

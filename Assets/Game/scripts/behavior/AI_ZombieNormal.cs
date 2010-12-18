@@ -241,6 +241,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
         FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
         FSM.Condition cond_isOnHit = new Condition_isOnHit(this);
         FSM.Condition cond_noHP = new Condition_noHP(this.zombieInfo);
+        // TODO: FSM.Condition cond_isStunning = new Condition_isStunning(this);
 
         // ======================================================== 
         // setup transitions
@@ -439,22 +440,19 @@ public class AI_ZombieNormal : AI_ZombieBase {
             return;
         }
 
-        /*float dmgOutput =*/ DamageRule.Instance().CalculateDamage( this.zombieInfo, dmgInfo );
+        float dmgOutput = DamageRule.Instance().CalculateDamage( this.zombieInfo, dmgInfo );
 
-        // TODO { 
-        // if ( dmgOutput < 20.0f )
-        //     this.lastHit.hitType = HitInfo.HitType.light;
-        // else if ( dmgOutput >= 20.0f )
-        //     this.lastHit.hitType = HitInfo.HitType.normal;
-        this.lastHit.hitType = HitInfo.HitType.normal;
-        // } TODO end 
+        if ( dmgOutput < 20.0f )
+            this.lastHit.hitType = HitInfo.HitType.normal;
+        else if ( dmgOutput >= 20.0f )
+            this.lastHit.hitType = HitInfo.HitType.serious;
 
         this.lastHit.position = _other.transform.position;
         this.lastHit.normal = _other.transform.right;
         Vector3 dir = _other.transform.position - transform.position;
         dir.y = 0.0f;
         dir.Normalize();
-        this.lastHit.hitBackForce = dir * DamageRule.Instance().HitBackForce(dmgInfo.hitBackType);  
+        this.lastHit.knockBackForce = dir * DamageRule.Instance().KnockBackForce(dmgInfo.knockBackType);  
 
         // TODO: if hit light, face it { 
         // transform.forward = -_other.transform.forward;
@@ -473,6 +471,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
         if ( animName == "unknown" )
             return;
 
+        // Debug.Log("animName: " + animName); // DEBUG
         this.anim.Rewind(animName);
         this.anim.Play(animName);
     } 

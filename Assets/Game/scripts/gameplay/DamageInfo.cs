@@ -25,7 +25,7 @@ public class DamageInfo : MonoBehaviour {
         energy_bullet,
     };
 
-    public enum HitBackType {
+    public enum KnockBackType {
         none,
         low,
         mid,
@@ -34,6 +34,6 @@ public class DamageInfo : MonoBehaviour {
 
     public float DP = 20.0f;
     public DamageType damageType = DamageType.none;
-    public HitBackType hitBackType = HitBackType.none;
+    public KnockBackType knockBackType = KnockBackType.none;
     [System.NonSerialized] public ActorInfo owner_info = null;
 }

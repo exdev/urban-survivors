@@ -493,7 +493,7 @@ public class Player_boy : Player_base {
         // Vector3 dir = _other.transform.position - transform.position;
         // dir.y = 0.0f;
         // dir.Normalize();
-        // this.lastHit.hitBackForce = dir * DamageRule.Instance().HitBackForce(dmgInfo.hitBackType);  
+        // this.lastHit.knockBackForce = dir * DamageRule.Instance().KnockBackForce(dmgInfo.knockBackType);  
 
         // // TODO: if hit light, face it { 
         // // transform.forward = -_other.transform.forward;
