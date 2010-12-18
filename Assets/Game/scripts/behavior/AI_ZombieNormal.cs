@@ -372,6 +372,16 @@ public class AI_ZombieNormal : AI_ZombieBase {
     void ProcessMovement () {
         // don't do anything if we disable the steer
         if (  this.steeringState == SteeringState.disable ) {
+            // TEMP HARDCODE { 
+            if ( this.anim.IsPlaying("death1") == false && 
+                 this.anim.IsPlaying("death2") == false )
+            {
+                this.transform.position =
+                    new Vector3 ( this.transform.position.x,
+                                  this.transform.position.y - Time.deltaTime * 0.3f,
+                                  this.transform.position.z );
+            }
+            // } TEMP HARDCODE end 
             return;
         }
 

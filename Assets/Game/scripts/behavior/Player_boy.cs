@@ -392,21 +392,27 @@ public class Player_boy : Player_base {
         if ( atk_info.curCombo == null )
             return;
 
+        AnimationState curAnim = this.anim[atk_info.curCombo.animName];
+        ComboInfo nextCombo = atk_info.curCombo.next;
+        if ( nextCombo == null )
+            return;
+
         // if we have input
         if ( this.meleeButtonTriggered ) {
-            AnimationState curAnim = this.anim[atk_info.curCombo.animName];
-            ComboInfo nextCombo = atk_info.curCombo.next;
-            if ( nextCombo == null )
-                return;
-
             // if we are in the valid input range
             if ( curAnim.time >= atk_info.curCombo.validInputTime.x 
                  && curAnim.time <= atk_info.curCombo.validInputTime.y )
             {
+                atk_info.waitForNextCombo = true;
+            }
+        }
+        else if ( atk_info.waitForNextCombo ) {
+            if ( curAnim.time >= atk_info.curCombo.validInputTime.y ) {
                 this.anim[nextCombo.animName].normalizedSpeed = atk_info.speed;
                 this.anim.Rewind(atk_info.curCombo.animName);
                 this.anim.CrossFade(nextCombo.animName);
                 atk_info.curCombo = nextCombo;
+                atk_info.waitForNextCombo = false;
             }
         }
     }

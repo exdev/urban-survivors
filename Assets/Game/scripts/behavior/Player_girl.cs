@@ -382,7 +382,7 @@ public class Player_girl : Player_base {
                                                   null );
         // getUp
         FSM.State state_getUp = new FSM.State( "GetUp", 
-                                               new Action_PlayAnim(this.anim,"getUp"), 
+                                               null, // TODO: new Action_PlayAnim(this.anim,"getUp") 
                                                null,
                                                null );
 
