@@ -222,11 +222,16 @@ public class AI_ZombieNormal : AI_ZombieBase {
                                                new Action_ActOnHit(this), 
                                                null,
                                                null );
+        // on dead
+        FSM.State state_onDead = new FSM.State( "OnDead",
+                                                new Action_ActOnDead(this), 
+                                                null, // TODO: dead clean up
+                                                null );
         // dead
-        FSM.State state_Dead = new FSM.State( "Dead", 
-                                               new Action_ActOnDead(this), 
-                                               null, // TODO: dead clean up
-                                               null );
+        FSM.State state_dead = new FSM.State( "Dead",
+                                              new Action_CleanDeadBody(this.gameObject), 
+                                              null,
+                                              null );
 
         // ======================================================== 
         // condition 
@@ -242,7 +247,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
         // ======================================================== 
 
         // idle to ...
-        state_idle.AddTransition( new FSM.Transition( state_Dead,
+        state_idle.AddTransition( new FSM.Transition( state_onDead,
                                                       cond_noHP,
                                                       null ) );
         state_idle.AddTransition( new FSM.Transition( state_onHit,
@@ -253,7 +258,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
                                                       null ) );
 
         // seekPlayers to ...
-        state_seekPlayers.AddTransition( new FSM.Transition( state_Dead,
+        state_seekPlayers.AddTransition( new FSM.Transition( state_onDead,
                                                              cond_noHP,
                                                              null ) );
         state_seekPlayers.AddTransition( new FSM.Transition( state_onHit,
@@ -266,7 +271,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
                                                              new FSM.Condition_not( new Condition_playerInRange( this.transform, 40.0f ) ) , 
                                                              null ) );
         // attack to ...
-        state_attack.AddTransition( new FSM.Transition( state_Dead,
+        state_attack.AddTransition( new FSM.Transition( state_onDead,
                                                         cond_noHP,
                                                         null ) );
         state_attack.AddTransition( new FSM.Transition( state_onHit,
@@ -276,7 +281,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
                                                          new FSM.Condition_not(cond_isAttacking),
                                                          null ) );
         // on hit to ...
-        state_onHit.AddTransition( new FSM.Transition( state_Dead,
+        state_onHit.AddTransition( new FSM.Transition( state_onDead,
                                                        cond_noHP,
                                                        null ) );
         state_onHit.AddTransition( new FSM.Transition ( state_idle, 
@@ -287,6 +292,11 @@ public class AI_ZombieNormal : AI_ZombieBase {
         //                                                 cond_isOnHit,
         //                                                 null ) );
         // } TODO end 
+
+        // on dead to ...
+        state_onDead.AddTransition( new FSM.Transition( state_dead,
+                                                        new FSM.Condition_waitForSeconds(this.deadBodyKeepTime),
+                                                        null ) );
 
         // init fsm
         fsm.init(state_idle);
@@ -360,6 +370,11 @@ public class AI_ZombieNormal : AI_ZombieBase {
     // ------------------------------------------------------------------ 
 
     void ProcessMovement () {
+        // don't do anything if we disable the steer
+        if (  this.steeringState == SteeringState.disable ) {
+            return;
+        }
+
         // handle steering
         Vector3 force = Vector3.zero;
         if ( this.steeringState == SteeringState.seeking ) {
@@ -441,6 +456,9 @@ public class AI_ZombieNormal : AI_ZombieBase {
     // ------------------------------------------------------------------ 
 
     public void ActOnHit () {
+        // NOTE: it could be possible we interupt to hit when zombie is attacking.
+        this.atkShape.active = false;
+
         string animName = DamageRule.Instance().HitAnim(this.lastHit.hitType);
         if ( animName == "unknown" )
             return;
@@ -460,6 +478,11 @@ public class AI_ZombieNormal : AI_ZombieBase {
             this.anim.CrossFade("death1");
         else
             this.anim.CrossFade("death2");
+
+        // make sure we disable all attack shapes
+        this.atkShape.active = false;
+        this.gameObject.layer = Layer.dead_body;
+        this.DisableSteering();
     } 
 
     // ------------------------------------------------------------------ 

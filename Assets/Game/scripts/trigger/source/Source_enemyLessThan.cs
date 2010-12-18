@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : Source_periodic.cs
+// File         : Source_enemyLessThan.cs
 // Author       : Wu Jie 
-// Last Change  : 10/30/2010 | 01:11:47 AM | Saturday,October
+// Last Change  : 12/18/2010 | 12:37:40 PM | Saturday,December
 // Description  : 
 // ======================================================================================
 
@@ -11,19 +11,19 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
 // class 
 ///////////////////////////////////////////////////////////////////////////////
 
-public class Source_periodic : Source_base {
+public class Source_enemyLessThan : Source_periodic {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public float StartTime = 0.0f;
-    public float IntervalTime = 0.0f;
+    public int enemyCount = 1;  
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -35,36 +35,14 @@ public class Source_periodic : Source_base {
 
 	protected override void Start () {
         base.Start();
-        StartCoroutine(StartCounter());
 	}
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    protected virtual bool CheckCondition () {
-        return true;
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    IEnumerator StartCounter () {
-        // if start time is zero, no need to wait.
-        if ( StartTime > 0.0f ) {
-            yield return new WaitForSeconds (StartTime);
-        }
-        if ( CheckCondition() ) {
-            base.Response();
-        }
-
-        // now enter the trigger loops
-        while ( base.CanTrigger() ) {
-            yield return new WaitForSeconds (IntervalTime);
-            if ( CheckCondition() ) {
-                base.Response();
-            }
-        }
+    protected override bool CheckCondition () {
+        List<GameObject> gos = GameRules.Instance().GetEnemies();
+        return gos.Count < enemyCount;
     }
 }

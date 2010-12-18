@@ -86,6 +86,7 @@ public class Actor : Steer {
         moving,
         seeking,
         braking,
+        disable,
     };
 
     public float StepSpeed = 0.5f;
@@ -159,6 +160,14 @@ public class Actor : Steer {
 
     public void Stop () {
         this.steeringState = SteeringState.braking;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void DisableSteering () {
+        this.steeringState = SteeringState.disable;
     }
 }
 

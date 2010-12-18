@@ -141,6 +141,31 @@ public class FSM {
         public override bool exec () { return this.cond1.exec() || this.cond2.exec(); }
     }
 
+    //
+    public class Condition_waitForSeconds : Condition {
+        float seconds = _seconds;
+        float startTime = 0.0f;
+        bool firstTime = true;
+        public Condition_waitForSeconds ( float _seconds ) { 
+            this.seconds = _seconds;
+        }
+        public override bool exec () { 
+            // if this is first time tick, just record the time.
+            if ( this.firstTime ) {
+                this.startTime = Time.time;
+                this.firstTime = false;
+                return false;
+            }
+
+            // if we exceed the time
+            if ( Time.time - this.startTime > this.seconds ) {
+                this.firstTime = true;
+                return true;
+            }
+            return false;
+        }
+    }
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 

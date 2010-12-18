@@ -23,6 +23,22 @@ public class AI_ZombieBase : Actor {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected class Action_CleanDeadBody : FSM.Action {
+        GameObject go = null;
+
+        public Action_CleanDeadBody ( GameObject _go ) {
+            this.go = _go;
+        } 
+
+        public override void exec () {
+            GameObject.Destroy(this.go);
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     // Desc: Action_MoveToNearestAlivedPlayer 
     // ------------------------------------------------------------------ 
 
@@ -89,6 +105,7 @@ public class AI_ZombieBase : Actor {
     public ActorInfo zombieInfo = new ActorInfo();
     public GameObject FX_HIT_bullet = null;
     public GameObject FX_HIT_melee = null;
+    public float deadBodyKeepTime = 2.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
