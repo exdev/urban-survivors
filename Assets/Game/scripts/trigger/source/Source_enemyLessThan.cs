@@ -24,6 +24,7 @@ public class Source_enemyLessThan : Source_periodic {
     ///////////////////////////////////////////////////////////////////////////////
 
     public int enemyCount = 1;  
+    public string enemyTag = "all"; 
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -42,7 +43,11 @@ public class Source_enemyLessThan : Source_periodic {
     // ------------------------------------------------------------------ 
 
     protected override bool CheckCondition () {
-        List<GameObject> gos = GameRules.Instance().GetEnemies();
+        List<GameObject> gos;
+        if ( enemyTag == "all" )
+            gos = GameRules.Instance().GetEnemies();
+        else
+            gos = GameRules.Instance().GetEnemiesByTag(this.enemyTag);
         return gos.Count < enemyCount;
     }
 }

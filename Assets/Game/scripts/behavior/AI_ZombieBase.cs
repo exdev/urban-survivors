@@ -130,6 +130,15 @@ public class AI_ZombieBase : Actor {
 
 	protected new void Start () {
         base.Start();
+        InitInfo();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void InitInfo () {
+        this.zombieInfo.curHP = this.zombieInfo.maxHP;
     }
 
     // ------------------------------------------------------------------ 
