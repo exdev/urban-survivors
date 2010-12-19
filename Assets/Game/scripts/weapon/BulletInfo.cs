@@ -71,8 +71,8 @@ public class BulletInfo : MonoBehaviour {
 
         // TODO: bullet type, hit what? should get through or not. { 
         // destroy bullet
-        // DISABLE: SpawnManager.Instance().Destroy(gameObject);
-        GameObject.Destroy(gameObject);
+        SpawnManager.Instance().Destroy(gameObject);
+        // GameObject.Destroy(gameObject);
         // } TODO end 
     }
 }

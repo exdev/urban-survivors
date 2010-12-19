@@ -44,8 +44,11 @@ public class Emitter_S : Emitter {
                                            rot.eulerAngles.z 
                                            );
 
-            GameObject spawnBullet = Instantiate(_bullet, _anchor.position, rot ) as GameObject;
-            // DISABLE: GameObject spawnBullet = SpawnManager.Instance().Spawn(_bullet, _anchor.position, rot );
+            // GameObject spawnBullet = Instantiate(_bullet, _anchor.position, rot ) as GameObject;
+            GameObject spawnBullet = SpawnManager.Instance().Spawn(_bullet, _anchor.position, rot );
+            BulletInfo bi = spawnBullet.GetComponent<BulletInfo>();
+            bi.ownerDamageInfo = this.GetComponent<DamageInfo>();
+
             DebugHelper.Assert( spawnBullet, "failed to spawn bullet" );
             // spawnBullet.transform.position += Random.Range(0.0f,3.0f) * spawnBullet.transform.forward;
 
