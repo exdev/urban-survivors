@@ -501,9 +501,16 @@ public class AI_ZombieNormal : AI_ZombieBase {
     // ------------------------------------------------------------------ 
 
     public void ActOnDead () {
-        Vector3 hitPos = this.lastHit.position;
-        hitPos.y = 0.0f;
-        if ( this.IsBehind(hitPos) )
+        // DISABLE { 
+        // Vector3 hitPos = this.lastHit.position;
+        // hitPos.y = 0.0f;
+        // if ( this.IsBehind(hitPos) )
+        //     this.anim.CrossFade("death1");
+        // else
+        //     this.anim.CrossFade("death2");
+        // } DISABLE end 
+        float r = Random.Range(0.0f,1.0f);
+        if ( r < 0.4f )
             this.anim.CrossFade("death1");
         else
             this.anim.CrossFade("death2");
