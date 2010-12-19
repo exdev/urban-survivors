@@ -18,9 +18,9 @@ using System.Collections;
 
 public class Spawner_point : Spawner_base {
 
-    public int maxAmount = -1;
-    public int minEmission = 1; // The minimum number of pawns that will be spawned every time the code execute.
-    public int maxEmission = 1; // The maximum number of pawns that will be spawned every time the code execute.
+    public int totalAmount = -1;
+    public int minAlive = 1; // The minimum number of pawns that will be spawned every time the code execute.
+    public int maxAlive = 1; // The maximum number of pawns that will be spawned every time the code execute.
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -32,14 +32,14 @@ public class Spawner_point : Spawner_base {
 
     public override void exec () {
         // never exec the code when we reach the limitation.
-        if ( maxAmount == 0 )
+        if ( totalAmount == 0 )
             return;
 
         //
-        int amount = Random.Range( minEmission, maxEmission );
-        if ( maxAmount != -1 ) {
-            amount = Mathf.Min(maxAmount,amount);
-            maxAmount = maxAmount - amount;
+        int amount = Random.Range( minAlive, maxAlive );
+        if ( totalAmount != -1 ) {
+            amount = Mathf.Min(totalAmount,amount);
+            totalAmount = totalAmount - amount;
         }
 
         //

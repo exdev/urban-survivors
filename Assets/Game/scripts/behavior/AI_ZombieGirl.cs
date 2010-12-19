@@ -73,14 +73,24 @@ public class AI_ZombieGirl : AI_ZombieBase {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    // HACK { 
+    protected static GameObject fxDead = null;
+
     public GameObject atkShape;
-    // public Transform atkAttachedBone;
-    // } HACK end 
+    public GameObject FX_dead = null;
 
     ///////////////////////////////////////////////////////////////////////////////
-    // defines
+    // function defines
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Awake () {
+        if ( fxDead  == null && this.FX_dead ) {
+            fxDead = (GameObject)Instantiate( this.FX_dead );
+        }
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -257,10 +267,9 @@ public class AI_ZombieGirl : AI_ZombieBase {
     // ------------------------------------------------------------------ 
 
     public void ActOnDead () {
-        // make sure we disable all attack shapes
-        // this.atkShape.active = false;
-        // this.gameObject.layer = Layer.dead_body;
-        // this.DisableSteering();
+        fxDead.transform.position = this.transform.position;
+        fxDead.transform.rotation = this.transform.rotation;
+        fxDead.particleEmitter.Emit();
         GameObject.Destroy(this.gameObject);
     } 
 
