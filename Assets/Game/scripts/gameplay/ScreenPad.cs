@@ -223,9 +223,12 @@ public class ScreenPad : MonoBehaviour {
 #if UNITY_IPHONE
                 // the screen touch priority is higher than aiming_zone
                 if ( available_touches.Count != 0 ) {
-                    Vector2 screen_center = new Vector2( Screen.width/2, Screen.height/2);
+                    GameObject girl = GameRules.Instance().GetPlayerGirl();
+                    Vector3 girlScreenPos = Camera.main.WorldToScreenPoint(girl.transform.position);
+                    Vector2 girlScreenPos_v2 = new Vector2(girlScreenPos.x, girlScreenPos.y); 
+
                     Touch t = GetLastTouch();
-                    Vector2 delta = t.position - screen_center;
+                    Vector2 delta = t.position - girlScreenPos_v2;
                     aiming_dir = delta.normalized;
                     canFire = true;
                 }
@@ -236,8 +239,10 @@ public class ScreenPad : MonoBehaviour {
                 }
 #endif
             } else {
-                Vector2 screen_center = new Vector2( Screen.width/2, Screen.height/2);
-                Vector2 delta = new Vector2(Input.mousePosition.x,Input.mousePosition.y) - screen_center;
+                GameObject girl = GameRules.Instance().GetPlayerGirl();
+                Vector3 girlScreenPos = Camera.main.WorldToScreenPoint(girl.transform.position);
+                Vector2 girlScreenPos_v2 = new Vector2(girlScreenPos.x, girlScreenPos.y); 
+                Vector2 delta = new Vector2(Input.mousePosition.x,Input.mousePosition.y) - girlScreenPos_v2;
                 aiming_dir = delta.normalized;
             } // end if ( useKeyboardAndMouse == false )
 
