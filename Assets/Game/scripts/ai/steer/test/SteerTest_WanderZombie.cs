@@ -41,7 +41,7 @@ public class SteerTest_WanderZombie : Steer {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Update () {
+    protected new void Update () {
         Vector3 force = GetSteering_Seek_LimitByMaxSpeed ( DestPos );
         // Vector3 force = GetSteering_Seek ( DestPos );
         force.y = 0.0f;

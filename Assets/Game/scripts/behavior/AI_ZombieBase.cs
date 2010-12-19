@@ -102,7 +102,7 @@ public class AI_ZombieBase : Actor {
     protected static GameObject fxHitBullet = null;
     protected static GameObject fxHitMelee = null;
 
-    public ActorInfo zombieInfo = new ActorInfo();
+    public ZombieInfo zombieInfo = new ZombieInfo();
     public GameObject FX_HIT_bullet = null;
     public GameObject FX_HIT_melee = null;
     public float deadBodyKeepTime = 2.0f;
@@ -130,6 +130,26 @@ public class AI_ZombieBase : Actor {
 
 	protected new void Start () {
         base.Start();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	protected new void Update () {
+        base.Update();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected new void ShowDebugInfo () {
+        base.ShowDebugInfo();
+
+        //
+        DebugHelper.ScreenPrint ( "target pos = " + this.targetPos );
+        DebugHelper.ScreenPrint ( "curHP = " + this.zombieInfo.curHP );
     }
 }
 

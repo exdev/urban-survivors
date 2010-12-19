@@ -204,7 +204,9 @@ public class AI_ZombieGirl : AI_ZombieBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Update () {
+    protected new void Update () {
+        base.Update();
+
         this.fsm.tick(); // update state machine
         ProcessMovement();
 

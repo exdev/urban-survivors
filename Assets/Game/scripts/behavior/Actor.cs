@@ -123,6 +123,14 @@ public class Actor : Steer {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+	protected new void Update () {
+        base.Update();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public bool IsPlayingAnim ( string _animName, float _endTime = -1.0f ) { 
         AnimationState state = this.anim[_animName];
         if ( state == null )
@@ -168,6 +176,23 @@ public class Actor : Steer {
 
     public void DisableSteering () {
         this.steeringState = SteeringState.disable;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected new void ShowDebugInfo () {
+        base.ShowDebugInfo();
+
+        // debug info
+        DebugHelper.ScreenPrint ( "steering state: " + this.steeringState );
+        DebugHelper.ScreenPrint ( "fsm state: " + this.fsm.CurrentState().name );
+
+        // debug animation
+        foreach ( AnimationState animS in this.anim ) {
+            DebugHelper.ScreenPrint ( animS.name + ": " + animS.enabled );
+        }
     }
 }
 

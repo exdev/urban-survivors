@@ -41,7 +41,7 @@ public class SteerTest_Simple : Steer {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Update () {
+    protected new void Update () {
         Vector3 force = Vector3.zero;
         Vector3 force_seek = GetSteering_Seek_LimitByMaxSpeed ( DestPos );
 

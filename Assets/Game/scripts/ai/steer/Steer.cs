@@ -49,6 +49,14 @@ public class Steer : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+	protected void Update () {
+        // ShowDebugInfo();
+	}
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     Vector3 AdjustRawSteeringForce ( Vector3 _force ) {
         float maxAdjustedSpeed = 0.2f * this.maxSpeed;
 
@@ -261,6 +269,23 @@ public class Steer : MonoBehaviour {
         this.curSpeed -= clipBraking * Time.deltaTime;
     }
     // } KEEPME end 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected void ShowDebugInfo () {
+        // draw velocity
+        Vector3 vel = this.Velocity(); 
+        DebugHelper.DrawLine ( transform.position, 
+                               transform.position + vel * 3.0f, 
+                               new Color(0.0f,1.0f,0.0f) );
+        // draw smoothed acceleration
+        Vector3 acc = this.smoothedAcceleration;
+        DebugHelper.DrawLine ( transform.position, 
+                               transform.position + acc * 3.0f, 
+                               new Color(1.0f,0.0f,1.0f) );
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 

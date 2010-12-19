@@ -111,6 +111,14 @@ public class Player_base : Actor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+	protected new void Update () {
+        base.Update();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     void InitInfo () {
         // TODO: we should load info from saved data or check point.
         // info.serialize();

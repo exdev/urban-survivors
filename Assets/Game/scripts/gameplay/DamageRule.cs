@@ -31,7 +31,7 @@ public class DamageRule : MonoBehaviour {
     protected Dictionary<DamageInfo.KnockBackType,float> knockBackTypeToForce = new Dictionary<DamageInfo.KnockBackType,float>();
 
     public string[] hitAnimList;
-    protected Dictionary<HitInfo.HitType,string> hitTypeToAnim = new Dictionary<HitInfo.HitType,string>(); 
+    protected Dictionary<HitInfo.StunType,string> stunTypeToAnim = new Dictionary<HitInfo.StunType,string>(); 
 
     protected static DamageRule instance  = null;
 
@@ -62,7 +62,7 @@ public class DamageRule : MonoBehaviour {
 
         //
         for ( int i = 0; i < this.hitAnimList.Length; ++i ) {
-            this.hitTypeToAnim[(HitInfo.HitType)i] = this.hitAnimList[i];
+            this.stunTypeToAnim[(HitInfo.StunType)i] = this.hitAnimList[i];
         }
         this.hitAnimList = null;
     }
@@ -79,8 +79,8 @@ public class DamageRule : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public string HitAnim ( HitInfo.HitType _type ) {
-        return this.hitTypeToAnim[_type]; 
+    public string HitAnim ( HitInfo.StunType _type ) {
+        return this.stunTypeToAnim[_type]; 
     }
 
     // ------------------------------------------------------------------ 
