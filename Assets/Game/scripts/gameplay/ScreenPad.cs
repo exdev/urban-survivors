@@ -31,9 +31,11 @@ public class ScreenPad : MonoBehaviour {
 #if UNITY_IPHONE
     private int moveID = -1;
     private int aimingID = -1;
+    private int meleeID = -1;
 #endif
     private Vector2 aiming_dir = Vector2.up;
     private bool canFire = false;
+    private bool meleeButtonDown = false;
     private List<Touch> available_touches = new List<Touch>();
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -46,8 +48,8 @@ public class ScreenPad : MonoBehaviour {
 
     public Circle move_zone;
     public float move_limitation;
-
     public Circle aiming_zone;
+    public Circle melee_zone;
     public bool useKeyboardAndMouse = false;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -134,11 +136,20 @@ public class ScreenPad : MonoBehaviour {
             foreach ( Touch t in Input.touches ) {
                 if ( t.phase == TouchPhase.Ended ||
                      t.phase == TouchPhase.Canceled ) {
+
+                    // we found the release touch is meleeID, 
+                    if ( t.fingerId == meleeID ) {
+                        meleeID = -1;
+                        meleeButtonDown = false;
+                    }
+
                     continue;
                 }
 
                 // skip move/aiming finger if we tracing it.
-                if ( t.fingerId == moveID || t.fingerId == aimingID ) {
+                if ( t.fingerId == moveID || 
+                     t.fingerId == aimingID ||
+                     t.fingerId == meleeID ) {
                     continue;
                 }
 
@@ -155,6 +166,10 @@ public class ScreenPad : MonoBehaviour {
                         aimingID = t.fingerId;
                         continue;
                     }
+                    else if ( melee_zone.Contains(screenPos) ) {
+                        meleeID = t.fingerId;
+                        continue;
+                    }
                 }
 
                 // those un-handle touches, will recognized as screen touch.
@@ -167,6 +182,9 @@ public class ScreenPad : MonoBehaviour {
             }
             // process aiming by first check if we have screenPad, then aimingID.
             HandleAiming(aiming_finger.position);
+            if ( meleeID != -1 ) {
+                meleeButtonDown = true;
+            }
 
             // DEBUG { 
             // foreach ( Touch t in Input.touches ) {
@@ -182,7 +200,8 @@ public class ScreenPad : MonoBehaviour {
             Vector2 screenPos = move_limitation * dir.normalized + move_zone.center;
             HandleMove(screenPos);
             HandleAiming(Vector2.zero);
-            canFire = Input.GetButton("Fire");
+            this.canFire = Input.GetButton("Fire");
+            this.meleeButtonDown = Input.GetKeyDown(KeyCode.Space);
         } // end if ( useKeyboardAndMouse == false )
 
         // if there is no move, keep the analog at the center of the move_zone. 
@@ -270,6 +289,12 @@ public class ScreenPad : MonoBehaviour {
         // ------------------------------------------------------------------ 
 
         public bool CanFire () { return canFire; }
+
+        // ------------------------------------------------------------------ 
+        // Desc: 
+        // ------------------------------------------------------------------ 
+
+        public bool MeleeButtonDown () { return meleeButtonDown; }
 
         // ------------------------------------------------------------------ 
         // Desc: 

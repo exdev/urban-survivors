@@ -26,7 +26,9 @@ public class GameRules : MonoBehaviour {
 
     protected static GameRules instance  = null;
     protected GameObject playerBoy = null;
+    protected PlayerInfo boyInfo = null;
     protected GameObject playerGirl = null;
+    protected PlayerInfo girlInfo = null;
     protected GameObject startPoint = null;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -49,7 +51,9 @@ public class GameRules : MonoBehaviour {
 
             //
             playerBoy = GameObject.FindWithTag("player_boy");
+            boyInfo = playerBoy.GetComponent<Player_base>().playerInfo;
             playerGirl = GameObject.FindWithTag("player_girl");
+            girlInfo = playerGirl.GetComponent<Player_base>().playerInfo;
 
             //
             startPoint = GameObject.Find("StartPoint");
@@ -97,7 +101,10 @@ public class GameRules : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public GameObject GetPlayerBoy () { return playerBoy; }
+    public PlayerInfo GetPlayerBoyInfo () { return boyInfo; }
+
     public GameObject GetPlayerGirl () { return playerGirl; }
+    public PlayerInfo GetPlayerGirlInfo () { return girlInfo; }
 
     // ------------------------------------------------------------------ 
     // Desc: 

@@ -239,7 +239,7 @@ public class Player_girl : Player_base {
         HandleInput ();
         this.fsm.tick(); // update state machine
         ProcessMovement (); // handle steering
-        ShowDebugInfo(); // DEBUG
+        // ShowDebugInfo(); // DEBUG
 	}
 
     // ------------------------------------------------------------------ 

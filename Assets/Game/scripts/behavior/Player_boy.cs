@@ -171,7 +171,7 @@ public class Player_boy : Player_base {
         HandleInput();
         this.fsm.tick(); // update state machine
         ProcessMovement (); // handle steering
-        ShowDebugInfo(); // DEBUG
+        // ShowDebugInfo(); // DEBUG
 	}
 
     // ------------------------------------------------------------------ 
@@ -330,11 +330,9 @@ public class Player_boy : Player_base {
 
     void HandleInput() {
         this.screenDir = this.screenPad ? this.screenPad.GetMoveDirection() : Vector2.zero;
-        // TEMP: change to screenPad { 
-        if ( Input.GetKeyDown(KeyCode.Space) ) {
+        if ( this.screenPad.MeleeButtonDown() ) {
             this.meleeButtonTriggered = true;
         }
-        // } TEMP end 
     }
 
     // ------------------------------------------------------------------ 
