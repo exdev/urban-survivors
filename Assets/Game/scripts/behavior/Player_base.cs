@@ -72,7 +72,8 @@ public class Player_base : Actor {
         // Debug.Log("after recover time" + Time.time ); // DEBUG
 
         // it is possible that we use HP pack save the player
-        if ( this.IsDown() == true ) {
+        if ( GameRules.Instance().IsGameOver() == false
+             && this.IsDown() == true ) {
             this.Recover(10.0f);
         }
     }

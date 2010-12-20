@@ -31,9 +31,12 @@ public class UIStatus : MonoBehaviour {
 
     public GameObject boyHpBar = null;
     public GameObject girlHpBar = null;
+    public GameObject gameOver = null;
+    public GameObject restartCounter = null;
 
     protected UIProgressBar boyProgressBar = null;
     protected UIProgressBar girlProgressBar = null;
+    protected TextMesh restartCounterText = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -46,6 +49,7 @@ public class UIStatus : MonoBehaviour {
     void Awake () {
         this.boyProgressBar = boyHpBar ? boyHpBar.GetComponent<UIProgressBar>() : null;
         this.girlProgressBar = girlHpBar ? girlHpBar.GetComponent<UIProgressBar>() : null;
+        this.restartCounterText = restartCounter ? restartCounter.GetComponent<TextMesh>() : null;
     }
 
     // ------------------------------------------------------------------ 
@@ -58,5 +62,11 @@ public class UIStatus : MonoBehaviour {
 
         PlayerInfo girlInfo = GameRules.Instance().GetPlayerGirlInfo();
         this.girlProgressBar.Value = girlInfo.curHP/girlInfo.maxHP;
+
+        if ( GameRules.Instance().IsGameOver() ) {
+            gameOver.SetActiveRecursively(true);
+            if ( this.restartCounterText )
+                this.restartCounterText.text = string.Format( "{0:0}", GameRules.Instance().RestartCounter() );
+        }
     }
 }

@@ -24,12 +24,14 @@ public class GameRules : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    public float RestartForSeconds = 5.0f; 
+
     protected static GameRules instance  = null;
-    protected GameObject playerBoy = null;
-    protected PlayerInfo boyInfo = null;
-    protected GameObject playerGirl = null;
-    protected PlayerInfo girlInfo = null;
+    protected Player_base playerBoy = null;
+    protected Player_base playerGirl = null;
     protected GameObject startPoint = null;
+    protected bool isGameOver = false;
+    protected float restartCounter = 0.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -50,10 +52,10 @@ public class GameRules : MonoBehaviour {
             instance = this;
 
             //
-            playerBoy = GameObject.FindWithTag("player_boy");
-            boyInfo = playerBoy.GetComponent<Player_base>().playerInfo;
-            playerGirl = GameObject.FindWithTag("player_girl");
-            girlInfo = playerGirl.GetComponent<Player_base>().playerInfo;
+            GameObject goBoy = GameObject.FindWithTag("player_boy");
+            playerBoy = goBoy.GetComponent<Player_base>(); 
+            GameObject goGirl = GameObject.FindWithTag("player_girl");
+            playerGirl = goGirl.GetComponent<Player_base>();
 
             //
             startPoint = GameObject.Find("StartPoint");
@@ -62,6 +64,33 @@ public class GameRules : MonoBehaviour {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Update () {
+        // check if we got game over status
+        if ( this.isGameOver == false ) {
+            if ( this.playerBoy.IsDown() && this.playerGirl.IsDown() ) {
+                this.isGameOver = true;
+                this.restartCounter = this.RestartForSeconds; 
+            }
+        }
+        else {
+            this.restartCounter -= Time.deltaTime;
+            if ( this.restartCounter <= 0.0f ) {
+                Application.LoadLevel(0);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool IsGameOver () { return this.isGameOver; } 
+    public float RestartCounter () { return this.restartCounter; } 
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -91,8 +120,8 @@ public class GameRules : MonoBehaviour {
 
     public GameObject[] GetPlayers () {
         GameObject[] goList = new GameObject[2];
-        goList[0] = playerBoy;
-        goList[1] = playerGirl;
+        goList[0] = playerBoy.gameObject;
+        goList[1] = playerGirl.gameObject;
         return goList;
     }
 
@@ -100,11 +129,11 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public GameObject GetPlayerBoy () { return playerBoy; }
-    public PlayerInfo GetPlayerBoyInfo () { return boyInfo; }
+    public GameObject GetPlayerBoy () { return playerBoy.gameObject; }
+    public PlayerInfo GetPlayerBoyInfo () { return playerBoy.playerInfo; }
 
-    public GameObject GetPlayerGirl () { return playerGirl; }
-    public PlayerInfo GetPlayerGirlInfo () { return girlInfo; }
+    public GameObject GetPlayerGirl () { return playerGirl.gameObject; }
+    public PlayerInfo GetPlayerGirlInfo () { return playerGirl.playerInfo; }
 
     // ------------------------------------------------------------------ 
     // Desc: 
