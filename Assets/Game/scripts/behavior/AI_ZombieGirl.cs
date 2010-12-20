@@ -43,14 +43,29 @@ public class AI_ZombieGirl : AI_ZombieBase {
     // ------------------------------------------------------------------ 
 
     class Action_Attack : FSM.Action {
-        Animation anim = null;
-        public Action_Attack ( Animation _anim ) {
-            this.anim = _anim;
+        AI_ZombieGirl zombieGirl = null;
+        public Action_Attack ( AI_ZombieGirl _zombieGirl ) {
+            this.zombieGirl = _zombieGirl;
         }
 
         public override void exec () {
-            this.anim.Rewind("attack_copy");
-            this.anim.CrossFade("attack_copy");
+            this.zombieGirl.ActAttack();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Action_ActOnDead : FSM.Action {
+        AI_ZombieGirl zombieGirl = null;
+
+        public Action_ActOnDead ( AI_ZombieGirl _zombieGirl ) {
+            this.zombieGirl = _zombieGirl;
+        }
+
+        public override void exec () {
+            this.zombieGirl.ActOnDead();
         }
     }
 
@@ -60,7 +75,7 @@ public class AI_ZombieGirl : AI_ZombieBase {
 
     // HACK { 
     public GameObject atkShape;
-    public Transform atkAttachedBone;
+    // public Transform atkAttachedBone;
     // } HACK end 
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -97,6 +112,7 @@ public class AI_ZombieGirl : AI_ZombieBase {
 
         FSM.Condition cond_isPlayerInAttackRange = new Condition_isPlayerInAttackRange(this,60.0f,2.0f);
         FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
+        FSM.Condition cond_noHP = new Condition_noHP(this.zombieInfo);
 
         // ======================================================== 
         // setup states
@@ -109,19 +125,30 @@ public class AI_ZombieGirl : AI_ZombieBase {
                                                      new Action_StopMoving(this) );
         // attack
         FSM.State state_attack = new FSM.State( "Attack", 
-                                                new Action_Attack(this.anim), 
+                                                new Action_Attack(this), 
                                                 null,
                                                 null );
+        // dead
+        FSM.State state_dead = new FSM.State( "Dead",
+                                              new Action_ActOnDead(this), 
+                                              null,
+                                              null );
 
         // ======================================================== 
         // setup transitions
         // ======================================================== 
 
         // seek to ...
+        state_seekPlayers.AddTransition( new FSM.Transition( state_dead,
+                                                             cond_noHP,
+                                                             null ) );
         state_seekPlayers.AddTransition( new FSM.Transition( state_attack,
                                                              cond_isPlayerInAttackRange,
                                                              null ) );
         // attack to ...
+        state_attack.AddTransition( new FSM.Transition( state_dead,
+                                                        cond_noHP,
+                                                        null ) );
         state_attack.AddTransition( new FSM.Transition( state_seekPlayers,
                                                         new FSM.Condition_not(cond_isAttacking),
                                                         null ) );
@@ -140,12 +167,14 @@ public class AI_ZombieGirl : AI_ZombieBase {
         this.InitAnim();
         this.InitFSM();
 
-        // HACK { 
+        // HARDCODE { 
         DebugHelper.Assert(this.atkShape, "attack shape not assigned");
-        DebugHelper.Assert(this.atkAttachedBone, "attack attached bone not assigned");
-        this.atkShape.transform.parent = atkAttachedBone;
+        // DebugHelper.Assert(this.atkAttachedBone, "attack attached bone not assigned");
+        // this.atkShape.transform.parent = atkAttachedBone;
         this.atkShape.active = false;
-        // } HACK end 
+        DamageInfo dmgInfo = this.atkShape.GetComponent<DamageInfo>();
+        dmgInfo.owner_info = this.zombieInfo;
+        // } HARDCODE end 
 
         // KEEPME { 
         // StartCoroutine(GetRandomDest(2.0));
@@ -204,39 +233,36 @@ public class AI_ZombieGirl : AI_ZombieBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Update () {
+    protected new void Update () {
+        base.Update();
+
         this.fsm.tick(); // update state machine
         ProcessMovement();
 
-        // TODO { 
-        // // material
-        // Renderer r = transform.Find("zombieGirl").renderer;
-        // r.material.color = new Color ( 1.0f, HP/100.0f, HP/100.0f );
-        // if ( HP <= 0.0f ) {
-        //     Destroy(gameObject);
-        // }
-        // } TODO end 
-
-        // DEBUG { 
-        // // draw velocity
-        // Vector3 vel = base.Velocity(); 
-        // DebugHelper.DrawLine ( transform.position, 
-        //                        transform.position + vel * 3.0f, 
-        //                        new Color(0.0f,1.0f,0.0f) );
-        // // draw smoothed acceleration
-        // Vector3 acc = base.smoothedAcceleration;
-        // DebugHelper.DrawLine ( transform.position, 
-        //                        transform.position + acc * 3.0f, 
-        //                        new Color(1.0f,0.0f,1.0f) );
-        // // draw target pos
-        // DebugHelper.DrawDestination ( this.targetPos );
-        // DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
-
-        // // debug info
-        // DebugHelper.ScreenPrint ( "AI_ZombieGirl steering state: " + this.steeringState );
-        // DebugHelper.ScreenPrint ( "AI_ZombieGirl current state: " + fsm.CurrentState().name );
-        // } DEBUG end 
+        // ShowDebugInfo (); // DEBUG
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void ActAttack () {
+        this.anim.Rewind("attack_copy");
+        this.anim.CrossFade("attack_copy");
+        this.transform.forward = targetPos - this.transform.position;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void ActOnDead () {
+        // make sure we disable all attack shapes
+        // this.atkShape.active = false;
+        // this.gameObject.layer = Layer.dead_body;
+        // this.DisableSteering();
+        GameObject.Destroy(this.gameObject);
+    } 
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -270,7 +296,51 @@ public class AI_ZombieGirl : AI_ZombieBase {
 	void AttackOff (){
         this.atkShape.active = false;
 	}
-	
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnTriggerEnter ( Collider _other ) {
+        DamageInfo dmgInfo = null;
+        if ( _other.gameObject.layer == Layer.melee_player ) {
+            Transform parent = _other.transform.parent;
+            DebugHelper.Assert( parent, "melee collider's parent is null" );
+            if ( parent == null ) {
+                return;
+            }
+            dmgInfo = parent.GetComponent<DamageInfo>();
+
+            // show the melee hit effect
+            if ( fxHitMelee != null ) {
+                fxHitMelee.transform.position = _other.transform.position;
+                fxHitMelee.transform.rotation = _other.transform.rotation;
+                fxHitMelee.particleEmitter.Emit();
+            }
+        }
+        else if ( _other.gameObject.layer == Layer.bullet_player ) {
+            BulletInfo bulletInfo = _other.GetComponent<BulletInfo>();
+            dmgInfo = bulletInfo.ownerDamageInfo;
+
+            // show the bullet hit effect
+            if ( fxHitBullet != null ) {
+                fxHitBullet.transform.position = _other.transform.position;
+                fxHitBullet.transform.rotation = _other.transform.rotation;
+                fxHitBullet.particleEmitter.Emit();
+            }
+        }
+        else {
+            return;
+        }
+
+        // if we don't get damage info, just return
+        DebugHelper.Assert( dmgInfo, "can't find damage info for given layer" );
+        if ( dmgInfo == null ) {
+            return;
+        }
+
+        DamageRule.Instance().CalculateDamage( this.zombieInfo, dmgInfo );
+    }
 }
 
 

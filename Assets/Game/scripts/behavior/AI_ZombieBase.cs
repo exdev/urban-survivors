@@ -23,6 +23,22 @@ public class AI_ZombieBase : Actor {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected class Action_CleanDeadBody : FSM.Action {
+        GameObject go = null;
+
+        public Action_CleanDeadBody ( GameObject _go ) {
+            this.go = _go;
+        } 
+
+        public override void exec () {
+            GameObject.Destroy(this.go);
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     // Desc: Action_MoveToNearestAlivedPlayer 
     // ------------------------------------------------------------------ 
 
@@ -86,9 +102,10 @@ public class AI_ZombieBase : Actor {
     protected static GameObject fxHitBullet = null;
     protected static GameObject fxHitMelee = null;
 
-    public ActorInfo zombieInfo = new ActorInfo();
+    public ZombieInfo zombieInfo = new ZombieInfo();
     public GameObject FX_HIT_bullet = null;
     public GameObject FX_HIT_melee = null;
+    public float deadBodyKeepTime = 2.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -113,6 +130,35 @@ public class AI_ZombieBase : Actor {
 
 	protected new void Start () {
         base.Start();
+        InitInfo();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void InitInfo () {
+        this.zombieInfo.curHP = this.zombieInfo.maxHP;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	protected new void Update () {
+        base.Update();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected new void ShowDebugInfo () {
+        base.ShowDebugInfo();
+
+        //
+        DebugHelper.ScreenPrint ( "target pos = " + this.targetPos );
+        DebugHelper.ScreenPrint ( "curHP = " + this.zombieInfo.curHP );
     }
 }
 

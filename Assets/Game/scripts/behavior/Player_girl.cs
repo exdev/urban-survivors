@@ -235,33 +235,20 @@ public class Player_girl : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	void Update () {
+	protected new void Update () {
         HandleInput ();
         this.fsm.tick(); // update state machine
         ProcessMovement (); // handle steering
-
-        // DEBUG { 
-        // // draw velocity
-        // Vector3 vel = base.Velocity(); 
-        // DebugHelper.DrawLine ( transform.position, 
-        //                        transform.position + vel,
-        //                        new Color(0.0f,1.0f,0.0f) );
-        // // draw smoothed acceleration
-        // Vector3 acc = base.smoothedAcceleration;
-        // DebugHelper.DrawLine ( transform.position, 
-        //                        transform.position + acc,
-        //                        new Color(1.0f,0.0f,1.0f) );
-
-        // // debug info
-        // DebugHelper.ScreenPrint ( "Player_girl current state: " + this.fsm.CurrentState().name );
-        // DebugHelper.ScreenPrint ( "Player_girl current HP: " + this.playerInfo.curHP );
-
-        // // debug animation
-        // foreach ( AnimationState animS in this.anim ) {
-        //     DebugHelper.ScreenPrint ( animS.name + ": " + animS.enabled );
-        // }
-        // } DEBUG end 
+        // ShowDebugInfo(); // DEBUG
 	}
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected new void ShowDebugInfo () {
+        base.ShowDebugInfo();
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -382,7 +369,7 @@ public class Player_girl : Player_base {
                                                   null );
         // getUp
         FSM.State state_getUp = new FSM.State( "GetUp", 
-                                               new Action_PlayAnim(this.anim,"getUp"), 
+                                               null, // TODO: new Action_PlayAnim(this.anim,"getUp") 
                                                null,
                                                null );
 
@@ -578,10 +565,10 @@ public class Player_girl : Player_base {
         // TODO { 
         // // TODO { 
         // // if ( dmgOutput < 20.0f )
-        // //     this.lastHit.hitType = HitInfo.HitType.light;
+        // //     this.lastHit.stunType = HitInfo.StunType.light;
         // // else if ( dmgOutput >= 20.0f )
-        // //     this.lastHit.hitType = HitInfo.HitType.normal;
-        // this.lastHit.hitType = HitInfo.HitType.normal;
+        // //     this.lastHit.stunType = HitInfo.StunType.normal;
+        // this.lastHit.stunType = HitInfo.StunType.normal;
         // // } TODO end 
 
         // this.lastHit.position = _other.transform.position;
@@ -589,7 +576,7 @@ public class Player_girl : Player_base {
         // Vector3 dir = _other.transform.position - transform.position;
         // dir.y = 0.0f;
         // dir.Normalize();
-        // this.lastHit.hitBackForce = dir * DamageRule.Instance().HitBackForce(dmgInfo.hitBackType);  
+        // this.lastHit.knockBackForce = dir * DamageRule.Instance().KnockBackForce(dmgInfo.knockBackType);  
 
         // // TODO: if hit light, face it { 
         // // transform.forward = -_other.transform.forward;

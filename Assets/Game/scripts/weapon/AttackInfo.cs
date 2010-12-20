@@ -46,6 +46,7 @@ public class AttackInfo : MonoBehaviour {
     public float speed = 2.0f;
     [System.NonSerialized] public ComboInfo combo_entry = null;
     [System.NonSerialized] public ComboInfo curCombo = null;
+    [System.NonSerialized] public bool waitForNextCombo = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines

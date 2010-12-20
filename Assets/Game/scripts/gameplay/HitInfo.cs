@@ -22,7 +22,7 @@ using System.Collections;
 
 [System.Serializable]
 public class HitInfo {
-    public enum HitType {
+    public enum StunType {
         none    = 0,
         ignore  = 1,
         imue    = 2, 
@@ -31,8 +31,8 @@ public class HitInfo {
         serious = 5,
     }
 
-    public HitType hitType = HitType.none;
+    public StunType stunType = StunType.none;
     public Vector3 position = Vector3.zero; 
     public Vector3 normal = Vector3.up; 
-    public Vector3 hitBackForce = Vector3.zero; 
+    public Vector3 knockBackForce = Vector3.zero; 
 }

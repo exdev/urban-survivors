@@ -71,3 +71,19 @@ public class PlayerInfo : ActorInfo {
 
     // TODO: public void serialize () {...} 
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// class ZombieInfo 
+// 
+// Purpose: 
+// 
+///////////////////////////////////////////////////////////////////////////////
+
+[System.Serializable]
+public class ZombieInfo : ActorInfo {
+    public float normalStun = 30.0f;
+    [System.NonSerialized] public float accDmgNormal = 0.0f;
+
+    public float seriousStun = 60.0f;
+    [System.NonSerialized] public float accDmgSerious = 0.0f;
+} 

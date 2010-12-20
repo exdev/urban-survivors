@@ -32,4 +32,5 @@ public class Layer {
     static public int trigger           = 14;
     static public int melee_player      = 15;
     static public int melee_enemy       = 16;
+    static public int dead_body         = 17;
 }

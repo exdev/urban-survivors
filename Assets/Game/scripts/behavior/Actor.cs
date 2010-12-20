@@ -86,6 +86,7 @@ public class Actor : Steer {
         moving,
         seeking,
         braking,
+        disable,
     };
 
     public float StepSpeed = 0.5f;
@@ -116,6 +117,14 @@ public class Actor : Steer {
         // init the player basic values.
         this.anim = gameObject.GetComponent(typeof(Animation)) as Animation;
         this.targetPos = transform.position;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	protected new void Update () {
+        base.Update();
     }
 
     // ------------------------------------------------------------------ 
@@ -159,6 +168,31 @@ public class Actor : Steer {
 
     public void Stop () {
         this.steeringState = SteeringState.braking;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void DisableSteering () {
+        this.steeringState = SteeringState.disable;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected new void ShowDebugInfo () {
+        base.ShowDebugInfo();
+
+        // debug info
+        DebugHelper.ScreenPrint ( "steering state: " + this.steeringState );
+        DebugHelper.ScreenPrint ( "fsm state: " + this.fsm.CurrentState().name );
+
+        // debug animation
+        foreach ( AnimationState animS in this.anim ) {
+            DebugHelper.ScreenPrint ( animS.name + ": " + animS.enabled );
+        }
     }
 }
 

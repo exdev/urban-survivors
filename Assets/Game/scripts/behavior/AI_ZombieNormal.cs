@@ -44,18 +44,18 @@ public class AI_ZombieNormal : AI_ZombieBase {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: Action_ActOnHit 
+    // Desc: Action_ActGetStun 
     // ------------------------------------------------------------------ 
 
-    class Action_ActOnHit : FSM.Action {
+    class Action_ActOnStun : FSM.Action {
         AI_ZombieNormal zombieNormal = null;
 
-        public Action_ActOnHit ( AI_ZombieNormal _zombieNormal ) {
+        public Action_ActOnStun ( AI_ZombieNormal _zombieNormal ) {
             this.zombieNormal = _zombieNormal;
         }
 
         public override void exec () {
-            this.zombieNormal.ActOnHit();
+            this.zombieNormal.ActOnStun();
         }
     }
 
@@ -134,15 +134,32 @@ public class AI_ZombieNormal : AI_ZombieBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    class Condition_isOnHit : FSM.Condition {
+    class Condition_isOnStun : FSM.Condition {
         AI_ZombieNormal zombieNormal = null;
 
-        public Condition_isOnHit ( AI_ZombieNormal _zombieNormal ) {
+        public Condition_isOnStun ( AI_ZombieNormal _zombieNormal ) {
             this.zombieNormal = _zombieNormal;
         }
 
         public override bool exec () {
-            return this.zombieNormal.isOnHit();
+            return this.zombieNormal.isGetStun();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Condition_isStunning : FSM.Condition {
+        AI_ZombieNormal zombieNormal = null;
+
+        public Condition_isStunning ( AI_ZombieNormal _zombieNormal ) {
+            this.zombieNormal = _zombieNormal;
+        }
+
+        public override bool exec () {
+            return this.zombieNormal.IsPlayingAnim("hit1") ||
+                this.zombieNormal.IsPlayingAnim("hit2");
         }
     }
 
@@ -218,15 +235,20 @@ public class AI_ZombieNormal : AI_ZombieBase {
                                                 null,
                                                 null );
         // get hit
-        FSM.State state_onHit = new FSM.State( "OnHit", 
-                                               new Action_ActOnHit(this), 
+        FSM.State state_onStun = new FSM.State( "OnStun", 
+                                               new Action_ActOnStun(this), 
                                                null,
                                                null );
+        // on dead
+        FSM.State state_onDead = new FSM.State( "OnDead",
+                                                new Action_ActOnDead(this), 
+                                                null, // TODO: dead clean up
+                                                null );
         // dead
-        FSM.State state_Dead = new FSM.State( "Dead", 
-                                               new Action_ActOnDead(this), 
-                                               null, // TODO: dead clean up
-                                               null );
+        FSM.State state_dead = new FSM.State( "Dead",
+                                              new Action_CleanDeadBody(this.gameObject), 
+                                              null,
+                                              null );
 
         // ======================================================== 
         // condition 
@@ -234,30 +256,31 @@ public class AI_ZombieNormal : AI_ZombieBase {
 
         FSM.Condition cond_isPlayerInAttackRange = new Condition_isPlayerInAttackRange(this,30.0f,this.attackDistance);
         FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
-        FSM.Condition cond_isOnHit = new Condition_isOnHit(this);
+        FSM.Condition cond_isOnStun = new Condition_isOnStun(this);
         FSM.Condition cond_noHP = new Condition_noHP(this.zombieInfo);
+        // TODO: FSM.Condition cond_isStunning = new Condition_isStunning(this);
 
         // ======================================================== 
         // setup transitions
         // ======================================================== 
 
         // idle to ...
-        state_idle.AddTransition( new FSM.Transition( state_Dead,
+        state_idle.AddTransition( new FSM.Transition( state_onDead,
                                                       cond_noHP,
                                                       null ) );
-        state_idle.AddTransition( new FSM.Transition( state_onHit,
-                                                      cond_isOnHit,
+        state_idle.AddTransition( new FSM.Transition( state_onStun,
+                                                      cond_isOnStun,
                                                       null ) );
         state_idle.AddTransition( new FSM.Transition( state_seekPlayers, 
                                                       new Condition_playerInRange( this.transform, 20.0f ), 
                                                       null ) );
 
         // seekPlayers to ...
-        state_seekPlayers.AddTransition( new FSM.Transition( state_Dead,
+        state_seekPlayers.AddTransition( new FSM.Transition( state_onDead,
                                                              cond_noHP,
                                                              null ) );
-        state_seekPlayers.AddTransition( new FSM.Transition( state_onHit,
-                                                             cond_isOnHit,
+        state_seekPlayers.AddTransition( new FSM.Transition( state_onStun,
+                                                             cond_isOnStun,
                                                              null ) );
         state_seekPlayers.AddTransition( new FSM.Transition( state_attack,
                                                              cond_isPlayerInAttackRange,
@@ -266,27 +289,30 @@ public class AI_ZombieNormal : AI_ZombieBase {
                                                              new FSM.Condition_not( new Condition_playerInRange( this.transform, 40.0f ) ) , 
                                                              null ) );
         // attack to ...
-        state_attack.AddTransition( new FSM.Transition( state_Dead,
+        state_attack.AddTransition( new FSM.Transition( state_onDead,
                                                         cond_noHP,
                                                         null ) );
-        state_attack.AddTransition( new FSM.Transition( state_onHit,
-                                                        cond_isOnHit,
+        state_attack.AddTransition( new FSM.Transition( state_onStun,
+                                                        cond_isOnStun,
                                                         null ) );
         state_attack.AddTransition( new FSM.Transition ( state_idle, 
                                                          new FSM.Condition_not(cond_isAttacking),
                                                          null ) );
         // on hit to ...
-        state_onHit.AddTransition( new FSM.Transition( state_Dead,
+        state_onStun.AddTransition( new FSM.Transition( state_onDead,
                                                        cond_noHP,
                                                        null ) );
-        state_onHit.AddTransition( new FSM.Transition ( state_idle, 
-                                                        new FSM.Condition_not(cond_isOnHit),
+        state_onStun.AddTransition( new FSM.Transition ( state_idle, 
+                                                        new FSM.Condition_not(new Condition_isStunning(this) ),
                                                         null ) );
-        // TODO { 
-        // state_onHit.AddTransition( new FSM.Transition ( state_onHit, 
-        //                                                 cond_isOnHit,
-        //                                                 null ) );
-        // } TODO end 
+        state_onStun.AddTransition( new FSM.Transition ( state_onStun, 
+                                                         cond_isOnStun,
+                                                         null ) );
+
+        // on dead to ...
+        state_onDead.AddTransition( new FSM.Transition( state_dead,
+                                                        new FSM.Condition_waitForSeconds(this.deadBodyKeepTime),
+                                                        null ) );
 
         // init fsm
         fsm.init(state_idle);
@@ -314,45 +340,33 @@ public class AI_ZombieNormal : AI_ZombieBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Update () {
+    protected new void Update () {
+        base.Update();
+
         this.fsm.tick(); // update state machine
         ProcessMovement();
 
         // reset values
-        this.lastHit.hitType = HitInfo.HitType.none;
+        this.lastHit.stunType = HitInfo.StunType.none;
 
-        // DEBUG { 
-        // // draw velocity
-        // Vector3 vel = base.Velocity(); 
-        // DebugHelper.DrawLine ( transform.position, 
-        //                        transform.position + vel * 3.0f, 
-        //                        new Color(0.0f,1.0f,0.0f) );
-        // // draw smoothed acceleration
-        // Vector3 acc = base.smoothedAcceleration;
-        // DebugHelper.DrawLine ( transform.position, 
-        //                        transform.position + acc * 3.0f, 
-        //                        new Color(1.0f,0.0f,1.0f) );
-        // // draw target pos
-        // DebugHelper.DrawDestination ( this.targetPos );
-        // DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
+        // ShowDebugInfo (); // DEBUG
+    }
 
-        // debug info
-        // DebugHelper.ScreenPrint ( "AI_ZombieNormal steering state: " + this.steeringState );
-        // DebugHelper.ScreenPrint ( "AI_ZombieNormal current state: " + fsm.CurrentState().name );
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
 
-        // Vector3 targetDir = (this.targetPos - transform.position).normalized;
-        // float cosTheta = Vector3.Dot ( transform.forward, targetDir );
-        // DebugHelper.ScreenPrint ( "angle: " + Mathf.Acos(cosTheta) * Mathf.Rad2Deg );
-        // DebugHelper.ScreenPrint ( "target pos: " + this.targetPos );
+    protected new void ShowDebugInfo () {
+        base.ShowDebugInfo();
 
-        // DEBUG actorInfo
-        // DebugHelper.ScreenPrint ( "AI_ZombieNormal curHP = " + this.zombieInfo.curHP );
+        // draw target pos
+        DebugHelper.DrawDestination ( this.targetPos );
+        DebugHelper.DrawCircleY( transform.position, 5.0f, Color.yellow );
 
-        // DEBUG animation
-        // foreach ( AnimationState animS in this.anim ) {
-        //     DebugHelper.ScreenPrint ( animS.name + ": " + animS.enabled );
-        // }
-        // } DEBUG end 
+        // debug attack range
+        Vector3 targetDir = (this.targetPos - transform.position).normalized;
+        float cosTheta = Vector3.Dot ( transform.forward, targetDir );
+        DebugHelper.ScreenPrint ( "face to target angle: " + Mathf.Acos(cosTheta) * Mathf.Rad2Deg );
     }
 
     // ------------------------------------------------------------------ 
@@ -360,6 +374,21 @@ public class AI_ZombieNormal : AI_ZombieBase {
     // ------------------------------------------------------------------ 
 
     void ProcessMovement () {
+        // don't do anything if we disable the steer
+        if (  this.steeringState == SteeringState.disable ) {
+            // TEMP HARDCODE { 
+            if ( this.anim.IsPlaying("death1") == false && 
+                 this.anim.IsPlaying("death2") == false )
+            {
+                this.transform.position =
+                    new Vector3 ( this.transform.position.x,
+                                  this.transform.position.y - Time.deltaTime * 0.3f,
+                                  this.transform.position.z );
+            }
+            // } TEMP HARDCODE end 
+            return;
+        }
+
         // handle steering
         Vector3 force = Vector3.zero;
         if ( this.steeringState == SteeringState.seeking ) {
@@ -414,22 +443,36 @@ public class AI_ZombieNormal : AI_ZombieBase {
             return;
         }
 
-        /*float dmgOutput =*/ DamageRule.Instance().CalculateDamage( this.zombieInfo, dmgInfo );
+        float dmgOutput = DamageRule.Instance().CalculateDamage( this.zombieInfo, dmgInfo );
 
-        // TODO { 
-        // if ( dmgOutput < 20.0f )
-        //     this.lastHit.hitType = HitInfo.HitType.light;
-        // else if ( dmgOutput >= 20.0f )
-        //     this.lastHit.hitType = HitInfo.HitType.normal;
-        this.lastHit.hitType = HitInfo.HitType.normal;
-        // } TODO end 
+        // caculate accumulate damage
+        if ( _other.gameObject.layer == Layer.melee_player ) {
+            this.zombieInfo.accDmgNormal += dmgOutput;
+            this.zombieInfo.accDmgSerious += dmgOutput;
+        }
+        else if ( _other.gameObject.layer == Layer.bullet_player ) {
+            this.zombieInfo.accDmgNormal += dmgOutput;
+        }
+
+        // serious stun have higher priority
+        if ( this.zombieInfo.accDmgSerious >= this.zombieInfo.seriousStun ) {
+            this.lastHit.stunType = HitInfo.StunType.serious;
+            this.zombieInfo.accDmgSerious = 0.0f;
+        }
+        else if ( this.zombieInfo.accDmgNormal >= this.zombieInfo.normalStun ) {
+            this.lastHit.stunType = HitInfo.StunType.normal;
+            this.zombieInfo.accDmgNormal = 0.0f;
+        }
+        else {
+            this.lastHit.stunType = HitInfo.StunType.none;
+        }
 
         this.lastHit.position = _other.transform.position;
         this.lastHit.normal = _other.transform.right;
         Vector3 dir = _other.transform.position - transform.position;
         dir.y = 0.0f;
         dir.Normalize();
-        this.lastHit.hitBackForce = dir * DamageRule.Instance().HitBackForce(dmgInfo.hitBackType);  
+        this.lastHit.knockBackForce = dir * DamageRule.Instance().KnockBackForce(dmgInfo.knockBackType);  
 
         // TODO: if hit light, face it { 
         // transform.forward = -_other.transform.forward;
@@ -440,11 +483,15 @@ public class AI_ZombieNormal : AI_ZombieBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void ActOnHit () {
-        string animName = DamageRule.Instance().HitAnim(this.lastHit.hitType);
+    public void ActOnStun () {
+        // NOTE: it could be possible we interupt to hit when zombie is attacking.
+        this.atkShape.active = false;
+
+        string animName = DamageRule.Instance().HitAnim(this.lastHit.stunType);
         if ( animName == "unknown" )
             return;
 
+        // Debug.Log("animName: " + animName); // DEBUG
         this.anim.Rewind(animName);
         this.anim.Play(animName);
     } 
@@ -460,14 +507,19 @@ public class AI_ZombieNormal : AI_ZombieBase {
             this.anim.CrossFade("death1");
         else
             this.anim.CrossFade("death2");
+
+        // make sure we disable all attack shapes
+        this.atkShape.active = false;
+        this.gameObject.layer = Layer.dead_body;
+        this.DisableSteering();
     } 
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public bool isOnHit () {
-        return this.lastHit.hitType != HitInfo.HitType.none;
+    public bool isGetStun () {
+        return this.lastHit.stunType != HitInfo.StunType.none;
     }
 
     // ------------------------------------------------------------------ 

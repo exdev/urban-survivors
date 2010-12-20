@@ -48,8 +48,8 @@ public class GameRules : MonoBehaviour {
             instance = this;
 
             //
-            playerBoy = GameObject.FindWithTag("player.boy");
-            playerGirl = GameObject.FindWithTag("player.girl");
+            playerBoy = GameObject.FindWithTag("player_boy");
+            playerGirl = GameObject.FindWithTag("player_girl");
 
             //
             startPoint = GameObject.Find("StartPoint");
@@ -105,9 +105,21 @@ public class GameRules : MonoBehaviour {
 
     public List<GameObject> GetEnemies () { 
         List<GameObject> enemies = new List<GameObject>();
-        enemies.AddRange ( GameObject.FindGameObjectsWithTag("zombie") ); 
+        enemies.AddRange ( GameObject.FindGameObjectsWithTag("zombie_girl") ); 
+        enemies.AddRange ( GameObject.FindGameObjectsWithTag("zombie_no1") ); 
         return enemies;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public List<GameObject> GetEnemiesByTag ( string _tagName ) { 
+        List<GameObject> enemies = new List<GameObject>();
+        enemies.AddRange ( GameObject.FindGameObjectsWithTag(_tagName) ); 
+        return enemies;
+    }
+
 
     // ------------------------------------------------------------------ 
     // Desc: 
