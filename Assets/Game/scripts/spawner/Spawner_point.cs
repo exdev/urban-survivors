@@ -18,9 +18,7 @@ using System.Collections;
 
 public class Spawner_point : Spawner_base {
 
-    public int totalAmount = -1;
-    public int minAlive = 1; // The minimum number of pawns that will be spawned every time the code execute.
-    public int maxAlive = 1; // The maximum number of pawns that will be spawned every time the code execute.
+    public float radius = 0.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -31,20 +29,12 @@ public class Spawner_point : Spawner_base {
     // ------------------------------------------------------------------ 
 
     public override void exec () {
-        // never exec the code when we reach the limitation.
-        if ( totalAmount == 0 )
-            return;
-
-        //
-        int amount = Random.Range( minAlive, maxAlive );
-        if ( totalAmount != -1 ) {
-            amount = Mathf.Min(totalAmount,amount);
-            totalAmount = totalAmount - amount;
-        }
-
-        //
+        int amount = calcSpawnAmount();
         while ( amount > 0 ) {
-            Instantiate( Prefab, transform.position, transform.rotation );
+            Vector2 offset = Random.insideUnitCircle * this.radius;
+            Instantiate( Prefab, 
+                         transform.position + new Vector3( offset.x, 0.0f, offset.y ),
+                         transform.rotation );
             --amount;
         }
     }

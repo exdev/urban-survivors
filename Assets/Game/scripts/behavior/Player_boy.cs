@@ -171,7 +171,7 @@ public class Player_boy : Player_base {
         HandleInput();
         this.fsm.tick(); // update state machine
         ProcessMovement (); // handle steering
-        // ShowDebugInfo(); // DEBUG
+        ShowDebugInfo(); // DEBUG
 	}
 
     // ------------------------------------------------------------------ 
@@ -179,7 +179,10 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     protected new void ShowDebugInfo () {
+        DebugHelper.ScreenPrint("== player boy debug info ==");
         base.ShowDebugInfo();
+        DebugHelper.ScreenPrint("curHP = " + this.playerInfo.curHP);
+        DebugHelper.ScreenPrint("maxHP = " + this.playerInfo.maxHP);
     }
 
 

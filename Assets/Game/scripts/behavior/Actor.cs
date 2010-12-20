@@ -190,9 +190,9 @@ public class Actor : Steer {
         DebugHelper.ScreenPrint ( "fsm state: " + this.fsm.CurrentState().name );
 
         // debug animation
-        foreach ( AnimationState animS in this.anim ) {
-            DebugHelper.ScreenPrint ( animS.name + ": " + animS.enabled );
-        }
+        // foreach ( AnimationState animS in this.anim ) {
+        //     DebugHelper.ScreenPrint ( animS.name + ": " + animS.enabled );
+        // }
     }
 }
 

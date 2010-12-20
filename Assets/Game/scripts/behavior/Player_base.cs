@@ -73,7 +73,7 @@ public class Player_base : Actor {
 
         // it is possible that we use HP pack save the player
         if ( this.IsDown() == true ) {
-            this.Recover();
+            this.Recover(10.0f);
         }
     }
 
@@ -163,9 +163,9 @@ public class Player_base : Actor {
     // ------------------------------------------------------------------ 
 
     public bool IsDown () { return this.isDown; } 
-    public void Recover ( float _hp = 0.0f ) { 
+    public void Recover ( float _hp ) { 
         this.isDown = false; 
-        this.playerInfo.curHP = Mathf.Max( this.playerInfo.curHP + _hp, 10.0f );
+        this.playerInfo.curHP = Mathf.Min( this.playerInfo.curHP + _hp, this.playerInfo.maxHP );
     } 
 }
 

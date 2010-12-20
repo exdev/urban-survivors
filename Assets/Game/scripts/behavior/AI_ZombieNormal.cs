@@ -357,6 +357,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
     // ------------------------------------------------------------------ 
 
     protected new void ShowDebugInfo () {
+        DebugHelper.ScreenPrint("== zombie No1 debug info ==");
         base.ShowDebugInfo();
 
         // draw target pos

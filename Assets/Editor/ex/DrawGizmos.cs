@@ -65,10 +65,25 @@ class DrawGizmos {
     }
 
     // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [DrawGizmo (GizmoType.SelectedOrChild | GizmoType.Pickable)]
+    static void DrawPeriodicSource ( Spawner_zone _c, GizmoType _gizmoType ) {
+        if ( EditorApplication.isPlaying ) return;
+
+        Vector3 position = _c.transform.position;
+        Gizmos.color = new Color( 0.0f, 0.5f, 0.0f, 0.2f );
+        Gizmos.DrawCube (position, _c.size);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube (position, _c.size);
+    }
+
+    // ------------------------------------------------------------------ 
     // Desc: Response_listSpawn
     // ------------------------------------------------------------------ 
 
-    [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
+    [DrawGizmo (GizmoType.Selected | GizmoType.Pickable)]
     static void DrawPeriodicSource ( Response_listSpawn _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
