@@ -34,7 +34,7 @@ public class ScreenPad : MonoBehaviour {
     private int meleeID = -1;
 #endif
     private Vector2 aiming_dir = Vector2.up;
-    private bool canFire = false;
+    private float shootCounter = 0.0f;
     private bool meleeButtonDown = false;
     private List<Touch> available_touches = new List<Touch>();
 
@@ -51,6 +51,7 @@ public class ScreenPad : MonoBehaviour {
     public Circle aiming_zone;
     public Circle melee_zone;
     public bool useKeyboardAndMouse = false;
+    public float shootingDuration = 3.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -77,12 +78,15 @@ public class ScreenPad : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
 	void Update () {
+        // minus shoot duration
+        if ( this.shootCounter > 0.0f )
+            this.shootCounter -= Time.deltaTime;
+
         if ( useKeyboardAndMouse == false ) {
 #if UNITY_IPHONE
             // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
             move_dir = Vector2.zero;
             available_touches.Clear();
-            canFire = false;
 
             Touch move_finger = new Touch();
             Touch aiming_finger = new Touch();
@@ -192,30 +196,31 @@ public class ScreenPad : MonoBehaviour {
             // }
             // } DEBUG end 
 #endif
-        } else {
-            // handle keyboard move
-            float moveFB = Input.GetAxisRaw("Vertical");
-            float moveLR = Input.GetAxisRaw("Horizontal");
-            Vector2 dir = new Vector2(moveLR,moveFB);
-            Vector2 screenPos = move_limitation * dir.normalized + move_zone.center;
-            HandleMove(screenPos);
-            HandleAiming(Vector2.zero);
-            this.canFire = Input.GetButton("Fire");
-            this.meleeButtonDown = Input.GetKeyDown(KeyCode.Space);
-        } // end if ( useKeyboardAndMouse == false )
+            } else {
+                // handle keyboard move
+                float moveFB = Input.GetAxisRaw("Vertical");
+                float moveLR = Input.GetAxisRaw("Horizontal");
+                Vector2 dir = new Vector2(moveLR,moveFB);
+                Vector2 screenPos = move_limitation * dir.normalized + move_zone.center;
+                HandleMove(screenPos);
+                HandleAiming(Vector2.zero);
+                if ( Input.GetButton("Fire") )
+                    this.shootCounter = this.shootingDuration;
+                this.meleeButtonDown = Input.GetKeyDown(KeyCode.Space);
+            } // end if ( useKeyboardAndMouse == false )
 
-        // if there is no move, keep the analog at the center of the move_zone. 
-        if ( MathHelper.IsZerof(move_dir.sqrMagnitude) ) {
-            Vector3 worldpos = hud_camera.ScreenToWorldPoint( new Vector3( move_zone.center.x, move_zone.center.y, 1 ) );
-            // analog.transform.position = new Vector3( worldpos.x, worldpos.y, analog.transform.position.z ); 
+            // if there is no move, keep the analog at the center of the move_zone. 
+            if ( MathHelper.IsZerof(move_dir.sqrMagnitude) ) {
+                Vector3 worldpos = hud_camera.ScreenToWorldPoint( new Vector3( move_zone.center.x, move_zone.center.y, 1 ) );
+                // analog.transform.position = new Vector3( worldpos.x, worldpos.y, analog.transform.position.z ); 
 
-            Hashtable args = iTween.Hash( "position", worldpos,
-                                          "time", 0.1f,
-                                          "easetype", iTween.EaseType.easeInCubic 
-                                        );
-            // iTween.MoveTo ( analog, worldpos, 0.2f );
-            iTween.MoveTo ( analog.gameObject, args );
-        }
+                Hashtable args = iTween.Hash( "position", worldpos,
+                                              "time", 0.1f,
+                                              "easetype", iTween.EaseType.easeInCubic 
+                                            );
+                // iTween.MoveTo ( analog, worldpos, 0.2f );
+                iTween.MoveTo ( analog.gameObject, args );
+            }
         }
 
         // ------------------------------------------------------------------ 
@@ -249,12 +254,12 @@ public class ScreenPad : MonoBehaviour {
                     Touch t = GetLastTouch();
                     Vector2 delta = t.position - girlScreenPos_v2;
                     aiming_dir = delta.normalized;
-                    canFire = true;
+                    this.shootCounter = this.shootingDuration;
                 }
                 else if ( aimingID != -1 ) {
                     Vector2 delta = _screenPos - aiming_zone.center;
                     aiming_dir = -delta.normalized;
-                    canFire = true;
+                    this.shootCounter = this.shootingDuration;
                 }
 #endif
             } else {
@@ -288,7 +293,7 @@ public class ScreenPad : MonoBehaviour {
         // Desc: 
         // ------------------------------------------------------------------ 
 
-        public bool CanFire () { return canFire; }
+        public bool CanShoot () { return this.shootCounter > 0.0f; }
 
         // ------------------------------------------------------------------ 
         // Desc: 
