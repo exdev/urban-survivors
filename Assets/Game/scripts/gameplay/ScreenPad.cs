@@ -50,7 +50,7 @@ public class ScreenPad : MonoBehaviour {
     public float move_limitation;
     public Circle aiming_zone;
     public Circle melee_zone;
-    public bool useKeyboardAndMouse = false;
+    public bool useRemoteTouch = false;
     public float shootingDuration = 3.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -64,8 +64,13 @@ public class ScreenPad : MonoBehaviour {
 	void Start () {
         DebugHelper.Assert( hud_camera != null, "pls assign hud_camera" );
         DebugHelper.Assert( analog != null, "pls assign analog" );
+
+        // always turn on keyboard and mouse when in PC version.
 #if !UNITY_IPHONE
-        useKeyboardAndMouse = true; // always turn on keyboard and mouse when in PC version.
+        useRemoteTouch = false; 
+#else
+        if ( Application.isEditor == false )
+            useRemoteTouch = true; 
 #endif
 
         // DEBUG { 
@@ -82,7 +87,7 @@ public class ScreenPad : MonoBehaviour {
         if ( this.shootCounter > 0.0f )
             this.shootCounter -= Time.deltaTime;
 
-        if ( useKeyboardAndMouse == false ) {
+        if ( useRemoteTouch ) {
 #if UNITY_IPHONE
             // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
             move_dir = Vector2.zero;
@@ -207,7 +212,7 @@ public class ScreenPad : MonoBehaviour {
                 if ( Input.GetButton("Fire") )
                     this.shootCounter = this.shootingDuration;
                 this.meleeButtonDown = Input.GetKeyDown(KeyCode.Space);
-            } // end if ( useKeyboardAndMouse == false )
+            } // end if ( !useRemoteTouch )
 
             // if there is no move, keep the analog at the center of the move_zone. 
             if ( MathHelper.IsZerof(move_dir.sqrMagnitude) ) {
@@ -243,7 +248,7 @@ public class ScreenPad : MonoBehaviour {
         // ------------------------------------------------------------------ 
 
         void HandleAiming ( Vector2 _screenPos ) {
-            if ( useKeyboardAndMouse == false ) {
+            if ( useRemoteTouch ) {
 #if UNITY_IPHONE
                 // the screen touch priority is higher than aiming_zone
                 if ( available_touches.Count != 0 ) {
@@ -268,7 +273,7 @@ public class ScreenPad : MonoBehaviour {
                 Vector2 girlScreenPos_v2 = new Vector2(girlScreenPos.x, girlScreenPos.y); 
                 Vector2 delta = new Vector2(Input.mousePosition.x,Input.mousePosition.y) - girlScreenPos_v2;
                 aiming_dir = delta.normalized;
-            } // end if ( useKeyboardAndMouse == false )
+            } // end if ( !useRemoteTouch )
 
             // use cross to get the direction of the rotation.
             Vector2 up = Vector2.up;
