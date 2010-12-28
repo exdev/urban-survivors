@@ -488,7 +488,7 @@ public class Player_girl : Player_base {
         this.aimDir = this.aimDir.normalized;
 
         // if we have weapon in hand.
-        if ( screenPad.CanFire() ) {
+        if ( screenPad.CanShoot() ) {
             this.shootButtonTriggered = true;
             // TODO { 
             // if ( this.curWeapon ) {
