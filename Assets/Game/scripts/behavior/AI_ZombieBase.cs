@@ -116,7 +116,7 @@ public class AI_ZombieBase : Actor {
     // ------------------------------------------------------------------ 
 
     void Awake () {
-        if ( fxHitBullet  == null && this.FX_HIT_bullet ) {
+        if ( fxHitBullet == null && this.FX_HIT_bullet ) {
             fxHitBullet = (GameObject)Instantiate( this.FX_HIT_bullet );
         }
         if ( fxHitMelee == null && this.FX_HIT_melee ) {

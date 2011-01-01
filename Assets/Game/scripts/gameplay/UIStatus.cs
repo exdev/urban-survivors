@@ -50,6 +50,7 @@ public class UIStatus : MonoBehaviour {
         this.boyProgressBar = boyHpBar ? boyHpBar.GetComponent<UIProgressBar>() : null;
         this.girlProgressBar = girlHpBar ? girlHpBar.GetComponent<UIProgressBar>() : null;
         this.restartCounterText = restartCounter ? restartCounter.GetComponent<TextMesh>() : null;
+        gameOver.SetActiveRecursively(false);
     }
 
     // ------------------------------------------------------------------ 
@@ -58,10 +59,10 @@ public class UIStatus : MonoBehaviour {
 
     void Update () {
         PlayerInfo boyInfo = GameRules.Instance().GetPlayerBoyInfo();
-        this.boyProgressBar.Value = 1.0f - boyInfo.curHP/boyInfo.maxHP;
+        this.boyProgressBar.Value = boyInfo.curHP/boyInfo.maxHP;
 
         PlayerInfo girlInfo = GameRules.Instance().GetPlayerGirlInfo();
-        this.girlProgressBar.Value = girlInfo.curHP/girlInfo.maxHP;
+        this.girlProgressBar.Value = 1.0f - girlInfo.curHP/girlInfo.maxHP;
 
         if ( GameRules.Instance().IsGameOver() ) {
             gameOver.SetActiveRecursively(true);

@@ -92,6 +92,8 @@ public class DebugHelper : MonoBehaviour {
             frames = 0;
             lastInterval = timeNow;
         }
+        // NOTE: the OnGUI call multiple times in one frame, so we just clear text here.
+        StartCoroutine(CleanDebugText());
     }
 
     // ------------------------------------------------------------------ 
@@ -103,7 +105,6 @@ public class DebugHelper : MonoBehaviour {
             GUILayout.Label ( "fps: " + fps.ToString("f2") );
         if ( showDebugText )
             GUILayout.Label ( debug_text );
-        StartCoroutine(CleanDebugText());
         if ( showHotPoints ) {
             foreach ( Touch t in Input.touches ) {
                 if (t.phase != TouchPhase.Ended && t.phase != TouchPhase.Canceled) {
