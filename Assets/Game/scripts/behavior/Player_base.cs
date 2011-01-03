@@ -99,11 +99,23 @@ public class Player_base : Actor {
         DebugHelper.Assert( this.weaponAnchor, "can't find WeaponAnchor");
 
         // init hud
-        GameObject hud = GameObject.Find("HUD");
+        GameObject hud = null;
+        if ( GameRules.Instance().IsMultiPlayer() ) {
+            hud = GameObject.Find("HUD_m");
+        }
+        else {
+            hud = GameObject.Find("HUD_s");
+        }
+
         if ( hud ) {
             screenPad = hud.GetComponent(typeof(ScreenPad)) as ScreenPad;
         }
-        // DebugHelper.Assert( screenPad, "screenPad not found" );
+
+#if UNITY_IPHONE
+        if ( Application.isEditor == false ) {
+            DebugHelper.Assert( screenPad, "screenPad not found" );
+        }
+#endif
 
         InitInfo();
     }

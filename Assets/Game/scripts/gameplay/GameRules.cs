@@ -25,6 +25,7 @@ public class GameRules : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     public float RestartForSeconds = 5.0f; 
+    public bool multiPlayer = false;
 
     protected static GameRules instance  = null;
     protected Player_base playerBoy = null;
@@ -89,6 +90,7 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public bool IsMultiPlayer () { return this.multiPlayer; } 
     public bool IsGameOver () { return this.isGameOver; } 
     public float RestartCounter () { return this.restartCounter; } 
 
