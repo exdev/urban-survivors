@@ -31,6 +31,7 @@ public class ScreenPad : MonoBehaviour {
     int moveID = -1;
     int aimingID = -1;
     int meleeID = -1;
+    Rect meleeZone = new Rect();
     List<Touch> availableTouches = new List<Touch>();
 #endif
     Vector2 moveDir;
@@ -40,7 +41,6 @@ public class ScreenPad : MonoBehaviour {
 
     Circle moveZone = new Circle();
     Circle aimingZone = new Circle();
-    Rect meleeZone = new Rect();
     Transform moveAnalog;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -94,6 +94,7 @@ public class ScreenPad : MonoBehaviour {
         this.aimingZone.radius = 64.0f;
 
         //
+#if UNITY_IPHONE
         PackedSprite sp = meleeOutline.GetComponent<PackedSprite>();
         int half_width = (int)sp.width/2;
         int half_height = (int)sp.height/2;
@@ -102,6 +103,7 @@ public class ScreenPad : MonoBehaviour {
                                    meleePos.y - half_height, 
                                    sp.width, 
                                    sp.height ); 
+#endif
     }
 	
     // ------------------------------------------------------------------ 
@@ -332,6 +334,7 @@ public class ScreenPad : MonoBehaviour {
 
         public bool MeleeButtonDown () { return meleeButtonDown; }
 
+#if UNITY_IPHONE
         // ------------------------------------------------------------------ 
         // Desc: 
         // ------------------------------------------------------------------ 
@@ -346,4 +349,5 @@ public class ScreenPad : MonoBehaviour {
             DebugHelper.Assert ( this.availableTouches.Count != 0, "the availableTouches is empty." );
             return this.availableTouches[this.availableTouches.Count-1];
         }
+#endif
 }

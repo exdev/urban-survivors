@@ -329,8 +329,8 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     void HandleInput() {
-        this.screenDir = this.screenPad ? this.screenPad.GetMoveDirection() : Vector2.zero;
-        if ( this.screenPad.MeleeButtonDown() ) {
+        this.screenDir = screenPad ? screenPad.GetMoveDirection() : Vector2.zero;
+        if ( screenPad.MeleeButtonDown() ) {
             this.meleeButtonTriggered = true;
         }
     }
@@ -500,7 +500,7 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     public void Act_Movement () {
-        this.screenDir = this.screenPad.GetMoveDirection();
+        this.screenDir = screenPad.GetMoveDirection();
         Vector3 dir = Vector3.zero; 
         dir.x = this.screenDir.x;
         dir.y = this.screenDir.y;
