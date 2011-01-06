@@ -639,7 +639,7 @@ public class Player_girl : Player_base {
             shootInfo.AdjustAnim(this.anim);
             this.anim.Play(shootInfo.reloadAnim);
             // TODO: HACK
-            shootInfo.Reload(shootInfo.capacity);
+            shootInfo.Reload();
         }
     }
 

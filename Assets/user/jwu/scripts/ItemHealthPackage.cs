@@ -84,9 +84,9 @@ public class ItemHealthPackage : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void OnTriggerEnter ( Collider _other ) {
-        Player_base boy = GameRules.Instance().GetPlayerBoy().GetComponent<Player_base>();
+        Player_base boy = GameRules.Instance().GetPlayerBoy();
         PlayerInfo boyInfo = boy.playerInfo;
-        Player_base girl = GameRules.Instance().GetPlayerGirl().GetComponent<Player_base>();
+        Player_base girl = GameRules.Instance().GetPlayerGirl();
         PlayerInfo girlInfo = girl.playerInfo;
 
         float hpLoseBoy = boyInfo.maxHP - boyInfo.curHP;

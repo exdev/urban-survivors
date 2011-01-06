@@ -33,10 +33,12 @@ public class UIStatus : MonoBehaviour {
     public GameObject girlHpBar = null;
     public GameObject gameOver = null;
     public GameObject restartCounter = null;
+    public GameObject bulletCounter = null;
 
     protected UIProgressBar boyProgressBar = null;
     protected UIProgressBar girlProgressBar = null;
     protected TextMesh restartCounterText = null;
+    protected TextMesh bulletCounterText = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -50,6 +52,7 @@ public class UIStatus : MonoBehaviour {
         this.boyProgressBar = boyHpBar ? boyHpBar.GetComponent<UIProgressBar>() : null;
         this.girlProgressBar = girlHpBar ? girlHpBar.GetComponent<UIProgressBar>() : null;
         this.restartCounterText = restartCounter ? restartCounter.GetComponent<TextMesh>() : null;
+        this.bulletCounterText = bulletCounter ? bulletCounter.GetComponent<TextMesh>() : null;
         gameOver.SetActiveRecursively(false);
     }
 
@@ -68,6 +71,15 @@ public class UIStatus : MonoBehaviour {
             gameOver.SetActiveRecursively(true);
             if ( this.restartCounterText )
                 this.restartCounterText.text = string.Format( "{0:0}", GameRules.Instance().RestartCounter() );
+        }
+
+        // update bullets
+        if ( this.bulletCounterText ) {
+            Player_base girl = GameRules.Instance().GetPlayerGirl();
+            ShootInfo shootInfo = girl.GetShootInfo();
+
+            // curbullet / totalbullet
+            this.bulletCounterText.text = shootInfo.CurBullets() + "/" + shootInfo.TotalBullets();
         }
     }
 }

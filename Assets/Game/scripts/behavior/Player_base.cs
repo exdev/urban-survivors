@@ -103,16 +103,15 @@ public class Player_base : Actor {
             GameObject hud = null;
             GameObject hud_s = GameObject.Find("HUD_s");
             GameObject hud_m = GameObject.Find("HUD_m");
-            hud = hud_s;
 
-            // if ( GameRules.Instance().IsMultiPlayer() ) {
-            //     hud = hud_m;
-            //     if ( hud_s ) hud_s.SetActiveRecursively(false);
-            // }
-            // else {
-            //     hud = hud_s;
-            //     if ( hud_m ) hud_m.SetActiveRecursively(false);
-            // }
+            if ( GameRules.Instance().IsMultiPlayer() ) {
+                hud = hud_m;
+                if ( hud_s ) hud_s.SetActiveRecursively(false);
+            }
+            else {
+                hud = hud_s;
+                if ( hud_m ) hud_m.SetActiveRecursively(false);
+            }
 
             if ( hud ) {
                 screenPad = hud.GetComponent(typeof(ScreenPad)) as ScreenPad;
@@ -171,9 +170,9 @@ public class Player_base : Actor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    protected ShootInfo GetShootInfo () { return this.curWeapon.GetComponent<ShootInfo>(); }
-    protected AttackInfo GetAttackInfo () { return this.curWeapon.GetComponent<AttackInfo>(); }
-    protected DamageInfo GetDamageInfo () { return this.curWeapon.GetComponent<DamageInfo>(); }
+    public ShootInfo GetShootInfo () { return this.curWeapon.GetComponent<ShootInfo>(); }
+    public AttackInfo GetAttackInfo () { return this.curWeapon.GetComponent<AttackInfo>(); }
+    public DamageInfo GetDamageInfo () { return this.curWeapon.GetComponent<DamageInfo>(); }
     protected void SetCurWeaponOwner () { 
         DamageInfo dmgInfo = this.GetDamageInfo();
         dmgInfo.owner_info = this.playerInfo; 

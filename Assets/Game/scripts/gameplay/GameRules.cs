@@ -102,13 +102,13 @@ public class GameRules : MonoBehaviour {
         Vector3 start_pos = startPoint.transform.position;
         Quaternion start_rot = startPoint.transform.rotation;
 
-        GameObject boy = GameRules.Instance().GetPlayerBoy();
+        GameObject boy = GameRules.Instance().GetPlayerBoy().gameObject;
         if (boy) {
             boy.transform.position = start_pos;
             boy.transform.rotation = start_rot;
         }
 
-        GameObject girl = GameRules.Instance().GetPlayerGirl();
+        GameObject girl = GameRules.Instance().GetPlayerGirl().gameObject;
         if (girl) {
             girl.transform.position = start_pos - boy.transform.forward * 2.0f;
             girl.transform.rotation = start_rot;
@@ -131,10 +131,10 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public GameObject GetPlayerBoy () { return playerBoy.gameObject; }
+    public Player_base GetPlayerBoy () { return playerBoy; }
     public PlayerInfo GetPlayerBoyInfo () { return playerBoy.playerInfo; }
 
-    public GameObject GetPlayerGirl () { return playerGirl.gameObject; }
+    public Player_base GetPlayerGirl () { return playerGirl; }
     public PlayerInfo GetPlayerGirlInfo () { return playerGirl.playerInfo; }
 
     // ------------------------------------------------------------------ 
