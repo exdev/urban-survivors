@@ -158,6 +158,41 @@ public class GameRules : MonoBehaviour {
         return enemies;
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void PickupBullets ( int _bullets ) {
+        ShootInfo shootInfo = playerGirl.GetShootInfo();
+        shootInfo.AddBullets(_bullets);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void PlayerRecover ( float _amount ) {
+        // TODO: I think recover girl first would be a better way.
+
+        PlayerInfo boyInfo = playerBoy.playerInfo;
+        PlayerInfo girlInfo = playerGirl.playerInfo;
+
+        float hpLoseBoy = boyInfo.maxHP - boyInfo.curHP;
+        float hpLoseGirl = girlInfo.maxHP - girlInfo.curHP;
+
+        if ( playerGirl.IsDown() || hpLoseGirl > hpLoseBoy ) {
+            playerGirl.Recover(_amount);
+            float hpLeft = hpLoseGirl - _amount;
+            if ( hpLeft > 0.0f )
+                playerBoy.Recover(hpLeft);
+        }
+        else {
+            playerBoy.Recover(_amount);
+            float hpLeft = hpLoseBoy - _amount;
+            if ( hpLeft > 0.0f )
+                playerGirl.Recover(hpLeft);
+        }
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 

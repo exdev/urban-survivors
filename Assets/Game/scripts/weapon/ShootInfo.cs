@@ -108,4 +108,12 @@ public class ShootInfo : MonoBehaviour {
         this.totalBullets -= amount;
         this.bullets += amount;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void AddBullets ( int _bullets ) {
+        this.totalBullets += _bullets;
+    }
 }
