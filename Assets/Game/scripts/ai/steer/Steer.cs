@@ -212,15 +212,18 @@ public class Steer : MonoBehaviour {
         Vector3 newAcceleration = (clippedForce / this.mass);
         Vector3 newVelocity = this.Velocity();
 
-        // damp out abrupt changes and oscillations in steering acceleration
-        // (rate is proportional to time step, then clipped into useful range)
-        if ( Time.deltaTime > 0.0f ) {
-            float smoothRate = Mathf.Clamp (9.0f * Time.deltaTime, 0.15f, 0.4f);
-            smoothRate = Mathf.Clamp01(smoothRate);
-            this.smoothedAcceleration = Vector3.Lerp ( this.smoothedAcceleration, 
-                                                       newAcceleration, 
-                                                       smoothRate );
-        }
+        // jwu DISABLE { 
+        // // damp out abrupt changes and oscillations in steering acceleration
+        // // (rate is proportional to time step, then clipped into useful range)
+        // if ( Time.deltaTime > 0.0f ) {
+        //     float smoothRate = Mathf.Clamp (9.0f * Time.deltaTime, 0.15f, 0.4f);
+        //     smoothRate = Mathf.Clamp01(smoothRate);
+        //     this.smoothedAcceleration = Vector3.Lerp ( this.smoothedAcceleration, 
+        //                                                newAcceleration, 
+        //                                                smoothRate );
+        // }
+        this.smoothedAcceleration = newAcceleration;
+        // } jwu DISABLE end 
 
         // Euler integrate (per frame) acceleration into velocity
         newVelocity += this.smoothedAcceleration * Time.deltaTime;
@@ -264,9 +267,12 @@ public class Steer : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public void ApplyBrakingForce ( float _brakingRate ) {
-        float rawBraking = this.curSpeed * _brakingRate;
-        float clipBraking = Mathf.Clamp( rawBraking, 0.0f, this.maxForce );
-        this.curSpeed -= clipBraking * Time.deltaTime;
+        // jwu DISABLE { 
+        // float rawBraking = this.curSpeed * _brakingRate;
+        // float clipBraking = Mathf.Clamp( rawBraking, 0.0f, this.maxForce );
+        // this.curSpeed -= clipBraking * Time.deltaTime;
+        // } DISABLE end 
+        this.curSpeed = 0.0f;
     }
     // } KEEPME end 
 

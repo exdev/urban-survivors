@@ -357,11 +357,11 @@ public class Player_boy : Player_base {
         if ( this.steeringState == SteeringState.moving ) {
             force = this.moveDir * base.maxForce;
             force.y = 0.0f;
+            ApplySteeringForce( force );
         }
         else if ( this.steeringState == SteeringState.braking ) {
             ApplyBrakingForce(10.0f);
         }
-        ApplySteeringForce( force );
     }
 
     // ------------------------------------------------------------------ 
@@ -375,6 +375,9 @@ public class Player_boy : Player_base {
         this.anim[first_combo.animName].normalizedSpeed = atk_info.speed;
         this.anim.Rewind(first_combo.animName);
         this.anim.CrossFade(first_combo.animName);
+
+        // adjust the orientation
+        AdjustOrientation();
     }
 
     // ------------------------------------------------------------------ 
@@ -407,6 +410,8 @@ public class Player_boy : Player_base {
                 this.anim.CrossFade(nextCombo.animName);
                 atk_info.curCombo = nextCombo;
                 atk_info.waitForNextCombo = false;
+                // adjust the orientation
+                AdjustOrientation();
             }
         }
     }
@@ -500,14 +505,10 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     public void Act_Movement () {
-        this.screenDir = screenPad.GetMoveDirection();
-        Vector3 dir = Vector3.zero; 
-        dir.x = this.screenDir.x;
-        dir.y = this.screenDir.y;
-        dir.z = 0.0f;
-
         Transform mainCamera = Camera.main.GetComponent( typeof(Transform) ) as Transform;
-        dir = mainCamera.TransformDirection(dir.normalized); 
+        Vector3 dir = mainCamera.TransformDirection(this.screenDir.normalized); 
+        dir.y = 0.0f;
+        dir.Normalize();
         this.Move(dir);
 
         // adjust move animation speed
@@ -522,5 +523,21 @@ public class Player_boy : Player_base {
         this.isDown = true;
         this.anim.CrossFade("fallDown");
         StartCoroutine( WaitForRecover() );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void AdjustOrientation () {
+        if ( this.screenDir == Vector3.zero )
+            return;
+
+        // adjust the orientation
+        Transform mainCamera = Camera.main.GetComponent( typeof(Transform) ) as Transform;
+        Vector3 dir = mainCamera.TransformDirection(this.screenDir.normalized); 
+        dir.y = 0.0f;
+        dir.Normalize();
+        this.transform.forward = dir;
     }
 }

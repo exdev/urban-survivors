@@ -291,7 +291,8 @@ public class ScreenPad : MonoBehaviour {
                 }
                 else if ( this.aimingID != -1 ) {
                     Vector2 delta = _screenPos - this.aimingZone.center;
-                    this.aimingDir = -delta.normalized;
+                    // this.aimingDir = -delta.normalized; // this is old method, inverse needle
+                    this.aimingDir = delta.normalized;
                     this.shootCounter = this.shootingDuration;
                 }
 #endif

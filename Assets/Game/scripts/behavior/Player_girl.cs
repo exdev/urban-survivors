@@ -638,7 +638,6 @@ public class Player_girl : Player_base {
         if ( shootInfo ) {
             shootInfo.AdjustAnim(this.anim);
             this.anim.Play(shootInfo.reloadAnim);
-            // TODO: HACK
             shootInfo.Reload();
         }
     }
