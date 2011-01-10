@@ -83,6 +83,7 @@ public class ShootInfo : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public bool OutOfAmmo () { return this.bullets <= 0; }
+    public bool isAmmoFull () { return this.bullets == this.capacity; }
     public int CurBullets () { return this.bullets; }
     public int TotalBullets () { return this.totalBullets; }
 

@@ -44,7 +44,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: Action_ActGetStun 
+    // Desc:
     // ------------------------------------------------------------------ 
 
     class Action_ActOnStun : FSM.Action {

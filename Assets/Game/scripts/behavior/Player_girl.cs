@@ -184,6 +184,23 @@ public class Player_girl : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    class Condition_isAmmoFull : FSM.Condition {
+        Player_girl playerGirl = null;
+
+        public Condition_isAmmoFull ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override bool exec () {
+            ShootInfo shootInfo = this.playerGirl.GetShootInfo();
+            return shootInfo.isAmmoFull();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     class Condition_isMoving : FSM.Condition {
         Player_girl playerGirl = null;
 
@@ -193,6 +210,22 @@ public class Player_girl : Player_base {
 
         public override bool exec () {
             return this.playerGirl.IsMoving();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Condition_isReloadButtonDown : FSM.Condition {
+        Player_girl playerGirl = null;
+
+        public Condition_isReloadButtonDown ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override bool exec () {
+            return this.playerGirl.ReloadButtonDown();
         }
     }
 
@@ -390,6 +423,9 @@ public class Player_girl : Player_base {
         FSM.Condition cond_isNotShooting = new FSM.Condition_not( new Condition_isShooting(this) );
         FSM.Condition cond_isNotReloading = new FSM.Condition_not( new Condition_isReloading(this) );
         FSM.Condition cond_isOutOfAmmo = new Condition_isOutOfAmmo(this);
+        FSM.Condition cond_canReload = new FSM.Condition_and( new FSM.Condition_not(new Condition_isAmmoFull(this)), 
+                                                              new Condition_isReloadButtonDown(this) );
+
         // DELME { 
         // FSM.Condition cond_isMoving = new Condition_isMoving(this);
         // FSM.Condition cond_isShooting = new Condition_isShooting(this);
@@ -410,21 +446,23 @@ public class Player_girl : Player_base {
         state_idle.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
         state_idle.AddTransition( new FSM.Transition( state_following, cond_isFarAwayTarget, action_FollowTarget ) );
         state_idle.AddTransition( new FSM.Transition( state_idleShooting, cond_isShootButtonTriggered, null ) );
+        state_idle.AddTransition( new FSM.Transition( state_idleReloading, cond_canReload, null ) );
 
         // following to ...
         state_following.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), action_StopAndIdle ) );
         state_following.AddTransition( new FSM.Transition( state_idle, cond_isNearTarget, action_StopAndIdle ) );
         state_following.AddTransition( new FSM.Transition( state_walkShooting, cond_isShootButtonTriggered, null ) );
+        state_following.AddTransition( new FSM.Transition( state_walkReloading, cond_canReload, null ) );
 
         // idle shooting to ...
         state_idleShooting.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
-        state_idleShooting.AddTransition( new FSM.Transition( state_idleReloading, cond_isOutOfAmmo, null ) );
+        state_idleShooting.AddTransition( new FSM.Transition( state_idleReloading, new FSM.Condition_or ( cond_isOutOfAmmo, cond_canReload ), null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_idle, cond_isNotShooting, null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_walkShooting, cond_isFarAwayTarget, action_FollowTarget ) );
 
         // walk shooting to ...
         state_walkShooting.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), action_StopAndIdle ) );
-        state_walkShooting.AddTransition( new FSM.Transition( state_walkReloading, cond_isOutOfAmmo, null ) );
+        state_walkShooting.AddTransition( new FSM.Transition( state_walkReloading, new FSM.Condition_or ( cond_isOutOfAmmo, cond_canReload ), null ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_following, cond_isNotShooting, null ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_idleShooting, cond_isNearTarget, action_StopAndIdle ) );
 
@@ -527,6 +565,12 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     public bool IsMoving () { return this.controller.velocity.sqrMagnitude > 0.0f; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool ReloadButtonDown () { return screenPad.ReloadButtonDown(); }
 
     // ------------------------------------------------------------------ 
     // Desc: 
