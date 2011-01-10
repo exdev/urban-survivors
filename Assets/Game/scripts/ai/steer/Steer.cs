@@ -30,7 +30,7 @@ public class Steer : MonoBehaviour {
 
     public float maxSpeed = 1.0f;
     public float maxForce = 0.1f;
-    public float maxBrakingForce = 1.0f;
+    public float brakingRate = 10.0f;
     public float mass = 1.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -266,14 +266,20 @@ public class Steer : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void ApplyBrakingForce ( float _brakingRate ) {
-        // jwu DISABLE { 
-        // float rawBraking = this.curSpeed * _brakingRate;
-        // float clipBraking = Mathf.Clamp( rawBraking, 0.0f, this.maxForce );
-        // this.curSpeed -= clipBraking * Time.deltaTime;
-        // } DISABLE end 
+    public void ApplyBrakingForce () {
+        float rawBraking = this.curSpeed * this.brakingRate;
+        float clipBraking = Mathf.Clamp( rawBraking, 0.0f, this.maxForce );
+        this.curSpeed -= clipBraking * Time.deltaTime;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void BrakeImmediately () {
         this.curSpeed = 0.0f;
     }
+
     // } KEEPME end 
 
     // ------------------------------------------------------------------ 

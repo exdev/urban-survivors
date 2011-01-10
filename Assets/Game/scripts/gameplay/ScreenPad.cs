@@ -31,16 +31,20 @@ public class ScreenPad : MonoBehaviour {
     int moveID = -1;
     int aimingID = -1;
     int meleeID = -1;
-    Rect meleeZone = new Rect();
+    int reloadID = -1;
+
+    Circle meleeZone = new Circle();
+    Circle reloadZone = new Circle();
+    Circle moveZone = new Circle();
+    Circle aimingZone = new Circle();
     List<Touch> availableTouches = new List<Touch>();
 #endif
-    Vector2 moveDir;
+
+    Vector2 moveDir = Vector2.zero;
     Vector2 aimingDir = Vector2.up;
     float shootCounter = 0.0f;
     bool meleeButtonDown = false;
-
-    Circle moveZone = new Circle();
-    Circle aimingZone = new Circle();
+    bool reloadButtonDown = false;
     Transform moveAnalog;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -52,6 +56,7 @@ public class ScreenPad : MonoBehaviour {
     public float moveLimitation;
     public Transform aimingAnchor;
     public Transform meleeOutline;
+    public Transform reloadOutline;
 
     public bool useRemoteTouch = false;
     public float shootingDuration = 3.0f;
@@ -69,6 +74,7 @@ public class ScreenPad : MonoBehaviour {
         DebugHelper.Assert( this.moveAnchor != null, "pls assign move anchor" );
         DebugHelper.Assert( this.aimingAnchor != null, "pls assign aiming anchor" );
         DebugHelper.Assert( this.meleeOutline != null, "pls assign meleeOutline" );
+        DebugHelper.Assert( this.reloadOutline != null, "pls assign reloadOutline" );
 
         // always turn on keyboard and mouse when in PC version.
 #if !UNITY_IPHONE
@@ -82,6 +88,8 @@ public class ScreenPad : MonoBehaviour {
         transform.Find("DEV_CENTER").gameObject.SetActiveRecursively(false);
 
         //
+#if UNITY_IPHONE
+        //
         this.moveAnalog = this.moveAnchor.Find("Analog");
         DebugHelper.Assert( this.moveAnalog != null, "pls assign moveAnalog" );
         this.moveZone.center = this.hudCamera.WorldToScreenPoint(this.moveAnchor.position); 
@@ -93,16 +101,11 @@ public class ScreenPad : MonoBehaviour {
         this.aimingZone.center = this.hudCamera.WorldToScreenPoint(this.aimingAnchor.position); 
         this.aimingZone.radius = 64.0f;
 
-        //
-#if UNITY_IPHONE
-        PackedSprite sp = meleeOutline.GetComponent<PackedSprite>();
-        int half_width = (int)sp.width/2;
-        int half_height = (int)sp.height/2;
-        Vector2 meleePos = this.hudCamera.WorldToScreenPoint(this.meleeOutline.position);
-        this.meleeZone = new Rect( meleePos.x - half_width,  
-                                   meleePos.y - half_height, 
-                                   sp.width, 
-                                   sp.height ); 
+        this.meleeZone.center = this.hudCamera.WorldToScreenPoint(this.meleeOutline.position);
+        this.meleeZone.radius = 50.0f;
+
+        this.reloadZone.center = this.hudCamera.WorldToScreenPoint(this.reloadOutline.position);
+        this.reloadZone.radius = 50.0f;
 #endif
     }
 	
@@ -120,108 +123,72 @@ public class ScreenPad : MonoBehaviour {
             // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
             this.moveDir = Vector2.zero;
             this.availableTouches.Clear();
-
-            Touch move_finger = new Touch();
-            Touch aiming_finger = new Touch();
-            bool tracMoveFinger = false;
-            bool tracAimingFinger = false;
+            this.meleeButtonDown = false;
+            this.reloadButtonDown = false;
 
             // first check if move finger invalid
+            Touch move_finger = new Touch();
+            Touch aiming_finger = new Touch();
             foreach ( Touch t in Input.touches ) {
-                // if we found them all, skip search the list.
-                if ( tracMoveFinger && tracAimingFinger ) {
-                    break;
-                }
-
-                // we found the the move finger to trac 
-                if ( tracMoveFinger == false ) {
-                    if ( t.fingerId == this.moveID ) {
-                        if ( t.phase == TouchPhase.Ended ||
-                             t.phase == TouchPhase.Canceled ) {
-                            this.moveID = -1;
-                        }
-                        else {
-                            move_finger = t;
-                            tracMoveFinger = true;
-                        }
-                        continue;
-                    }
-                }
-
-                // we found the aiming finger to trac
-                if ( tracAimingFinger == false ) {
-                    if ( t.fingerId == this.aimingID ) {
-                        if ( t.phase == TouchPhase.Ended ||
-                             t.phase == TouchPhase.Canceled ) {
-                            this.aimingID = -1;
-                        }
-                        else {
-                            aiming_finger = t;
-                            tracAimingFinger = true;
-                        }
-                        continue;
-                    }
-                }
-            }
-
-            // NOTE: this will protect the code in UnityRemote mode { 
-            if ( tracMoveFinger == false ) this.moveID = -1;
-            if ( tracAimingFinger == false ) this.aimingID = -1;
-            // } NOTE end 
-
-            //
-            foreach ( Touch t in Input.touches ) {
-                if ( t.phase == TouchPhase.Ended ||
-                     t.phase == TouchPhase.Canceled ) {
-
-                    // we found the release touch is meleeID, 
-                    if ( t.fingerId == this.meleeID ) {
-                        this.meleeID = -1;
-                        meleeButtonDown = false;
-                    }
-
-                    continue;
-                }
-
-                // skip move/aiming finger if we tracing it.
-                if ( t.fingerId == this.moveID || 
-                     t.fingerId == this.aimingID ||
-                     t.fingerId == this.meleeID ) {
-                    continue;
-                }
-
-                // record the finger in the move zone as move finger
-                Vector2 screenPos = t.position;
-                if ( t.phase == TouchPhase.Began ) {
-                    if ( this.moveZone.Contains(screenPos) ) {
-                        move_finger = t;
+                // if we just touch the zone
+                if ( t.phase == TouchPhase.Began ) 
+                {
+                    if ( this.moveID == -1 && this.moveZone.Contains(t.position) ) {
                         this.moveID = t.fingerId;
+                        move_finger = t;
                         continue;
                     }
-                    else if ( this.aimingZone.Contains(screenPos) ) {
-                        aiming_finger = t;
+                    else if ( this.aimingID == -1 && this.aimingZone.Contains(t.position) ) {
                         this.aimingID = t.fingerId;
+                        aiming_finger = t;
                         continue;
                     }
-                    else if ( this.meleeZone.Contains(screenPos) ) {
+                    else if ( this.meleeID == -1 && this.meleeZone.Contains(t.position) ) {
                         this.meleeID = t.fingerId;
+                        this.meleeButtonDown = true;
+                        continue;
+                    }
+                    else if ( this.reloadID == -1 && this.reloadZone.Contains(t.position) ) {
+                        this.reloadID = t.fingerId;
+                        this.reloadButtonDown = true;
                         continue;
                     }
                 }
 
-                // those un-handle touches, will recognized as screen touch.
-                this.availableTouches.Add(t);
+                // check fingerId
+                if ( t.fingerId == this.moveID ) {
+                    if ( t.phase == TouchPhase.Ended )
+                        this.moveID = -1;
+                    else
+                        move_finger = t;
+                }
+                else if ( t.fingerId == this.aimingID ) {
+                    if ( t.phase == TouchPhase.Ended )
+                        this.aimingID = -1;
+                    else
+                        aiming_finger = t;
+                }
+                else if ( t.fingerId == this.meleeID ) {
+                    if ( t.phase == TouchPhase.Ended )
+                        this.meleeID = -1;
+                }
+                else if ( t.fingerId == this.reloadID ) {
+                    if ( t.phase == TouchPhase.Ended )
+                        this.reloadID = -1;
+                }
+                // if none of them are the above IDs, add them to availableTouches.
+                else {
+                    this.availableTouches.Add(t);
+                }
             }
 
             // process move by move_finger
             if ( this.moveID != -1 ) {
-                HandleMove(move_finger.position);
+                HandleMove( move_finger.position );
             }
+
             // process aiming by first check if we have screenPad, then aimingID.
             HandleAiming(aiming_finger.position);
-            if ( this.meleeID != -1 ) {
-                meleeButtonDown = true;
-            }
 
             // DEBUG { 
             // foreach ( Touch t in Input.touches ) {
@@ -240,6 +207,7 @@ public class ScreenPad : MonoBehaviour {
                 if ( Input.GetButton("Fire") )
                     this.shootCounter = this.shootingDuration;
                 this.meleeButtonDown = Input.GetKeyDown(KeyCode.Space);
+                this.reloadButtonDown = Input.GetKeyDown(KeyCode.R);
             } // end if ( !this.useRemoteTouch )
 
             // if there is no move, keep the moveAnalog at the center of the moveZone. 
@@ -334,6 +302,12 @@ public class ScreenPad : MonoBehaviour {
         // ------------------------------------------------------------------ 
 
         public bool MeleeButtonDown () { return meleeButtonDown; }
+
+        // ------------------------------------------------------------------ 
+        // Desc: 
+        // ------------------------------------------------------------------ 
+
+        public bool ReloadButtonDown () { return reloadButtonDown; }
 
 #if UNITY_IPHONE
         // ------------------------------------------------------------------ 

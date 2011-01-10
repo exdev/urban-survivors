@@ -75,18 +75,18 @@ public class Player_boy : Player_base {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: Condition_isMeleeButtonTriggered 
+    // Desc: Condition_isMeleeButtonDown 
     // ------------------------------------------------------------------ 
 
-    class Condition_isMeleeButtonTriggered : FSM.Condition {
+    class Condition_isMeleeButtonDown : FSM.Condition {
         Player_boy playerBoy = null;
 
-        public Condition_isMeleeButtonTriggered ( Player_boy _playerBoy ) {
+        public Condition_isMeleeButtonDown ( Player_boy _playerBoy ) {
             this.playerBoy = _playerBoy;
         }
 
         public override bool exec () {
-            return this.playerBoy.MeleeButtonTriggered();
+            return this.playerBoy.MeleeButtonDown();
         }
     }
 
@@ -145,7 +145,6 @@ public class Player_boy : Player_base {
     ///////////////////////////////////////////////////////////////////////////////
 
     public Vector3 screenDir = Vector3.zero;
-    protected bool meleeButtonTriggered = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -192,7 +191,6 @@ public class Player_boy : Player_base {
 
     void LateUpdate () {
         // reset the internal state.
-        this.meleeButtonTriggered = false;
         this.moveDir = Vector3.zero; 
     }
 
@@ -277,7 +275,7 @@ public class Player_boy : Player_base {
         // ======================================================== 
 
         FSM.Condition cond_isMoving = new Condition_isMoving(this);
-        FSM.Condition cond_isMeleeButtonTriggered = new Condition_isMeleeButtonTriggered(this);
+        FSM.Condition cond_isMeleeButtonDown = new Condition_isMeleeButtonDown(this);
         FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
 
         // ======================================================== 
@@ -287,12 +285,12 @@ public class Player_boy : Player_base {
         // idle to ...
         state_idle.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
         state_idle.AddTransition( new FSM.Transition( state_walk, cond_isMoving, null ) );
-        state_idle.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonTriggered, null ) );
+        state_idle.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonDown, null ) );
 
         // walk to ...
         state_walk.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
         state_walk.AddTransition( new FSM.Transition( state_idle, new FSM.Condition_not(cond_isMoving), null ) );
-        state_walk.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonTriggered, null ) );
+        state_walk.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonDown, null ) );
 
         // melee to ...
         state_melee.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
@@ -330,9 +328,6 @@ public class Player_boy : Player_base {
 
     void HandleInput() {
         this.screenDir = screenPad ? screenPad.GetMoveDirection() : Vector2.zero;
-        if ( screenPad.MeleeButtonDown() ) {
-            this.meleeButtonTriggered = true;
-        }
     }
 
     // ------------------------------------------------------------------ 
@@ -357,11 +352,11 @@ public class Player_boy : Player_base {
         if ( this.steeringState == SteeringState.moving ) {
             force = this.moveDir * base.maxForce;
             force.y = 0.0f;
-            ApplySteeringForce( force );
         }
         else if ( this.steeringState == SteeringState.braking ) {
-            ApplyBrakingForce(10.0f);
+            ApplyBrakingForce();
         }
+        ApplySteeringForce( force );
     }
 
     // ------------------------------------------------------------------ 
@@ -395,7 +390,7 @@ public class Player_boy : Player_base {
             return;
 
         // if we have input
-        if ( this.meleeButtonTriggered ) {
+        if ( screenPad.MeleeButtonDown() ) {
             // if we are in the valid input range
             if ( curAnim.time >= atk_info.curCombo.validInputTime.x 
                  && curAnim.time <= atk_info.curCombo.validInputTime.y )
@@ -426,7 +421,7 @@ public class Player_boy : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public bool MeleeButtonTriggered () { return this.meleeButtonTriggered; }
+    public bool MeleeButtonDown () { return screenPad.MeleeButtonDown(); }
 
     // ------------------------------------------------------------------ 
     // Desc: 

@@ -285,7 +285,7 @@ public class AI_ZombieGirl : AI_ZombieBase {
             force.y = 0.0f;
         }
         else if ( this.steeringState == SteeringState.braking ) {
-            ApplyBrakingForce(10.0f);
+            ApplyBrakingForce();
         }
         ApplySteeringForce(force);
     }
