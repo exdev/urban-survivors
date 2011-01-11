@@ -169,7 +169,6 @@ public class AI_ZombieNormal : AI_ZombieBase {
 
     public float attackDistance = 1.5f;
     public GameObject atkShape = null;
-    protected HitInfo lastHit = new HitInfo();
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
@@ -330,6 +329,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
         this.atkShape.active = false;
         DamageInfo dmgInfo = this.atkShape.GetComponent<DamageInfo>();
         dmgInfo.owner_info = this.zombieInfo;
+        dmgInfo.owner = this.gameObject;
         // } HARDCODE end 
 
         this.InitAnim();

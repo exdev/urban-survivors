@@ -299,6 +299,7 @@ public class Player_girl : Player_base {
 
         // reset the internal state.
         this.shootButtonTriggered = false;
+        this.lastHit.stunType = HitInfo.StunType.none;
     }
 
     // ------------------------------------------------------------------ 
@@ -408,6 +409,11 @@ public class Player_girl : Player_base {
                                                null, // TODO: new Action_PlayAnim(this.anim,"getUp") 
                                                null,
                                                null );
+        // get stun
+        FSM.State state_onStun = new FSM.State( "OnStun", 
+                                               new Action_ActOnStun(this), 
+                                               null,
+                                               null );
 
         // ======================================================== 
         // condition 
@@ -425,6 +431,8 @@ public class Player_girl : Player_base {
         FSM.Condition cond_isOutOfAmmo = new Condition_isOutOfAmmo(this);
         FSM.Condition cond_canReload = new FSM.Condition_and( new FSM.Condition_not(new Condition_isAmmoFull(this)), 
                                                               new Condition_isReloadButtonDown(this) );
+        FSM.Condition cond_isOnStun = new Condition_isOnStun(this);
+        FSM.Condition cond_noHP = new Condition_noHP(this.playerInfo);
 
         // DELME { 
         // FSM.Condition cond_isMoving = new Condition_isMoving(this);
@@ -436,43 +444,50 @@ public class Player_girl : Player_base {
         // ======================================================== 
 
         FSM.Action action_FollowTarget = new Action_FollowTarget(this,this.followTarget.transform);
+        FSM.Action action_Stop = new Action_StopMoving(this);
         FSM.Action action_StopAndIdle = new FSM.Action_list( new FSM.Action[] {
-                                                             new Action_StopMoving(this), 
+                                                             action_Stop, 
                                                              new Action_PlayAnim(this.anim,"idle"), 
                                                              }
                                                            );
 
         // idle to ...
-        state_idle.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
+        state_idle.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
+        state_idle.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_idle.AddTransition( new FSM.Transition( state_following, cond_isFarAwayTarget, action_FollowTarget ) );
         state_idle.AddTransition( new FSM.Transition( state_idleShooting, cond_isShootButtonTriggered, null ) );
         state_idle.AddTransition( new FSM.Transition( state_idleReloading, cond_canReload, null ) );
 
         // following to ...
-        state_following.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), action_StopAndIdle ) );
+        state_following.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Stop ) );
+        state_following.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, action_Stop ) );
         state_following.AddTransition( new FSM.Transition( state_idle, cond_isNearTarget, action_StopAndIdle ) );
         state_following.AddTransition( new FSM.Transition( state_walkShooting, cond_isShootButtonTriggered, null ) );
         state_following.AddTransition( new FSM.Transition( state_walkReloading, cond_canReload, null ) );
 
         // idle shooting to ...
-        state_idleShooting.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
+        state_idleShooting.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
+        state_idleShooting.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_idleReloading, new FSM.Condition_or ( cond_isOutOfAmmo, cond_canReload ), null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_idle, cond_isNotShooting, null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_walkShooting, cond_isFarAwayTarget, action_FollowTarget ) );
 
         // walk shooting to ...
-        state_walkShooting.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), action_StopAndIdle ) );
+        state_walkShooting.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Stop ) );
+        state_walkShooting.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, action_Stop ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_walkReloading, new FSM.Condition_or ( cond_isOutOfAmmo, cond_canReload ), null ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_following, cond_isNotShooting, null ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_idleShooting, cond_isNearTarget, action_StopAndIdle ) );
 
         // idle reload to ...
-        state_idleReloading.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
+        state_idleReloading.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
+        state_idleReloading.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_idleReloading.AddTransition( new FSM.Transition( state_idle, cond_isNotReloading, null ) );
         state_idleReloading.AddTransition( new FSM.Transition( state_walkReloading, cond_isFarAwayTarget, action_FollowTarget ) );
 
         // walk reload to ...
-        state_walkReloading.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), action_StopAndIdle ) );
+        state_walkReloading.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Stop ) );
+        state_walkReloading.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, action_Stop ) );
         state_walkReloading.AddTransition( new FSM.Transition( state_following, cond_isNotReloading, null ) );
         state_walkReloading.AddTransition( new FSM.Transition( state_idleReloading, cond_isNearTarget, action_StopAndIdle ) );
 
@@ -486,11 +501,19 @@ public class Player_girl : Player_base {
                                                           null ) );
         // getUp to ...
         state_getUp.AddTransition( new FSM.Transition( state_down, 
-                                                       new Condition_noHP( this.playerInfo ),
+                                                       cond_noHP,
                                                        null ) );
         state_getUp.AddTransition( new FSM.Transition( state_idle, 
                                                        new FSM.Condition_not( new Condition_isPlayingAnim( this, "getUp" ) ), 
                                                        null ) );
+        // on hit to ...
+        state_onStun.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
+        state_onStun.AddTransition( new FSM.Transition ( state_idle, 
+                                                        new FSM.Condition_not(new Condition_isStunning(this) ),
+                                                        null ) );
+        state_onStun.AddTransition( new FSM.Transition ( state_onStun, 
+                                                         cond_isOnStun,
+                                                         null ) );
 
         // init fsm
         this.fsm.init(state_idle);
@@ -554,10 +577,6 @@ public class Player_girl : Player_base {
             ApplyBrakingForce();
         }
         ApplySteeringForce( force );
-
-        // DEBUG { 
-        // DebugHelper.DrawCircleY( this.followTarget.transform.position, this.followDistance, Color.yellow );
-        // } DEBUG end 
     }
 
     // ------------------------------------------------------------------ 
@@ -577,59 +596,6 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     public bool ShootButtonTriggered () { return this.shootButtonTriggered; }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void OnTriggerEnter ( Collider _other ) {
-        // don't do anything if player is down
-        if ( this.isDown )
-            return;
-
-        DamageInfo dmgInfo = null;
-        if ( _other.gameObject.layer == Layer.melee_enemy ) {
-            dmgInfo = _other.GetComponent<DamageInfo>();
-
-            if ( fxHitBite != null ) {
-                fxHitBite.transform.position = _other.transform.position;
-                fxHitBite.transform.rotation = _other.transform.rotation;
-                fxHitBite.particleEmitter.Emit();
-            }
-        }
-        else {
-            return;
-        }
-
-        // if we don't get damage info, just return
-        DebugHelper.Assert( dmgInfo, "can't find damage info for given layer" );
-        if ( dmgInfo == null ) {
-            return;
-        }
-
-        /*float dmgOutput =*/ DamageRule.Instance().CalculateDamage( this.playerInfo, dmgInfo );
-
-        // TODO { 
-        // // TODO { 
-        // // if ( dmgOutput < 20.0f )
-        // //     this.lastHit.stunType = HitInfo.StunType.light;
-        // // else if ( dmgOutput >= 20.0f )
-        // //     this.lastHit.stunType = HitInfo.StunType.normal;
-        // this.lastHit.stunType = HitInfo.StunType.normal;
-        // // } TODO end 
-
-        // this.lastHit.position = _other.transform.position;
-        // this.lastHit.normal = _other.transform.right;
-        // Vector3 dir = _other.transform.position - transform.position;
-        // dir.y = 0.0f;
-        // dir.Normalize();
-        // this.lastHit.knockBackForce = dir * DamageRule.Instance().KnockBackForce(dmgInfo.knockBackType);  
-
-        // // TODO: if hit light, face it { 
-        // // transform.forward = -_other.transform.forward;
-        // // } TODO end 
-        // } TODO end 
-    }
 
     // ------------------------------------------------------------------ 
     // Desc: 

@@ -184,6 +184,7 @@ public class AI_ZombieGirl : AI_ZombieBase {
         this.atkShape.active = false;
         DamageInfo dmgInfo = this.atkShape.GetComponent<DamageInfo>();
         dmgInfo.owner_info = this.zombieInfo;
+        dmgInfo.owner = this.gameObject;
         // } HARDCODE end 
 
         // KEEPME { 

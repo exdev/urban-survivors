@@ -192,6 +192,7 @@ public class Player_boy : Player_base {
     void LateUpdate () {
         // reset the internal state.
         this.moveDir = Vector3.zero; 
+        this.lastHit.stunType = HitInfo.StunType.none;
     }
 
     // ------------------------------------------------------------------ 
@@ -269,6 +270,11 @@ public class Player_boy : Player_base {
                                                new Action_PlayAnim(this.anim,"getUp"), 
                                                null,
                                                null );
+        // get hit
+        FSM.State state_onStun = new FSM.State( "OnStun", 
+                                               new Action_ActOnStun(this), 
+                                               null,
+                                               null );
 
         // ======================================================== 
         // condition 
@@ -277,23 +283,27 @@ public class Player_boy : Player_base {
         FSM.Condition cond_isMoving = new Condition_isMoving(this);
         FSM.Condition cond_isMeleeButtonDown = new Condition_isMeleeButtonDown(this);
         FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
+        FSM.Condition cond_isOnStun = new Condition_isOnStun(this);
+        FSM.Condition cond_noHP = new Condition_noHP(this.playerInfo);
 
         // ======================================================== 
         // setup transitions
         // ======================================================== 
 
         // idle to ...
-        state_idle.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
+        state_idle.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
+        state_idle.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_idle.AddTransition( new FSM.Transition( state_walk, cond_isMoving, null ) );
         state_idle.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonDown, null ) );
 
         // walk to ...
-        state_walk.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
+        state_walk.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
+        state_walk.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_walk.AddTransition( new FSM.Transition( state_idle, new FSM.Condition_not(cond_isMoving), null ) );
         state_walk.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonDown, null ) );
 
         // melee to ...
-        state_melee.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
+        state_melee.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
         state_melee.AddTransition( new FSM.Transition( state_idle, 
                                                        new FSM.Condition_and(new FSM.Condition_not(cond_isMoving),
                                                                              new FSM.Condition_not(cond_isAttacking)), 
@@ -312,11 +322,19 @@ public class Player_boy : Player_base {
                                                           null ) );
         // getUp to ...
         state_getUp.AddTransition( new FSM.Transition( state_down, 
-                                                       new Condition_noHP( this.playerInfo ),
+                                                       cond_noHP,
                                                        null ) );
         state_getUp.AddTransition( new FSM.Transition( state_idle, 
                                                        new FSM.Condition_not( new Condition_isPlayingAnim( this, "getUp" ) ), 
                                                        null ) );
+        // on hit to ...
+        state_onStun.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
+        state_onStun.AddTransition( new FSM.Transition ( state_idle, 
+                                                        new FSM.Condition_not(new Condition_isStunning(this) ),
+                                                        null ) );
+        state_onStun.AddTransition( new FSM.Transition ( state_onStun, 
+                                                         cond_isOnStun,
+                                                         null ) );
 
         // init fsm
         this.fsm.init(state_idle);
@@ -335,18 +353,6 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     void ProcessMovement () {
-        // stop moving when in melee attack state.
-        // if ( this.fsm.CurrentState().name == "Melee" ) {
-        //     ApplyBrakingForce(10.0f);
-        //     ApplySteeringForce(Vector3.zero);
-        // }
-        // else {
-        //     if ( MathHelper.IsZerof(this.moveDir.sqrMagnitude) ) {
-        //         ApplyBrakingForce(10.0f);
-        //     }
-        //     ApplySteeringForce( this.moveDir * base.maxForce );
-        // }
-
         // handle steering
         Vector3 force = Vector3.zero;
         if ( this.steeringState == SteeringState.moving ) {
@@ -439,60 +445,6 @@ public class Player_boy : Player_base {
     void EndMeleeAttack () {
         AttackInfo atk_info = this.GetAttackInfo();
         atk_info.curCombo.attack_shape.active = false;
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void OnTriggerEnter ( Collider _other ) {
-        // don't do anything if player is down
-        if ( this.isDown )
-            return;
-
-        //
-        DamageInfo dmgInfo = null;
-        if ( _other.gameObject.layer == Layer.melee_enemy ) {
-            dmgInfo = _other.GetComponent<DamageInfo>();
-
-            if ( fxHitBite != null ) {
-                fxHitBite.transform.position = _other.transform.position;
-                fxHitBite.transform.rotation = _other.transform.rotation;
-                fxHitBite.particleEmitter.Emit();
-            }
-        }
-        else {
-            return;
-        }
-
-        // if we don't get damage info, just return
-        DebugHelper.Assert( dmgInfo, "can't find damage info for given layer" );
-        if ( dmgInfo == null ) {
-            return;
-        }
-
-        /*float dmgOutput =*/ DamageRule.Instance().CalculateDamage( this.playerInfo, dmgInfo );
-
-        // TODO { 
-        // // TODO { 
-        // // if ( dmgOutput < 20.0f )
-        // //     this.lastHit.stunType = HitInfo.StunType.light;
-        // // else if ( dmgOutput >= 20.0f )
-        // //     this.lastHit.stunType = HitInfo.StunType.normal;
-        // this.lastHit.stunType = HitInfo.StunType.normal;
-        // // } TODO end 
-
-        // this.lastHit.position = _other.transform.position;
-        // this.lastHit.normal = _other.transform.right;
-        // Vector3 dir = _other.transform.position - transform.position;
-        // dir.y = 0.0f;
-        // dir.Normalize();
-        // this.lastHit.knockBackForce = dir * DamageRule.Instance().KnockBackForce(dmgInfo.knockBackType);  
-
-        // // TODO: if hit light, face it { 
-        // // transform.forward = -_other.transform.forward;
-        // // } TODO end 
-        // } TODO end 
     }
 
     // ------------------------------------------------------------------ 

@@ -65,6 +65,9 @@ public class PlayerInfo : ActorInfo {
     public WeaponBase.WeaponID weapon1 = WeaponBase.WeaponID.unknown;
     public WeaponBase.WeaponID weapon2 = WeaponBase.WeaponID.unknown;
 
+    public float normalStun = 30.0f;
+    [System.NonSerialized] public float accDmgNormal = 0.0f;
+
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////

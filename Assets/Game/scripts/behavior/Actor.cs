@@ -91,6 +91,7 @@ public class Actor : Steer {
 
     public float StepSpeed = 0.5f;
 
+    protected HitInfo lastHit = new HitInfo();
     protected Animation anim = null;
     protected FSM fsm = new FSM();
     protected Vector3 targetPos;

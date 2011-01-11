@@ -41,6 +41,55 @@ public class Player_base : Actor {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected class Condition_isStunning : FSM.Condition {
+        Player_base player = null;
+
+        public Condition_isStunning ( Player_base _player ) {
+            this.player = _player;
+        }
+
+        public override bool exec () {
+            return this.player.IsPlayingAnim("hit1") ||
+                this.player.IsPlayingAnim("hit2");
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected class Condition_isOnStun : FSM.Condition {
+        Player_base player = null;
+
+        public Condition_isOnStun ( Player_base _player ) {
+            this.player = _player;
+        }
+
+        public override bool exec () {
+            return this.player.isGetStun();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc:
+    // ------------------------------------------------------------------ 
+
+    protected class Action_ActOnStun : FSM.Action {
+        Player_base player = null;
+
+        public Action_ActOnStun ( Player_base _player ) {
+            this.player = _player;
+        }
+
+        public override void exec () {
+            this.player.ActOnStun();
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -176,6 +225,7 @@ public class Player_base : Actor {
     protected void SetCurWeaponOwner () { 
         DamageInfo dmgInfo = this.GetDamageInfo();
         dmgInfo.owner_info = this.playerInfo; 
+        dmgInfo.owner = this.gameObject;
     }
 
     // ------------------------------------------------------------------ 
@@ -186,6 +236,85 @@ public class Player_base : Actor {
     public void Recover ( float _hp ) { 
         this.isDown = false; 
         this.playerInfo.curHP = Mathf.Min( this.playerInfo.curHP + _hp, this.playerInfo.maxHP );
+    } 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnTriggerEnter ( Collider _other ) {
+        // don't do anything if player is down
+        if ( this.isDown )
+            return;
+
+        //
+        DamageInfo dmgInfo = null;
+        if ( _other.gameObject.layer == Layer.melee_enemy ) {
+            dmgInfo = _other.GetComponent<DamageInfo>();
+
+            if ( fxHitBite != null ) {
+                fxHitBite.transform.position = _other.transform.position;
+                fxHitBite.transform.rotation = _other.transform.rotation;
+                fxHitBite.particleEmitter.Emit();
+            }
+        }
+        else {
+            return;
+        }
+
+        // if we don't get damage info, just return
+        DebugHelper.Assert( dmgInfo, "can't find damage info for given layer" );
+        if ( dmgInfo == null ) {
+            return;
+        }
+        float dmgOutput = DamageRule.Instance().CalculateDamage( this.playerInfo, dmgInfo );
+        this.playerInfo.accDmgNormal += dmgOutput;
+
+        if ( this.playerInfo.accDmgNormal >= this.playerInfo.normalStun ) {
+            this.lastHit.stunType = HitInfo.StunType.normal;
+            this.playerInfo.accDmgNormal = 0.0f;
+        }
+        else {
+            this.lastHit.stunType = HitInfo.StunType.none;
+        }
+
+        // this.lastHit.position = _other.transform.position;
+        this.lastHit.position = dmgInfo.owner.transform.position; // HACK:
+        this.lastHit.normal = _other.transform.right;
+        Vector3 dir = _other.transform.position - transform.position;
+        dir.y = 0.0f;
+        dir.Normalize();
+        this.lastHit.knockBackForce = dir * DamageRule.Instance().KnockBackForce(dmgInfo.knockBackType);  
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool isGetStun () {
+        return this.lastHit.stunType != HitInfo.StunType.none;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void ActOnStun () {
+        // NOTE: it could be possible we interupt to hit when boy is attacking.
+        AttackInfo atk_info = this.GetAttackInfo();
+        if ( atk_info != null && atk_info.curCombo != null )
+            atk_info.curCombo.attack_shape.active = false;
+
+        // HACK: simple random choose animation { 
+        // string[] names = {"hit1", "hit2"};
+        // string animName = names[Mathf.FloorToInt(Random.Range(0.0f,2.0f))];
+        // } HACK end 
+        string animName = "hit1";
+        if ( IsBehind( this.lastHit.position ) )
+            animName = "hit2";
+
+        this.anim.Rewind(animName);
+        this.anim.Play(animName);
     } 
 }
 
