@@ -1,6 +1,7 @@
 Title: urban survivors
-Home Page: http://studio.ex-dev.com/projects/urban
-Studio Page: http://studio.ex-dev.com
+Home Page: http://dev.abitgames.com/wiki/urban/WikiStart
+Developer Page: http://dev.abitgames.com
+Studio Page: http://abitgames.com
 
 == How to merge complex branches? == 
 just run "sh output_git_merge_cmds.sh", it will generate a command 
