@@ -28,6 +28,7 @@ public class GameRules : MonoBehaviour {
     public bool multiPlayer = false;
 
     protected static GameRules instance  = null;
+
     protected Player_base playerBoy = null;
     protected Player_base playerGirl = null;
     protected GameObject startPoint = null;

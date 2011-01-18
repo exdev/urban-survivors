@@ -163,7 +163,7 @@ public class Player_base : Actor {
             }
 
             if ( hud ) {
-                screenPad = hud.GetComponent(typeof(ScreenPad)) as ScreenPad;
+                screenPad = hud.GetComponent<ScreenPad>();
             }
 
 #if UNITY_IPHONE

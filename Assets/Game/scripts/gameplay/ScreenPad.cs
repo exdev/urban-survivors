@@ -27,7 +27,6 @@ using System.Collections.Generic;
 public class ScreenPad : MonoBehaviour {
 
     //
-#if UNITY_IPHONE
     int moveID = -1;
     int aimingID = -1;
     int meleeID = -1;
@@ -38,14 +37,16 @@ public class ScreenPad : MonoBehaviour {
     Circle moveZone = new Circle();
     Circle aimingZone = new Circle();
     List<Touch> availableTouches = new List<Touch>();
-#endif
 
     Vector2 moveDir = Vector2.zero;
     Vector2 aimingDir = Vector2.up;
     float shootCounter = 0.0f;
-    bool meleeButtonDown = false;
-    bool reloadButtonDown = false;
     Transform moveAnalog;
+
+    int meleeButtonStat = 0; // 1 down, 2 up
+    int reloadButtonStat = 0; // 1 down, 2 up
+    int moveZoneStat = 0; // 1 down, 2 up
+    int aimingZoneStat = 0; // 1 down, 2 up
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -123,8 +124,11 @@ public class ScreenPad : MonoBehaviour {
             // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
             this.moveDir = Vector2.zero;
             this.availableTouches.Clear();
-            this.meleeButtonDown = false;
-            this.reloadButtonDown = false;
+
+            this.reloadButtonStat = 0;
+            this.meleeButtonStat = 0;
+            this.aimingZoneStat = 0;
+            this.moveZoneStat = 0;
 
             // first check if move finger invalid
             Touch move_finger = new Touch();
@@ -136,45 +140,55 @@ public class ScreenPad : MonoBehaviour {
                     if ( this.moveID == -1 && this.moveZone.Contains(t.position) ) {
                         this.moveID = t.fingerId;
                         move_finger = t;
+                        this.moveZoneStat = 1;
                         continue;
                     }
                     else if ( this.aimingID == -1 && this.aimingZone.Contains(t.position) ) {
                         this.aimingID = t.fingerId;
                         aiming_finger = t;
+                        this.aimingZoneStat = 1;
                         continue;
                     }
                     else if ( this.meleeID == -1 && this.meleeZone.Contains(t.position) ) {
                         this.meleeID = t.fingerId;
-                        this.meleeButtonDown = true;
+                        this.meleeButtonStat = 1;
                         continue;
                     }
                     else if ( this.reloadID == -1 && this.reloadZone.Contains(t.position) ) {
                         this.reloadID = t.fingerId;
-                        this.reloadButtonDown = true;
+                        this.reloadButtonStat = 1;
                         continue;
                     }
                 }
 
                 // check fingerId
                 if ( t.fingerId == this.moveID ) {
-                    if ( t.phase == TouchPhase.Ended )
+                    if ( t.phase == TouchPhase.Ended ) {
                         this.moveID = -1;
+                        this.moveZoneStat = 2;
+                    }
                     else
                         move_finger = t;
                 }
                 else if ( t.fingerId == this.aimingID ) {
-                    if ( t.phase == TouchPhase.Ended )
+                    if ( t.phase == TouchPhase.Ended ) {
                         this.aimingID = -1;
+                        this.aimingZoneStat = 2;
+                    }
                     else
                         aiming_finger = t;
                 }
                 else if ( t.fingerId == this.meleeID ) {
-                    if ( t.phase == TouchPhase.Ended )
+                    if ( t.phase == TouchPhase.Ended ) {
                         this.meleeID = -1;
+                        this.meleeButtonStat = 2;
+                    }
                 }
                 else if ( t.fingerId == this.reloadID ) {
-                    if ( t.phase == TouchPhase.Ended )
+                    if ( t.phase == TouchPhase.Ended ) {
                         this.reloadID = -1;
+                        this.reloadButtonStat = 2;
+                    }
                 }
                 // if none of them are the above IDs, add them to availableTouches.
                 else {
@@ -197,6 +211,9 @@ public class ScreenPad : MonoBehaviour {
             // } DEBUG end 
 #endif
             } else {
+                this.meleeButtonStat = 0;
+                this.reloadButtonStat = 0;
+
                 // handle keyboard move
                 float moveFB = Input.GetAxisRaw("Vertical");
                 float moveLR = Input.GetAxisRaw("Horizontal");
@@ -206,8 +223,16 @@ public class ScreenPad : MonoBehaviour {
                 HandleAiming(Vector2.zero);
                 if ( Input.GetButton("Fire") )
                     this.shootCounter = this.shootingDuration;
-                this.meleeButtonDown = Input.GetKeyDown(KeyCode.Space);
-                this.reloadButtonDown = Input.GetKeyDown(KeyCode.R);
+
+                if ( Input.GetKeyDown(KeyCode.Space) )
+                    this.meleeButtonStat = 1;
+                else if ( Input.GetKeyUp(KeyCode.Space) )
+                    this.meleeButtonStat = 2;
+
+                if ( Input.GetKeyDown(KeyCode.R) )
+                    this.reloadButtonStat = 1;
+                else if ( Input.GetKeyUp(KeyCode.R) )
+                    this.reloadButtonStat = 2;
             } // end if ( !this.useRemoteTouch )
 
             // if there is no move, keep the moveAnalog at the center of the moveZone. 
@@ -284,12 +309,18 @@ public class ScreenPad : MonoBehaviour {
         // ------------------------------------------------------------------ 
 
         public Vector2 GetMoveDirection () { return this.moveDir; }
+        public bool MoveZoneTouching () { return this.moveID != -1; }
+        public bool MoveZoneDown () { return this.moveZoneStat == 1; }
+        public bool MoveZoneUp () { return this.moveZoneStat == 2; }
 
         // ------------------------------------------------------------------ 
         // Desc: 
         // ------------------------------------------------------------------ 
 
         public Vector2 GetAimingDirection () { return this.aimingDir; }
+        public bool AimingZoneTouching () { return this.aimingID != -1; }
+        public bool AimingZoneDown () { return this.aimingZoneStat == 1; }
+        public bool AimingZoneUp () { return this.aimingZoneStat == 2; }
 
         // ------------------------------------------------------------------ 
         // Desc: 
@@ -301,26 +332,22 @@ public class ScreenPad : MonoBehaviour {
         // Desc: 
         // ------------------------------------------------------------------ 
 
-        public bool MeleeButtonDown () { return meleeButtonDown; }
+        public bool MeleeButtonDown () { return this.meleeButtonStat == 1; }
+        public bool MeleeButtonUp () { return this.meleeButtonStat == 2; }
 
         // ------------------------------------------------------------------ 
         // Desc: 
         // ------------------------------------------------------------------ 
 
-        public bool ReloadButtonDown () { return reloadButtonDown; }
+        public bool ReloadButtonDown () { return this.reloadButtonStat == 1; }
+        public bool ReloadButtonUp () { return this.reloadButtonStat == 2; }
 
 #if UNITY_IPHONE
         // ------------------------------------------------------------------ 
         // Desc: 
         // ------------------------------------------------------------------ 
 
-        public List<Touch> AvailableTouches () { return this.availableTouches; } 
-
-        // ------------------------------------------------------------------ 
-        // Desc: 
-        // ------------------------------------------------------------------ 
-
-        public Touch GetLastTouch () { 
+        protected Touch GetLastTouch () { 
             DebugHelper.Assert ( this.availableTouches.Count != 0, "the availableTouches is empty." );
             return this.availableTouches[this.availableTouches.Count-1];
         }

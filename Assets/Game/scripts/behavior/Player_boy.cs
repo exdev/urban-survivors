@@ -452,7 +452,7 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     public void Act_Movement () {
-        Transform mainCamera = Camera.main.GetComponent( typeof(Transform) ) as Transform;
+        Transform mainCamera = Camera.main.transform;
         Vector3 dir = mainCamera.TransformDirection(this.screenDir.normalized); 
         dir.y = 0.0f;
         dir.Normalize();
@@ -481,7 +481,7 @@ public class Player_boy : Player_base {
             return;
 
         // adjust the orientation
-        Transform mainCamera = Camera.main.GetComponent( typeof(Transform) ) as Transform;
+        Transform mainCamera = Camera.main.transform;
         Vector3 dir = mainCamera.TransformDirection(this.screenDir.normalized); 
         dir.y = 0.0f;
         dir.Normalize();

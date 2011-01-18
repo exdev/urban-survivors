@@ -199,6 +199,10 @@ public class SpawnManager : MonoBehaviour {
 
     public void Destroy ( GameObject _obj ) {
         _obj.SetActiveRecursively(false);
+        if ( _obj.rigidbody ) {
+            _obj.rigidbody.velocity = Vector3.zero;
+            _obj.rigidbody.angularVelocity = Vector3.zero;
+        }
     }
 
     // ------------------------------------------------------------------ 
