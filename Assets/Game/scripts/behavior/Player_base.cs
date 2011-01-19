@@ -242,7 +242,7 @@ public class Player_base : Actor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnTriggerEnter ( Collider _other ) {
+    protected void OnTriggerEnter ( Collider _other ) {
         // don't do anything if player is down
         if ( this.isDown )
             return;

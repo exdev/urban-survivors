@@ -187,11 +187,58 @@ public class Steer : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public Vector3 GetSteering_Flee_MaxForces ( Vector3 _pos ) {
+        Vector3 dir = (_pos - transform.position).normalized;
+        return -dir * this.maxForce;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public Vector3 GetSteering_Wander () {
         float speed = 12.0f * Time.deltaTime;
         this.wanderSide = this.wanderSide + speed * Random.Range(-1.0f,1.0f); 
         this.wanderSide = Mathf.Clamp ( this.wanderSide, -1.0f, 1.0f );
         return transform.right * this.wanderSide;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Vector3 GetSteering_AvoidObstacle ( float _minTimeToCollision, Collider _obstacle ) {
+        float ob_radius = _obstacle.bounds.size.x; 
+        Vector3 ob_center = _obstacle.transform.position;
+        float my_raidus = controller.radius;
+
+        // minimum distance to obstacle before avoidance is required
+        float minDistanceToCollision = _minTimeToCollision * this.curSpeed;
+        float minDistanceToCenter = minDistanceToCollision + ob_radius;
+
+        // contact distance: sum of radii of obstacle and vehicle
+        float totalRadius = ob_radius + my_raidus;
+
+        // obstacle center relative to vehicle position
+        Vector3 localOffset = ob_center - controller.transform.position;
+
+        // distance along vehicle's forward axis to obstacle's center
+        float forwardComponent = Vector3.Dot( localOffset, controller.transform.forward );
+        Vector3 forwardOffset = forwardComponent * controller.transform.forward;
+
+        // offset from forward axis to obstacle's center
+        Vector3 offForwardOffset = localOffset - forwardOffset;
+
+        // test to see if sphere overlaps with obstacle-free corridor
+        bool inCylinder = offForwardOffset.magnitude < totalRadius;
+        bool nearby = forwardComponent < minDistanceToCenter;
+        bool inFront = forwardComponent > 0;
+
+        // if all three conditions are met, steer away from sphere center
+        if (inCylinder && nearby && inFront)
+            return offForwardOffset * -1;
+        else
+            return Vector3.zero;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
