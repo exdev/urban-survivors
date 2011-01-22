@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DigestAlgorithm</key>
+	<string>MD5</string>
+	<key>Pages</key>
+	<dict>
+		<key>rw:plugin:stacks</key>
+		<dict>
+			<key>CreationDate</key>
+			<date>2010-12-01T02:39:01Z</date>
+			<key>DigestAlgorithm</key>
+			<string>MD5</string>
+			<key>DocumentGUID</key>
+			<string>D7C3595C-B943-44E3-B2ED-CD2E6E4A5B35</string>
+			<key>PageDigests</key>
+			<dict>
+				<key>stacks.css</key>
+				<dict>
+					<key>Digest</key>
+					<data>
+					Z7M2+k+nTYMvS8RIXHdH9w==
+					</data>
+					<key>Size</key>
+					<integer>1882</integer>
+				</dict>
+				<key>stacks_ie.css</key>
+				<dict>
+					<key>Digest</key>
+					<data>
+					7iAH6PH4xgg0VPXgfbIV7Q==
+					</data>
+					<key>Size</key>
+					<integer>229</integer>
+				</dict>
+			</dict>
+			<key>PageID</key>
+			<string>rw:plugin:stacks</string>
+			<key>Version</key>
+			<integer>3</integer>
+		</dict>
+	</dict>
+	<key>Version</key>
+	<integer>3</integer>
+</dict>
+</plist>
