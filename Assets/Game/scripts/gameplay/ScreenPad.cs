@@ -89,8 +89,6 @@ public class ScreenPad : MonoBehaviour {
         transform.Find("DEV_CENTER").gameObject.SetActiveRecursively(false);
 
         //
-#if UNITY_IPHONE
-        //
         this.moveAnalog = this.moveAnchor.Find("Analog");
         DebugHelper.Assert( this.moveAnalog != null, "pls assign moveAnalog" );
         this.moveZone.center = this.hudCamera.WorldToScreenPoint(this.moveAnchor.position); 
@@ -107,7 +105,6 @@ public class ScreenPad : MonoBehaviour {
 
         this.reloadZone.center = this.hudCamera.WorldToScreenPoint(this.reloadOutline.position);
         this.reloadZone.radius = 50.0f;
-#endif
     }
 	
     // ------------------------------------------------------------------ 
