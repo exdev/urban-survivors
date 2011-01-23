@@ -284,8 +284,11 @@ public class ScreenPad : MonoBehaviour {
                 }
                 else if ( this.aimingID != -1 ) {
                     Vector2 delta = _screenPos - this.aimingZone.center;
-                    // this.aimingDir = -delta.normalized; // this is old method, inverse needle
-                    this.aimingDir = delta.normalized;
+                    Vector2 desiredDir = delta.normalized; 
+                    // DISABLE: this.aimingDir = -delta.normalized; // this is old method, inverse needle
+                    // adjust the aiming direction by 
+                    desiredDir = (GameRules.Instance().GetPlayerGirl() as Player_girl).GetAutoLockDir(desiredDir);
+                    this.aimingDir = desiredDir; 
                     this.shootCounter = this.shootingDuration;
                 }
 #endif
@@ -294,7 +297,9 @@ public class ScreenPad : MonoBehaviour {
                 Vector3 girlScreenPos = Camera.main.WorldToScreenPoint(girl.transform.position);
                 Vector2 girlScreenPos_v2 = new Vector2(girlScreenPos.x, girlScreenPos.y); 
                 Vector2 delta = new Vector2(Input.mousePosition.x,Input.mousePosition.y) - girlScreenPos_v2;
-                this.aimingDir = delta.normalized;
+                Vector2 desiredDir = delta.normalized; 
+                desiredDir = (GameRules.Instance().GetPlayerGirl() as Player_girl).GetAutoLockDir(desiredDir);
+                this.aimingDir = desiredDir;
             } // end if ( !this.useRemoteTouch )
 
             // use cross to get the direction of the rotation.

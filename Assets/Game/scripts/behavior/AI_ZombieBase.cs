@@ -137,6 +137,14 @@ public class AI_ZombieBase : Actor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    void OnDisable () {
+        Debug.Log("hello world");
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     void InitInfo () {
         this.zombieInfo.curHP = this.zombieInfo.maxHP;
     }
