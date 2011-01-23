@@ -1,0 +1,16 @@
+.toggle_container{
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-box-shadow: 0 0 14px rgba(0,0,0,0.5); 
+	-webkit-box-shadow: 0 0 14px rgba(0,0,0,0.5);
+	border-radius: 4px;
+	box-shadow: 0px 0px 10px 0px #000000;
+}
+
+.trigger{
+	-moz-box-shadow: 0 2px 1px rgba(0,0,0,0.5); 
+	-webkit-box-shadow: 0 2px 1px rgba(0,0,0,0.5);
+	box-shadow: 0px 0px 4px 0px #000000;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+}

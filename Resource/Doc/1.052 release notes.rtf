@@ -1,0 +1,539 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red219\green10\blue0;}
+\margl1440\margr1440\vieww9000\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\b\fs32 \cf0 In 1.052:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs30 \cf0 \
+Changes:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * 
+\b IMPORTANT:
+\b0  When registering an input or value changed delegate with a control, it is now strongly recommended that you use AddInputDeletate() or AddValueChangedDelegate() as opposed to SetInputDelegate() or SetValueChangedDelegate().  The reason is that the "Add" versions will add your delegate to be called, whereas the "Set" version will now remove any existing registered delegates and replace them with the one you specify.\
+\
+* Changed the default drag threshold in UIManager to 8 pixels.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs30 \cf0 \
+Additions:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * Added "Password" checkbox to UITextField and SpriteText objects which, when checked, will visually replace all characters with the character specified in the "Masking Character" field.\
+\
+* Added experimental screen space-relative positioning settings.  
+\b NOTE: This is subject to substantial change in the future.
+\b0 \
+\
+* Added various versions of GetTransition() to UIPanelBase, which should ease the process of getting references to a specific panel transition in-code.\
+\
+* Added "Clip Contents" checkbox to UIScrollList which, when unchecked, will cause the contents not to be clipped to the viewable area - possibly improving performance with lists that contain items with lots of text or complex controls.\
+\
+* You can now de-select the current selection of a scroll list by either passing -1 to the list's SetSelectedItem() method, or by assigning null to its .SelectedItem property.\
+\
+* Added "Active Only When Selected" option to UIListItem which, when set to true (defaults to true), will cause the list item not to enter the active state unless it is selected, as opposed to going into the active state when a touch/click initially occurs on it.  This allows you to touch-scroll the list without having the items momentarily enter the active state.\
+\
+* The Build Atlases and Size Sprites wizards should now save their settings between uses.\
+\
+* Added BringInImmediate and DismissImmediate modes to UIBtnChangePanel, as well as a corresponding set of methods in UIPanelManager.  This new "immediate" version of BringIn and Dismiss skips the panel's transition, instantly placing it in its end state.  See the scripting reference for more details.\
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs30 \cf0 Fixes:
+\b0\fs24 \
+* Fixed issue where UIListItems which were selected would not appear "Active" (selected) if scrolled out of view and then back into view.\
+\
+* Fixed issue where empty layers of sliders and progress bars were not being properly truncated.\
+\
+* Fixed issue with not being able to select multiple textures for dragging into the control editor.\
+\
+* Fixed small bug in AutoSpriteControlBase where the IControl version of Copy() could wind up calling itself in a loop.\
+\
+* Fixed issue where UIButtons could cause the EZAnimator object to not be destroyed in-editor when play was stopped, leaving it in the scene.\
+\
+* Addressed issue where controls may not receive a RELEASE_OFF event until after a transition completed if that transition blocked input.\
+\
+* Addressed rare issue where an EZAnimation object could potentially cause an exception if the object it was animating was destroyed while the animation element was running.\
+\
+* Resolved issue where a non-UI hit delegate, when using multiple cameras, could be called multiple times for a single pointer, or could be called for a pointer that hit a UI element in one camera, but not in another.  The non-UI hit delegate should now only be called a single time for each pointer which does not hit any UI elements in any cameras.\
+\
+* Fixed issue where a UIScrollList, when its .controlIsEnabled property was set to false, would still be scrollable via touch scrolling.\
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs32 \cf0 In 1.051:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs30 \cf0 Additions:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * Added SetCharacterSize() method to SpriteText which, when used, will automatically disable pixel-perfect (as it assumes you wish to change it from being pixel-perfect, lest you wouldn't be calling it) and will resize the text according to the newly specified character size.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs30 \cf0 Fixes:
+\b0\fs24 \
+* Addressed issue that could sometimes arise when a managed list item's collider would be updated before it was added to a manager.\
+\
+* Fixed issue where controls marked to be hidden at start would not be if managed.\
+\
+* Fixed issue that could arise when a newline character was placed at the very beginning of a SpriteText.\
+\
+* Fixed issue where assigning new text content to a UIListItemContainer did not cause it to correctly update its extents information so as to be properly positioned in a scroll list based on the new text extents.\
+\
+* The zero-argument version of SpriteText.GetDisplayLineCount() should now return a 1-based value.\
+\
+* Improved behavior of animation elements when using FromTo mode.\
+\
+* Resolved rare issue that could occur where a control that was part of a dismissed panel could receive TAP or other such events if they occurred at the instant the dismissed panel's transition completed, even if the control was no longer present in the area.\
+\
+* Addressed issue where a sprite created at runtime by adding a sprite component to a new GameObject, when marked persistent, would not automatically set the associated mesh to be persistent as well.\
+\
+* Fixed issue where the text of a single-line text field control would be truncated at the caret position if enter/return was pressed.\
+\
+* Addressed possibility of a null texture reference exception when using a control with no texture/material.\
+\
+* Fixed issue where progress bars and sliders might have their "empty" object sized by a different camera than the "filed" object.\
+\
+* Resolved issue where a deactivated managed control could cause a null reference exception when trying to resize its collider.\
+\
+* Various fixes related to managed controls being hidden.\
+\
+* Fixed issue where controls derived from ControlBase (such as various 3D controls) would not have their colliders automatically generated if they did not already have one.\
+\
+
+\b\fs30 Changes:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * If a UIManager is set to survive scene loading, Input blocking/locking is now reset to be unlocked/unblocked when a new scene is loaded. \
+\
+* List item controls (UIListItemContainer, UIListItem, and UIListButton) will now automatically tell their associated list to re-position items if their .Text property is assigned to and has a .maxWidth greater than 0 (meaning it could be multi-line).
+\b\fs32 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs30 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * Any existing "scroll coasting" that may be taking place on a scroll list will be eliminated when ScrollPosition or ScrollListTo() are used to set the position. \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs32 \cf0 \
+\
+In 1.05:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs30 \cf0 Additions:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * Added ability to invoke a method as well as call a delegate upon the user pressing the enter/return key on a single-line UITextField, or pressing the "Done" button on the iOS keyboard.  The method to invoke can be set using the same procedure as a button or other standard control.  The delegate can be set via the .SetCommitDelegate() method, and accepts a delegate that returns no value (void) and accepts a reference to an object of type IKeyFocusable as its sole argument.  IKeyFocusable can be cast to the appropriate type (currently only UITextField).\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs30 \cf0 \
+Changes (\cf2 IMPORTANT\cf0 ):\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * "hidden" setting in SpriteText has been renamed "hideAtStart" (or "Hide At Start" in the inspector).  If you have any SpriteText objects which have set this value to false, you may need to re-set them to false after importing this package.\
+\
+* defaultState in UIBistateInteractivePanel has been renamed to "initialState" (or "Initial State" in the inspector).  If you have any UIBistateInteractivePanels which have this setting set to SHOWING, you may need to re-set these to SHOWING after importing this package.\
+\
+* defaultPanel in UIPanelManager has been deprecated.  Please begin using  initialPanel instead as defaultPanel will be removed in a future revision.\
+\
+* deactivateNonDefaultAtStart in UIPanelManager has been renamed to deactivateAllButInitialAtStart.  If you have any UIPanelManagers where this setting is set to true, you will need to re-set them to true after importing this package.\
+\
+* In UITextField, caretZOffset has been replaced with caretOffset, allowing you to offset the caret in all 3 axes, if desired.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs30 \cf0 \
+Fixes:
+\b0\fs24 \
+* Resolved issue where a text field with margins too small to contain a single line of text would cause an editor crash due to infinite attempts to reposition the text so that it would be visible.\
+\
+* Resolved issue where explicitly inserted line breaks could cause a SpriteText to incorrectly word-wrap the text following.\
+\
+* Resolved issue where an array out of bounds issue could occur in UIManager if using the AUTO_TOUCHPAD pointer type while not in iOS or Android mode.\
+\
+* Resolved issue where margin lines were not getting visually updated in-editor while adjusting margin values.\
+\
+* Resolved issue where scroll lists would not scroll properly when the game was paused.\
+\
+* FadeText elements on panel transitions should not cause text to fade correctly.\
+\
+* Addressed rare issue where the UI Control Editor could encounter an exception when drawing the state tabs.\
+\
+* Fixed rare editor hang issue that could occur when creating prefab out of an entire hierarchy which includes managed sprites/controls and their associated SpriteManager.\
+\
+* Fixed issue that could arise if input was occurring on a control while it was in the process of being destroyed.\
+\
+* Fixed issue where sprite-based controls derived from other control classes could not have their pointer information modified by an input delegate.  This has been solved by shifting these controls' OnInput() methods to pass the POINTER_INFO by reference.\
+\
+* Fixed issue where UIBtnChangePanel did not handle it gracefully when set to toggle mode, trying to dismiss the panel, and the panel manager did not have a current panel set.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs32 \cf0 \
+\
+In 1.05 b5:
+\b0\fs24 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs30 \cf0 Additions:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * 
+\b IMPORTANT NOTE:
+\b0  Layer masks and depth settings are now set per-camera to avoid problems with some multi-camera setups.  This change means that your current mask and camera assignments will need to be re-set for any existing projects.  The cameras are still set within the "UI Cameras" array in the UIManager.  In addition, you will also find "Ray Depth" and "Mask" fields which are set per-camera in this array.  Apologies for any inconvenience, but this change was necessary to resolve a problem that could easily arise when using multiple cameras (a very common situation).\
+\
+* Added word-wrapping to SpriteText.  Just set the "Max Width" field to a value greater than 0 and text will be wrapped automatically.  "Max Width" is the maximum width, in local space units (not characters), that a line can be.\
+\
+* Added "Parse Color Tags" option to allow you to disable parsing of color tags.  This is disabled by default for UITextField controls.\
+\
+* UITextField now has a "Multiline" option, which makes it accept multi-line input, and will automatically word-wrap input at the margins.\
+\
+* You can now define a caret for a UITextField.  It shows up as a state/element in the control editor and inspector.  Just assign a graphic for it and then either set the text field to pixel-perfect, or specify the caret dimensions using the "Caret Size" field.  You can make it flash (or otherwise animate) either using sprite animation (if you have SM2 installed), or by definition a repeating transition (use a negative duration to cause it to repeat).\
+\
+* Added "Clip When Moving" option to UIScrollList which should be used if you are experiencing any item clipping problems during, or immediately after, movement of your list.  It is advised to keep this disabled otherwise.\
+\
+* UIListItemContainer now supports automatic clipping of child SpriteText which are not associated with any control.\
+\
+* Cloning transitions, and adding/removing transition elements should now be undo-able.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs30 \cf0 \
+Fixes:
+\b0\fs24 \
+* Slider knobs should now be visible when the slider is set to pixel perfect.\
+\
+* Slider knobs should only slide now if the pointer is within the knob's area.\
+\
+* Fixed issue where buttons on panels which play a dismissal transition could get temporarily stuck in their last state.\
+\
+* Fixed issue where list item elements contained in a UIListItemContainer would not take the extents of any sprite objects into account if the item was created entirely in-code.\
+\
+* Fixed issue where lists being rotated or scaled would not properly update the clipping area and re-clip their child items.\
+\
+* Instances of pixel-perfect objects being sized incorrectly should now be greatly reduced in Unity 3+.  In particular, a work-around has been written for the Unity bug where playing a scene for longer than 10 seconds would cause Start() not to be called and therefore the incorrect camera information to be fed to the sprites.\
+\
+* Fixed issue where UIActionBtn did not fire its method to invoke.\
+\
+* Controls will no longer override a custom collider at runtime.\
+\
+* Buttons should now behave as expected when the "Repeat" option is checked when the pointer is dragged off of the control.  In other words, they will continue to receive notification while the pointer is held down even if the pointer is dragged away.\
+\
+* Fixed exception that could be raised if Stop() was called on an EZAnimation object more than once for a single play-through.  EZAnimation objects are now checked to see if they are running before being removed from the active list.\
+\
+* Addressed issue where text fields were still receiving return characters on some platforms.\
+\
+* Fixed issue where copying an uninstantiated control prefab would result in a hidden control.\
+\
+* Fixed issue where when creating new scroll list items at runtime and using a perspective camera, the items would not be properly sized.  Newly created items are now moved into the list's plane before their size is calculated.\
+\
+* Fixed issue where sometimes the last few scroll list items might get clipped incorrectly when using a horizontal orientation.\
+\
+* Improved positioning of sprite when using TEXTURE_OFFSET with a 100% blank 1x1 pixel image.\
+\
+* Fixed an issue with the positioning of sprite vertices when switching frames on a sprite that uses TEXTURE_OFFSET but not pixel-perfect or auto-resize.  Before, subsequent frames would not be correctly offset and would retain the offsets of the initial frame.\
+\
+* Corrected clipping error when sprite/control uses an offset.\
+\
+* Fixed issue that could arise when using multiple cameras with a TOUCHPAD or AUTO_TOUCHPAD pointer type that would cause input to only be fired through the first camera in the UI Cameras list.\
+\
+* Fixed issue where if a panel manager was set to deactivate non-default panels at start, and a panel was brought-in at start, but was not the default, it would be hidden after completing its "Bring In" transition.\
+\
+* Fixed spacing of transition options in the inspector pane when using Unity 3 in iPhone mode.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs32 \cf0 \
+\
+In 1.05 b4:
+\b0\fs24 \
+\
+NOTE: Should be used with SM2 1.75 or higher.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs30 \cf0 Additions:
+\b0\fs24 \
+* Added new UIListItemContainer class which can be added to a scroll list, but itself can "contain" (serve as the parent to) multiple controls that can be used in a single list item.  See 
+\b IMPORTANT
+\b0  note under "Changes" below.\
+\
+* Added new AUTO_TOUCHPAD pointer type, which allows both mouse and touchpad (via Unity Remote) input while in-editor, and automatically switches to TOUCHPAD when deployed to a touchpad device.\
+\
+* Added new setting in UIManager called "focusWithRay" (or Focus With Ray) which is used to resolve issues that can arise when using a mouse/touchpad with a ray pointer and one or the other pointer steals the keyboard focus from the other.  To focus using the ray pointer, set this value to true.  Otherwise, set it to false.\
+\
+* Added "Dismiss On Move Off" option to UIBistateInteractivePanel.\
+\
+* Added SetFont() methods to SpriteText, which allow you to change the font used by a SpriteText object at runtime.\
+\
+* Added a "Text Offset Z" setting to all controls which sets the Z-offset that will be applied to any text generated at runtime for the control.\
+\
+* SpriteText is now available through the EZ GUI component menu as "Label".\
+\
+* Added "Activate When Adding" checkbox to UIScrollList which, when set to true, will recursively activate items when they are added to the list.  Defaults to true.\
+\
+* Added "ContainsCharacter()" method to SpriteFont which returns whether a specified character exists in the font definition.\
+\
+* Added new StartTransition() method to UIPanelBase which allows starting a transition on a panel by name (string).\
+\
+\
+
+\b\fs30 Fixes:
+\b0\fs24 \
+* Fixed issue where UIPanelManager.MoveForward() and UIPanelManager.MoveBack() were not re-activating panels deactivated at start because of the "Deactivate Non Default At Start".\
+\
+* UIBistateInteractivePanel should now help prevent parent panels from confusing a MOVE_OFF or RELEASE_OFF on a child control with a MOVE_OFF or RELEASE_OFF of the entire panel.\
+\
+* Improved accuracy of pixel-perfect setting when using perspective cameras.\
+\
+* Fixed the case where you might get harmless error messages if creating a control or text before you have a UIManager in the scene, or if a control or text happened to be initialized before the UIManager.\
+\
+* Resolved issue where controls hidden from the start may have their colliders be out of synch with their hidden state, causing them to be unclickable.\
+\
+* Fixed an issue where under certain circumstances, text would not be sized pixel-perfect at start.\
+\
+* UITextField will now reject characters input that do not exist in the font being used.\
+\
+* Fixed issue where the first character of a line would sometimes have an extra little bit of space between it and the following characters.\
+\
+* Added protection from cases where a third-party font generator assigns a negative size to the font.\
+\
+* Fixed issue where scroll lists would sometimes stop scroll coasting when there was a quick swipe.\
+\
+* Fixed exception that could be raised if a list item was removed while a pointer was interacting with it at the time.\
+\
+* Fixed issue when non-visible scroll list items which were managed would be selected via code.  Managed UIListItems and UIListButtons are now only hidden and not deactivated when outside the viewable area.\
+\
+* Fixed issue where inserting/removing items to/from a scroll list would result in items having incorrect index values.\
+\
+* Fixed issue when using controls with clipping rectangles (such as UITextField or UIScrollList) in an orientation other than along the XY plane.  Clipping rectangles can now be defined in 3D space in any orientation using the Rect3D struct.\
+\
+* Fixed issue where creating transitions in-code could cause an exception on an iOS device.\
+\
+* Fixed issue where attempting to set the state of some controls in Start() would fail to override the control's initial default state.\
+\
+* Controls marked as persistent will now automatically flag their associated text label as persistent also.\
+\
+* Fixed cases where a delegate registered with SetNonUIHitDelegate() would not be called in certain situations where it should have been.\
+\
+
+\b\fs30 Changes:
+\b0\fs24 \
+* 
+\b IMPORTANT:
+\b0  The type used by the sceneItems and prefabItems arrays of the UIScrollList control have been changed to type GameObject.  This means upon importation of this package, if you have any scroll lists which have these arrays populated with values, you will probably need to re-assign them as Unity will probably not retain the old references since they are no longer of the correct type.\
+\
+* Controls will now automatically recalculate their colliders when they change states.\
+\
+* Changed "hidden" member to "hideAtStart (or displays in the inspector as "Hide At Start").  If you have any objects that used this setting in the inspector, you may need to re-set them since the name has changed.\
+\
+* Sliders will now ignore the "knob size" values if they are set to be pixel-perfect, and will therefore cause the knobs to be pixel-perfect as well.\
+\
+* When removing an item from a scroll list using RemoveItem(), the item will now be returned to the root of the project hierarchy.\
+\
+* Made some internal optimizations as to how the item list in a UIScrollList is handled.\
+\
+* Made some internal optimizations as to how the list items of a UIScrollList are clipped and culled.  Performance should be better for very long lists.\
+\
+* Improved the quality of the way slider knobs move.  Instead of the knob immediately centering on the input point, it will now move in a relative way, much like similar knobs in any OS.\
+\
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs32 \cf0 In 1.05 b3:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs30 \cf0 Additions:
+\b0\fs24 \
+* Added the ability to run animations created with Unity's Animation View using the AnimClip transition element.\
+\
+* Controls with multiple states (i.e. buttons, radio buttons, and toggles, but not sliders and progress bars) can now be assigned unique text for each state.\
+\
+
+\b\fs30 Fixes:
+\b0\fs24 \
+* Fixed issue causing list items to be disabled when creating a scroll list through code.\
+\
+* Fixed issue causing scroll list items instantiated directly from prefab to always be disabled.\
+\
+* Fixed index out of bounds exception when using multiple UI cameras with a TOUCHPAD pointer type.\
+\
+* Fixed issue where parts of a progress bar or slider control were not placed into the same plane if a plane other than XY was used.\
+\
+* Fixed issue where a prefab using SpriteText would not appear when instanced into a scene.\
+\
+* Using the UIPanelManager's "Deactivate Non Default At Start" option now works more reliably.\
+\
+* Fixed issue where UIButton and derived classes would not play state transitions.\
+\
+
+\b\fs30 Changes:
+\b0\fs24 \
+* When a pointer encounters a control in front of a camera in the UIManaber's "UI Cameras" array, that pointer will not be "passed on" to the next camera in the array so as to avoid inadvertently "hitting" objects in the background behind a control.\
+\
+* Sprite-based controls should now, if no render camera is specified, default to the first UI Camera in the UIManager's "Ui Cameras" array.\
+\
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs32 \cf0 In 1.05 b1/2:
+\b0\fs24 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs28 \cf0 Additions:
+\fs24 \
+\
+Panels:
+\b0 \
+* Added an internal "history" or "breadcrumb" tracker for UIPanelManager which allows non-linear menus to "remember" the panels that were showing previously so that a single "back" button can be used to return to the previous panel.\
+\
+* Added "Linear Navigation" option in UIPanelManager which should be used in menus that will be navigated in a linear or circular fashion, such as a wizard.\
+\
+* Added "Circular" option in UIPanelManager that causes linearly navigated menus to wrap around to the beginning or end of the panel sequence if you attempt to move past either end.\
+\
+* Added "Advance Past End" option to UIPanelManager which, when enabled, retains the previous functionality where going "forward" or "back" at the end or beginning of a panel sequence (respectively) would dismiss the last panel, leaving the area empty.  If this option is disabled, the sequence will stop at the end/beginning unless the "Circular" setting is enabled.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 Controls:
+\b0 \
+* Added .data member to all controls, allowing you to associate arbitrary data or objects with any control for later reference and use.\
+\
+* Added alternate Copy() method which accepts one or more flags indicating which attributes to copy.\
+\
+* Added "Set as Current" button to transition editors, making it easier to quickly setup transitions without losing or having to re-enter your object's original values.\
+\
+* Add ability to clip all control types to a Rect specified in world space.\
+\
+\
+
+\b Text:
+\b0 \
+* New integrated text class "SpriteText", which allows per-character tinting and clips to a specified Rect.  Insert a color tag (which shades all subsequent characters until another tag is specified) by either simply adding a Color value to the string:\
+string myStr = "Hello " + Color.red + "world!";\
+\
+or by using hex values like so: \
+string myStr = "Hello [#FF0000]world!";\
+Hex values can be 24-bit (6-digit) or 32-bit with alpha (8-digit), in the format: [#RRGGBBAA]\
+\
+* Added the ability to bring in panels by index.\
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs28 \cf0 Changes:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * Progress bars can now be set to auto-resize or pixel perfect without interfering with them.\
+\
+* Pixel-perfect objects are now also possible with cameras using perspective projections.  However, if the distance between the object and the camera changes, SetCamera() will need to be called again on the object to allow it to update its size.
+\b\fs28 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0 \cf0 * Hiding controls should now also hide the associated text object, and also effectively disable its box collider (if any) while hidden.\
+\
+* The Copy() method for all control types should now support copying uninstantiated prefabs.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0 \cf0 * In the Control Editor, changed the "Scripts" drop-down to say "Script" to more accurately reflect what the setting is for.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0 \cf0 * Improved UIBistateInteractivePanel behavior.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0 \cf0 * Added the ability to register multiple delegates to be run upon the completion of a transition.  SetOnTransitionEndDelegate() has thereby been replaced with AddTransitionEndDelegate().\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0 \cf0 * FadeText's Do() methods should now return references of the FadeText type.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0 \cf0 * Due to the change in this version from TextMesh/3D Text to SpriteText (EZ GUI's integrated text solution), the FadeText animation element now operates on objects of type SpriteText rather than TextMesh.  Any code that uses FadeText.Do() will need to change the argument it passes appropriately.  As such, the .textMesh member of all controls has now been replaced with .spriteText.  To modify the actual string of the text of a control, however, use its .Text property.
+\b \
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs28 \cf0 Fixes:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * Fixed misc. issues related to Unity iPhone 1.7's poor .NET support.\
+\
+* Fixed compiler error on Unity iPhone, which does not support a generic Stack.\
+\
+* Fixed issue where controls in different planes than XY did not have their collider generated in the correct orientation.\
+\
+* Fixed issue with list item collider calculation.
+\b\fs28 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs24 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0 \cf0 * Fixed a bug where when using the TOUCHPAD pointer type with multiple UI cameras, you could receive an array out of bounds exception.\
+\
+* Fixed an issue where setting the winding order to CCW while using an anchor method of TEXTURE_OFFSET would cause the sprite to be positioned incorrectly.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0 \cf0 * The invocation script selection should no longer appear on the control editor window while the game is playing, thereby keeping it from re-assigning the script to invoke while testing the game.\
+\
+* UIBtnWWW and UIBtnLoadScene now take the "delay" setting into account when loading a URL or a new scene.  They also execute based upon the "when to invoke" setting.\
+\
+* Fixed issue where marking a control as persistent did not preserve its mesh between scenes.\
+\
+* All controls should now always obey their .controlIsEnabled setting.\
+\
+* Addressed issue where controls that were not set to be enabled could cause a parent interactive panel to not detect input correctly.\
+\
+* Resolved issue where deactivating or setting the sprite/control to "hidden" while in edit mode would not cause the sprite/control to disappear from the scene.\
+\
+* Made SetControlState() in UIButton public to make it easier to directly control the state of a button.\
+\
+* Fixed an issue where dragging and releasing a UIListItem control the exact amount of its drag threshold would cause it not to revert to its original appearance.\
+\
+* Fixed an issue where a button would remain in the "Over" state if it had quickly moved out from under the pointer when clicked.\
+\
+* Fixed issue where sometimes after pressing Play, the Control or Panel editor windows would no longer modify the values of the control or panel until the object was selected again in the hierarchy.\
+\
+* Fixed issue where calling Hide() or SetColor() on a slider or progress bar did not have the expected effect on the entire control.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs28 \cf0 Misc:
+\b0\fs24 \
+* This version should now compile to Android successfully (no keyboard input is presently supported on Android).
+\b\fs30 \
+}
