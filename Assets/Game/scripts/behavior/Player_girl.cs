@@ -339,7 +339,9 @@ public class Player_girl : Player_base {
 
         string[] anim_keys1 = { 
             "shootSMG",
-            "reload_smg"
+            "reload_smg",
+            "hit1",
+            "hit2"
         };
         foreach (string key in anim_keys1) {
             state = this.anim[key];
@@ -446,41 +448,41 @@ public class Player_girl : Player_base {
 
         // idle to ...
         state_idle.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
-        state_idle.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, action_Disable ) );
+        state_idle.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_idle.AddTransition( new FSM.Transition( state_walk, cond_isMoving, action_Move ) );
         state_idle.AddTransition( new FSM.Transition( state_idleShooting, cond_isShootButtonTriggered, null ) );
         state_idle.AddTransition( new FSM.Transition( state_idleReloading, cond_canReload, null ) );
 
         // walk to ...
         state_walk.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
-        state_walk.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, action_Disable ) );
+        state_walk.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_walk.AddTransition( new FSM.Transition( state_idle, cond_isNotMoving, action_Idle ) );
         state_walk.AddTransition( new FSM.Transition( state_walkShooting, cond_isShootButtonTriggered, null ) );
         state_walk.AddTransition( new FSM.Transition( state_walkReloading, cond_canReload, null ) );
 
         // idle shooting to ...
         state_idleShooting.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
-        state_idleShooting.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, action_Disable ) );
+        state_idleShooting.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_idleReloading, new FSM.Condition_or ( cond_isOutOfAmmo, cond_canReload ), null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_idle, cond_isNotShooting, null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_walkShooting, cond_isMoving, action_Move ) );
 
         // walk shooting to ...
         state_walkShooting.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
-        state_walkShooting.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, action_Disable ) );
+        state_walkShooting.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_walkReloading, new FSM.Condition_or ( cond_isOutOfAmmo, cond_canReload ), null ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_walk, cond_isNotShooting, null ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_idleShooting, cond_isNotMoving, action_Idle ) );
 
         // idle reload to ...
         state_idleReloading.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
-        state_idleReloading.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, action_Disable ) );
+        state_idleReloading.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_idleReloading.AddTransition( new FSM.Transition( state_idle, cond_isNotReloading, null ) );
         state_idleReloading.AddTransition( new FSM.Transition( state_walkReloading, cond_isMoving, action_Move ) );
 
         // walk reload to ...
         state_walkReloading.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
-        state_walkReloading.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, action_Disable ) );
+        state_walkReloading.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_walkReloading.AddTransition( new FSM.Transition( state_walk, cond_isNotReloading, null ) );
         state_walkReloading.AddTransition( new FSM.Transition( state_idleReloading, cond_isNotMoving, action_Idle ) );
 
@@ -495,15 +497,15 @@ public class Player_girl : Player_base {
         // getUp to ...
         state_getUp.AddTransition( new FSM.Transition( state_down, 
                                                        cond_noHP,
-                                                       null ) );
+                                                       action_Disable ) );
         state_getUp.AddTransition( new FSM.Transition( state_idle, 
                                                        new FSM.Condition_not( new Condition_isPlayingAnim( this, "getUp" ) ), 
                                                        action_Enable ) );
         // on hit to ...
-        state_onStun.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
+        state_onStun.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
         state_onStun.AddTransition( new FSM.Transition ( state_idle, 
-                                                        new FSM.Condition_not(new Condition_isStunning(this) ),
-                                                        action_Enable ) );
+                                                         new FSM.Condition_not(new Condition_isStunning(this) ),
+                                                         null ) );
         state_onStun.AddTransition( new FSM.Transition ( state_onStun, 
                                                          cond_isOnStun,
                                                          null ) );
@@ -604,6 +606,7 @@ public class Player_girl : Player_base {
         if ( this.steeringState == SteeringState.seeking ) {
             force = GetSteering_Seek_MaxForces ( this.targetPos );
             force.y = 0.0f;
+            Act_Movement(); // HACK
         }
         // HACK: should use behavior-tree fix this { 
         else if ( this.steeringState == SteeringState.braking || 

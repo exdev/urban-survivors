@@ -294,6 +294,8 @@ public class Player_boy : Player_base {
         // ======================================================== 
 
         FSM.Action act_startCombo = new Action_StartCombo(this); 
+        FSM.Action act_Disable = new Action_DisableSteering(this);
+        FSM.Action act_Enable = new Action_EnableSteering(this);
 
         FSM.Condition cond_isMoving = new Condition_isMoving(this);
         FSM.Condition cond_isMeleeButtonDown = new Condition_isMeleeButtonDown(this);
@@ -306,19 +308,20 @@ public class Player_boy : Player_base {
         // ======================================================== 
 
         // idle to ...
-        state_idle.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
-        state_idle.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
+        state_idle.AddTransition( new FSM.Transition( state_down, cond_noHP, act_Disable ) );
+        state_idle.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, act_Disable ) );
         state_idle.AddTransition( new FSM.Transition( state_walk, cond_isMoving, null ) );
         state_idle.AddTransition( new FSM.Transition( state_idleMelee, cond_isMeleeButtonDown, act_startCombo ) );
 
         // walk to ...
-        state_walk.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
-        state_walk.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
+        state_walk.AddTransition( new FSM.Transition( state_down, cond_noHP, act_Disable ) );
+        state_walk.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, act_Disable ) );
         state_walk.AddTransition( new FSM.Transition( state_idle, new FSM.Condition_not(cond_isMoving), null ) );
         state_walk.AddTransition( new FSM.Transition( state_walkMelee, cond_isMeleeButtonDown, act_startCombo ) );
 
         // idle melee to ...
-        state_idleMelee.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
+        state_idleMelee.AddTransition( new FSM.Transition( state_down, cond_noHP, act_Disable ) );
+        state_idleMelee.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, act_Disable ) );
         state_idleMelee.AddTransition( new FSM.Transition( state_idle, 
                                                        new FSM.Condition_and(new FSM.Condition_not(cond_isMoving),
                                                                              new FSM.Condition_not(cond_isAttacking)), 
@@ -332,7 +335,8 @@ public class Player_boy : Player_base {
                                                        null ) );
 
         // walk melee to ..
-        state_walkMelee.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
+        state_walkMelee.AddTransition( new FSM.Transition( state_down, cond_noHP, act_Disable ) );
+        state_walkMelee.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, act_Disable ) );
         state_walkMelee.AddTransition( new FSM.Transition( state_idle, 
                                                        new FSM.Condition_and(new FSM.Condition_not(cond_isMoving),
                                                                              new FSM.Condition_not(cond_isAttacking)), 
@@ -355,15 +359,15 @@ public class Player_boy : Player_base {
         // getUp to ...
         state_getUp.AddTransition( new FSM.Transition( state_down, 
                                                        cond_noHP,
-                                                       null ) );
+                                                       act_Disable ) );
         state_getUp.AddTransition( new FSM.Transition( state_idle, 
                                                        new FSM.Condition_not( new Condition_isPlayingAnim( this, "getUp" ) ), 
-                                                       null ) );
+                                                       act_Enable ) );
         // on hit to ...
         state_onStun.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
         state_onStun.AddTransition( new FSM.Transition ( state_idle, 
                                                         new FSM.Condition_not(new Condition_isStunning(this) ),
-                                                        null ) );
+                                                        act_Enable ) );
         state_onStun.AddTransition( new FSM.Transition ( state_onStun, 
                                                          cond_isOnStun,
                                                          null ) );
@@ -385,10 +389,12 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     void ProcessMovement () {
-        if ( IsMoving() == false )
-            this.Stop();
-        else
-            this.Act_Movement();
+        if ( this.steeringState != SteeringState.disable ) {
+            if ( IsMoving() == false )
+                this.Stop();
+            else
+                this.Act_Movement();
+        }
 
         // handle steering
         Vector3 force = Vector3.zero;
@@ -396,7 +402,8 @@ public class Player_boy : Player_base {
             force = this.moveDir * base.maxForce;
             force.y = 0.0f;
         }
-        else if ( this.steeringState == SteeringState.braking ) {
+        else if ( this.steeringState == SteeringState.braking || 
+                  this.steeringState == SteeringState.disable ) {
             ApplyBrakingForce();
         }
         ApplySteeringForce( force );

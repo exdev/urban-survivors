@@ -120,7 +120,7 @@ public class AI_ZombieGirl : AI_ZombieBase {
 
     void InitFSM () {
 
-        FSM.Condition cond_isPlayerInAttackRange = new Condition_isPlayerInAttackRange(this,60.0f,2.0f);
+        FSM.Condition cond_isPlayerInAttackRange = new Condition_isPlayerInAttackRange(this,60.0f,1.5f);
         FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
         FSM.Condition cond_noHP = new Condition_noHP(this.zombieInfo);
 

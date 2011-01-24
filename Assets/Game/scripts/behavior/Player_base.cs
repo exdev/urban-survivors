@@ -314,7 +314,7 @@ public class Player_base : Actor {
             animName = "hit2";
 
         this.anim.Rewind(animName);
-        this.anim.Play(animName);
+        this.anim.CrossFade(animName);
     } 
 }
 
