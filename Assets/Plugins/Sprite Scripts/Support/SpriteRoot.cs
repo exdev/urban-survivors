@@ -4,6 +4,9 @@
 //-----------------------------------------------------------------
 
 
+// Screen-space positioning, ALPHA, subject to change
+//#define SCREEN_SPACE_POSITIONING
+
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -732,7 +735,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	/// Automatically sizes the sprite so that it will 
 	/// display pixel-perfect on-screen.
 	/// NOTE: If you change the orthographic size of 
-	/// the camera or the distance between the text 
+	/// the camera or the distance between the sprite 
 	/// and a perspective camera, call SetCamera()
 	/// to make the text pixel-perfect again.
 	/// However, if you want automatic resizing functionality
@@ -784,6 +787,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	[HideInInspector]
 	public bool isClone = false;				// Set this to true when the sprite has been instantiated from another sprite in the scene.
 	protected bool m_started = false;			// This gets set when the sprite has entered Start()
+	protected bool deleted = false;				// This is set to true when the sprite's mesh has been deleted in preparation for destruction.
 
 	/// <summary>
 	/// Offsets the sprite, in world space, from the center of its
@@ -821,17 +825,97 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 
 	protected SpriteResizedDelegate resizedDelegate = null; // Delegate to be called upon sprite resizing.
 
+#if SCREEN_SPACE_POSITIONING
+
+	/// <summary>
+	/// Specifies what the object will be aligned relative to on the horizontal axis.
+	/// </summary>
+	public enum HORIZONTAL_ALIGN
+	{
+		/// <summary>
+		/// The object will not be repositioned along the X axis.
+		/// </summary>
+		NONE,
+
+		/// <summary>
+		/// The X coordinate of screenPos will be interpreted as the number of pixels from the left edge of the screen.
+		/// </summary>
+		LEFT,
+
+		/// <summary>
+		/// The X coordinate of screenPos will be interpreted as the number of pixels from the right edge of the screen.
+		/// </summary>
+		RIGHT,
+
+		/// <summary>
+		/// The X coordinate of screenPos will be interpreted as the number of pixels from the center of the screen.
+		/// </summary>
+		CENTER
+	}
+
+	/// <summary>
+	/// Specifies what the object will be aligned relative to on the vertical axis.
+	/// </summary>
+	public enum VERTICAL_ALIGN
+	{
+		/// <summary>
+		/// The object will not be repositioned along the Y axis.
+		/// </summary>
+		NONE,
+
+		/// <summary>
+		/// The Y coordinate of screenPos will be interpreted as the number of pixels from the top edge of the screen.
+		/// </summary>
+		TOP,
+
+		/// <summary>
+		/// The Y coordinate of screenPos will be interpreted as the number of pixels from the bottom edge of the screen.
+		/// </summary>
+		BOTTOM,
+
+		/// <summary>
+		/// The Y coordinate of screenPos will be interpreted as the number of pixels from the center of the screen.
+		/// </summary>
+		CENTER
+	}
+
+	[System.Serializable]
+	public class RelativeTo
+	{
+		public HORIZONTAL_ALIGN horizontal = HORIZONTAL_ALIGN.LEFT;
+		public VERTICAL_ALIGN vertical = VERTICAL_ALIGN.TOP;
+
+		public bool Equals(RelativeTo rt)
+		{
+			if (rt == null)
+				return false;
+			return (horizontal == rt.horizontal && vertical == rt.vertical);
+		}
+		public void Copy(RelativeTo rt)
+		{
+			if (rt == null)
+				return;
+			horizontal = rt.horizontal;
+			vertical = rt.vertical;
+		}
+	}
+
+	public bool positionInScreenSpace = false;
+	public Vector3 screenPos = Vector3.forward;
+	public RelativeTo relativeToScreen = new RelativeTo();
+#endif
+
 	// Start-up state vars:
 	/// <summary>
-	/// Whether the sprite will be hidden when it starts.
+	/// Whether the sprite will be hideAtStart when it starts.
 	/// </summary>
 	public bool hideAtStart = false;
 
-	// Will tell us if we INTEND for the sprite to be hidden,
+	// Will tell us if we INTEND for the sprite to be hideAtStart,
 	// so that if the mesh renderer happens to be incidentally
 	// disabled, such as on a prefab that is uninstantiated,
-	// we don't mistake that for being hidden.
-	// We set this when we intentionall hide the sprite.
+	// we don't mistake that for being hideAtStart.
+	// We set this when we intentionally hide the sprite.
 	protected bool m_hidden = false;
 
 
@@ -901,6 +985,8 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		if (persistent)
 		{
 			DontDestroyOnLoad(this);
+			if (m_spriteMesh is SpriteMesh)
+				((SpriteMesh)m_spriteMesh).SetPersistent();
 		}
 
 		prevUVRect = frameInfo.uvs;
@@ -917,9 +1003,9 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		}
 
 		if (renderCamera == null)
-			SetCamera(Camera.mainCamera);
-		else
-			SetCamera(renderCamera);
+			renderCamera = Camera.mainCamera;
+
+		SetCamera(renderCamera);
 
 		if (clipped)
 			UpdateUVs();
@@ -1029,8 +1115,10 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	/// this component or the GameObject to which it is 
 	/// attached. Memory leaks can ensue otherwise.
 	/// </summary>
-	public void Delete()
+	public virtual void Delete()
 	{
+		deleted = true;
+
 		// Destroy our mesh:
 		if (!managed && Application.isPlaying)
 		{
@@ -1068,6 +1156,65 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 			}
 		}
 	}
+
+#if SCREEN_SPACE_POSITIONING
+	/// <summary>
+	/// Repositions the object using the existing screen-space settings.
+	/// </summary>
+	public void PositionOnScreen()
+	{
+		if(positionInScreenSpace)
+			PositionOnScreen(screenPos);
+	}
+
+	/// <summary>
+	/// Positions the object using screen coordinates, according to
+	/// the relativity settings stored in relativeToScreen.
+	/// </summary>
+	/// <param name="x">The number of pixels in the X axis relative to the position specified in relativeToScreen.</param>
+	/// <param name="y">The number of pixels in the Y axis relative to the position specified in relativeToScreen.</param>
+	/// <param name="depth">The distance the object should be in front of the camera.</param>
+	public void PositionOnScreen(int x, int y, float depth)
+	{
+		PositionOnScreen(new Vector3((float)x, (float)y, depth));
+	}
+
+	/// <summary>
+	/// Positions the object using screen coordinates, according to
+	/// the relativity settings stored in relativeToScreen.
+	/// </summary>
+	/// <param name="pos">The X and Y screen coordinates where the object should be positioned, as well as the Z coordinate which represents the distance in front of the camera.</param>
+	public void PositionOnScreen(Vector3 pos)
+	{
+		if (renderCamera == null)
+		{
+			Debug.LogError("Render camera not yet assigned to sprite \"" + name + "\" when attempting to call PositionOnScreen()");
+			return;
+		}
+
+		positionInScreenSpace = true;
+
+		screenPos = pos;
+
+		Vector3 curPos = renderCamera.WorldToScreenPoint(transform.position);
+
+		if (relativeToScreen.horizontal == HORIZONTAL_ALIGN.RIGHT)
+			pos.x = screenSize.x - pos.x;
+		else if (relativeToScreen.horizontal == HORIZONTAL_ALIGN.CENTER)
+			pos.x = screenSize.x * 0.5f + pos.x;
+		else if (relativeToScreen.horizontal == HORIZONTAL_ALIGN.NONE)
+			pos.x = curPos.x;
+
+		if (relativeToScreen.vertical == VERTICAL_ALIGN.TOP)
+			pos.y = screenSize.y - pos.y;
+		else if (relativeToScreen.vertical == VERTICAL_ALIGN.CENTER)
+			pos.y = screenSize.y * 0.5f + pos.y;
+		else if (relativeToScreen.vertical == VERTICAL_ALIGN.NONE)
+			pos.y = curPos.y;
+		
+		transform.position = renderCamera.ScreenToWorldPoint(pos);
+	}
+#endif
 
 	// Sets the edge positions needed to properly
 	// orient our sprite according to our anchoring
@@ -1251,7 +1398,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	/// <summary>
 	/// Recalculates the width and height of the sprite
 	/// based upon the change in its UV dimensions (autoResize) or
-	/// on the current orthographic size (pixelPerfect).
+	/// on the current camera's disposition (pixelPerfect).
 	/// </summary>
 	public void CalcSize()
 	{
@@ -1263,7 +1410,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 
 		if (pixelPerfect)
 		{
-			// Calculate the size based on the orthographic size:
+			// Calculate the size based on the camera's disposition:
 			//worldUnitsPerScreenPixel = (renderCamera.orthographicSize * 2f) / screenSize.y;
 			width = worldUnitsPerScreenPixel * frameInfo.uvs.width * pixelsPerUV.x;
 			height = worldUnitsPerScreenPixel * frameInfo.uvs.height * pixelsPerUV.y;
@@ -1692,6 +1839,11 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 
 			renderCamera = c;
 
+#if SCREEN_SPACE_POSITIONING
+			if (positionInScreenSpace)
+				PositionOnScreen(screenPos);
+#endif
+
 			// Determine the world distance between two vertical
 			// screen pixels for this camera:
 			dist = nearPlane.GetDistanceToPoint(transform.position);
@@ -1702,14 +1854,20 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 			return;
 		}
 
+		renderCamera = c;
+		screenSize.x = c.pixelWidth;
+		screenSize.y = c.pixelHeight;
+
+#if SCREEN_SPACE_POSITIONING
+		if (positionInScreenSpace)
+			PositionOnScreen(screenPos);
+#endif
+
 		// Determine the world distance between two vertical
 		// screen pixels for this camera:
 		dist = nearPlane.GetDistanceToPoint(transform.position);
 		worldUnitsPerScreenPixel = Vector3.Distance(c.ScreenToWorldPoint(new Vector3(0, 1, dist)), c.ScreenToWorldPoint(new Vector3(0, 0, dist)));
 
-		screenSize.x = c.pixelWidth;
-		screenSize.y = c.pixelHeight;
-		renderCamera = c;
 		CalcSize();
 	}
 
@@ -1718,7 +1876,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	/// the sprite's mesh renderer component, or if managed,
 	/// sets the mesh size to 0.
 	/// </summary>
-	/// <param name="tf">When true, the sprite is hidden, when false, the sprite will be displayed.</param>
+	/// <param name="tf">When true, the sprite is hideAtStart, when false, the sprite will be displayed.</param>
 	public virtual void Hide(bool tf)
 	{
 		if (m_spriteMesh != null)
@@ -1727,10 +1885,10 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	}
 
 	/// <summary>
-	/// Returns whether the sprite is currently set to be hidden
+	/// Returns whether the sprite is currently set to be hideAtStart
 	/// (whether its mesh renderer component is enabled).
 	/// </summary>
-	/// <returns>True when hidden, false when set to be displayed.</returns>
+	/// <returns>True when hideAtStart, false when set to be displayed.</returns>
 	public bool IsHidden()
 	{
 		return m_hidden;
@@ -2232,7 +2390,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	// Included to work around the Unity bug where Start() is not
 	// called when reintering edit mode if play lasts for longer 
 	// than 10 seconds:
-#if UNITY_3_1 && UNITY_EDITOR
+#if (UNITY_3_0 || UNITY_3_1) && UNITY_EDITOR
 	void Update() {}
 #endif
 
@@ -2297,6 +2455,11 @@ public class SpriteRootMirror
 	public bool pixelPerfect;
 	public bool autoResize;
 	public Camera renderCamera;
+#if SCREEN_SPACE_POSITIONING
+	public bool positionInScreenSpace;
+	public Vector3 screenPos;
+	public SpriteRoot.RelativeTo relativeToScreen = new SpriteRoot.RelativeTo();
+#endif
 	public bool hideAtStart;
 /*
 	public Vector3 pos;
@@ -2321,6 +2484,11 @@ public class SpriteRootMirror
 		pixelPerfect = s.pixelPerfect;
 		autoResize = s.autoResize;
 		renderCamera = s.renderCamera;
+#if SCREEN_SPACE_POSITIONING
+		positionInScreenSpace = s.positionInScreenSpace;
+		screenPos = s.screenPos;
+		relativeToScreen.Copy(s.relativeToScreen);
+#endif
 		hideAtStart = s.hideAtStart;
 /*
 		pos = s.transform.position;
@@ -2398,6 +2566,29 @@ public class SpriteRootMirror
 			return true;
 		if (s.renderCamera != renderCamera)
 			return true;
+#if SCREEN_SPACE_POSITIONING
+		if (positionInScreenSpace != s.positionInScreenSpace)
+		{
+			// Handle this ourselves
+			s.PositionOnScreen();
+			positionInScreenSpace = s.positionInScreenSpace;
+		}
+		if (screenPos != s.screenPos)
+		{
+			// Handle this ourselves
+			s.PositionOnScreen();
+			screenPos = s.screenPos;
+		}
+		if (!relativeToScreen.Equals(s.relativeToScreen))
+		{
+			if(s.positionInScreenSpace)
+			{
+				// Handle this ourselves
+				s.PositionOnScreen();
+				relativeToScreen.Copy(s.relativeToScreen);
+			}
+		}
+#endif
 		if (s.hideAtStart != hideAtStart)
 		{
 			s.Hide(s.hideAtStart);

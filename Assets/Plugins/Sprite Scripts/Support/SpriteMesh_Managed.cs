@@ -57,9 +57,9 @@ public class SpriteMesh_Managed : ISpriteMesh, IEZLinkedListItem<SpriteMesh_Mana
 	public int cv3;
 	public int cv4;
 
-	public void SetBuffers(Vector3[] vertices, Vector2[] uvs, Color[] cols)
+	public void SetBuffers(Vector3[] verts, Vector2[] uvs, Color[] cols)
 	{
-		meshVerts = vertices;
+		meshVerts = verts;
 		meshUVs = uvs;
 		meshColors = cols;
 	}
@@ -147,10 +147,17 @@ public class SpriteMesh_Managed : ISpriteMesh, IEZLinkedListItem<SpriteMesh_Mana
 
 	public virtual void UpdateVerts()
 	{
-		meshVerts[mv1] = vertices[0];
-		meshVerts[mv2] = vertices[1];
-		meshVerts[mv3] = vertices[2];
-		meshVerts[mv4] = vertices[3];
+		// Only update our vertices if we
+		// aren't hidden since we hide
+		// managed sprites by keeping the
+		// vertices at 0,0,0:
+		if (hidden)
+			return;
+
+		meshVerts[mv1] = m_vertices[0];
+		meshVerts[mv2] = m_vertices[1];
+		meshVerts[mv3] = m_vertices[2];
+		meshVerts[mv4] = m_vertices[3];
 
 		m_manager.UpdatePositions();
 	}
@@ -177,18 +184,18 @@ public class SpriteMesh_Managed : ISpriteMesh, IEZLinkedListItem<SpriteMesh_Mana
 
 	public virtual void Hide(bool tf)
 	{
-		hidden = tf;
-
-		if (hidden)
+		if (tf)
 		{
-			vertices[0] = Vector3.zero;
-			vertices[1] = Vector3.zero;
-			vertices[2] = Vector3.zero;
-			vertices[3] = Vector3.zero;
+			m_vertices[0] = Vector3.zero;
+			m_vertices[1] = Vector3.zero;
+			m_vertices[2] = Vector3.zero;
+			m_vertices[3] = Vector3.zero;
 			UpdateVerts();
+			hidden = tf; // Assign after so that UpdateVerts() will run.
 		}
 		else
 		{
+			hidden = tf;
 			if (m_sprite.pixelPerfect)
 				m_sprite.CalcSize();
 			else

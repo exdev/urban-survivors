@@ -16,6 +16,9 @@ using System.Collections;
 [AddComponentMenu("EZ GUI/Controls/List Item")]
 public class UIListItem : UIButton, IUIListObject
 {
+	[HideInInspector]
+	public bool activeOnlyWhenSelected = true;
+
 	// Index of the item in the list
 	protected int m_index;
 
@@ -72,7 +75,7 @@ public class UIListItem : UIButton, IUIListObject
 	}
 
 
-	public override void OnInput(POINTER_INFO ptr)
+	public override void OnInput(ref POINTER_INFO ptr)
 	{
 		if (!m_controlIsEnabled /*|| IsHidden()*/)
 		{
@@ -109,6 +112,8 @@ public class UIListItem : UIButton, IUIListObject
 			if (ptr.evt == POINTER_INFO.INPUT_EVENT.TAP)
 				ptr.evt = POINTER_INFO.INPUT_EVENT.RELEASE;
 		}
+		else
+			ptr.isTap = true;
 
 
 		if (inputDelegate != null)
@@ -138,11 +143,12 @@ public class UIListItem : UIButton, IUIListObject
 						SetControlState(CONTROL_STATE.NORMAL);
 					list.ListDragged(ptr);
 				}
-				else
+				else if(!activeOnlyWhenSelected)
 					SetControlState(CONTROL_STATE.ACTIVE);
 				break;
 			case POINTER_INFO.INPUT_EVENT.PRESS:
-				SetControlState(CONTROL_STATE.ACTIVE);
+				if(!activeOnlyWhenSelected)
+					SetControlState(CONTROL_STATE.ACTIVE);
 				break;
 			case POINTER_INFO.INPUT_EVENT.TAP:
 				// Tell our list we were selected:
@@ -189,6 +195,18 @@ public class UIListItem : UIButton, IUIListObject
 			changeDelegate(this);
 	}
 
+	protected override void OnDisable()
+	{
+		// First, save our state as it will get changed
+		// in UIButton's implementation:
+		CONTROL_STATE oldState = controlState;
+
+		base.OnDisable();
+
+		// Now restore our previous state:
+		SetControlState(oldState);
+	}
+
 	public override void Copy(SpriteRoot s)
 	{
 		Copy(s, ControlCopyFlags.All);
@@ -227,6 +245,11 @@ public class UIListItem : UIButton, IUIListObject
 		{
 			base.Text = value;
 			FindOuterEdges();
+			
+			// Inform the list we may have been resized,
+			// so it needs to reposition items:
+			if (spriteText.maxWidth > 0 && list != null)
+				list.PositionItems();
 		}
 	}
 

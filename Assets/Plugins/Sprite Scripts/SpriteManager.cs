@@ -31,7 +31,7 @@ public class SpriteManager : MonoBehaviour
 	/// Determines which side of the sprite is 
 	/// considered by the renderer to be the "front".
 	/// </summary>
-	public SpriteRoot.WINDING_ORDER winding;
+	public SpriteRoot.WINDING_ORDER winding = SpriteRoot.WINDING_ORDER.CW;
 
 	/// <summary>
 	/// How many sprites to allocate at a time 
@@ -79,7 +79,7 @@ public class SpriteManager : MonoBehaviour
 	protected SpriteDrawLayerComparer drawOrderComparer = new SpriteDrawLayerComparer(); // Used to sort our draw order array
 	protected float boundUpdateInterval;	// Interval, in seconds, to update the mesh bounds
 
-	protected EZLinkedList<SpriteRoot> spriteAddQueue; // List of sprites to be added that we have accumilated before initialization
+	protected List<SpriteRoot> spriteAddQueue; // List of sprites to be added that we have accumilated before initialization
 
 	protected SkinnedMeshRenderer meshRenderer;
 	protected Mesh mesh;					// Reference to our mesh (contained in the SkinnedMeshRenderer)
@@ -185,7 +185,7 @@ public class SpriteManager : MonoBehaviour
 	void Awake()
 	{
 		if (spriteAddQueue == null)
-			spriteAddQueue = new EZLinkedList<SpriteRoot>();
+			spriteAddQueue = new List<SpriteRoot>();
 		
 		// Make sure the manager is centered:
 		//transform.position = Vector3.zero;
@@ -217,13 +217,8 @@ public class SpriteManager : MonoBehaviour
 		initialized = true;
 
 		// Now process any outstanding sprite additions:
-		if(spriteAddQueue.Rewind())
-		{
-			do
-			{
-				AddSprite(spriteAddQueue.Current);
-			} while (spriteAddQueue.MoveNext());
-		}
+		for(int i=0; i<spriteAddQueue.Count; ++i)
+			AddSprite(spriteAddQueue[i]);
 	}
 
 	// Allocates initial arrays
@@ -449,7 +444,7 @@ public class SpriteManager : MonoBehaviour
 		if(!initialized)
 		{
 			if (spriteAddQueue == null)
-				spriteAddQueue = new EZLinkedList<SpriteRoot>();
+				spriteAddQueue = new List<SpriteRoot>();
 
 			spriteAddQueue.Add(sprite);
 			return null;
@@ -579,7 +574,8 @@ public class SpriteManager : MonoBehaviour
 			activeBlocks.Remove(sprite);
 
 		// Reset the bone:
-		bones[sprite.index] = transform;
+		if (gameObject != null)
+			bones[sprite.index] = transform;
 
 		// Clean the sprite's settings:
 		sprite.Clear();

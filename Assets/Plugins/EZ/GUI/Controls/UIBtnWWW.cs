@@ -19,9 +19,9 @@ public class UIBtnWWW : UIButton
 	/// </summary>
 	public string URL;
 
-	public override void OnInput(POINTER_INFO ptr)
+	public override void OnInput(ref POINTER_INFO ptr)
 	{
-		base.OnInput(ptr);
+		base.OnInput(ref ptr);
 
 		if (!m_controlIsEnabled || IsHidden())
 		{

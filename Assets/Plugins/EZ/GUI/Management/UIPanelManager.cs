@@ -118,19 +118,24 @@ public class UIPanelManager : MonoBehaviour, IUIContainer
 
 
 	/// <summary>
-	/// The default panel to show at the start of a menu
+	/// The panel to show at the start of a menu
 	/// sequence.  This value overrides the indexing order
-	/// in that the menu will begin at the defaultPanel
+	/// in that the menu will begin at the initialPanel
 	/// and then move from there based on index order
 	/// (if using anonymous menu navigation).
+	/// </summary>
+	public UIPanelBase initialPanel;
+
+	/// <summary>
+	/// Deprecated. Use initialPanel instead.
 	/// </summary>
 	public UIPanelBase defaultPanel;
 
 	/// <summary>
-	/// When true, all but the default panel will be
+	/// When true, all but the initial panel will be
 	/// disabled at start.
 	/// </summary>
-	public bool deactivateNonDefaultAtStart = false;
+	public bool deactivateAllButInitialAtStart = false;
 
 	/// <summary>
 	/// When true, the internal navigation logic of the
@@ -230,22 +235,25 @@ public class UIPanelManager : MonoBehaviour, IUIContainer
 	{
 		if (m_instance == null)
 			m_instance = this;
+
+		if(defaultPanel != null && initialPanel == null)
+			initialPanel = defaultPanel;
 	}
 
 	IEnumerator Start()
 	{
 		ScanChildren();
 
-		if (defaultPanel != null)
+		if (initialPanel != null)
 		{
-			curPanel = defaultPanel;
+			curPanel = initialPanel;
 			breadcrumbs.Add(curPanel);
 		}
 
 		if (circular)
 			linearNavigation = true;
 
-		if(deactivateNonDefaultAtStart)
+		if(deactivateAllButInitialAtStart)
 		{
 			// Wait a frame so the contents of the panels
 			// are done Start()'ing, or else we'll get
@@ -253,7 +261,7 @@ public class UIPanelManager : MonoBehaviour, IUIContainer
 			yield return null;
 
 			for (int i = 0; i<panels.Count; ++i)
-				if (panels[i] != defaultPanel && panels[i] != curPanel)
+				if (panels[i] != initialPanel && panels[i] != curPanel)
 					panels[i].gameObject.SetActiveRecursively(false);
 		}
 	}
@@ -341,7 +349,7 @@ public class UIPanelManager : MonoBehaviour, IUIContainer
 		curPanel = panels[index];
 		breadcrumbs.Add(curPanel);
 
-		if (deactivateNonDefaultAtStart && !curPanel.gameObject.active)
+		if (deactivateAllButInitialAtStart && !curPanel.gameObject.active)
 		{
 			curPanel.Start();
 			curPanel.gameObject.SetActiveRecursively(true);
@@ -409,7 +417,7 @@ public class UIPanelManager : MonoBehaviour, IUIContainer
 				curPanel = breadcrumbs[breadcrumbs.Count-1];
 			if (curPanel != null)
 			{
-				if (deactivateNonDefaultAtStart && !curPanel.gameObject.active)
+				if (deactivateAllButInitialAtStart && !curPanel.gameObject.active)
 				{
 					curPanel.Start();
 					curPanel.gameObject.SetActiveRecursively(true);
@@ -458,7 +466,7 @@ public class UIPanelManager : MonoBehaviour, IUIContainer
 			--index;
 			curPanel = panels[index];
 
-			if (deactivateNonDefaultAtStart && !curPanel.gameObject.active)
+			if (deactivateAllButInitialAtStart && !curPanel.gameObject.active)
 			{
 				curPanel.Start();
 				curPanel.gameObject.SetActiveRecursively(true);
@@ -518,12 +526,61 @@ public class UIPanelManager : MonoBehaviour, IUIContainer
 		// Bring in the next panel:
 		curPanel = panel;
 		breadcrumbs.Add(curPanel);
-		if (deactivateNonDefaultAtStart && !curPanel.gameObject.active)
+		if (deactivateAllButInitialAtStart && !curPanel.gameObject.active)
 		{
 			curPanel.Start();
 			curPanel.gameObject.SetActiveRecursively(true);
 		}
 		curPanel.StartTransition(bringInMode);
+	}
+
+
+	/// <summary>
+	/// Same as BringIn(...), but skips the panel's transition, fast-forwarding
+	/// it instantly to its end state.  See the corresponding BringIn() entry for more details.
+	/// </summary>
+	/// <param name="panel">Reference to the panel to bring up.</param>
+	/// <param name="dir">Direction the menu should appear to be moving.
+	/// If "Auto" is specified, the direction is determined by comparing
+	/// the index of the current panel to the one being brought up.</param>
+	public void BringInImmediate(UIPanelBase panel, MENU_DIRECTION dir)
+	{
+		UIPanelBase prevPanel = curPanel;
+		EZTransition trans;
+
+		// Get the transition directions:
+		if(dir == MENU_DIRECTION.Auto)
+		{
+			// See if we can determine the direction:
+			if (curPanel != null)
+			{
+				// Forward
+				if (curPanel.index <= panel.index)
+					dir = MENU_DIRECTION.Forwards;
+				else // Backward
+					dir = MENU_DIRECTION.Backwards;
+			}
+			else // Assume forward:
+				dir = MENU_DIRECTION.Forwards;
+		}
+
+		SHOW_MODE dismissMode = ( (dir == MENU_DIRECTION.Forwards) ? (SHOW_MODE.DismissForward) : (SHOW_MODE.DismissBack) );
+		SHOW_MODE bringInMode = ((dir == MENU_DIRECTION.Forwards) ? (SHOW_MODE.BringInForward) : (SHOW_MODE.BringInBack));
+
+		// Do the bring-in:
+		BringIn(panel, dir);
+
+		// End the transitions early:
+		if(prevPanel != null)
+		{
+			trans = prevPanel.GetTransition(dismissMode);
+			trans.End();
+		}
+		if(curPanel != null)
+		{
+			trans = curPanel.GetTransition(bringInMode);
+			trans.End();
+		}
 	}
 
 	/// <summary>
@@ -542,9 +599,9 @@ public class UIPanelManager : MonoBehaviour, IUIContainer
 	{
 		UIPanelBase panel = null;
 
-		for(int i=0; i<panels.Count; ++i)
+		for (int i = 0; i < panels.Count; ++i)
 		{
-			if(string.Equals(panels[i].name, panelName, System.StringComparison.CurrentCultureIgnoreCase))
+			if (string.Equals(panels[i].name, panelName, System.StringComparison.CurrentCultureIgnoreCase))
 			{
 				panel = panels[i];
 				break;
@@ -627,6 +684,93 @@ public class UIPanelManager : MonoBehaviour, IUIContainer
 	}
 
 	/// <summary>
+	/// Same as BringIn(...), but skips the panel's transition, fast-forwarding
+	/// it instantly to its end state.  See the corresponding BringIn() entry for more details.
+	/// </summary>
+	/// <param name="panelName">Name of the panel to bring up.</param>
+	/// <param name="dir">Direction the menu should appear to be moving.
+	/// If "Auto" is specified, the direction is determined by comparing
+	/// the index of the current panel to the one being brought up.</param>
+	public void BringInImmediate(string panelName, MENU_DIRECTION dir)
+	{
+		UIPanelBase panel = null;
+
+		for (int i = 0; i < panels.Count; ++i)
+		{
+			if (string.Equals(panels[i].name, panelName, System.StringComparison.CurrentCultureIgnoreCase))
+			{
+				panel = panels[i];
+				break;
+			}
+		}
+
+		if (panel != null)
+			BringInImmediate(panel, dir);
+	}
+
+	/// <summary>
+	/// Same as BringIn(...), but skips the panel's transition, fast-forwarding
+	/// it instantly to its end state.  See the corresponding BringIn() entry for more details.
+	/// </summary>
+	/// <param name="panel">Reference to the panel to bring up.</param>
+	public void BringInImmediate(UIPanelBase panel)
+	{
+		BringInImmediate(panel, MENU_DIRECTION.Auto);
+	}
+
+	/// <summary>
+	/// Same as BringIn(...), but skips the panel's transition, fast-forwarding
+	/// it instantly to its end state.  See the corresponding BringIn() entry for more details.
+	/// </summary>
+	/// <param name="panelName">Name of the panel to bring up.</param>
+	public void BringInImmediate(string panelName)
+	{
+		BringInImmediate(panelName, MENU_DIRECTION.Auto);
+	}
+
+	/// <summary>
+	/// Same as BringIn(...), but skips the panel's transition, fast-forwarding
+	/// it instantly to its end state.  See the corresponding BringIn() entry for more details.
+	/// </summary>
+	/// <param name="panelIndex">Index of the panel.</param>
+	public void BringInImmediate(int panelIndex)
+	{
+		for (int i = 0; i < panels.Count; ++i)
+		{
+			if (panels[i].index == panelIndex)
+			{
+				BringInImmediate(panels[i]);
+				return;
+			}
+		}
+
+		Debug.LogWarning("No panel found with index value of " + panelIndex);
+	}
+
+	/// <summary>
+	/// Same as BringIn(...), but skips the panel's transition, fast-forwarding
+	/// it instantly to its end state.  See the corresponding BringIn() entry for more details.
+	/// </summary>
+	/// <param name="panelIndex">Index of the panel to bring in.</param>
+	/// <param name="dir">Direction the menu should appear to be moving.
+	/// If "Auto" is specified, the direction is determined by comparing
+	/// the index of the current panel to the one being brought up.</param>
+	public void BringInImmediate(int panelIndex, MENU_DIRECTION dir)
+	{
+		for (int i = 0; i < panels.Count; ++i)
+		{
+			if (panels[i].index == panelIndex)
+			{
+				BringInImmediate(panels[i], dir);
+				return;
+			}
+		}
+
+		Debug.LogWarning("No panel found with index value of " + panelIndex);
+	}
+
+
+	/// <summary>
 	/// Dismisses the currently showing panel, if any,
 	/// in the direction specified.
 	/// </summary>
@@ -657,6 +801,37 @@ public class UIPanelManager : MonoBehaviour, IUIContainer
 	public void Dismiss()
 	{
 		Dismiss(MENU_DIRECTION.Auto);
+	}
+
+	/// <summary>
+	/// Same as Dismiss(...), but skips the panel's transition, fast-forwarding
+	/// it instantly to its end state.  See the corresponding Dismiss() entry for more details.
+	/// </summary>
+	/// <param name="dir">The direction in which the panel is to be dismissed.</param>
+	public void DismissImmediate(MENU_DIRECTION dir)
+	{
+		if (dir == MENU_DIRECTION.Auto)
+			dir = MENU_DIRECTION.Backwards;
+
+		SHOW_MODE mode = ((dir == MENU_DIRECTION.Forwards) ? (SHOW_MODE.DismissForward) : (SHOW_MODE.DismissBack));
+
+		UIPanelBase prevPanel = curPanel;
+
+		Dismiss(dir);
+
+		if(prevPanel != null)
+		{
+			prevPanel.GetTransition(mode).End();
+		}
+	}
+
+	/// <summary>
+	/// Same as Dismiss(...), but skips the panel's transition, fast-forwarding
+	/// it instantly to its end state.  See the corresponding Dismiss() entry for more details.
+	/// </summary>
+	public void DismissImmediate()
+	{
+		DismissImmediate(MENU_DIRECTION.Auto);
 	}
 
 
@@ -715,23 +890,32 @@ public class UIPanelManager : MonoBehaviour, IUIContainer
 	}
 
 	public bool GotFocus() { return false; }
-	public void LostFocus() { }
-	public string GetInputText(ref KEYBOARD_INFO info) { return null; }
-	public string SetInputText(string text, ref int insert) { return null; }
 
 	protected EZInputDelegate inputDelegate;
 	protected EZValueChangedDelegate changeDelegate;
-	public virtual EZInputDelegate SetInputDelegate(EZInputDelegate del)
+	public virtual void SetInputDelegate(EZInputDelegate del)
 	{
-		EZInputDelegate oldDel = inputDelegate;
 		inputDelegate = del;
-		return oldDel;
 	}
-	public virtual EZValueChangedDelegate SetValueChangedDelegate(EZValueChangedDelegate del)
+	public virtual void AddInputDelegate(EZInputDelegate del)
 	{
-		EZValueChangedDelegate oldDel = changeDelegate;
+		inputDelegate += del;
+	}
+	public virtual void RemoveInputDelegate(EZInputDelegate del)
+	{
+		inputDelegate -= del;
+	}
+	public virtual void SetValueChangedDelegate(EZValueChangedDelegate del)
+	{
 		changeDelegate = del;
-		return oldDel;
+	}
+	public virtual void AddValueChangedDelegate(EZValueChangedDelegate del)
+	{
+		changeDelegate += del;
+	}
+	public virtual void RemoveValueChangedDelegate(EZValueChangedDelegate del)
+	{
+		changeDelegate -= del;
 	}
 
 	public virtual void OnInput(POINTER_INFO ptr) { }

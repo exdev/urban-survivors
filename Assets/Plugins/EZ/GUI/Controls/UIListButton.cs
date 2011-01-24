@@ -16,7 +16,7 @@ using System.Collections;
 [AddComponentMenu("EZ GUI/Controls/List Button")]
 public class UIListButton : UIListItem
 {
-	public override void OnInput(POINTER_INFO ptr)
+	public override void OnInput(ref POINTER_INFO ptr)
 	{
 		if (!m_controlIsEnabled /*|| IsHidden()*/)
 		{
@@ -53,7 +53,8 @@ public class UIListButton : UIListItem
 			if (ptr.evt == POINTER_INFO.INPUT_EVENT.TAP)
 				ptr.evt = POINTER_INFO.INPUT_EVENT.RELEASE;
 		}
-
+		else
+			ptr.isTap = true;
 
 		if (inputDelegate != null)
 			inputDelegate(ref ptr);

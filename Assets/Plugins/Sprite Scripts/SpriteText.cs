@@ -3,6 +3,8 @@
 //	All rights reserved
 //-----------------------------------------------------------------
 
+// Screen-space positioning, ALPHA, subject to change
+#define SCREEN_SPACE_POSITIONING
 #define WARN_ON_NO_MATERIAL
 
 
@@ -165,13 +167,106 @@ public class SpriteText : MonoBehaviour
 	/// from the string.  NOTE: Using this on large amounts 
 	/// of text may have an adverse impact on performance.
 	/// </summary>
-	public bool removeUnsupportedCharacters = false;
+	public bool removeUnsupportedCharacters = true;
 
 	/// <summary>
 	/// If set to false, color tags will not be parsed out
 	/// of the text.
 	/// </summary>
 	public bool parseColorTags = true;
+
+	/// <summary>
+	/// When set to true, all text in this control will
+	/// be masked using the specified maskingCharacter.
+	/// </summary>
+	public bool password = false;
+
+	/// <summary>
+	/// Holds the character to be used to mask password
+	/// text.  Defaults to asterisk (*).
+	/// </summary>
+	public string maskingCharacter = "*";
+
+#if SCREEN_SPACE_POSITIONING
+
+	/// <summary>
+	/// Specifies what the object will be aligned relative to on the horizontal axis.
+	/// </summary>
+	public enum HORIZONTAL_ALIGN
+	{
+		/// <summary>
+		/// The object will not be repositioned along the X axis.
+		/// </summary>
+		NONE,
+
+		/// <summary>
+		/// The X coordinate of screenPos will be interpreted as the number of pixels from the left edge of the screen.
+		/// </summary>
+		LEFT,
+
+		/// <summary>
+		/// The X coordinate of screenPos will be interpreted as the number of pixels from the right edge of the screen.
+		/// </summary>
+		RIGHT,
+
+		/// <summary>
+		/// The X coordinate of screenPos will be interpreted as the number of pixels from the center of the screen.
+		/// </summary>
+		CENTER
+	}
+
+	/// <summary>
+	/// Specifies what the object will be aligned relative to on the vertical axis.
+	/// </summary>
+	public enum VERTICAL_ALIGN
+	{
+		/// <summary>
+		/// The object will not be repositioned along the Y axis.
+		/// </summary>
+		NONE,
+
+		/// <summary>
+		/// The Y coordinate of screenPos will be interpreted as the number of pixels from the top edge of the screen.
+		/// </summary>
+		TOP,
+
+		/// <summary>
+		/// The Y coordinate of screenPos will be interpreted as the number of pixels from the bottom edge of the screen.
+		/// </summary>
+		BOTTOM,
+
+		/// <summary>
+		/// The Y coordinate of screenPos will be interpreted as the number of pixels from the center of the screen.
+		/// </summary>
+		CENTER
+	}
+	
+	[System.Serializable]
+	public class RelativeTo
+	{
+		public HORIZONTAL_ALIGN horizontal = HORIZONTAL_ALIGN.LEFT;
+		public VERTICAL_ALIGN vertical = VERTICAL_ALIGN.TOP;
+
+		public bool Equals(RelativeTo rt)
+		{
+			if (rt == null)
+				return false;
+			return (horizontal == rt.horizontal && vertical == rt.vertical);
+		}
+		public void Copy(RelativeTo rt)
+		{
+			if (rt == null)
+				return;
+			horizontal = rt.horizontal;
+			vertical = rt.vertical;
+		}
+	}
+
+	public bool positionInScreenSpace = false;
+	public Vector3 screenPos = Vector3.forward;
+	public RelativeTo relativeToScreen = new RelativeTo();
+#endif
+
 
 	// Reference to a possible parent control
 	IControl parentControl;
@@ -198,6 +293,7 @@ public class SpriteText : MonoBehaviour
 	[HideInInspector]
 	public bool isClone = false;				// Set this to true when the SpriteText object has been instantiated from another SpriteText in the scene.
 	protected bool m_started = false;			// Lets us detect whether Start() has yet been called.
+	protected bool stringContentChanged = true;	// Gets set to true when a string value is assigned.
 
 
 	// Vars that make pixel-perfect sizing and
@@ -215,7 +311,14 @@ public class SpriteText : MonoBehaviour
 	/// <summary>
 	/// Whether the text will be hidden when it starts.
 	/// </summary>
-	public bool hidden = false;
+	public bool hideAtStart = false;
+
+	// Will tell us if we INTEND for the sprite to be hidden,
+	// so that if the mesh renderer happens to be incidentally
+	// disabled, such as on a prefab that is uninstantiated,
+	// we don't mistake that for being hidden.
+	// We set this when we intentionally hide the sprite.
+	protected bool m_hidden = false;
 
 	/// <summary>
 	/// This must be set to true at design time for the object to survive loading a new level.
@@ -234,6 +337,9 @@ public class SpriteText : MonoBehaviour
 	protected string displayString = "";
 	// Places **in the plain text** where newlines have been inserted for word-wrapping purposes.
 	protected List<NewlineInsertInfo> newLineInserts = new List<NewlineInsertInfo>();
+	
+	// Holds the current total width of the text (widest line, in local units).
+	protected float totalWidth;
 
 	// The SpriteFont itself
 	protected SpriteFont spriteFont;
@@ -259,6 +365,7 @@ public class SpriteText : MonoBehaviour
 	List<int> colorInserts = new List<int>();
 	List<int> colorTags = new List<int>();
 	List<Color> cols = new List<Color>();
+	string[] lines;
 
 
 
@@ -454,6 +561,11 @@ public class SpriteText : MonoBehaviour
 			} while (tagIdx != -1);
 		}
 
+		
+		// Make sure we have a masking character:
+		if (maskingCharacter.Length < 1)
+			maskingCharacter = "*";
+
 
 		// If there were no tags, just set the text:
 		if(colorTags.Count < 1)
@@ -468,15 +580,22 @@ public class SpriteText : MonoBehaviour
 
 				for(int i=0; i<str.Length; ++i)
 				{
-					if (char.IsWhiteSpace(str[i]) && str[i] != '\n')
+					if (char.IsWhiteSpace(str[i]))
 					{
+						// If it's a newline, reset our space left:
+						if (str[i] == '\n')
+							spaceLeft = maxWidth;
+
 						lastWhiteSpace = displaySB.Length;
 						lastPlainWhiteSpace = i;
 					}
 
-					displaySB.Append(str[i]);
+					if (password && str[i] != '\n')
+						displaySB.Append(maskingCharacter[0]);
+					else
+						displaySB.Append(str[i]);
 
-					if (i != lastPlainWhiteSpace+1)
+					if (i != lastPlainWhiteSpace+1 && i > 0)
 						spaceLeft -= spriteFont.GetWidth(str[i - 1], str[i]) * worldUnitsPerTexel;
 					else
 						spaceLeft -= spriteFont.GetSpriteChar(str[i]).xAdvance * worldUnitsPerTexel;
@@ -585,16 +704,24 @@ public class SpriteText : MonoBehaviour
 				// See if we're word-wrapping:
 				if(maxWidth > 0)
 				{
-					if (char.IsWhiteSpace(str[strOffset]) && str[strOffset] != '\n')
+					if (char.IsWhiteSpace(str[strOffset]))
 					{
+						// If it's a newline, reset our space left:
+						if (str[strOffset] == '\n')
+							spaceLeft = maxWidth;
+
 						lastWhiteSpace = displaySB.Length;
 						lastPlainWhiteSpace = strOffset;
 					}
 
-					displaySB.Append(str[strOffset]);
+					if (password && str[strOffset] != '\n')
+						displaySB.Append(maskingCharacter[0]);
+					else
+						displaySB.Append(str[strOffset]);
+
 					plainSB.Append(str[strOffset]);
 
-					if (strOffset != lastPlainWhiteSpace+1)
+					if (strOffset != lastPlainWhiteSpace+1 && strOffset > 0)
 						spaceLeft -= spriteFont.GetWidth(str[strOffset - 1], str[strOffset]) * worldUnitsPerTexel;
 					else
 						spaceLeft -= spriteFont.GetSpriteChar(str[strOffset]).xAdvance * worldUnitsPerTexel;
@@ -778,11 +905,13 @@ public class SpriteText : MonoBehaviour
 		if (spriteFont == null)
 			return;
 
+		bool vertCountChanged = false;
+
 		// Only do a quick equality check if
 		// the strings involved are relatively
 		// short:
 		if(meshString.Length < 15 && !updateClipping && !updateColors)
-			if (meshString.Length == displayString.Length)
+			if (stringContentChanged)
 				if (meshString == displayString)
 					return;
 
@@ -795,10 +924,12 @@ public class SpriteText : MonoBehaviour
 		{
 			// See if we need to enlarge the mesh:
 			if (displayString.Length > capacity)
+			{
 				EnlargeMesh();
+				vertCountChanged = true;
+			}
 
 			// Get the number of lines:
-			string[] lines;
 //			int newLineIndex = 0;
 
 // 			while (newLineIndex != -1)
@@ -814,7 +945,9 @@ public class SpriteText : MonoBehaviour
 				localClipRect = Rect3D.MultFast(clippingRect, transform.worldToLocalMatrix).GetRect();
 			}
 
-			lines = displayString.Split(new char[] { '\n' });
+			// See if our string content has changed:
+			if(stringContentChanged)
+				lines = displayString.Split(new char[] { '\n' });
 
 			// See if we have only a single line:
 			if (lines.Length == 1)
@@ -839,6 +972,8 @@ public class SpriteText : MonoBehaviour
 			}
 		}
 
+		stringContentChanged = false;
+
 
 
 
@@ -849,7 +984,8 @@ public class SpriteText : MonoBehaviour
 		mesh.uv = UVs;
 		mesh.colors = meshColors;
 		mesh.triangles = faces;
-		mesh.RecalculateNormals();
+		if(vertCountChanged)
+			mesh.RecalculateNormals();
 		mesh.RecalculateBounds();
 
 		// Inform our control it needs to update itself:
@@ -912,20 +1048,27 @@ public class SpriteText : MonoBehaviour
 	/// <param name="charLine">OUT: The 1-based line number on which the character 
 	/// at charIndex sits.</param>
 	/// <param name="lineStart">OUT: The index of the first character on the same line as the character at the specified index.</param>
+	/// <param name="lineEnd">OUT: The index of the last character on the same line as the character at the specified index (excludes ending newline character).</param>
 	/// <returns>The number of lines actually being displayed.</returns>
-	public int GetDisplayLineCount(int charIndex, out int charLine, out int lineStart)
+	public int GetDisplayLineCount(int charIndex, out int charLine, out int lineStart, out int lineEnd)
 	{
 		int count = 1;
 		int ci = 0;		// Our character index counter
-		charLine = 1;
+		charLine = -1;
 // 		int lastNewline = -1;
  		int curNewLine = -1;
 		lineStart = 0;
+		lineEnd = -1;
 
 		for (int i = 0; i < displayString.Length; ++i)
 		{
 			if (displayString[i] == '\n')
 			{
+				// See if this is the end of
+				// the character's line:
+				if (count == charLine)
+					lineEnd = Mathf.Max(0, i - 1);
+
 // 				lastNewline = curNewLine;
  				curNewLine = i;
 //				lineStart = i + 1;
@@ -935,7 +1078,7 @@ public class SpriteText : MonoBehaviour
 			if (ci == charIndex)
 			{
 				charLine = count;
-				lineStart = curNewLine+1;
+				lineStart = curNewLine + 1;
 
 				// If our index is on a newline, use the
 				// start position of the previous line:
@@ -952,6 +1095,15 @@ public class SpriteText : MonoBehaviour
 			++ci;
 		}
 
+		// See if we ever set lineEnd:
+		if (lineEnd < 0)
+			lineEnd = displayString.Length - 1;
+		if (charLine < 0)
+		{
+			charLine = count;
+			lineStart = Mathf.Min(displayString.Length-1, curNewLine + 1);
+		}
+
 		return count;
 	}
 
@@ -962,10 +1114,11 @@ public class SpriteText : MonoBehaviour
 	/// used, the number of actual lines displayed may be more
 	/// than the number of lines in the actual string.
 	/// </summary>
-	/// <returns>The number of lines actually being displayed.</returns>
+	/// <returns>The number of lines actually being displayed.
+	/// NOTE: This value will never be less than 1.</returns>
 	public int GetDisplayLineCount()
 	{
-		int count = 0;
+		int count = 1;
 		for (int i = 0; i < displayString.Length; ++i)
 			if (displayString[i] == '\n')
 				++count;
@@ -1039,6 +1192,8 @@ public class SpriteText : MonoBehaviour
 		float baseHeight = ((float)spriteFont.PixelSize) * worldUnitsPerTexel;
 		float width = spriteFont.GetWidth(displayString) * worldUnitsPerTexel;
 
+		totalWidth = width;
+
 		startPos = GetStartPos_SingleLine(baseHeight, width);
 
 		topLeft = startPos;
@@ -1082,6 +1237,8 @@ public class SpriteText : MonoBehaviour
 			if (largestWidth < widths[i])
 				largestWidth = widths[i];
 		}
+
+		totalWidth = largestWidth;
 
 		// Find the starting position
 		switch (anchor)
@@ -1354,7 +1511,67 @@ public class SpriteText : MonoBehaviour
 // 	public virtual void Clear()
 // 	{
 // 		SetColor(Color.white);
-// 	}
+	// 	}
+
+
+#if SCREEN_SPACE_POSITIONING
+	/// <summary>
+	/// Repositions the object using the existing screen-space settings.
+	/// </summary>
+	public void PositionOnScreen()
+	{
+		if (positionInScreenSpace)
+			PositionOnScreen(screenPos);
+	}
+
+	/// <summary>
+	/// Positions the object using screen coordinates, according to
+	/// the relativity settings stored in relativeToScreen.
+	/// </summary>
+	/// <param name="x">The number of pixels in the X axis relative to the position specified in relativeToScreen.</param>
+	/// <param name="y">The number of pixels in the Y axis relative to the position specified in relativeToScreen.</param>
+	/// <param name="depth">The distance the object should be in front of the camera.</param>
+	public void PositionOnScreen(int x, int y, float depth)
+	{
+		PositionOnScreen(new Vector3((float)x, (float)y, depth));
+	}
+
+	/// <summary>
+	/// Positions the object using screen coordinates, according to
+	/// the relativity settings stored in relativeToScreen.
+	/// </summary>
+	/// <param name="pos">The X and Y screen coordinates where the object should be positioned, as well as the Z coordinate which represents the distance in front of the camera.</param>
+	public void PositionOnScreen(Vector3 pos)
+	{
+		if (renderCamera == null)
+		{
+			Debug.LogError("Render camera not yet assigned to SpriteText \"" + name + "\" when attempting to call PositionOnScreen()");
+			return;
+		}
+
+		positionInScreenSpace = true;
+
+		screenPos = pos;
+
+		Vector3 curPos = renderCamera.WorldToScreenPoint(transform.position);
+
+		if (relativeToScreen.horizontal == HORIZONTAL_ALIGN.RIGHT)
+			pos.x = screenSize.x - pos.x;
+		else if (relativeToScreen.horizontal == HORIZONTAL_ALIGN.CENTER)
+			pos.x = screenSize.x * 0.5f + pos.x;
+		else if (relativeToScreen.horizontal == HORIZONTAL_ALIGN.NONE)
+			pos.x = curPos.x;
+
+		if (relativeToScreen.vertical == VERTICAL_ALIGN.TOP)
+			pos.y = screenSize.y - pos.y;
+		else if (relativeToScreen.vertical == VERTICAL_ALIGN.CENTER)
+			pos.y = screenSize.y * 0.5f + pos.y;
+		else if (relativeToScreen.vertical == VERTICAL_ALIGN.NONE)
+			pos.y = curPos.y;
+
+		transform.position = renderCamera.ScreenToWorldPoint(pos);
+	}
+#endif
 
 
 	/// <summary>
@@ -1435,8 +1652,9 @@ public class SpriteText : MonoBehaviour
 		pixelPerfect = s.pixelPerfect;
 		dynamicLength = s.dynamicLength;
 		SetCamera(s.renderCamera);
-		hidden = s.hidden;
-		Hide(hidden);
+		hideAtStart = s.hideAtStart;
+		m_hidden = s.m_hidden;
+		Hide(m_hidden);
 	}
 
 
@@ -1460,6 +1678,16 @@ public class SpriteText : MonoBehaviour
 		UpdateMesh();
 	}
 
+	// Re-lays out text when something has changed that may
+	// affect the text's layout.
+	protected void LayoutText()
+	{
+		stringContentChanged = true;
+
+		ProcessString(text);
+		UpdateMesh();
+	}
+
 
 	/// <summary>
 	/// Sets the text's color to the specified color.
@@ -1473,6 +1701,45 @@ public class SpriteText : MonoBehaviour
 
 		updateColors = true;
 		Text = text;
+	}
+
+
+	/// <summary>
+	/// Sets the size (height) of the text such that a
+	/// capital character that extends from the baseline
+	/// to the absolute top of the line will be the
+	/// specified height in world units.  All other
+	/// characters will be sized proportionately.
+	/// If called while set to pixel perfect, pixel-perfect
+	/// will be automatically disabled.
+	/// </summary>
+	/// <param name="size">The size of a full-height character, in world units.</param>
+	public void SetCharacterSize(float size)
+	{
+		if (spriteFont == null)
+			return;
+
+		pixelPerfect = false;
+		characterSize = size;
+		SetPixelToUV(texture);
+		lineSpaceSize = lineSpacing * spriteFont.LineHeight * worldUnitsPerTexel;
+
+		LayoutText();
+	}
+
+	/// <summary>
+	/// Sets the spacing between lines as a percentage
+	/// of the character size.  i.e. a value of 1.1
+	/// means 10% of the height of a full-height character
+	/// will be placed between lines.
+	/// </summary>
+	/// <param name="spacing">Percentage of the line height to place between lines.</param>
+	public void SetLineSpacing(float spacing)
+	{
+		lineSpacing = spacing;
+		lineSpaceSize = lineSpacing * spriteFont.LineHeight * worldUnitsPerTexel;
+
+		LayoutText();
 	}
 
 
@@ -1495,8 +1762,11 @@ public class SpriteText : MonoBehaviour
 	{
 		spriteFont = newFont;
 		renderer.sharedMaterial = fontMaterial;
+		texture = fontMaterial.GetTexture("_MainTex");
+		SetPixelToUV(texture);
 		lineSpaceSize = lineSpacing * spriteFont.LineHeight * worldUnitsPerTexel;
 		CalcSize();
+		LayoutText();
 	}
 
 
@@ -1552,24 +1822,34 @@ public class SpriteText : MonoBehaviour
 
 			renderCamera = c;
 
+#if SCREEN_SPACE_POSITIONING
+			if (positionInScreenSpace)
+				PositionOnScreen(screenPos);
+#endif
+
 			// Determine the world distance between two vertical
 			// screen pixels for this camera:
 			dist = nearPlane.GetDistanceToPoint(transform.position);
 			worldUnitsPerScreenPixel = Vector3.Distance(c.ScreenToWorldPoint(new Vector3(0, 1, dist)), c.ScreenToWorldPoint(new Vector3(0, 0, dist)));
 
-			if(!hidden)
+			if(!hideAtStart)
 				CalcSize();
 			return;
 		}
+
+		screenSize.x = c.pixelWidth;
+		screenSize.y = c.pixelHeight;
+		renderCamera = c;
+
+#if SCREEN_SPACE_POSITIONING
+		if (positionInScreenSpace)
+			PositionOnScreen(screenPos);
+#endif
 
 		// Determine the world distance between two vertical
 		// screen pixels for this camera:
 		dist = nearPlane.GetDistanceToPoint(transform.position);
 		worldUnitsPerScreenPixel = Vector3.Distance(c.ScreenToWorldPoint(new Vector3(0, 1, dist)), c.ScreenToWorldPoint(new Vector3(0, 0, dist)));
-
-		screenSize.x = c.pixelWidth;
-		screenSize.y = c.pixelHeight;
-		renderCamera = c;
 
 		CalcSize();
 	}
@@ -1581,6 +1861,7 @@ public class SpriteText : MonoBehaviour
 	/// <param name="tf">When true, the text is hidden, when false, the text will be displayed.</param>
 	public virtual void Hide(bool tf)
 	{
+		m_hidden = tf;
 		meshRenderer.enabled = !tf;
 	}
 
@@ -1591,7 +1872,7 @@ public class SpriteText : MonoBehaviour
 	/// <returns>True when hidden, false when set to be displayed.</returns>
 	public bool IsHidden()
 	{
-		return !meshRenderer.enabled;
+		return m_hidden;
 	}
 
 
@@ -1628,10 +1909,16 @@ public class SpriteText : MonoBehaviour
 		get { return text; }
 		set
 		{
-			if (removeUnsupportedCharacters && spriteFont != null)
+			if (spriteFont == null)
+				return;
+
+			stringContentChanged = true;
+
+			if (removeUnsupportedCharacters)
 				ProcessString(spriteFont.RemoveUnsupportedCharacters(value));
 			else
 				ProcessString(value);
+
 			UpdateMesh();
 		}
 	}
@@ -1713,11 +2000,11 @@ public class SpriteText : MonoBehaviour
 		// If the string is empty, return the start:
 		if(meshString.Length < 1)
 		{
-			float baseHeight = ((float)spriteFont.PixelSize) * worldUnitsPerTexel;
+			float baseHeight = ((float)spriteFont.BaseHeight) * worldUnitsPerTexel;
 			return transform.TransformPoint(GetStartPos_SingleLine(baseHeight, 0) - Vector3.up * baseHeight);
 		}
 
-		int numLines, lineNum, lineStart;
+		int numLines, lineNum, lineStart, lineEnd;
 		int leftSideOffset = 1;
 		float charX;
 
@@ -1725,18 +2012,71 @@ public class SpriteText : MonoBehaviour
 		if (charIndex >= meshString.Length)
 			leftSideOffset = 0;
 		
-		numLines = GetDisplayLineCount(charIndex, out lineNum, out lineStart);
+		numLines = GetDisplayLineCount(charIndex, out lineNum, out lineStart, out lineEnd);
 
 		// Clamp the character index:
-		charIndex = Mathf.Clamp(charIndex, 0, meshString.Length - 1);
-
-		GetDisplayLineCount(charIndex, out lineNum, out lineStart);
+		charIndex = Mathf.Min(charIndex, meshString.Length - 1);
 
 		// See if we should move to the end of the previous line:
 		if (charIndex < lineStart)
-			GetDisplayLineCount(charIndex-1, out lineNum, out lineStart);
+			GetDisplayLineCount(charIndex-1, out lineNum, out lineStart, out lineEnd);
 
 		charX = spriteFont.GetWidth(displayString, lineStart, charIndex - leftSideOffset) * worldUnitsPerTexel;
+
+		// Adjust for the anchor if necessary:
+		switch(anchor)
+		{
+			case Anchor_Pos.Upper_Center:
+			case Anchor_Pos.Middle_Center:
+			case Anchor_Pos.Lower_Center:
+				if(alignment == Alignment_Type.Left)
+				{
+					// Subtract half the total width:
+					charX -= totalWidth * 0.5f;
+				}
+				else if(alignment == Alignment_Type.Right)
+				{
+					// Not implemented...too weird to be a likely use case
+				}
+				else  // Subtract half the line width:
+					charX -= spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel * 0.5f;
+				break;
+
+			case Anchor_Pos.Upper_Left:
+			case Anchor_Pos.Middle_Left:
+			case Anchor_Pos.Lower_Left:
+				if(alignment == Alignment_Type.Center)
+				{
+					charX += (totalWidth * 0.5f) - (spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel * 0.5f);
+				}
+				else if(alignment == Alignment_Type.Right)
+				{
+					charX += totalWidth - (spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel);
+				}
+				else
+				{
+					// Do nothing...
+				}
+				break;
+
+			case Anchor_Pos.Upper_Right:
+			case Anchor_Pos.Middle_Right:
+			case Anchor_Pos.Lower_Right:
+				if(alignment == Alignment_Type.Center)
+				{
+					charX += (totalWidth * -0.5f) - (spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel * 0.5f);
+				}
+				else if(alignment == Alignment_Type.Left)
+				{
+					charX -= totalWidth;
+				}
+				else
+				{
+					charX += -1f * spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel;
+				}
+				break;
+		}
+
 		return transform.TransformPoint(charX, GetLineBaseline(numLines, lineNum), offsetZ);
 	}
 
@@ -1854,6 +2194,17 @@ public class SpriteText : MonoBehaviour
 	public void SetAnchor(Anchor_Pos a)
 	{
 		anchor = a;
+		LayoutText();
+	}
+
+	/// <summary>
+	/// Sets the alignment of the text (left, right, center).
+	/// </summary>
+	/// <param name="a">The alignment to use.</param>
+	public void SetAlignment(Alignment_Type a)
+	{
+		alignment = a;
+		LayoutText();
 	}
 
 	// Used internally by any parent control
@@ -1936,7 +2287,7 @@ public class SpriteText : MonoBehaviour
 	// Included to work around the Unity bug where Start() is not
 	// called when reintering edit mode if play lasts for longer 
 	// than 10 seconds:
-#if UNITY_3_1 && UNITY_EDITOR
+#if (UNITY_3_0 || UNITY_3_1) && UNITY_EDITOR
 	void Update() {}
 #endif
 
@@ -1977,6 +2328,7 @@ public class SpriteText : MonoBehaviour
 		// to see if something was changed:
 		if (mirror.DidChange(this))
 		{
+			stringContentChanged = true;
 			Init();
 			CalcSize();
 			mirror.Mirror(this);	// Update the mirror
@@ -2001,7 +2353,12 @@ public class SpriteTextMirror
 	public float maxWidth;
 	public bool pixelPerfect;
 	public Camera renderCamera;
-	public bool hidden;
+#if SCREEN_SPACE_POSITIONING
+	public bool positionInScreenSpace;
+	public Vector3 screenPos;
+	public SpriteText.RelativeTo relativeToScreen = new SpriteText.RelativeTo();
+#endif
+	public bool hideAtStart;
 	/*
 		public Vector3 pos;
 		public Vector3 scale;
@@ -2023,7 +2380,12 @@ public class SpriteTextMirror
 		maxWidth = s.maxWidth;
 		pixelPerfect = s.pixelPerfect;
 		renderCamera = s.renderCamera;
-		hidden = s.hidden;
+#if SCREEN_SPACE_POSITIONING
+		positionInScreenSpace = s.positionInScreenSpace;
+		screenPos = s.screenPos;
+		relativeToScreen.Copy(s.relativeToScreen);
+#endif
+		hideAtStart = s.hideAtStart;
 	}
 
 	// Validates certain settings:
@@ -2062,9 +2424,32 @@ public class SpriteTextMirror
 			return true;
 		if (s.renderCamera != renderCamera)
 			return true;
-		if (s.hidden != hidden)
+#if SCREEN_SPACE_POSITIONING
+		if (positionInScreenSpace != s.positionInScreenSpace)
 		{
-			s.Hide(s.hidden);
+			// Handle this ourselves
+			s.PositionOnScreen();
+			positionInScreenSpace = s.positionInScreenSpace;
+		}
+		if (screenPos != s.screenPos)
+		{
+			// Handle this ourselves
+			s.PositionOnScreen();
+			screenPos = s.screenPos;
+		}
+		if (!relativeToScreen.Equals(s.relativeToScreen))
+		{
+			if (s.positionInScreenSpace)
+			{
+				// Handle this ourselves
+				s.PositionOnScreen();
+				relativeToScreen.Copy(s.relativeToScreen);
+			}
+		}
+#endif
+		if (s.hideAtStart != hideAtStart)
+		{
+			s.Hide(s.hideAtStart);
 			return true;
 		}
 

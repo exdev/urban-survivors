@@ -12,7 +12,7 @@ using System.Collections;
 /// Class which allows single-line text input.
 /// </remarks>
 [AddComponentMenu("EZ GUI/Controls/Text Field")]
-public class UITextField : AutoSpriteControlBase
+public class UITextField : AutoSpriteControlBase, IKeyFocusable
 {
 	public override bool controlIsEnabled
 	{
@@ -84,6 +84,18 @@ public class UITextField : AutoSpriteControlBase
 	public bool multiline = false;
 
 	/// <summary>
+	/// When set to true, all text in this control will
+	/// be masked using the specified maskingCharacter.
+	/// </summary>
+	public bool password = false;
+
+	/// <summary>
+	/// Holds the character to be used to mask password
+	/// text.  Defaults to asterisk (*).
+	/// </summary>
+	public string maskingCharacter = "*";
+
+	/// <summary>
 	/// The size, in local units, of the caret sprite.
 	/// This can be left at default if using pixel-perfect.
 	/// </summary>
@@ -96,9 +108,10 @@ public class UITextField : AutoSpriteControlBase
 
 	/// <summary>
 	/// The distance, in local units, that the caret will be
-	/// offset from the text, along the Z-axis.
+	/// offset from the insertion point.  Defaults to 0,0,-0.1
+	/// to keep it from being hidden "behind" the text.
 	/// </summary>
-	public float caretZOffset = -0.1f;
+	public Vector3 caretOffset = new Vector3(0,0,-0.1f);
 
 #if UNITY_IPHONE || UNITY_ANDROID
 	/// <summary>
@@ -121,6 +134,24 @@ public class UITextField : AutoSpriteControlBase
 	/// </summary>
 	public bool alert;
 #endif
+
+	/// <summary>
+	/// Reference to the script component with the method
+	/// you wish to invoke when enter is pressed (if single-line),
+	/// or when "Done" is pressed on the iOS keyboard.
+	/// </summary>
+	public MonoBehaviour scriptWithMethodToInvoke;
+
+	/// <summary>
+	/// A string containing the name of the method to be invoked
+	/// when enter is pressed (if single-line), or when "Done" 
+	/// is pressed on the iOS keyboard.
+	/// </summary>
+	public string methodToInvoke;
+
+	// The delegate to be called when the user "commits"
+	// the content of the text field.
+	protected EZKeyboardCommitDelegate commitDelegate;
 
 	/// <summary>
 	/// Sound that will be played when the field receives keyboard input
@@ -161,11 +192,11 @@ public class UITextField : AutoSpriteControlBase
 	//---------------------------------------------------
 	// Input handling:
 	//---------------------------------------------------
-	public override void OnInput(POINTER_INFO ptr)
+	public override void OnInput(ref POINTER_INFO ptr)
 	{
 		if (!m_controlIsEnabled || IsHidden())
 		{
-			base.OnInput(ptr);
+			base.OnInput(ref ptr);
 			return;
 		}
 
@@ -180,7 +211,7 @@ public class UITextField : AutoSpriteControlBase
 				break;
 		}
 
-		base.OnInput(ptr);
+		base.OnInput(ref ptr);
 	}
 
 	public override void Copy(SpriteRoot s)
@@ -232,7 +263,7 @@ public class UITextField : AutoSpriteControlBase
 		return m_controlIsEnabled;
 	}
 
-	public override string GetInputText(ref KEYBOARD_INFO info)
+	public string GetInputText(ref KEYBOARD_INFO info)
 	{
 		info.insert = insert;
 #if UNITY_IPHONE
@@ -248,7 +279,7 @@ public class UITextField : AutoSpriteControlBase
 		return text;
 	}
 
-	public override string SetInputText(string inputText, ref int insertPt)
+	public string SetInputText(string inputText, ref int insertPt)
 	{
 		// Validate our input:
 		if(!multiline)
@@ -257,12 +288,12 @@ public class UITextField : AutoSpriteControlBase
 			// Check for Enter:
 			if ((idx = inputText.IndexOf('\n')) != -1)
 			{
-				inputText = inputText.Substring(0, idx);
+				inputText = inputText.Remove(idx, 1);
 				UIManager.instance.FocusObject = null;
 			}
 			if ((idx = inputText.IndexOf('\r')) != -1)
 			{
-				inputText = inputText.Substring(0, idx);
+				inputText = inputText.Remove(idx, 1);
 				UIManager.instance.FocusObject = null;
 			}
 		}
@@ -305,10 +336,14 @@ public class UITextField : AutoSpriteControlBase
 			PositionCaret();
 		}
 
+		// See if enter was pressed:
+		if (UIManager.instance.FocusObject == null)
+			Commit();
+
 		return text;
 	}
 
-	public override void LostFocus()
+	public void LostFocus()
 	{
 		hasFocus = false;
 
@@ -316,10 +351,26 @@ public class UITextField : AutoSpriteControlBase
 		HideCaret();
 	}
 
+	public void Commit()
+	{
+		if (scriptWithMethodToInvoke != null && !string.IsNullOrEmpty(methodToInvoke))
+			scriptWithMethodToInvoke.Invoke(methodToInvoke, 0);
+		if (commitDelegate != null)
+			commitDelegate(this);
+	}
+
+	public string Content
+	{
+		get { return Text; }
+	}
+
 	protected void ShowCaret()
 	{
 		if (caret == null)
 			return;
+
+		// Recalculate our clipping rect:
+		CalcClippingRect();
 
 		caret.Hide(false);
 		PositionCaret();
@@ -353,6 +404,15 @@ public class UITextField : AutoSpriteControlBase
 
 	protected void PositionCaret()
 	{
+		PositionCaret(true);
+	}
+
+	// recur tells us if we want to do a single
+	// recursive positioning because our text
+	// object moved as a result of an attempt
+	// to keep the caret in the viewable area:
+	protected void PositionCaret(bool recur)
+	{
 		if (caret == null || spriteText == null)
 			return;
 
@@ -361,57 +421,66 @@ public class UITextField : AutoSpriteControlBase
 		Vector3 pos = transform.InverseTransformPoint(spriteText.GetInsertionPointPos(spriteText.PlainIndexToDisplayIndex(insert)));
 
 		// See if the current character is in our viewable area:
-		Vector3 top = pos + Vector3.up * spriteText.BaseHeight;
-		if(top.y > marginTopLeft.y)
+		Vector3 top = pos + Vector3.up * spriteText.BaseHeight * spriteText.transform.localScale.y;
+		
+		if(recur)
 		{
-			spriteText.transform.localPosition -= Vector3.up * spriteText.LineSpan;
-			PositionCaret();
-			// Re-clip our text:
-			spriteText.ClippingRect = clientClippingRect;
-			return;
-		}
-		else if(pos.y < marginBottomRight.y)
-		{
-			spriteText.transform.localPosition += Vector3.up * spriteText.LineSpan;
-			PositionCaret();
-			// Re-clip our text:
-			spriteText.ClippingRect = clientClippingRect;
-			return;
-		}
-		else if(!multiline) // Only check left/right if we're not multiline
-		{
-			if (pos.x < marginTopLeft.x)
+			if(multiline) // Only check top/bottom if we're multiline
 			{
-				Vector3 center = GetCenterPoint();
-				// Move it so that the current character is in the middle:
-				Vector3 newTxtPos = spriteText.transform.localPosition + Vector3.right * Mathf.Abs(center.x - pos.x);
-				// Don't move right of its starting position:
-				newTxtPos.x = Mathf.Min(newTxtPos.x, origTextPos.x);
-				spriteText.transform.localPosition = newTxtPos;
-				PositionCaret();
-				// Re-clip our text:
-				spriteText.ClippingRect = clientClippingRect;
-				return;
+				if (top.y > marginTopLeft.y)
+				{
+					spriteText.transform.localPosition -= Vector3.up * spriteText.LineSpan;
+					PositionCaret(false);
+					// Re-clip our text:
+					spriteText.ClippingRect = clientClippingRect;
+					return;
+				}
+				else if (pos.y < marginBottomRight.y)
+				{
+					spriteText.transform.localPosition += Vector3.up * spriteText.LineSpan;
+					PositionCaret(false);
+					// Re-clip our text:
+					spriteText.ClippingRect = clientClippingRect;
+					return;
+				}
 			}
-			else if (pos.x > marginBottomRight.x)
+			else // Only check left/right if we're not multiline
 			{
-				Vector3 center = GetCenterPoint();
-				// Move it so that the current character is in the middle:
-				Vector3 newTxtPos = spriteText.transform.localPosition - Vector3.right * Mathf.Abs(center.x - pos.x);
-				spriteText.transform.localPosition = newTxtPos;
-				PositionCaret();
-				// Re-clip our text:
-				spriteText.ClippingRect = clientClippingRect;
-				return;
+				if (pos.x < marginTopLeft.x)
+				{
+					Vector3 center = GetCenterPoint();
+					// Move it so that the current character is in the middle:
+					Vector3 newTxtPos = spriteText.transform.localPosition + Vector3.right * Mathf.Abs(center.x - pos.x);
+					// Don't move right of its starting position:
+					newTxtPos.x = Mathf.Min(newTxtPos.x, origTextPos.x);
+					spriteText.transform.localPosition = newTxtPos;
+					PositionCaret(false);
+					// Re-clip our text:
+					spriteText.ClippingRect = clientClippingRect;
+					return;
+				}
+				else if (pos.x > marginBottomRight.x)
+				{
+					Vector3 center = GetCenterPoint();
+					// Move it so that the current character is in the middle:
+					Vector3 newTxtPos = spriteText.transform.localPosition - Vector3.right * Mathf.Abs(center.x - pos.x);
+					spriteText.transform.localPosition = newTxtPos;
+					PositionCaret(false);
+					// Re-clip our text:
+					spriteText.ClippingRect = clientClippingRect;
+					return;
+				}
 			}
 		}
 
 		transitions[1].list[0].StopSafe();
 
-		pos.z += caretZOffset;
 		caret.transform.localPosition = pos;
 
 		transitions[1].list[0].Start();
+
+		// Re-clip:
+		caret.ClippingRect = clientClippingRect;
 	}
 
 	// Accepts a point in world space and finds which
@@ -451,6 +520,11 @@ public class UITextField : AutoSpriteControlBase
 		*/
 	}
 
+	public void SetCommitDelegate(EZKeyboardCommitDelegate del)
+	{
+		commitDelegate = del;
+	}
+
 
 	//---------------------------------------------------
 	// Misc
@@ -476,6 +550,8 @@ public class UITextField : AutoSpriteControlBase
 
 		if(spriteText != null)
 		{
+			spriteText.password = password;
+			spriteText.maskingCharacter = maskingCharacter;
 			origTextPos = spriteText.transform.localPosition;
 			SetMargins(margins);
 		}
@@ -500,6 +576,7 @@ public class UITextField : AutoSpriteControlBase
 			go.layer = gameObject.layer;
 			caret = (AutoSprite)go.AddComponent(typeof(AutoSprite));
 			caret.plane = plane;
+			caret.offset = caretOffset;
 			caret.SetAnchor(caretAnchor);
 			caret.persistent = persistent;
 			if (!managed)
@@ -545,6 +622,13 @@ public class UITextField : AutoSpriteControlBase
 		cachedRot = transform.rotation;
 		cachedScale = transform.lossyScale;
 		CalcClippingRect();
+
+		// Since hiding while managed depends on
+		// setting our mesh extents to 0, and the
+		// foregoing code causes us to not be set
+		// to 0, re-hide ourselves:
+		if (managed && m_hidden)
+			Hide(true);
 	}
 
 	// Calculates the clipping rect for the text
@@ -741,6 +825,11 @@ public class UITextField : AutoSpriteControlBase
 		}
 	}
 
+	public override void DrawPreTransitionUI(int selState, IGUIScriptSelector gui)
+	{
+		scriptWithMethodToInvoke = gui.DrawScriptSelection(scriptWithMethodToInvoke, ref methodToInvoke);
+	}
+
 
 
 	public override void OnDrawGizmosSelected()
@@ -822,8 +911,11 @@ public class UITextFieldMirror : AutoSpriteControlBaseMirror
 	{
 		UITextField tf = (UITextField)s;
 		if (margins.x != tf.margins.x ||
-			margins.y != tf.margins.y)
+			margins.y != tf.margins.y ||
+			width != tf.width ||
+			height != tf.height)
 		{
+			tf.SetMargins(tf.margins);
 			tf.CalcClippingRect();
 			margins = tf.margins;
 			// Keep it to ourselves since we handled it

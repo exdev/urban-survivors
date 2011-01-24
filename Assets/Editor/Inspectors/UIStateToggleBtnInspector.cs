@@ -10,7 +10,7 @@ using System.Collections;
 
 
 // Only compile if not using Unity iPhone
-#if !UNITY_IPHONE || UNITY_3_1
+#if !UNITY_IPHONE || (UNITY_3_0 || UNITY_3_1)
 [CustomEditor(typeof(UIStateToggleBtn))]
 #endif
 public class UIStateToggleBtnInspector : UICtlInspector

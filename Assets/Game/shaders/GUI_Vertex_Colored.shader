@@ -1,4 +1,4 @@
-Shader "GUI/Vertex Colored" {
+Shader "Transparent/Vertex Colored" {
 Properties {
 	_Color ("Main Color", Color) = (0.5,0.5,0.5,1)
 	_Emission ("Emmisive Color", Color) = (0,0,0,0)
@@ -7,35 +7,26 @@ Properties {
 
 Category {
 	Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
-	Tags { "LightMode" = "Vertex" }
-	Cull Off
 	ZWrite Off
 	Alphatest Greater 0
 	Blend SrcAlpha OneMinusSrcAlpha 
 	SubShader {
 		Material {
-            // DISABLE { 
-            // Diffuse [_Color]
-            // Ambient [_Color]
-            // } DISABLE end 
+			Diffuse [_Color]
+			Ambient [_Color]
 			Emission [_Emission]	
 		}
 		Pass {
-            ColorMaterial AmbientAndDiffuse
+			ColorMaterial AmbientAndDiffuse
 			Lighting Off
-            Cull Off
-            SetTexture [_MainTex] {
-                Combine texture * primary
-                // DISABLE { 
-                // Combine texture * primary, texture * primary
-                // } DISABLE end 
-            }
-            // DISABLE { 
-            // SetTexture [_MainTex] {
-            //     constantColor [_Color]
-            //     Combine previous * constant DOUBLE, previous * constant
-            // }  
-            // } DISABLE end 
+			Cull Off
+        SetTexture [_MainTex] {
+            Combine texture * primary, texture * primary
+        }
+        SetTexture [_MainTex] {
+            constantColor [_Color]
+            Combine previous * constant DOUBLE, previous * constant
+        }  
 		}
 	} 
 }

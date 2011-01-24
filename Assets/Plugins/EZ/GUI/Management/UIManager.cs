@@ -254,7 +254,7 @@ public struct POINTER_INFO
 
 public struct KEYBOARD_INFO
 {
-#if UNITY_IPHONE //	|| UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID
 	public iPhoneKeyboardType type;
 	public bool autoCorrect;
 	public bool multiline;
@@ -321,7 +321,7 @@ public class UIManager : MonoBehaviour
 			{
 				s_Instance = FindObjectOfType(typeof(UIManager)) as UIManager;
 
-				if (s_Instance == null)
+				if (s_Instance == null && Application.isEditor)
 					Debug.LogError("Could not locate a UIManager object. You have to have exactly one UIManager in the scene.");
 			}
 
@@ -416,7 +416,7 @@ public class UIManager : MonoBehaviour
 	/// event not to be considered to be a "tap" (click) but
 	/// rather just a drag action.
 	/// </summary>
-	public float dragThreshold = 5f;
+	public float dragThreshold = 8f;
 
 	/// <summary>
 	/// This is similar to dragThreshold except instead of a
@@ -536,16 +536,17 @@ public class UIManager : MonoBehaviour
 
 	// Pointer-related stuff:
 	protected POINTER_INFO[,] pointers;			// Used to track the status of pointer devices (mouse pointer, finger touches, etc) (one array for each mouse/touchpad camera in use)
+	protected int[] nonUIHits;					// Holds a list of indices of all pointers hitting something other than a UI element for the current frame.
 	protected bool[] usedPointers;				// Used to track which pointers have been used by a camera already (have already hit a control)
 	protected int numPointers;					// The number of pointers we have elements for in the "pointers" arrays (one for each camera).
 	protected int[] activePointers;				// Indices of active pointers (same for all cameras)
 	protected int numActivePointers;			// Holds the number of active pointers (this minus 1 indicates the index of the last valid index in activePointers)
+	protected int numNonUIHits;					// Holds the number of pointers hitting something other than the UI for the current frame.
 	protected POINTER_INFO rayPtr;				// The ray pointer
 	protected PointerPollerDelegate pointerPoller; // Delegate we'll call to poll the pointing device(s).
 	protected PointerInfoDelegate informNonUIHit; // Delegate to call when we have a non-UI raycast hit
-	protected EZLinkedList<EZLinkedListNode<PointerInfoDelegate>> mouseTouchListeners = new EZLinkedList<EZLinkedListNode<PointerInfoDelegate>>(); // Delegate to call with all mouse/touchpad input
-	protected EZLinkedList<EZLinkedListNode<PointerInfoDelegate>> rayListeners = new EZLinkedList<EZLinkedListNode<PointerInfoDelegate>>();	// Delegate to call with all ray input
-	protected EZLinkedList<EZLinkedListNode<PointerInfoDelegate>> listenerPool = new EZLinkedList<EZLinkedListNode<PointerInfoDelegate>>(); // Pool of unused listener delegate list notes.
+	protected PointerInfoDelegate mouseTouchListeners; // Delegate to call with all mouse/touchpad input
+	protected PointerInfoDelegate rayListeners;	// Delegate to call with all ray input
 
 	// Keyboard stuff:
 	protected IUIObject focusObj;				// The object that has the keyboard focus
@@ -565,7 +566,7 @@ public class UIManager : MonoBehaviour
 	IUIObject tempObj;
 	POINTER_INFO tempPtr;
 	System.Text.StringBuilder sb = new System.Text.StringBuilder();
-#if UNITY_IPHONE //|| UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID
 	iPhoneKeyboard iKeyboard;
 #endif
 
@@ -590,7 +591,7 @@ public class UIManager : MonoBehaviour
 		// Determine how many touches should be supported:
 		if (pointerType == POINTER_TYPE.TOUCHPAD || pointerType == POINTER_TYPE.TOUCHPAD_AND_RAY)
 		{
-#if UNITY_IPHONE //|| UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID
 			iPhoneKeyboard.autorotateToPortrait = autoRotateKeyboardPortrait;
 			iPhoneKeyboard.autorotateToPortraitUpsideDown = autoRotateKeyboardPortraitUpsideDown;
 			iPhoneKeyboard.autorotateToLandscapeLeft = autoRotateKeyboardLandscapeLeft;
@@ -603,7 +604,7 @@ public class UIManager : MonoBehaviour
 			//					numTouches = 12;
 			//				else
 			numTouches = 11;
-#if UNITY_IPHONE //|| UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID
 			}
 			else
 			{
@@ -645,6 +646,9 @@ public class UIManager : MonoBehaviour
 		numPointers = numTouches;
 		activePointers = new int[numTouches];
 		usedPointers = new bool[numPointers];
+
+		nonUIHits = new int[numTouches];
+		numNonUIHits = 0;
 
 		// Get our raycasting object:
 		/*
@@ -691,7 +695,7 @@ public class UIManager : MonoBehaviour
 						pointers[i, j].layerMask = uiCameras[i].mask;
 						pointers[i, j].type = POINTER_INFO.POINTER_TYPE.TOUCHPAD;
 					}
-					pointers[i, numPointers-1].type = POINTER_INFO.POINTER_TYPE.MOUSE;
+					pointers[i, numPointers - 1].type = POINTER_INFO.POINTER_TYPE.MOUSE;
 				}
 				break;
 			case POINTER_TYPE.RAY:
@@ -742,38 +746,41 @@ public class UIManager : MonoBehaviour
 
 
 	/// <summary>
-	/// Registers a delegate to be called when a raycast is
+	/// Sets the delegate to be called when a raycast is
+	/// performed on an input event which hits a non-UI
+	/// object.  Use this when your game uses raycasts for
+	/// non-UI game purposes but you don't want to waste 
+	/// performance with a redundant set of raycasts.
+	/// NOTE: This will replace any previously registered
+	/// delegates.
+	/// </summary>
+	/// <param name="del">Delegate to be called.</param>
+	public void SetNonUIHitDelegate(PointerInfoDelegate del)
+	{
+		informNonUIHit = del;
+	}
+
+	/// <summary>
+	/// Adds a delegate to be called when a raycast is
 	/// performed on an input event which hits a non-UI
 	/// object.  Use this when your game uses raycasts for
 	/// non-UI game purposes but you don't want to waste 
 	/// performance with a redundant set of raycasts.
 	/// </summary>
 	/// <param name="del">Delegate to be called.</param>
-	/// <returns>The previous delegate. It is recommended to save 
-	/// this value and call it in your own delegate to preserve 
-	/// the delegate chain.</returns>
-	public PointerInfoDelegate SetNonUIHitDelegate(PointerInfoDelegate del)
+	public void AddNonUIHitDelegate(PointerInfoDelegate del)
 	{
-		PointerInfoDelegate oldDel = informNonUIHit;
-		informNonUIHit = del;
-		return oldDel;
+		informNonUIHit += del;
 	}
 
-
-	protected EZLinkedListNode<PointerInfoDelegate> GetPtrListenNode(PointerInfoDelegate del)
+	/// <summary>
+	/// Removes a delegate previously added with SetNonUIHitDelegate()
+	/// or AddNonUIHitDelegate().
+	/// </summary>
+	/// <param name="del"></param>
+	public void RemoveNonUIHitDelegate(PointerInfoDelegate del)
 	{
-		EZLinkedListNode<PointerInfoDelegate> delNode;
-
-		if (listenerPool.Count > 0)
-		{
-			delNode = listenerPool.Head;
-			listenerPool.Remove(delNode);
-			delNode.val = del;
-		}
-		else
-			delNode = new EZLinkedListNode<PointerInfoDelegate>(del);
-
-		return delNode;
+		informNonUIHit -= del;
 	}
 
 
@@ -785,7 +792,7 @@ public class UIManager : MonoBehaviour
 	/// <param name="del">Delegate to be called.</param>
 	public void AddMouseTouchPtrListener(PointerInfoDelegate del)
 	{
-		mouseTouchListeners.Add(GetPtrListenNode(del));
+		mouseTouchListeners += del;
 	}
 
 
@@ -797,31 +804,7 @@ public class UIManager : MonoBehaviour
 	/// <param name="del">Delegate to be called.</param>
 	public void AddRayPtrListener(PointerInfoDelegate del)
 	{
-		rayListeners.Add(GetPtrListenNode(del));
-	}
-
-
-	// Helper method that removes a pointer listener from a list:
-	protected void RemovePtrListener(EZLinkedList<EZLinkedListNode<PointerInfoDelegate>> list, PointerInfoDelegate del)
-	{
-		for (EZLinkedListIterator<EZLinkedListNode<PointerInfoDelegate>> i = list.Begin(); !i.Done; i.Next())
-		{
-			if (i.Current.val == del)
-			{
-				// Save it:
-				EZLinkedListNode<PointerInfoDelegate> node = i.Current;
-
-				// Remove it from the active list:
-				list.Remove(i.Current);
-
-				// Add it to our free pool:
-				listenerPool.Add(node);
-
-				// We're done.
-				i.End();
-				break;
-			}
-		}
+		rayListeners += del;
 	}
 
 
@@ -831,7 +814,7 @@ public class UIManager : MonoBehaviour
 	/// <param name="del">Delegate to be removed.</param>
 	public void RemoveMouseTouchPtrListener(PointerInfoDelegate del)
 	{
-		RemovePtrListener(mouseTouchListeners, del);
+		mouseTouchListeners -= del;
 	}
 
 
@@ -841,25 +824,36 @@ public class UIManager : MonoBehaviour
 	/// <param name="del">Delegate to be removed.</param>
 	public void RemoveRayPtrListener(PointerInfoDelegate del)
 	{
-		RemovePtrListener(rayListeners, del);
+		rayListeners -= del;
 	}
 
 
-	// Calls all the mouse/touch pointer listeners.
-	protected void CallMouseTouchListeners(POINTER_INFO ptr)
+	protected void AddNonUIHit(int index)
 	{
-		for (EZLinkedListIterator<EZLinkedListNode<PointerInfoDelegate>> i = mouseTouchListeners.Begin(); !i.Done; i.Next())
-		{
-			i.Current.val(ptr);
-		}
+		if (informNonUIHit == null)
+			return;
+
+		// See if this pointer was used by another camera:
+		if (usedPointers[index])
+			return;
+
+		++numNonUIHits;
+		nonUIHits[numNonUIHits] = index;
 	}
 
-	// Calls all the ray pointer listeners.
-	protected void CallRayListeners()
+	protected void CallNonUIHitDelegate()
 	{
-		for (EZLinkedListIterator<EZLinkedListNode<PointerInfoDelegate>> i = rayListeners.Begin(); !i.Done; i.Next())
+		if(informNonUIHit == null)
+			return;
+
+		int index;
+
+		for (int i = 0; i < numNonUIHits; ++i)
 		{
-			i.Current.val(rayPtr);
+			index = nonUIHits[i];
+			if (usedPointers[index])
+				continue;
+			informNonUIHit(pointers[0, index]);
 		}
 	}
 
@@ -877,6 +871,9 @@ public class UIManager : MonoBehaviour
 		// Check the focus object:
 		if (focusObj == null)
 			FocusObject = null;
+
+		blockInput = false;
+		inputLockCount = 0;
 	}
 
 
@@ -921,9 +918,12 @@ public class UIManager : MonoBehaviour
 	// Dispatches detected input to any hit UIObject
 	protected void DispatchInput()
 	{
+		// Reset our non-UI hit tracking:
+		numNonUIHits = 0;
+
 		// Loop through each active pointer once for each camera
 		// and dispatch input events:
-		if (mouseTouchListeners.Count > 0)
+		if (mouseTouchListeners != null)
 		{
 			for (int i = 0; i < uiCameras.Length; ++i)
 				for (int j = 0; j < numActivePointers; ++j)
@@ -933,7 +933,8 @@ public class UIManager : MonoBehaviour
 					if (!usedPointers[activePointers[j]])
 					{
 						DispatchHelper(ref pointers[i, activePointers[j]]);
-						CallMouseTouchListeners(pointers[i, activePointers[j]]);
+						if(mouseTouchListeners != null)
+							mouseTouchListeners(pointers[i, activePointers[j]]);
 					}
 				}
 		}
@@ -955,9 +956,12 @@ public class UIManager : MonoBehaviour
 			pointerType == POINTER_TYPE.TOUCHPAD_AND_RAY)
 		{
 			DispatchHelper(ref rayPtr);
-			if (rayListeners.Count > 0)
-				CallRayListeners();
+			if (rayListeners != null)
+				rayListeners(rayPtr);
 		}
+		
+		// Call any non-UI hit delegate:
+		CallNonUIHitDelegate();
 
 		// Unset our used flags:
 		for (int i = 0; i < usedPointers.Length; ++i)
@@ -996,7 +1000,7 @@ public class UIManager : MonoBehaviour
 					if (tempObj != curPtr.targetObj)
 					{
 						// If we have someone to notify of a release-off:
-						if (curPtr.targetObj != null && !blockInput) // Don't change the targetObj if input is blocked
+						if (curPtr.targetObj != null)
 						{
 							// Notify the targetObj of the event:
 							tempPtr.Copy(curPtr);
@@ -1009,7 +1013,9 @@ public class UIManager : MonoBehaviour
 
 							curPtr.targetObj.OnInput(tempPtr);
 
-							curPtr.targetObj = tempObj;
+							// Don't change the targetObj if input is blocked
+							if(!blockInput)
+								curPtr.targetObj = tempObj;
 						}
 
 						// See if we need to notify our new target:
@@ -1025,15 +1031,24 @@ public class UIManager : MonoBehaviour
 					else if (curPtr.targetObj != null)
 					{
 						// Tell our target about the event:
-						if (!blockInput)
-							curPtr.targetObj.OnInput(curPtr);
+						curPtr.targetObj.OnInput(curPtr);
+
+						// In this case we don't care about whether input
+						// is blocked because we want objects to still
+						// get notified of a release since it is likely
+						// that the control that is now being released
+						// is being released from a press that initiated
+						// whatever is now blocking input.
+						// Plus, further input will not be processed from
+						// this point until input is unblocked because
+						// neither a move nor another press will be
+						// processed.
 					}
 
 					// See if we hit a non-UI object:
 					if (tempObj == null)
 					{
-						if (informNonUIHit != null)
-							informNonUIHit(curPtr);
+						AddNonUIHit(curPtr.id);
 					}
 
 				}// Notify focus object:
@@ -1044,8 +1059,7 @@ public class UIManager : MonoBehaviour
 
 					if (curPtr.targetObj == null)
 					{
-						if (informNonUIHit != null)
-							informNonUIHit(curPtr);
+						AddNonUIHit(curPtr.id);
 					}
 					else if (!blockInput)
 					{
@@ -1076,8 +1090,7 @@ public class UIManager : MonoBehaviour
 					else
 					{
 						// Let any listener know the UI was not hit
-						if (informNonUIHit != null)
-							informNonUIHit(curPtr);
+						AddNonUIHit(curPtr.id);
 						if (warnOnNonUiHits)
 							LogNonUIObjErr(hit.collider.gameObject);
 					}
@@ -1087,8 +1100,8 @@ public class UIManager : MonoBehaviour
 					if (!blockInput)
 						curPtr.targetObj.OnInput(curPtr);
 				}
-				else if (informNonUIHit != null)
-					informNonUIHit(curPtr);
+				else 
+					AddNonUIHit(curPtr.id);
 
 
 				// If the mouse/touch isn't being held, then
@@ -1135,9 +1148,23 @@ public class UIManager : MonoBehaviour
 							curPtr.targetObj.OnInput(tempPtr);
 					}
 
-					// Don't change the targetObj if input is blocked
+					// Don't acquire a new targetObj if input is blocked
 					if (!blockInput)
 						curPtr.targetObj = tempObj;
+					else
+					{
+						// If we clicked while input was blocked, lose the target
+						if (curPtr.targetObj != null)
+						{
+							// Send an innocuous message that will reset any
+							// control's state since we're blocking input but
+							// need to make sure the control's state is reset:
+							tempPtr.Copy(curPtr);
+							tempPtr.evt = POINTER_INFO.INPUT_EVENT.RELEASE_OFF;
+							curPtr.targetObj.OnInput(tempPtr);
+						}
+						curPtr.targetObj = null;
+					}
 
 					if (curPtr.targetObj != null)
 					{
@@ -1162,8 +1189,7 @@ public class UIManager : MonoBehaviour
 					else
 					{
 						// Let any listener know the UI was not hit
-						if (informNonUIHit != null)
-							informNonUIHit(curPtr);
+						AddNonUIHit(curPtr.id);
 						if (warnOnNonUiHits)
 							LogNonUIObjErr(hit.collider.gameObject);
 					}
@@ -1178,10 +1204,27 @@ public class UIManager : MonoBehaviour
 				}
 				else
 				{
+					if (blockInput)
+					{
+						// If we clicked while input was blocked, lose the target
+						if (curPtr.targetObj != null)
+						{
+							// Send an innocuous message that will reset any
+							// control's state since we're blocking input but
+							// need to make sure the control's state is reset:
+							tempPtr.Copy(curPtr);
+							tempPtr.evt = POINTER_INFO.INPUT_EVENT.RELEASE_OFF;
+							curPtr.targetObj.OnInput(tempPtr);
+						}
+					}
+
 					// Nothing was hit, so unset the focus object, if allowed:
-					// Don't change the targetObj if input is blocked
-					if (!blockInput)
-						curPtr.targetObj = null;
+					// Change the target even if input is blocked since we
+					// don't want new PRESSes passing through to our existing
+					// target object:
+					//if (!blockInput)
+					curPtr.targetObj = null;
+
 					// Make sure this pointer is allowed to unset the focus:
 					if ((curPtr.type == POINTER_INFO.POINTER_TYPE.RAY) == focusWithRay)
 					{
@@ -1189,8 +1232,7 @@ public class UIManager : MonoBehaviour
 					}
 
 					// Let any listener know the UI was not hit
-					if (informNonUIHit != null)
-						informNonUIHit(curPtr);
+					AddNonUIHit(curPtr.id);
 				}
 				break;
 		}
@@ -1221,7 +1263,11 @@ public class UIManager : MonoBehaviour
 
 		int mouseIndex = numTouches - 1;
 
+#if UNITY_IPHONE || UNITY_ANDROID
 		numActivePointers += 1; // Add one for the mouse that is always active
+#else
+		numActivePointers = 1; // Just the mouse
+#endif
 		activePointers[numActivePointers - 1] = mouseIndex;
 
 		// Our mouse is the last pointer in the list:
@@ -1321,14 +1367,14 @@ public class UIManager : MonoBehaviour
 	{
 #if UNITY_IPHONE || UNITY_ANDROID
 
-#if UNITY_3_1
+#if (UNITY_3_0 || UNITY_3_1)
 		Touch touch;
 #else
-		TouchPhoneTouch touch;
+		iPhoneTouch touch;
 #endif
 		int id;
 
-#if UNITY_3_1
+#if (UNITY_3_0 || UNITY_3_1)
 		numActivePointers = Input.touchCount;
 #else
 		numActivePointers = iPhoneInput.touchCount;
@@ -1337,7 +1383,7 @@ public class UIManager : MonoBehaviour
 		// Process our touches:
 		for(int i=0; i<numActivePointers; ++i)
 		{
-#if UNITY_3_1
+#if (UNITY_3_0 || UNITY_3_1)
 			touch = Input.GetTouch(i);
 #else
 			touch = iPhoneInput.GetTouch(i);
@@ -1351,7 +1397,7 @@ public class UIManager : MonoBehaviour
 			switch(touch.phase)
 			{
 				// Drag:
-#if UNITY_3_1
+#if (UNITY_3_0 || UNITY_3_1)
 				case TouchPhase.Moved:
 #else
 				case iPhoneTouchPhase.Moved:
@@ -1370,7 +1416,7 @@ public class UIManager : MonoBehaviour
 					break;
 
 				// Press:
-#if UNITY_3_1
+#if (UNITY_3_0 || UNITY_3_1)
 				case TouchPhase.Began:
 #else
 				case iPhoneTouchPhase.Began:
@@ -1384,7 +1430,7 @@ public class UIManager : MonoBehaviour
 					break;
 
 				// Release
-#if UNITY_3_1
+#if (UNITY_3_0 || UNITY_3_1)
 				case TouchPhase.Ended:
 				case TouchPhase.Canceled:
 #else
@@ -1401,7 +1447,7 @@ public class UIManager : MonoBehaviour
 					break;
 
 				// No change:
-#if UNITY_3_1
+#if (UNITY_3_0 || UNITY_3_1)
 				case TouchPhase.Stationary:
 #else
 				case iPhoneTouchPhase.Stationary:
@@ -1525,25 +1571,26 @@ public class UIManager : MonoBehaviour
 
 	protected void PollKeyboard()
 	{
-#if UNITY_IPHONE //|| UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID
 		if(!Application.isEditor)
 		{
 			if(iKeyboard == null)
 				return;
-
-			if(controlText == iKeyboard.text)
+			
+			if(iKeyboard.done)
+			{
+				controlText = iKeyboard.text;
+				controlText = ((IKeyFocusable)focusObj).SetInputText(controlText, ref insert);
+				((IKeyFocusable)focusObj).Commit();
+				FocusObject = null;
+				return;
+			}
+			else if(controlText == iKeyboard.text)
 				return; // Nothing to do
 
 			controlText = iKeyboard.text;
 			
-			if(iKeyboard.done)
-			{
-				controlText = focusObj.SetInputText(controlText, ref insert);
-				FocusObject = null;
-				return;
-			}
-			
-			iKeyboard.text = focusObj.SetInputText(controlText, ref insert);
+			iKeyboard.text = ((IKeyFocusable)focusObj).SetInputText(controlText, ref insert);
 		}
 		else
 			ProcessKeyboard();
@@ -1554,28 +1601,22 @@ public class UIManager : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.RightArrow))
 		{
 			insert = Mathf.Min(controlText.Length, insert + 1);
-			// Don't stop on a newline:
-			while(insert < controlText.Length && controlText[insert] == '\n')
-				++insert;
-			focusObj.SetInputText(controlText, ref insert);
+			((IKeyFocusable)focusObj).SetInputText(controlText, ref insert);
 		}
-		else if(Input.GetKeyDown(KeyCode.LeftArrow))
+		else if (Input.GetKeyDown(KeyCode.LeftArrow))
 		{
 			insert = Mathf.Max(0, insert - 1);
-			focusObj.SetInputText(controlText, ref insert);
-			// Don't stop on a newline:
-			while (insert > 0 && controlText[insert] == '\n')
-				--insert;
+			((IKeyFocusable)focusObj).SetInputText(controlText, ref insert);
 		}
-		else if(Input.GetKeyDown(KeyCode.Home))
+		else if (Input.GetKeyDown(KeyCode.Home))
 		{
 			insert = 0;
-			focusObj.SetInputText(controlText, ref insert);
+			((IKeyFocusable)focusObj).SetInputText(controlText, ref insert);
 		}
-		else if(Input.GetKeyDown(KeyCode.End))
+		else if (Input.GetKeyDown(KeyCode.End))
 		{
 			insert = controlText.Length;
-			focusObj.SetInputText(controlText, ref insert);
+			((IKeyFocusable)focusObj).SetInputText(controlText, ref insert);
 		}
 #endif
 	}
@@ -1608,7 +1649,7 @@ public class UIManager : MonoBehaviour
 		}
 
 		controlText = sb.ToString();
-		controlText = focusObj.SetInputText(controlText, ref insert);
+		controlText = ((IKeyFocusable)focusObj).SetInputText(controlText, ref insert);
 	}
 
 	/// <summary>
@@ -1669,18 +1710,18 @@ public class UIManager : MonoBehaviour
 		set
 		{
 			// See if another object is losing focus:
-			if (focusObj != null)
-				focusObj.LostFocus();
+			if (focusObj != null && focusObj is IKeyFocusable)
+				((IKeyFocusable)focusObj).LostFocus();
 
 			focusObj = value;
 
 			if (focusObj != null)
 			{
-				controlText = focusObj.GetInputText(ref kbInfo);
+				controlText = ((IKeyFocusable)focusObj).GetInputText(ref kbInfo);
 				if (controlText == null)
 					controlText = "";	// To be safe
 
-#if UNITY_IPHONE //|| UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID
 				if(!Application.isEditor)
 				{
 					iKeyboard = iPhoneKeyboard.Open(controlText, kbInfo.type, kbInfo.autoCorrect, kbInfo.multiline, kbInfo.secure, kbInfo.alert, controlText);
@@ -1694,7 +1735,7 @@ public class UIManager : MonoBehaviour
 				else
 					sb.Append(controlText);
 			}
-#if UNITY_IPHONE //|| UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID
 			else
 			{
 				if(iKeyboard != null)

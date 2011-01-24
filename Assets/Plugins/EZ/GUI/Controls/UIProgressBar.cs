@@ -88,7 +88,7 @@ public class UIProgressBar : AutoSpriteControlBase
 	//---------------------------------------------------
 	// Misc
 	//---------------------------------------------------
-	public override void OnInput(POINTER_INFO ptr) {}
+	public override void OnInput(ref POINTER_INFO ptr) {}
 
 	protected override void Start()
 	{
@@ -143,7 +143,7 @@ public class UIProgressBar : AutoSpriteControlBase
 			emptyObj.transform.localRotation = Quaternion.identity;
 			emptyObj.layer = gameObject.layer;
 			emptySprite = (AutoSprite)emptyObj.AddComponent(typeof(AutoSprite));
-			emptySprite.plane = this.plane;
+			emptySprite.plane = plane;
 			emptySprite.autoResize = autoResize;
 			emptySprite.pixelPerfect = pixelPerfect;
 			emptySprite.persistent = persistent;
@@ -169,7 +169,7 @@ public class UIProgressBar : AutoSpriteControlBase
 				emptySprite.animations[0].SetAnim(states[1], 0);
 				emptySprite.PlayAnim(0, 0);
 			}
-			emptySprite.SetCamera(renderCamera);
+			emptySprite.renderCamera = renderCamera;
 			emptySprite.Hide(IsHidden());
 
 			Value = m_value;
@@ -179,6 +179,13 @@ public class UIProgressBar : AutoSpriteControlBase
 
 			SetState(0);
 		}
+
+		// Since hiding while managed depends on
+		// setting our mesh extents to 0, and the
+		// foregoing code causes us to not be set
+		// to 0, re-hide ourselves:
+		if (managed && m_hidden)
+			Hide(true);
 	}
 
 	public override void Copy(SpriteRoot s)
@@ -228,12 +235,12 @@ public class UIProgressBar : AutoSpriteControlBase
 		// Truncate layers:
 		for(int i=0; i<filledLayers.Length; ++i)
 		{
-			if (filledIndices[i] != -1)
+			//if (filledIndices[i] != -1)
 				filledLayers[i].TruncateRight(m_value);
 		}
 		for (int i = 0; i < emptyLayers.Length; ++i)
 		{
-			if (emptyIndices[i] != -1)
+			//if (emptyIndices[i] != -1)
 				emptyLayers[i].TruncateLeft(1f-m_value);
 		}
 	}

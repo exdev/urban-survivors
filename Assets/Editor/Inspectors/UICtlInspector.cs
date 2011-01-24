@@ -10,7 +10,7 @@ using System.Collections;
 
 
 // Only compile if not using Unity iPhone
-#if !UNITY_IPHONE || UNITY_3_1
+#if !UNITY_IPHONE || (UNITY_3_0 || UNITY_3_1)
 
 public class UICtlInspector : Editor, IGUIHelper
 {
@@ -43,6 +43,14 @@ public class UICtlInspector : Editor, IGUIHelper
 	}
 
 
+	// Override this in subclasses to add settings that
+	// will get drawn before the state selection block:
+	public virtual void DrawPrestateSettings()
+	{
+
+	}
+
+
 	public override void OnInspectorGUI()
 	{
 		base.OnInspectorGUI();
@@ -50,6 +58,10 @@ public class UICtlInspector : Editor, IGUIHelper
 		isDirty = false;
 
 		control = (IControl)target;
+
+		// Have the specific control class's implementation
+		// draw any control-specific settings:
+		DrawPrestateSettings();
 
 		GUILayout.BeginVertical();
 
@@ -79,6 +91,9 @@ public class UICtlInspector : Editor, IGUIHelper
 
 		// Get the control's state names:
 		stateNames = control.EnumStateElements();
+
+		if (stateNames == null)
+			return;
 
 		// Cap our state to the number of states available:
 		curState = Mathf.Min(curState, stateNames.Length - 1);

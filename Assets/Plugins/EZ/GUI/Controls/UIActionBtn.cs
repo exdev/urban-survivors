@@ -20,11 +20,11 @@ using System.Collections;
 [AddComponentMenu("EZ GUI/Controls/Action Button")] 
 public class UIActionBtn : UIButton
 {
-	public override void OnInput(POINTER_INFO ptr)
+	public override void OnInput(ref POINTER_INFO ptr)
 	{
 		if (!m_controlIsEnabled || IsHidden())
 		{
-			base.OnInput(ptr);
+			base.OnInput(ref ptr);
 			return;
 		}
 
@@ -38,7 +38,7 @@ public class UIActionBtn : UIButton
 				UIManager.instance.RayActive = UIManager.RAY_ACTIVE_STATE.Momentary;
 		}
 
-		base.OnInput(ptr);
+		base.OnInput(ref ptr);
 	}
 
 

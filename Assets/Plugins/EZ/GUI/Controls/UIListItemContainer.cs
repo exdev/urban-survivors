@@ -258,6 +258,8 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 			if (ptr.evt == POINTER_INFO.INPUT_EVENT.TAP)
 				ptr.evt = POINTER_INFO.INPUT_EVENT.RELEASE;
 		}
+		else
+			ptr.isTap = true;
 
 		if (inputDelegate != null)
 			inputDelegate(ref ptr);
@@ -468,6 +470,20 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 	{
 		get { return index; }
 		set { index = value; }
+	}
+
+	public override string Text
+	{
+		set
+		{
+			base.Text = value;
+			FindOuterEdges();
+
+			// Inform the list we may have been resized,
+			// so it needs to reposition items:
+			if (spriteText.maxWidth > 0 && list != null)
+				list.PositionItems();
+		}
 	}
 
 	public SpriteText TextObj

@@ -166,8 +166,10 @@ public class UIStateToggleBtn3D : ControlBase
 	//---------------------------------------------------
 	// Misc
 	//---------------------------------------------------
-	protected void Awake()
+	protected override void Awake()
 	{
+		base.Awake();
+
 		curStateIndex = defaultState;
 	}
 

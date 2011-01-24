@@ -10,7 +10,7 @@ using System.Collections;
 
 /// <remarks>
 /// A type of panel that, when clicked, will toggle
-/// between its showing and hidden states.
+/// between its showing and hideAtStart states.
 /// Use this to implement things like popup-menus.
 /// NOTE: The panel is shown using the BringInForward
 /// transition, and dismissed using the DismissForward
@@ -108,7 +108,7 @@ public class UIBistateInteractivePanel : UIPanelBase
 
 	/// <summary>
 	/// When true, if any child is clicked/tapped
-	/// while the panel is hidden, the panel will
+	/// while the panel is hideAtStart, the panel will
 	/// be shown.
 	/// </summary>
 	public bool showOnChildClick = true;
@@ -116,7 +116,7 @@ public class UIBistateInteractivePanel : UIPanelBase
 	/// <summary>
 	/// The starting state of the panel.
 	/// </summary>
-	public STATE defaultState = STATE.HIDDEN;
+	public STATE initialState = STATE.HIDDEN;
 
 	
 	// Keeps us from responding to the same action twice:
@@ -223,7 +223,7 @@ public class UIBistateInteractivePanel : UIPanelBase
 		// Is this a click from a child?
 		if (ptr.callerIsControl)
 		{
-			// If we're hidden, see if we should show:
+			// If we're hideAtStart, see if we should show:
 			if (m_panelState == STATE.HIDDEN && showOnChildClick)
 			{
 				SetPanelState(STATE.SHOWING);
@@ -247,7 +247,7 @@ public class UIBistateInteractivePanel : UIPanelBase
 	//---------------------------------------------------
 	public void Awake()
 	{
-		m_panelState = defaultState;
+		m_panelState = initialState;
 	}
 
 	public void ToggleState()

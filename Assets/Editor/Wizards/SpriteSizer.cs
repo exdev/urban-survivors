@@ -30,10 +30,32 @@ public class SpriteSizer : ScriptableWizard
 	ArrayList sprites = new ArrayList();
 
 
+	// Loads previous settings from PlayerPrefs
+	void LoadSettings()
+	{
+		onlyApplyToSelected = 1 == PlayerPrefs.GetInt("SpriteSizer.onlyApplyToSelected", onlyApplyToSelected ? 1 : 0);
+		applyToAllInScene = 1 == PlayerPrefs.GetInt("SpriteSizer.applyToAllInScene", applyToAllInScene ? 1 : 0);
+		applyToAllPrefabs = 1 == PlayerPrefs.GetInt("SpriteSizer.applyToAllPrefabs", applyToAllPrefabs ? 1 : 0);
+		disablePixelPerfect = 1 == PlayerPrefs.GetInt("SpriteSizer.disablePixelPerfect", disablePixelPerfect ? 1 : 0);
+		targetScreenHeight = PlayerPrefs.GetInt("SpriteSizer.targetScreenHeight", targetScreenHeight);
+	}
+
+	// Saves settings to PlayerPrefs
+	void SaveSettings()
+	{
+		PlayerPrefs.SetInt("SpriteSizer.onlyApplyToSelected", onlyApplyToSelected ? 1 : 0);
+		PlayerPrefs.SetInt("SpriteSizer.applyToAllInScene", applyToAllInScene ? 1 : 0);
+		PlayerPrefs.SetInt("SpriteSizer.applyToAllPrefabs", applyToAllPrefabs ? 1 : 0);
+		PlayerPrefs.SetInt("SpriteSizer.disablePixelPerfect", disablePixelPerfect ? 1 : 0);
+		PlayerPrefs.SetInt("SpriteSizer.targetScreenHeight", targetScreenHeight);
+	}
+
+
 	[MenuItem("Custom/Size Sprites")]
 	static void StartSizingSprites()
 	{
-		ScriptableWizard.DisplayWizard("Size Sprites", typeof(SpriteSizer), "Ok");
+		SpriteSizer ss = (SpriteSizer) ScriptableWizard.DisplayWizard("Size Sprites", typeof(SpriteSizer), "Ok");
+		ss.LoadSettings();
 	}
 
 
@@ -125,6 +147,9 @@ public class SpriteSizer : ScriptableWizard
 			EditorUtility.DisplayDialog("NOTE", "You may need to reload the current scene for prefab instances to reflect your changes.", "OK");
 
 		Debug.Log(sprites.Count + " sprites sized.");
+
+		// Save our settings for next time:
+		SaveSettings();
 	}
 
 

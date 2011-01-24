@@ -10,9 +10,21 @@ using System.Collections;
 
 
 // Only compile if not using Unity iPhone
-#if !UNITY_IPHONE || UNITY_3_1
+#if !UNITY_IPHONE || (UNITY_3_0 || UNITY_3_1)
 [CustomEditor(typeof(UIListItem))]
 #endif
 public class UIListItemInspector : UICtlInspector
 {
+	public override void DrawPrestateSettings()
+	{
+		base.DrawPrestateSettings();
+
+		BeginMonitorChanges();
+
+		UIListItem li = (UIListItem)control;
+
+		li.activeOnlyWhenSelected = EditorGUILayout.Toggle("Active Only When Selected", li.activeOnlyWhenSelected);
+
+		EndMonitorChanges();
+	}
 }

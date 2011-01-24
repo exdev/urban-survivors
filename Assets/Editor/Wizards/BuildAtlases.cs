@@ -1,5 +1,5 @@
+
 //-----------------------------------------------------------------
-//	BuildAtlases v1.0.1 (3-8-2010)
 //  Copyright 2009 Brady Wright and Above and Beyond Software
 //	All rights reserved
 //-----------------------------------------------------------------
@@ -66,10 +66,10 @@ public class BuildAtlases : ScriptableWizard
 	public int padding = 1;				// Pixels of padding to place around each packed texture
 	public bool trimImages = true;		// Whether or not to trim blank pixels from sprite frames automatically.
 	public bool forceSquare = false;	// Force the output atlases to be square?
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 	public bool onlyScanProjectFolder = true;	// Scan the entire "Assets" folder for prefabs containing packable sprites.
 #else
-	public bool scanProjectFolder = false;	// Reuse the entire "Assets" folder for prefabs containing packable sprites.
+	public bool scanProjectFolder = true;	// Reuse the entire "Assets" folder for prefabs containing packable sprites.
 #endif
 
 	public static bool doSingleMaterial = false; // Will only build the atlas for a single material - the one currently selected
@@ -79,10 +79,42 @@ public class BuildAtlases : ScriptableWizard
 	System.Type packableType = typeof(ISpriteAggregator);
 
 
+	// Loads previous settings from PlayerPrefs.
+	void LoadSettings()
+	{
+		atlasFolder = PlayerPrefs.GetString("BuildAtlases.atlasFolder", atlasFolder);
+		maxAtlasSize = PlayerPrefs.GetInt("BuildAtlases.maxAtlasSize", maxAtlasSize);
+		padding = PlayerPrefs.GetInt("BuildAtlases.padding", padding);
+		trimImages = 1 == PlayerPrefs.GetInt("BuildAtlases.trimImages", trimImages ? 1 : 0);
+		forceSquare = 1 == PlayerPrefs.GetInt("BuildAtlases.forceSquare", forceSquare ? 1 : 0);
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
+		onlyScanProjectFolder = 1 == PlayerPrefs.GetInt("BuildAtlases.onlyScanProjectFolder", onlyScanProjectFolder ? 1 : 0);
+#else
+		scanProjectFolder = 1 == PlayerPrefs.GetInt("BuildAtlases.scanProjectFolder", scanProjectFolder ? 1 : 0);
+#endif
+	}
+
+	// Saves settings to PlayerPrefs.
+	void SaveSettings()
+	{
+		PlayerPrefs.SetString("BuildAtlases.atlasFolder", atlasFolder);
+		PlayerPrefs.SetInt("BuildAtlases.maxAtlasSize", maxAtlasSize);
+		PlayerPrefs.SetInt("BuildAtlases.padding", padding);
+		PlayerPrefs.SetInt("BuildAtlases.trimImages", trimImages ? 1 : 0);
+		PlayerPrefs.SetInt("BuildAtlases.forceSquare", forceSquare ? 1 : 0);
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
+		PlayerPrefs.SetInt("BuildAtlases.onlyScanProjectFolder", onlyScanProjectFolder ? 1 : 0);
+#else
+		PlayerPrefs.SetInt("BuildAtlases.scanProjectFolder", scanProjectFolder ? 1 : 0);
+#endif
+	}
+
+
 	[MenuItem("Custom/Build Atlases &a")]
 	static void BuildSpriteAtlases()
 	{
-		ScriptableWizard.DisplayWizard("Build Atlases", typeof(BuildAtlases));
+		BuildAtlases ba = (BuildAtlases) ScriptableWizard.DisplayWizard("Build Atlases", typeof(BuildAtlases));
+		ba.LoadSettings();
 	}
 
 	// Single-material build:
@@ -91,7 +123,9 @@ public class BuildAtlases : ScriptableWizard
 	{
 		BuildAtlases.doSingleMaterial = true;
 		BuildAtlases.targetMaterial = (Material)Selection.activeObject;
-		ScriptableWizard.DisplayWizard("Build Atlas", typeof(BuildAtlases));
+		
+		BuildAtlases ba = (BuildAtlases) ScriptableWizard.DisplayWizard("Build Atlas", typeof(BuildAtlases));
+		ba.LoadSettings();
 	}
 
 	// Validator:
@@ -107,7 +141,9 @@ public class BuildAtlases : ScriptableWizard
 	{
 		BuildAtlases.doSingleMaterial = true;
 		BuildAtlases.targetMaterial = (Material)cmd.context;
-		ScriptableWizard.DisplayWizard("Build Atlas", typeof(BuildAtlases));
+		
+		BuildAtlases ba = (BuildAtlases) ScriptableWizard.DisplayWizard("Build Atlas", typeof(BuildAtlases));
+		ba.LoadSettings();
 	}
 
 	// Validator:
@@ -195,14 +231,14 @@ public class BuildAtlases : ScriptableWizard
 			texList = null;
 
 			// Try to free some memory:
-#if !UNITY_IPHONE || UNITY_3_1
+#if !UNITY_IPHONE || (UNITY_3_0 || UNITY_3_1)
 			Resources.UnloadUnusedAssets();
 #endif
 
 			++numAtlasesBuilt;
 		}
 
-#if !UNITY_IPHONE || UNITY_3_1
+#if !UNITY_IPHONE || (UNITY_3_0 || UNITY_3_1)
 		// Make sure all changes to objects are committed to disk:
 		//AssetDatabase.SaveAssets();
 #endif
@@ -214,6 +250,9 @@ public class BuildAtlases : ScriptableWizard
 			matSpriteMap[i].material.mainTexture = (Texture2D)AssetDatabase.LoadAssetAtPath(matSpriteMap[i].texPath, typeof(Texture2D));
 
 		Debug.Log(numAtlasesBuilt + " atlases generated.");
+
+		// Save our settings for next time:
+		SaveSettings();
 	}
 
 
@@ -225,7 +264,7 @@ public class BuildAtlases : ScriptableWizard
 
 		for (int i = 0; i < o.Length; ++i)
 		{
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 			if (onlyScanProjectFolder)
 #else
 			if (scanProjectFolder)
@@ -239,7 +278,7 @@ public class BuildAtlases : ScriptableWizard
 				// iPhone, we can't tell if a scene instance is a
 				// prefab instance and we'll mess up prefab relationships
 				// otherwise:
-#if !UNITY_IPHONE || UNITY_3_1
+#if !UNITY_IPHONE || (UNITY_3_0 || UNITY_3_1)
 				if (PrefabType.PrefabInstance != EditorUtility.GetPrefabType(o[i]))
 					sprites.Add(o[i]);
 #endif
@@ -249,7 +288,7 @@ public class BuildAtlases : ScriptableWizard
 		}
 
 		// See if we need to scan the Assets folder for sprite objects
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 		if (onlyScanProjectFolder)
 #else
 		if (scanProjectFolder)
@@ -487,7 +526,7 @@ public class BuildAtlases : ScriptableWizard
 		}
 		texList.trimmedTextures.Clear();
 
-#if !UNITY_IPHONE || UNITY_3_1
+#if !UNITY_IPHONE || (UNITY_3_0 || UNITY_3_1)
 		Resources.UnloadUnusedAssets();
 #endif
 
@@ -495,13 +534,16 @@ public class BuildAtlases : ScriptableWizard
 		if (forceSquare && atlas.width != atlas.height)
 		{
 			int size = Mathf.Max(atlas.width, atlas.height);
+			
 			// Create a square texture:
 			Texture2D tempTex = (Texture2D)Instantiate(atlas);
 			tempTex.name = atlas.name;
 			tempTex.Resize(size, size, TextureFormat.ARGB32, false);
+			
 			// Copy the contents:
 			tempTex.SetPixels(0, 0, atlas.width, atlas.height, atlas.GetPixels(0), 0);
 			tempTex.Apply(false);
+			
 			// Scale the UVs to account for this:
 			for (int j = 0; j < texList.uvs.Length; ++j)
 			{
@@ -631,11 +673,12 @@ public class BuildAtlases : ScriptableWizard
 		texturePath = AssetDatabase.GetAssetPath(tex);
 		// Get the texture's importer:
 		TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(texturePath);
-		if (!importer.isReadable || importer.textureFormat != TextureImporterFormat.ARGB32)
+		if (!importer.isReadable || importer.textureFormat != TextureImporterFormat.ARGB32 || importer.npotScale != TextureImporterNPOTScale.None)
 		{
 			// Reimport it with isReadable set to true and ARGB32:
 			importer.isReadable = true;
 			importer.textureFormat = TextureImporterFormat.ARGB32;
+			importer.npotScale = TextureImporterNPOTScale.None;
 			AssetDatabase.ImportAsset(texturePath, ImportAssetOptions.ForceSynchronousImport);
 		}
 	}
@@ -714,7 +757,7 @@ public class BuildAtlases : ScriptableWizard
 		// Check for an empty frame, and in which case, 
 		// leave a 2x2 pixel area:
 		if (area.width == 0 || area.height == 0)
-			area = new Rect(0, 0, 2f, 2f);
+			area = new Rect(tex.width/2f-1f, tex.height/2f-1f, 2f, 2f);
 
 		return area;
 	}

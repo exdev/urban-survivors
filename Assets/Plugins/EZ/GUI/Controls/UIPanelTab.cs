@@ -33,7 +33,7 @@ public class UIPanelTab : UIRadioBtn
 	/// we will be bringing up/dismissing.
 	/// This can be left to None/null if there is
 	/// only one UIPanelManager object in the scene.
-	/// NOTE: For other panels to be hidden when this
+	/// NOTE: For other panels to be hideAtStart when this
 	/// one is shown requires the use of a UIPanelManager.
 	/// </summary>
 	public UIPanelManager panelManager;
@@ -78,11 +78,18 @@ public class UIPanelTab : UIRadioBtn
 		}
 
 		Value = panelIsShowing;
+
+		// Since hiding while managed depends on
+		// setting our mesh extents to 0, and the
+		// foregoing code causes us to not be set
+		// to 0, re-hide ourselves:
+		if (managed && m_hidden)
+			Hide(true);
 	}
 
-	public override void OnInput(POINTER_INFO ptr)
+	public override void OnInput(ref POINTER_INFO ptr)
 	{
-		base.OnInput(ptr);
+		base.OnInput(ref ptr);
 
 		if (!m_controlIsEnabled || IsHidden())
 		{

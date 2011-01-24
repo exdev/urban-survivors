@@ -4,7 +4,7 @@
 //	All rights reserved
 //-----------------------------------------------------------------
 
-// #define SM2_FRAME_DELEGATE		// Adds code to call a delegate for each frame of animation (comment out this line to improve performance)
+// #define SPRITE_FRAME_DELEGATE		// Adds code to call a delegate for each frame of animation (comment out this line to improve performance)
 
 
 using UnityEngine;
@@ -450,6 +450,9 @@ public class Sprite : SpriteBase
 	/// <param name="anim">A reference to the animation to play.</param>
 	public void PlayAnim(UVAnimation_Multi anim)
 	{
+		if (deleted)
+			return;
+
 		curAnim = anim;
 		curAnimIndex = curAnim.index;
 		curAnim.Reset();
@@ -463,7 +466,7 @@ public class Sprite : SpriteBase
 
 		// Only add to the animated list if
 		// the animation has more than 1 frame:
-		if (anim.GetFrameCount() > 1)
+		if (anim.GetFrameCount() > 1 || anim.onAnimEnd != UVAnimation.ANIM_END_ACTION.Do_Nothing)
 		{
 			StepAnim(0);
 			// Start coroutine

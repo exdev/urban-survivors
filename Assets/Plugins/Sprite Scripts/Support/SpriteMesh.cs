@@ -78,7 +78,7 @@ public class SpriteMesh : ISpriteMesh
 		{ 
 			meshRenderer.sharedMaterial = value;
 			m_texture = meshRenderer.sharedMaterial.mainTexture;
-			if (m_sprite != null)
+			if (m_sprite != null && m_texture != null)
 				m_sprite.SetPixelToUV(m_texture);
 		}
 	}
@@ -190,6 +190,12 @@ public class SpriteMesh : ISpriteMesh
 			return true;
 
 		return !meshRenderer.enabled;
+	}
+
+	public void SetPersistent()
+	{
+		if(m_mesh != null)
+			GameObject.DontDestroyOnLoad(m_mesh);
 	}
 
 	public virtual void SetWindingOrder(SpriteRoot.WINDING_ORDER winding)
