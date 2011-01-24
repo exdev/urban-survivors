@@ -733,4 +733,13 @@ public class Player_girl : Player_base {
         this.anim.Play("fallDown", PlayMode.StopAll);
         StartCoroutine( WaitForRecover() );
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    new void OnTriggerEnter ( Collider _other ) {
+        base.OnTriggerEnter(_other);
+        screenPad.gameObject.SendMessage ( "OnGirlHit" );
+    }
 }

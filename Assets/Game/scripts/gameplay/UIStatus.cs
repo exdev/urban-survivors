@@ -31,7 +31,9 @@ public class UIStatus : MonoBehaviour {
 
     public GameObject gameOver = null;
     public UIProgressBar boyProgressBar = null;
+    public GameObject boyFace = null; 
     public UIProgressBar girlProgressBar = null;
+    public GameObject girlFace = null; 
     public TextMesh restartCounterText = null;
     public TextMesh bulletCounterText = null;
 
@@ -45,6 +47,8 @@ public class UIStatus : MonoBehaviour {
     public PackedSprite reloadButton = null;
 
     protected ScreenPad screenPad = null;
+    protected Transform initBoyTrans; 
+    protected Transform initGirlTrans; 
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -63,6 +67,9 @@ public class UIStatus : MonoBehaviour {
 
         gameOver.SetActiveRecursively(false);
         screenPad = GetComponent<ScreenPad>();
+
+        this.initBoyTrans = boyFace.transform;
+        this.initGirlTrans = girlFace.transform;
 
         // 
         this.ActiveAimingZone(false);
@@ -193,5 +200,29 @@ public class UIStatus : MonoBehaviour {
         else {
             reloadButton.PlayAnimInReverse("active");
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnBoyHit () {
+        iTween.Stop(this.boyFace, "shake" );
+        this.boyFace.transform.position = this.initBoyTrans.position;
+        this.boyFace.transform.rotation = this.initBoyTrans.rotation;
+        iTween.ShakePosition(this.boyFace, 10.0f * Vector3.right, 0.5f );
+        // iTween.ShakeRotation(this.boyFace, 30.0f * Vector3.forward, 0.5f );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnGirlHit () {
+        iTween.Stop(this.girlFace, "shake" );
+        this.girlFace.transform.position = this.initGirlTrans.position;
+        this.girlFace.transform.rotation = this.initGirlTrans.rotation;
+        iTween.ShakePosition(this.girlFace, 10.0f * Vector3.right, 0.5f );
+        // iTween.ShakeRotation(this.girlFace, 30.0f * Vector3.forward, 0.5f );
     }
 }

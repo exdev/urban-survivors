@@ -531,4 +531,13 @@ public class Player_boy : Player_base {
         dir.Normalize();
         this.transform.forward = dir;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    new void OnTriggerEnter ( Collider _other ) {
+        base.OnTriggerEnter(_other);
+        screenPad.gameObject.SendMessage ( "OnBoyHit" );
+    }
 }
