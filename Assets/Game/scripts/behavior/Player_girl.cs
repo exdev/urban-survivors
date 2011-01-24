@@ -637,27 +637,29 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     public Vector2 GetAutoLockDir ( Vector2 _dir ) {
-        Vector2 my_pos = new Vector2 ( this.transform.position.x, 
-                                       this.transform.position.z );
-        List<GameObject> enemies = GameRules.Instance().GetEnemies();
-        foreach ( GameObject enemy in enemies ) {
-            CharacterController ctrl = enemy.collider as CharacterController;
-            if ( ctrl ) {
-                float radius = ctrl.radius; 
+        // TODO { 
+        // Vector2 my_pos = new Vector2 ( this.transform.position.x, 
+        //                                this.transform.position.z );
+        // List<GameObject> enemies = GameRules.Instance().GetEnemies();
+        // foreach ( GameObject enemy in enemies ) {
+        //     CharacterController ctrl = enemy.collider as CharacterController;
+        //     if ( ctrl ) {
+        //         float radius = ctrl.radius; 
 
-                Vector2 min = new Vector2 ( enemy.collider.bounds.min.x,
-                                            enemy.collider.bounds.min.z );
-                Vector2 max = new Vector2 ( enemy.collider.bounds.max.x,
-                                            enemy.collider.bounds.max.z );
-                Vector2 dmin = min - my_pos; 
-                Vector2 dmax = max - my_pos; 
-                float deg1 = Vector2.Angle(_dir,dmin);
-                float deg2 = Vector2.Angle(_dir,dmax);
+        //         Vector2 min = new Vector2 ( enemy.collider.bounds.min.x,
+        //                                     enemy.collider.bounds.min.z );
+        //         Vector2 max = new Vector2 ( enemy.collider.bounds.max.x,
+        //                                     enemy.collider.bounds.max.z );
+        //         Vector2 dmin = min - my_pos; 
+        //         Vector2 dmax = max - my_pos; 
+        //         float deg1 = Vector2.Angle(_dir,dmin);
+        //         float deg2 = Vector2.Angle(_dir,dmax);
 
-                // DebugHelper.ScreenPrint("deg1: " + deg1);
-                // DebugHelper.ScreenPrint("deg2: " + deg2);
-            }
-        }
+        //         // DebugHelper.ScreenPrint("deg1: " + deg1);
+        //         // DebugHelper.ScreenPrint("deg2: " + deg2);
+        //     }
+        // }
+        // } TODO end 
         // TODO:
         return _dir;
     }

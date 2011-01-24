@@ -145,6 +145,7 @@ public class Player_boy : Player_base {
     ///////////////////////////////////////////////////////////////////////////////
 
     public Vector3 screenDir = Vector3.zero;
+    public Transform upperBody;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -217,7 +218,7 @@ public class Player_boy : Player_base {
 
         //
         string[] anim_keys0_once = { 
-            "melee1_copy", 
+            // "melee1_copy", 
             "fallDown",
             "getUp"
         };
@@ -228,6 +229,13 @@ public class Player_boy : Player_base {
             state.weight = 1.0f;
             state.enabled = false;
         }
+
+        // melee attack can go for walk.
+        state = anim["melee1_copy"]; 
+        state.layer = 1;
+        state.AddMixingTransform(this.upperBody);
+        state.weight = 1.0f;
+        state.enabled = false;
     }
 
     // ------------------------------------------------------------------ 
@@ -248,11 +256,16 @@ public class Player_boy : Player_base {
         // walk
         FSM.State state_walk = new FSM.State( "Walk", 
                                               new Action_PlayAnim(this.anim,"moveforward"), 
-                                              new Action_Move(this),
-                                              new Action_StopMoving(this) );
+                                              null, // new Action_Move(this),
+                                              null );
         // melee
-        FSM.State state_melee = new FSM.State( "Melee", 
-                                               new Action_StartCombo(this), 
+        FSM.State state_idleMelee = new FSM.State( "IdleMelee", 
+                                               new Action_PlayAnim(this.anim,"idle"), 
+                                               new Action_NextCombo(this), 
+                                               null );
+        // walk melee
+        FSM.State state_walkMelee = new FSM.State( "WalkMelee", 
+                                               new Action_PlayAnim(this.anim,"moveforward"), 
                                                new Action_NextCombo(this), 
                                                null );
         // down
@@ -280,6 +293,8 @@ public class Player_boy : Player_base {
         // condition 
         // ======================================================== 
 
+        FSM.Action act_startCombo = new Action_StartCombo(this); 
+
         FSM.Condition cond_isMoving = new Condition_isMoving(this);
         FSM.Condition cond_isMeleeButtonDown = new Condition_isMeleeButtonDown(this);
         FSM.Condition cond_isAttacking = new Condition_isAttacking(this);
@@ -294,21 +309,38 @@ public class Player_boy : Player_base {
         state_idle.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
         state_idle.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_idle.AddTransition( new FSM.Transition( state_walk, cond_isMoving, null ) );
-        state_idle.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonDown, null ) );
+        state_idle.AddTransition( new FSM.Transition( state_idleMelee, cond_isMeleeButtonDown, act_startCombo ) );
 
         // walk to ...
         state_walk.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
         state_walk.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_walk.AddTransition( new FSM.Transition( state_idle, new FSM.Condition_not(cond_isMoving), null ) );
-        state_walk.AddTransition( new FSM.Transition( state_melee, cond_isMeleeButtonDown, null ) );
+        state_walk.AddTransition( new FSM.Transition( state_walkMelee, cond_isMeleeButtonDown, act_startCombo ) );
 
-        // melee to ...
-        state_melee.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
-        state_melee.AddTransition( new FSM.Transition( state_idle, 
+        // idle melee to ...
+        state_idleMelee.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
+        state_idleMelee.AddTransition( new FSM.Transition( state_idle, 
                                                        new FSM.Condition_and(new FSM.Condition_not(cond_isMoving),
                                                                              new FSM.Condition_not(cond_isAttacking)), 
                                                        null ) );
-        state_melee.AddTransition( new FSM.Transition( state_walk, 
+        state_idleMelee.AddTransition( new FSM.Transition( state_walk, 
+                                                       new FSM.Condition_and(cond_isMoving, 
+                                                                             new FSM.Condition_not(cond_isAttacking) ),
+                                                       null ) );
+        state_idleMelee.AddTransition( new FSM.Transition( state_walkMelee, 
+                                                       new FSM.Condition_and(cond_isMoving, cond_isAttacking ),
+                                                       null ) );
+
+        // walk melee to ..
+        state_walkMelee.AddTransition( new FSM.Transition( state_down, cond_noHP, null ) );
+        state_walkMelee.AddTransition( new FSM.Transition( state_idle, 
+                                                       new FSM.Condition_and(new FSM.Condition_not(cond_isMoving),
+                                                                             new FSM.Condition_not(cond_isAttacking)), 
+                                                       null ) );
+        state_walkMelee.AddTransition( new FSM.Transition( state_idleMelee, 
+                                                       new FSM.Condition_and(new FSM.Condition_not(cond_isMoving),cond_isAttacking),
+                                                       null ) );
+        state_walkMelee.AddTransition( new FSM.Transition( state_walk, 
                                                        new FSM.Condition_and(cond_isMoving,
                                                                              new FSM.Condition_not(cond_isAttacking)), 
                                                        null ) );
@@ -353,6 +385,11 @@ public class Player_boy : Player_base {
     // ------------------------------------------------------------------ 
 
     void ProcessMovement () {
+        if ( IsMoving() == false )
+            this.Stop();
+        else
+            this.Act_Movement();
+
         // handle steering
         Vector3 force = Vector3.zero;
         if ( this.steeringState == SteeringState.moving ) {
@@ -378,7 +415,7 @@ public class Player_boy : Player_base {
         this.anim.CrossFade(first_combo.animName);
 
         // adjust the orientation
-        AdjustOrientation();
+        // AdjustOrientation();
     }
 
     // ------------------------------------------------------------------ 
@@ -412,7 +449,7 @@ public class Player_boy : Player_base {
                 atk_info.curCombo = nextCombo;
                 atk_info.waitForNextCombo = false;
                 // adjust the orientation
-                AdjustOrientation();
+                // AdjustOrientation();
             }
         }
     }
