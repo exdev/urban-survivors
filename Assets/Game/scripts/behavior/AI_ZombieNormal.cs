@@ -389,6 +389,9 @@ public class AI_ZombieNormal : AI_ZombieBase {
             // } TEMP HARDCODE end 
             return;
         }
+        else {
+            Act_Movement();
+        }
 
         // handle steering
         Vector3 force = Vector3.zero;
@@ -478,6 +481,15 @@ public class AI_ZombieNormal : AI_ZombieBase {
         // TODO: if hit light, face it { 
         // transform.forward = -_other.transform.forward;
         // } TODO end 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Act_Movement () {
+        // adjust move animation speed
+        this.anim["moveForward"].normalizedSpeed = Mathf.Max(this.StepSpeed * this.CurSpeed(),0.1f);
     }
 
     // ------------------------------------------------------------------ 

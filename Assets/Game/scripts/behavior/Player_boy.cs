@@ -541,8 +541,9 @@ public class Player_boy : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    new void OnTriggerEnter ( Collider _other ) {
-        base.OnTriggerEnter(_other);
-        screenPad.gameObject.SendMessage ( "OnBoyHit" );
+    void OnTriggerEnter ( Collider _other ) {
+        if ( base.ApplyDamage(_other) ) {
+            screenPad.gameObject.SendMessage ( "OnBoyHit" );
+        }
     }
 }

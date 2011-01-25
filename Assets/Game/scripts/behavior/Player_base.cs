@@ -242,10 +242,10 @@ public class Player_base : Actor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    protected void OnTriggerEnter ( Collider _other ) {
+    protected bool ApplyDamage ( Collider _other ) {
         // don't do anything if player is down
         if ( this.isDown )
-            return;
+            return false;
 
         //
         DamageInfo dmgInfo = null;
@@ -259,13 +259,13 @@ public class Player_base : Actor {
             }
         }
         else {
-            return;
+            return false;
         }
 
         // if we don't get damage info, just return
         DebugHelper.Assert( dmgInfo, "can't find damage info for given layer" );
         if ( dmgInfo == null ) {
-            return;
+            return false;
         }
         float dmgOutput = DamageRule.Instance().CalculateDamage( this.playerInfo, dmgInfo );
         this.playerInfo.accDmgNormal += dmgOutput;
@@ -285,6 +285,8 @@ public class Player_base : Actor {
         dir.y = 0.0f;
         dir.Normalize();
         this.lastHit.knockBackForce = dir * DamageRule.Instance().KnockBackForce(dmgInfo.knockBackType);  
+
+        return true;
     }
 
     // ------------------------------------------------------------------ 
