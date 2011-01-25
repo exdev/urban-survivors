@@ -76,6 +76,22 @@ public class Player_girl : Player_base {
     }
 
     // ------------------------------------------------------------------ 
+    // Desc: Action_ActiveReloading 
+    // ------------------------------------------------------------------ 
+
+    class Action_ActiveReloading : FSM.Action {
+        Player_girl playerGirl; 
+
+        public Action_ActiveReloading ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override void exec () {
+            this.playerGirl.Act_ActiveReloading();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     // Desc: Action_FallDown 
     // ------------------------------------------------------------------ 
 
@@ -227,6 +243,22 @@ public class Player_girl : Player_base {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Condition_activeReloadTriggered : FSM.Condition {
+        Player_girl playerGirl = null;
+
+        public Condition_activeReloadTriggered ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override bool exec () {
+            return this.playerGirl.ActiveReloadTriggered();
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -296,7 +328,6 @@ public class Player_girl : Player_base {
         }
 
         // reset the internal state.
-        this.shootButtonTriggered = false;
         this.lastHit.stunType = HitInfo.StunType.none;
     }
 
@@ -389,6 +420,11 @@ public class Player_girl : Player_base {
                                                        new Action_Reloading(this), 
                                                        null,
                                                        null );
+        // active reloading
+        FSM.State state_idleActiveReloading = new FSM.State( "idle_active_reloading", 
+                                                             new Action_ActiveReloading(this), 
+                                                             null,
+                                                             null );
         // walk reloading
         FSM.State state_walkReloading = new FSM.State( "walk_reloading", 
                                                        new Action_Reloading(this), 
@@ -425,6 +461,8 @@ public class Player_girl : Player_base {
         FSM.Condition cond_isOutOfAmmo = new Condition_isOutOfAmmo(this);
         FSM.Condition cond_canReload = new FSM.Condition_and( new FSM.Condition_not(new Condition_isAmmoFull(this)), 
                                                               new Condition_isReloadButtonDown(this) );
+        FSM.Condition cond_activeReloadTriggered = new Condition_activeReloadTriggered(this);
+
         FSM.Condition cond_isOnStun = new Condition_isOnStun(this);
         FSM.Condition cond_noHP = new Condition_noHP(this.playerInfo);
 
@@ -439,8 +477,6 @@ public class Player_girl : Player_base {
         // setup transitions
         // ======================================================== 
 
-         
-                                        
         FSM.Action action_Move = new Action_Move(this);
         FSM.Action action_Enable = new Action_EnableSteering(this);
         FSM.Action action_Disable = new Action_DisableSteering(this);
@@ -479,7 +515,14 @@ public class Player_girl : Player_base {
         state_idleReloading.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_idleReloading.AddTransition( new FSM.Transition( state_idle, cond_isNotReloading, null ) );
         state_idleReloading.AddTransition( new FSM.Transition( state_walkReloading, cond_isMoving, action_Move ) );
+        state_idleReloading.AddTransition( new FSM.Transition( state_idleActiveReloading, cond_activeReloadTriggered, null ) );
 
+        // idle active reload to ...
+        state_idleActiveReloading.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
+        state_idleActiveReloading.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
+        state_idleActiveReloading.AddTransition( new FSM.Transition( state_idle, cond_isNotReloading, null ) );
+        state_idleActiveReloading.AddTransition( new FSM.Transition( state_walkReloading, cond_isMoving, action_Move ) );
+    
         // walk reload to ...
         state_walkReloading.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
         state_walkReloading.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
@@ -544,17 +587,7 @@ public class Player_girl : Player_base {
         this.aimDir = this.aimDir.normalized;
 
         // if we have weapon in hand.
-        if ( screenPad.CanShoot() ) {
-            this.shootButtonTriggered = true;
-            // TODO { 
-            // if ( this.curWeapon ) {
-            //     Fire fire = this.curWeapon.GetComponent<Fire>();
-            //     if (fire) {
-            //         fire.Trigger();
-            //     }
-            // }
-            // } TODO end 
-        }
+        this.shootButtonTriggered = screenPad.CanShoot(); 
     }
 
     // ------------------------------------------------------------------ 
@@ -628,6 +661,21 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     public bool ReloadButtonDown () { return screenPad.ReloadButtonDown(); }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool ActiveReloadTriggered () {
+        // TEMP HACK { 
+        ShootInfo shootInfo = this.GetShootInfo();
+        if ( this.IsPlayingAnim( shootInfo.reloadAnim ) ) {
+            if ( Input.GetKeyDown("t") )
+                return true;
+        }
+        return false;
+        // } TEMP HACK end 
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -716,6 +764,21 @@ public class Player_girl : Player_base {
     public void Act_Reloading () {
         ShootInfo shootInfo = this.GetShootInfo();
         if ( shootInfo ) {
+            shootInfo.ActiveReload(false);
+            shootInfo.AdjustAnim(this.anim);
+            this.anim.Play(shootInfo.reloadAnim);
+            shootInfo.Reload();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Act_ActiveReloading () {
+        ShootInfo shootInfo = this.GetShootInfo();
+        if ( shootInfo ) {
+            shootInfo.ActiveReload(true);
             shootInfo.AdjustAnim(this.anim);
             this.anim.Play(shootInfo.reloadAnim);
             shootInfo.Reload();
