@@ -105,8 +105,7 @@ public class Player_boy : Player_base {
             AttackInfo atk_info = playerBoy.GetAttackInfo();
             if ( atk_info.curCombo == null )
                 return false;
-            return this.playerBoy.IsPlayingAnim( atk_info.curCombo.animName, 
-                                                 atk_info.curCombo.endTime );
+            return this.playerBoy.IsPlayingAnim( atk_info.curCombo.animName, atk_info.curCombo.endTime );
         }
     }
 
@@ -218,7 +217,6 @@ public class Player_boy : Player_base {
 
         //
         string[] anim_keys0_once = { 
-            // "melee1_copy", 
             "fallDown",
             "getUp"
         };
@@ -230,12 +228,19 @@ public class Player_boy : Player_base {
             state.enabled = false;
         }
 
-        // melee attack can go for walk.
-        state = anim["melee1_copy"]; 
-        state.layer = 1;
-        state.AddMixingTransform(this.upperBody);
-        state.weight = 1.0f;
-        state.enabled = false;
+        //
+        string[] melee_anims = { 
+            "melee1_copy", 
+            "melee2_copy", 
+        };
+        foreach (string key in melee_anims) {
+            state = this.anim[key];
+            state.layer = 1;
+            state.wrapMode = WrapMode.Once;
+            state.weight = 1.0f;
+            state.enabled = false;
+            state.AddMixingTransform(this.upperBody);
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -418,7 +423,7 @@ public class Player_boy : Player_base {
         ComboInfo first_combo = atk_info.combo_entry;
         atk_info.curCombo = first_combo;
         this.anim[first_combo.animName].normalizedSpeed = atk_info.speed;
-        this.anim.Rewind(first_combo.animName);
+        this.anim.Rewind(first_combo.animName); // NOTE: without rewind, you can't play one animation continuesly
         this.anim.CrossFade(first_combo.animName);
 
         // adjust the orientation
@@ -451,7 +456,7 @@ public class Player_boy : Player_base {
         else if ( atk_info.waitForNextCombo ) {
             if ( curAnim.time >= atk_info.curCombo.validInputTime.y ) {
                 this.anim[nextCombo.animName].normalizedSpeed = atk_info.speed;
-                this.anim.Rewind(atk_info.curCombo.animName);
+                this.anim.Rewind(nextCombo.animName); // NOTE: without rewind, you can't play one animation continuesly
                 this.anim.CrossFade(nextCombo.animName);
                 atk_info.curCombo = nextCombo;
                 atk_info.waitForNextCombo = false;

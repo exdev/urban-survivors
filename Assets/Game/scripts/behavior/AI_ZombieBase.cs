@@ -138,7 +138,7 @@ public class AI_ZombieBase : Actor {
     // ------------------------------------------------------------------ 
 
     void OnDisable () {
-        Debug.Log("hello world");
+        // Debug.Log("hello world");
     }
 
     // ------------------------------------------------------------------ 
