@@ -105,7 +105,10 @@ public class Player_boy : Player_base {
             AttackInfo atk_info = playerBoy.GetAttackInfo();
             if ( atk_info.curCombo == null )
                 return false;
-            return this.playerBoy.IsPlayingAnim( atk_info.curCombo.animName, atk_info.curCombo.endTime );
+            if ( atk_info.waitForNextCombo == false )
+                return this.playerBoy.IsPlayingAnim( atk_info.curCombo.animName );
+            else
+                return this.playerBoy.IsPlayingAnim( atk_info.curCombo.animName, atk_info.curCombo.endTime );
         }
     }
 
@@ -237,7 +240,7 @@ public class Player_boy : Player_base {
             state = this.anim[key];
             state.layer = 1;
             state.wrapMode = WrapMode.Once;
-            state.weight = 1.0f;
+            state.weight = 5.0f;
             state.enabled = false;
             state.AddMixingTransform(this.upperBody);
         }
@@ -424,7 +427,7 @@ public class Player_boy : Player_base {
         atk_info.curCombo = first_combo;
         this.anim[first_combo.animName].normalizedSpeed = atk_info.speed;
         this.anim.Rewind(first_combo.animName); // NOTE: without rewind, you can't play one animation continuesly
-        this.anim.CrossFade(first_combo.animName);
+        this.anim.CrossFade(first_combo.animName,0.1f);
 
         // adjust the orientation
         // AdjustOrientation();
@@ -457,7 +460,7 @@ public class Player_boy : Player_base {
             if ( curAnim.time >= atk_info.curCombo.validInputTime.y ) {
                 this.anim[nextCombo.animName].normalizedSpeed = atk_info.speed;
                 this.anim.Rewind(nextCombo.animName); // NOTE: without rewind, you can't play one animation continuesly
-                this.anim.CrossFade(nextCombo.animName);
+                this.anim.CrossFade(nextCombo.animName,0.1f);
                 atk_info.curCombo = nextCombo;
                 atk_info.waitForNextCombo = false;
                 // adjust the orientation
