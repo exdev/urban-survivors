@@ -44,11 +44,21 @@ public class UIStatus : MonoBehaviour {
     public PackedSprite moveAnalog = null;
 
     public PackedSprite meleeButton = null;
+
     public PackedSprite reloadButton = null;
+    public PackedSprite reloadindEffect = null;
 
     protected ScreenPad screenPad = null;
     protected Transform initBoyTrans; 
     protected Transform initGirlTrans; 
+
+    public enum ReloadBtnState {
+        accept_reload,
+        accept_activeReload,
+        disable
+    };
+    protected ReloadBtnState reloadBtnState = ReloadBtnState.accept_reload; 
+    protected ReloadBtnState lastReloadBtnState = ReloadBtnState.accept_reload; 
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -75,7 +85,11 @@ public class UIStatus : MonoBehaviour {
         this.ActiveAimingZone(false);
         this.ActiveMovingZone(false);
         this.ActiveMeleeButton(false);
-        this.ActiveReloadButton(false);
+
+        // 
+        reloadButton.PlayAnimInReverse("active");
+        reloadindEffect.color.a = 0.5f;
+        reloadindEffect.SetColor(reloadindEffect.color);
     }
 
     // ------------------------------------------------------------------ 
@@ -86,6 +100,7 @@ public class UIStatus : MonoBehaviour {
         PlayerInfo boyInfo = GameRules.Instance().GetPlayerBoyInfo();
         this.boyProgressBar.Value = boyInfo.curHP/boyInfo.maxHP;
 
+        Player_girl girl = GameRules.Instance().GetPlayerGirl() as Player_girl;
         PlayerInfo girlInfo = GameRules.Instance().GetPlayerGirlInfo();
         this.girlProgressBar.Value = 1.0f - girlInfo.curHP/girlInfo.maxHP;
 
@@ -97,11 +112,10 @@ public class UIStatus : MonoBehaviour {
 
         // update bullets
         if ( this.bulletCounterText ) {
-            Player_base girl = GameRules.Instance().GetPlayerGirl();
             ShootInfo shootInfo = girl.GetShootInfo();
 
             // curbullet / totalbullet
-            this.bulletCounterText.text = shootInfo.CurBullets() + "/" + shootInfo.TotalBullets();
+            this.bulletCounterText.text = shootInfo.CurBullets() + "/" + shootInfo.RemainBullets();
         }
 
         // KEEPME { 
@@ -134,10 +148,7 @@ public class UIStatus : MonoBehaviour {
             this.ActiveMeleeButton(false);
 
         // reload button
-        if ( screenPad.ReloadButtonDown() )
-            this.ActiveReloadButton(true);
-        else if ( screenPad.ReloadButtonUp() )
-            this.ActiveReloadButton(false);
+        this.UpdateReloadButtonState();
     }
 
     // ------------------------------------------------------------------ 
@@ -193,12 +204,55 @@ public class UIStatus : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void ActiveReloadButton ( bool _active ) {
-        if ( _active ) {
-            reloadButton.PlayAnim("active");
+    void UpdateReloadButtonState () {
+        this.lastReloadBtnState = this.reloadBtnState;
+
+        Player_girl girl = GameRules.Instance().GetPlayerGirl() as Player_girl;
+        ShootInfo shootInfo = girl.GetShootInfo();
+
+        // get current reload button state
+        if ( girl.IsReloading() == false && 
+             shootInfo.isAmmoFull() == false && 
+             shootInfo.NoBulletForReloading() == false ) 
+        {
+            this.reloadBtnState = ReloadBtnState.accept_reload;
+        }
+        else if ( girl.IsReloading() && 
+                  this.lastReloadBtnState != ReloadBtnState.disable ) {
+            this.reloadBtnState = ReloadBtnState.accept_activeReload;
         }
         else {
-            reloadButton.PlayAnimInReverse("active");
+            this.reloadBtnState = ReloadBtnState.disable;
+        }
+
+        // check if we need process 
+        if ( this.lastReloadBtnState != this.reloadBtnState ) {
+            if ( this.reloadBtnState == ReloadBtnState.accept_reload ) {
+                reloadButton.color.a = 1.0f;
+                reloadButton.SetColor(reloadButton.color);
+                reloadindEffect.color.a = 0.5f;
+                reloadindEffect.SetColor(reloadindEffect.color);
+            }
+            else if ( this.reloadBtnState == ReloadBtnState.accept_activeReload ) {
+            }
+        }
+
+        //
+        if ( this.reloadBtnState != ReloadBtnState.disable ) {
+            if ( screenPad.ReloadButtonDown() ) {
+                reloadButton.PlayAnim("active");
+                reloadindEffect.PlayAnim("active");
+            }
+            else if ( screenPad.ReloadButtonUp() ) {
+                reloadButton.PlayAnimInReverse("active");
+                reloadindEffect.PlayAnimInReverse("active");
+            }
+        }
+        else {
+            reloadButton.color.a = 0.5f;
+            reloadButton.SetColor(reloadButton.color);
+            reloadindEffect.color.a = 0.2f;
+            reloadindEffect.SetColor(reloadindEffect.color);
         }
     }
 

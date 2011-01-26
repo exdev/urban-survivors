@@ -172,8 +172,7 @@ public class Player_girl : Player_base {
         }
 
         public override bool exec () {
-            ShootInfo shootInfo = this.playerGirl.GetShootInfo();
-            return this.playerGirl.IsPlayingAnim( shootInfo.reloadAnim );
+            return this.playerGirl.IsReloading();
         }
     }
 
@@ -198,16 +197,19 @@ public class Player_girl : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    class Condition_isAmmoFull : FSM.Condition {
+    class Condition_canReload : FSM.Condition {
         Player_girl playerGirl = null;
 
-        public Condition_isAmmoFull ( Player_girl _playerGirl ) {
+        public Condition_canReload ( Player_girl _playerGirl ) {
             this.playerGirl = _playerGirl;
         }
 
         public override bool exec () {
             ShootInfo shootInfo = this.playerGirl.GetShootInfo();
-            return shootInfo.isAmmoFull();
+            return ( shootInfo.isAmmoFull() == false &&
+                     shootInfo.NoBulletForReloading() == false &&
+                     this.playerGirl.IsReloading() == false
+                   );
         }
     }
 
@@ -459,8 +461,10 @@ public class Player_girl : Player_base {
         FSM.Condition cond_isNotShooting = new FSM.Condition_not( new Condition_isShooting(this) );
         FSM.Condition cond_isNotReloading = new FSM.Condition_not( new Condition_isReloading(this) );
         FSM.Condition cond_isOutOfAmmo = new Condition_isOutOfAmmo(this);
-        FSM.Condition cond_canReload = new FSM.Condition_and( new FSM.Condition_not(new Condition_isAmmoFull(this)), 
-                                                              new Condition_isReloadButtonDown(this) );
+        FSM.Condition cond_triggerReload = new FSM.Condition_and( new Condition_canReload(this),
+                                                                  new FSM.Condition_or ( new Condition_isOutOfAmmo(this),
+                                                                                         new Condition_isReloadButtonDown(this) )
+                                                                );
         FSM.Condition cond_activeReloadTriggered = new Condition_activeReloadTriggered(this);
 
         FSM.Condition cond_isOnStun = new Condition_isOnStun(this);
@@ -487,26 +491,26 @@ public class Player_girl : Player_base {
         state_idle.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_idle.AddTransition( new FSM.Transition( state_walk, cond_isMoving, action_Move ) );
         state_idle.AddTransition( new FSM.Transition( state_idleShooting, cond_isShootButtonTriggered, null ) );
-        state_idle.AddTransition( new FSM.Transition( state_idleReloading, cond_canReload, null ) );
+        state_idle.AddTransition( new FSM.Transition( state_idleReloading, cond_triggerReload, null ) );
 
         // walk to ...
         state_walk.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
         state_walk.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_walk.AddTransition( new FSM.Transition( state_idle, cond_isNotMoving, action_Idle ) );
         state_walk.AddTransition( new FSM.Transition( state_walkShooting, cond_isShootButtonTriggered, null ) );
-        state_walk.AddTransition( new FSM.Transition( state_walkReloading, cond_canReload, null ) );
+        state_walk.AddTransition( new FSM.Transition( state_walkReloading, cond_triggerReload, null ) );
 
         // idle shooting to ...
         state_idleShooting.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
-        state_idleShooting.AddTransition( new FSM.Transition( state_idleReloading, new FSM.Condition_or ( cond_isOutOfAmmo, cond_canReload ), null ) );
+        state_idleShooting.AddTransition( new FSM.Transition( state_idleReloading, cond_triggerReload, null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_idle, cond_isNotShooting, null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_walkShooting, cond_isMoving, action_Move ) );
 
         // walk shooting to ...
         state_walkShooting.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
-        state_walkShooting.AddTransition( new FSM.Transition( state_walkReloading, new FSM.Condition_or ( cond_isOutOfAmmo, cond_canReload ), null ) );
+        state_walkShooting.AddTransition( new FSM.Transition( state_walkReloading, cond_triggerReload, null ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_walk, cond_isNotShooting, null ) );
         state_walkShooting.AddTransition( new FSM.Transition( state_idleShooting, cond_isNotMoving, action_Idle ) );
 
@@ -752,6 +756,10 @@ public class Player_girl : Player_base {
             if ( this.anim.IsPlaying(shootInfo.shootAnim) == false ) {
                 shootInfo.AdjustAnim(this.anim);
                 shootInfo.Fire();
+                // TODO: to use this way, you must rewrite the shoot system { 
+                // this.anim.Rewind(shootInfo.shootAnim);
+                // this.anim.CrossFade(shootInfo.shootAnim, 0.05f);
+                // } TODO end 
                 this.anim.Play(shootInfo.shootAnim);
             }
         }
@@ -766,7 +774,7 @@ public class Player_girl : Player_base {
         if ( shootInfo ) {
             shootInfo.ActiveReload(false);
             shootInfo.AdjustAnim(this.anim);
-            this.anim.Play(shootInfo.reloadAnim);
+            this.anim.CrossFade(shootInfo.reloadAnim);
             shootInfo.Reload();
         }
     }
@@ -780,7 +788,7 @@ public class Player_girl : Player_base {
         if ( shootInfo ) {
             shootInfo.ActiveReload(true);
             shootInfo.AdjustAnim(this.anim);
-            this.anim.Play(shootInfo.reloadAnim);
+            this.anim.CrossFade(shootInfo.reloadAnim);
             shootInfo.Reload();
         }
     }
@@ -805,5 +813,14 @@ public class Player_girl : Player_base {
         if ( base.ApplyDamage(_other) ) {
             screenPad.gameObject.SendMessage ( "OnGirlHit" );
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool IsReloading () {
+        ShootInfo shootInfo = this.GetShootInfo();
+        return this.IsPlayingAnim( shootInfo.reloadAnim );
     }
 }

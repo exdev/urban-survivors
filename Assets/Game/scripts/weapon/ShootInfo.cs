@@ -38,7 +38,7 @@ public class ShootInfo : MonoBehaviour {
     public float activeReloadTime = 2.0f;
 
     protected int bullets = 10;
-    protected int totalBullets = 100;
+    protected int remainBullets = 100;
 
     protected Emitter emitter = null;
     protected float activeReloadCounter = 0.0f;
@@ -121,9 +121,10 @@ public class ShootInfo : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public bool OutOfAmmo () { return this.bullets <= 0; }
+    public bool NoBulletForReloading () { return this.remainBullets <= 0; }
     public bool isAmmoFull () { return this.bullets == this.capacity; }
     public int CurBullets () { return this.bullets; }
-    public int TotalBullets () { return this.totalBullets; }
+    public int RemainBullets () { return this.remainBullets; }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -143,8 +144,8 @@ public class ShootInfo : MonoBehaviour {
 
     public void Reload () {
         int amount = this.capacity - this.bullets;
-        amount = Mathf.Min( this.totalBullets, amount );
-        this.totalBullets -= amount;
+        amount = Mathf.Min( this.remainBullets, amount );
+        this.remainBullets -= amount;
         this.bullets += amount;
     }
 
@@ -153,6 +154,6 @@ public class ShootInfo : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public void AddBullets ( int _bullets ) {
-        this.totalBullets += _bullets;
+        this.remainBullets += _bullets;
     }
 }
