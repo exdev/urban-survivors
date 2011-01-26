@@ -57,7 +57,7 @@ public class Obstacle_transparent: MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Update () {
-        GameObject girl = GameRules.Instance().GetPlayerGirl();
+        GameObject girl = GameRules.Instance().GetPlayerGirl().gameObject;
         Vector3 dir = girl.transform.position - transform.position;
 
         //

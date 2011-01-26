@@ -61,45 +61,47 @@ public interface IUIObject
 	// keyboard on iPhone OS devices), or false if it cannot.</returns>
 	bool GotFocus();
 
-	// Is called to inform a control that it has lost the
-	// keyboard focus.
-	void LostFocus();
-
-	// Gets the input text of the control (if any)
-	// and returns the insertion point in the
-	// reference variable "insert".
-	// <param name="info">Will contain information about how the keyboard should be displayed (if iPhone) as well as the index of the insertion point.</param>
-	// <returns>Returns the input text of the control.</returns>
-	string GetInputText(ref KEYBOARD_INFO info);
-
-	// Sets the input text of the control as well as
-	// the insertion point.
-	// <param name="text">The input text of the control.</param>
-	// <param name="insert">The index of the insertion point.</param>
-	// <returns>Returns the text accepted which may be different from the text sent in the "text" argument.</returns>
-	string SetInputText(string text, ref int insert);
-
 	/// <summary>
 	/// This is where input handling code should go in any derived class.
 	/// </summary>
 	/// <param name="ptr">POINTER_INFO struct that contains information on the pointer that caused the event, as well as the event that occurred.</param>
 	void OnInput(POINTER_INFO ptr);
 
-	/// <summary>
-	/// Register a method to be called when input occurs (input is forwarded from OnInput()).
-	/// NOTE: It is recommended to save the return value of SetInputDelegate() and call it,
-	/// if not null, when your delegate gets called so as to preserve the delegate chain.
-	/// </summary>
-	/// <param name="del">A method that conforms to the EZInputDelegate pattern.</param>
-	/// <returns>Returns a reference to the previously registered delegate.</returns>
-	EZInputDelegate SetInputDelegate(EZInputDelegate del);
+	// Sets the method to be called when input occurs (input is forwarded from OnInput()).
+	// NOTE: This will replace any and all delegates which have been set or added previously.  If you are unsure
+	// if any delegates are already registered, use AddInputDelegate() instead, or RemoveInputDelegate() to unset
+	// a previously registered delegate.  Only use this when you are sure you want to replace all previously registered delegates.
+	// <param name="del">A method that conforms to the EZInputDelegate pattern.</param>
+	void SetInputDelegate(EZInputDelegate del);
 
 	/// <summary>
-	/// Register a method to be called when the value of a control changes (such as a checkbox changing from false to true, or a slider being moved).
-	/// NOTE: It is recommended to save the return value of SetValueChangedDelegate() and call it,
-	/// if not null, when your delegate gets called so as to preserve the delegate chain.
+	/// Adds a method to be called when input occurs (input is forwarded from OnInput()).
+	/// </summary>
+	/// <param name="del">A method that conforms to the EZInputDelegate pattern.</param>
+	void AddInputDelegate(EZInputDelegate del);
+
+	/// <summary>
+	/// Removes a method added with AddInputDelegate().
+	/// </summary>
+	/// <param name="del">A method that conforms to the EZInputDelegate pattern.</param>
+	void RemoveInputDelegate(EZInputDelegate del);
+
+	// Sets the method to be called when the value of a control changes (such as a checkbox changing from false to true, or a slider being moved).
+	// NOTE: This will replace any and all delegates which have been set or added previously.  If you are unsure
+	// if any delegates are already registered, use AddValueChangedDelegate() instead, or RemoveValueChangedDelegate() to unset
+	// a previously registered delegate.  Only use this when you are sure you want to replace all previously registered delegates.
+	// <param name="del">A method that conforms to the EZValueChangedDelegate pattern.</param>
+	void SetValueChangedDelegate(EZValueChangedDelegate del);
+
+	/// <summary>
+	/// Adds a method to be called when the value of a control changes (such as a checkbox changing from false to true, or a slider being moved).
 	/// </summary>
 	/// <param name="del">A method that conforms to the EZValueChangedDelegate pattern.</param>
-	/// <returns>Returns a reference to the previously registered delegate.</returns>
-	EZValueChangedDelegate SetValueChangedDelegate(EZValueChangedDelegate del);
+	void AddValueChangedDelegate(EZValueChangedDelegate del);
+
+	/// <summary>
+	/// Removes a method added with AddValueChangedDelegate().
+	/// </summary>
+	/// <param name="del">A method that conforms to the EZValueChangedDelegate pattern.</param>
+	void RemoveValueChangedDelegate(EZValueChangedDelegate del);
 }

@@ -1,0 +1,140 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww9000\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\b\fs34 \cf0 In 1.8:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 \
+* Added experimental screen space-relative positioning settings.  
+\b NOTE: This is subject to substantial change in the future.
+\fs34 \
+\
+
+\b0\fs24 * Fixed issue in Unity 2.6 where it was not possible to drag multiple textures onto the timeline.\
+\
+* The Build Atlases and Size Sprites wizards should now save their settings between uses.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs34 \cf0 \
+\
+In 1.78:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 \
+* Addressed issue where a sprite created at runtime by adding a sprite component to a new GameObject, when marked persistent, would not automatically set the associated mesh to be persistent as well.\
+\
+* Addressed possibility of a null texture reference exception when using a sprite with no texture/material.\
+\
+* Changed the default winding order for SpriteManager to match that of regular sprites: CW (clock-wise).\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs34 \cf0 \
+\
+In 1.77:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 \
+* Addressed issue where "On Anim End" action would not take place on single-frame animations.\
+\
+* Fixed rare editor hang issue that could occur when creating prefab out of an entire hierarchy which includes managed sprites and their associated SpriteManager.\
+\
+* Fixed issue where code that might try to play an animation on a sprite after it had been destroyed would raise an exception.\
+\
+* Fixed issue in Unity 3 where you could not select a range of textures to drag onto an animation without causing the timeline window to disable because the selection had changed.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs34 \cf0 \
+In 1.76:\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * Fixed issue in the timeline editor where selecting between two sprites with the same number of frames in their selected animation would cause the contents of the timeline not to be updated.\
+\
+* Instances of pixel-perfect objects being sized incorrectly should now be greatly reduced in Unity 3+.  In particular, a work-around has been written for the Unity bug where playing a scene for longer than 10 seconds would cause Start() not to be called and therefore the incorrect camera information to be fed to the sprites.\
+\
+* Improved positioning of sprite when using TEXTURE_OFFSET with a 100% blank 1x1 pixel image.\
+\
+* Fixed an issue with the positioning of sprite vertices when switching frames on a sprite that uses TEXTURE_OFFSET but not pixel-perfect or auto-resize.  Before, subsequent frames would not be correctly offset and would retain the offsets of the initial frame.\
+\
+* Corrected clipping error when sprite uses an offset.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs34 \cf0 \
+\
+In 1.75:\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * Added "CurrentSprite" property to SuperSprite, which returns a reference to the currently showing sprite, if any.\
+\
+* Resolved issue where clipping rects set immediately after sprite instantiation were clipping the geometry, but not the UVs.\
+\
+* Improved accuracy of pixel-perfect setting when using perspective cameras.\
+\
+* Changed "hidden" member to "hideAtStart (or displays in the inspector as "Hide At Start").  If you have any objects that used this setting in the inspector, you may need to re-set them since the name has changed.\
+\
+* It is now possible to get the top-left and bottom-right extents of a sprite, both after clipping and trimming, and without it, using the following properties:\
+TopLeft\
+BottomRight\
+UnclippedTopLeft\
+UnclippedBottomRight\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs34 \cf0 \
+\
+In 1.74:\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * Minor improvements to ClippingRect feature. \
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs34 \cf0 \
+In 1.73:
+\b0\fs24 \
+\
+* Added ability to pass a Rect, defined in world space, to the .ClippingRect property, which will clip the sprite to it.\
+\
+* You can now truncate sprites that are set to pixel-perfect or auto-resize without problem.\
+\
+* Fixed some Unity iPhone 1.7 related quirks.\
+\
+\
+\
+\
+
+\b\fs34 In 1.72:
+\b0\fs24 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs30 \cf0 Additions:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 * Added the ability to register a callback to be called when a SuperSprite animation completes.\
+\
+* Added the ability to optionally deactivate non-showing sprites which are part of a SuperSprite animation, as opposed to merely hiding them.\
+\
+* Added the ability to specify certain actions to be taken upon reaching the end of a SuperSprite animation.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs30 \cf0 \
+Fixes:
+\b0\fs24 \
+* Fixed an issue where setting the winding order to CCW while using an anchor method of TEXTURE_OFFSET would cause the sprite to be positioned incorrectly.\
+\
+* Fixed issue where marking a sprite as persistent did not preserve its mesh between scenes.\
+\
+* Resolved issue where deactivating or setting the sprite to "hidden" while in edit mode would not cause the sprite to disappear from the scene.\
+\
+
+\b\fs30 Changes:
+\b0\fs24 \
+* Pixel-perfect objects are now also possible with cameras using perspective projections.  However, if the distance between the object and the camera changes, SetCamera() will need to be called again on the object to allow it to update its size.\
+}

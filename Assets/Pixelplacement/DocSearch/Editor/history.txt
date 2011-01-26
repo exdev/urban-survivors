@@ -1,1 +1,1 @@
-ontrigger,invisible
+playanim,ontrigger,invisible

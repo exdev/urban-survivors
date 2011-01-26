@@ -1,7 +1,7 @@
 // ======================================================================================
 // File         : SpawnManager.cs
 // Author       : Wu Jie 
-// Last Change  : 09/23/2010 | 08:58:12 AM | Thursday,September
+// Last Change  : 01/21/2011 | 15:38:11 PM | Friday,January
 // Description  : 
 // ======================================================================================
 
@@ -199,6 +199,10 @@ public class SpawnManager : MonoBehaviour {
 
     public void Destroy ( GameObject _obj ) {
         _obj.SetActiveRecursively(false);
+        if ( _obj.rigidbody ) {
+            _obj.rigidbody.velocity = Vector3.zero;
+            _obj.rigidbody.angularVelocity = Vector3.zero;
+        }
     }
 
     // ------------------------------------------------------------------ 

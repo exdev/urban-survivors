@@ -35,9 +35,13 @@ public class ShootInfo : MonoBehaviour {
     public float reloadSpeed = 1.0f;
     // public float accuracy = 1.0f; // DELME: looks like accuracy is hardcoded in the Emitter.
     public int capacity = 10;
+    public float activeReloadTime = 2.0f;
 
     protected int bullets = 10;
+    protected int remainBullets = 100;
+
     protected Emitter emitter = null;
+    protected float activeReloadCounter = 0.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
@@ -64,16 +68,52 @@ public class ShootInfo : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    void Update () {
+        this.activeReloadCounter = Mathf.Max ( this.activeReloadCounter - Time.deltaTime, 0.0f );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void ActiveReload ( bool _triggered ) {
+        if ( _triggered )
+            this.activeReloadCounter = this.activeReloadTime;
+        else
+            this.activeReloadCounter = 0.0f;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public void AdjustAnim ( Animation _anim ) {
         AnimationState state = null;
 
-        // adjust shoot speed;
-        state = _anim[this.shootAnim];
-        state.normalizedSpeed = shootSpeed;
+        if ( activeReloadCounter > 0.0f ) {
+            DamageInfo dmgInfo = this.GetComponent<DamageInfo>();
+            dmgInfo.isActiveReload = true;
 
-        // adjust reload speed;
-        state = _anim[this.reloadAnim];
-        state.normalizedSpeed = reloadSpeed;
+            // adjust shoot speed;
+            state = _anim[this.shootAnim];
+            state.normalizedSpeed = shootSpeed * 2.0f;
+
+            // adjust reload speed;
+            state = _anim[this.reloadAnim];
+            state.normalizedSpeed = reloadSpeed * 4.0f;
+        }
+        else {
+            DamageInfo dmgInfo = this.GetComponent<DamageInfo>();
+            dmgInfo.isActiveReload = false;
+
+            // adjust shoot speed;
+            state = _anim[this.shootAnim];
+            state.normalizedSpeed = shootSpeed;
+
+            // adjust reload speed;
+            state = _anim[this.reloadAnim];
+            state.normalizedSpeed = reloadSpeed;
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -81,6 +121,10 @@ public class ShootInfo : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public bool OutOfAmmo () { return this.bullets <= 0; }
+    public bool NoBulletForReloading () { return this.remainBullets <= 0; }
+    public bool isAmmoFull () { return this.bullets == this.capacity; }
+    public int CurBullets () { return this.bullets; }
+    public int RemainBullets () { return this.remainBullets; }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -98,7 +142,18 @@ public class ShootInfo : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void Reload ( int _amount ) {
-        this.bullets = _amount;
+    public void Reload () {
+        int amount = this.capacity - this.bullets;
+        amount = Mathf.Min( this.remainBullets, amount );
+        this.remainBullets -= amount;
+        this.bullets += amount;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void AddBullets ( int _bullets ) {
+        this.remainBullets += _bullets;
     }
 }

@@ -25,8 +25,10 @@ public class GameRules : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     public float RestartForSeconds = 5.0f; 
+    public bool multiPlayer = false;
 
     protected static GameRules instance  = null;
+
     protected Player_base playerBoy = null;
     protected Player_base playerGirl = null;
     protected GameObject startPoint = null;
@@ -89,6 +91,7 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public bool IsMultiPlayer () { return this.multiPlayer; } 
     public bool IsGameOver () { return this.isGameOver; } 
     public float RestartCounter () { return this.restartCounter; } 
 
@@ -100,13 +103,13 @@ public class GameRules : MonoBehaviour {
         Vector3 start_pos = startPoint.transform.position;
         Quaternion start_rot = startPoint.transform.rotation;
 
-        GameObject boy = GameRules.Instance().GetPlayerBoy();
+        GameObject boy = GameRules.Instance().GetPlayerBoy().gameObject;
         if (boy) {
             boy.transform.position = start_pos;
             boy.transform.rotation = start_rot;
         }
 
-        GameObject girl = GameRules.Instance().GetPlayerGirl();
+        GameObject girl = GameRules.Instance().GetPlayerGirl().gameObject;
         if (girl) {
             girl.transform.position = start_pos - boy.transform.forward * 2.0f;
             girl.transform.rotation = start_rot;
@@ -129,10 +132,10 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public GameObject GetPlayerBoy () { return playerBoy.gameObject; }
+    public Player_base GetPlayerBoy () { return playerBoy; }
     public PlayerInfo GetPlayerBoyInfo () { return playerBoy.playerInfo; }
 
-    public GameObject GetPlayerGirl () { return playerGirl.gameObject; }
+    public Player_base GetPlayerGirl () { return playerGirl; }
     public PlayerInfo GetPlayerGirlInfo () { return playerGirl.playerInfo; }
 
     // ------------------------------------------------------------------ 
@@ -156,6 +159,41 @@ public class GameRules : MonoBehaviour {
         return enemies;
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void PickupBullets ( int _bullets ) {
+        ShootInfo shootInfo = playerGirl.GetShootInfo();
+        shootInfo.AddBullets(_bullets);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void PlayerRecover ( float _amount ) {
+        // TODO: I think recover girl first would be a better way.
+
+        PlayerInfo boyInfo = playerBoy.playerInfo;
+        PlayerInfo girlInfo = playerGirl.playerInfo;
+
+        float hpLoseBoy = boyInfo.maxHP - boyInfo.curHP;
+        float hpLoseGirl = girlInfo.maxHP - girlInfo.curHP;
+
+        if ( playerGirl.IsDown() || hpLoseGirl > hpLoseBoy ) {
+            playerGirl.Recover(_amount);
+            float hpLeft = hpLoseGirl - _amount;
+            if ( hpLeft > 0.0f )
+                playerBoy.Recover(hpLeft);
+        }
+        else {
+            playerBoy.Recover(_amount);
+            float hpLeft = hpLoseBoy - _amount;
+            if ( hpLeft > 0.0f )
+                playerGirl.Recover(hpLeft);
+        }
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 

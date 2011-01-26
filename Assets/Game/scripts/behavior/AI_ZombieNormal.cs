@@ -44,7 +44,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: Action_ActGetStun 
+    // Desc:
     // ------------------------------------------------------------------ 
 
     class Action_ActOnStun : FSM.Action {
@@ -169,7 +169,6 @@ public class AI_ZombieNormal : AI_ZombieBase {
 
     public float attackDistance = 1.5f;
     public GameObject atkShape = null;
-    protected HitInfo lastHit = new HitInfo();
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
@@ -330,6 +329,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
         this.atkShape.active = false;
         DamageInfo dmgInfo = this.atkShape.GetComponent<DamageInfo>();
         dmgInfo.owner_info = this.zombieInfo;
+        dmgInfo.owner = this.gameObject;
         // } HARDCODE end 
 
         this.InitAnim();
@@ -389,6 +389,9 @@ public class AI_ZombieNormal : AI_ZombieBase {
             // } TEMP HARDCODE end 
             return;
         }
+        else {
+            Act_Movement();
+        }
 
         // handle steering
         Vector3 force = Vector3.zero;
@@ -397,7 +400,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
             force.y = 0.0f;
         }
         else if ( this.steeringState == SteeringState.braking ) {
-            ApplyBrakingForce(10.0f);
+            ApplyBrakingForce();
         }
         ApplySteeringForce(force);
     }
@@ -478,6 +481,15 @@ public class AI_ZombieNormal : AI_ZombieBase {
         // TODO: if hit light, face it { 
         // transform.forward = -_other.transform.forward;
         // } TODO end 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Act_Movement () {
+        // adjust move animation speed
+        this.anim["moveForward"].normalizedSpeed = Mathf.Max(this.StepSpeed * this.CurSpeed(),0.1f);
     }
 
     // ------------------------------------------------------------------ 

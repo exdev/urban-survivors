@@ -186,11 +186,11 @@ public class UIStateToggleBtn : AutoSpriteControlBase
 	//---------------------------------------------------
 	// Input handling:
 	//---------------------------------------------------
-	public override void OnInput(POINTER_INFO ptr)
+	public override void OnInput(ref POINTER_INFO ptr)
 	{
 		if (!m_controlIsEnabled || IsHidden())
 		{
-			base.OnInput(ptr);
+			base.OnInput(ref ptr);
 			return;
 		}
 
@@ -211,7 +211,7 @@ public class UIStateToggleBtn : AutoSpriteControlBase
 				scriptWithMethodToInvoke.Invoke(methodToInvoke, delay);
 		}
 
-		base.OnInput(ptr);
+		base.OnInput(ref ptr);
 	}
 
 	
@@ -275,8 +275,15 @@ public class UIStateToggleBtn : AutoSpriteControlBase
 			if (collider == null)
 				AddCollider();
 
-			SetState(curStateIndex);
+			SetToggleState(curStateIndex);
 		}
+
+		// Since hiding while managed depends on
+		// setting our mesh extents to 0, and the
+		// foregoing code causes us to not be set
+		// to 0, re-hide ourselves:
+		if (managed && m_hidden)
+			Hide(true);
 	}
 
 	public override void Copy(SpriteRoot s)

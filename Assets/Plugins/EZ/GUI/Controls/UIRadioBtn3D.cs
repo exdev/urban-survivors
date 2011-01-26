@@ -295,8 +295,10 @@ public class UIRadioBtn3D : ControlBase
 	}
 
 
-	protected void Awake()
+	protected override void Awake()
 	{
+		base.Awake();
+
 		btnValue = defaultValue;
 	}
 

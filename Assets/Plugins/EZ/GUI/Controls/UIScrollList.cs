@@ -248,6 +248,13 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	public bool activateWhenAdding = true;
 
 	/// <summary>
+	/// When true, the contents of the list will be clipped
+	/// to the viewable area.  Otherwise, the content will
+	/// extend beyond the specified viewable area.
+	/// </summary>
+	public bool clipContents = true;
+
+	/// <summary>
 	/// When true, items will be clipped each frame in which
 	/// it is detected that the list has moved, rotated, or
 	/// scaled.  Use this if you are having clipping errors
@@ -359,6 +366,8 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	protected const float backgroundColliderOffset = 0.01f; // How far behind the list items the background collider should be placed.
 	protected float scrollMax;					// Absolute max we can scroll beyond the edge of the list.
 	float scrollDelta;
+	float lastTime = 0;
+	float timeDelta = 0;
 
 
 	void Awake()
@@ -378,13 +387,15 @@ public class UIScrollList : MonoBehaviour, IUIObject
 			return;
 		m_started = true;
 
+		lastTime = Time.realtimeSinceStartup;
+
 		cachedPos = transform.position;
 		cachedRot = transform.rotation;
 		cachedScale = transform.lossyScale;
 		CalcClippingRect();
 
 		if (slider != null)
-			slider.SetValueChangedDelegate( SliderMoved );
+			slider.AddValueChangedDelegate( SliderMoved );
 
 		// Create a background box collider to catch
 		// input events between list items:
@@ -440,15 +451,12 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	// is moved.
 	public void SliderMoved(IUIObject slider)
 	{
-		ScrollListTo(((UISlider)slider).Value);
+		ScrollListTo_Internal(((UISlider)slider).Value);
 	}
 
-	/// <summary>
-	/// Scrolls the list directly to the position
-	/// indicated (0-1).
-	/// </summary>
-	/// <param name="pos">Position of the list - 0-1 (0 == beginning, 1 == end)</param>
-	public void ScrollListTo(float pos)
+	// Internal version of ScrollListTo that doesn't eliminate
+	// scroll coasting inertia, etc.
+	protected void ScrollListTo_Internal(float pos)
 	{
 		float amtOfPlay;
 
@@ -470,6 +478,19 @@ public class UIScrollList : MonoBehaviour, IUIObject
 
 		if (slider != null)
 			slider.Value = scrollPos;
+	}
+
+	/// <summary>
+	/// Scrolls the list directly to the position
+	/// indicated (0-1).
+	/// </summary>
+	/// <param name="pos">Position of the list - 0-1 (0 == beginning, 1 == end)</param>
+	public void ScrollListTo(float pos)
+	{
+		scrollInertia = 0;
+		scrollDelta = 0;
+
+		ScrollListTo_Internal(pos);
 	}
 
 	/// <summary>
@@ -807,24 +828,42 @@ public class UIScrollList : MonoBehaviour, IUIObject
 			scrollMax = (viewableArea.y / ((contentExtents + itemSpacing) - viewableArea.y)) * overscrollAllowance;
 		}
 
-		ScrollListTo(Mathf.Clamp01((oldAmtOfPlay * scrollPos) / newAmtOfPlay));
+		ScrollListTo_Internal(Mathf.Clamp01((oldAmtOfPlay * scrollPos) / newAmtOfPlay));
 	}
 
-	// Positions list items according to our
-	// current scroll position.
-	protected void PositionItems()
+	/// <summary>
+	/// Positions list items according to the
+	/// current scroll position.
+	/// </summary>
+	public void PositionItems()
 	{
 		if (orientation == ORIENTATION.HORIZONTAL)
-			PositionHorizontally();
+			PositionHorizontally(false);
 		else
-			PositionVertically();
+			PositionVertically(false);
+
+		UpdateContentExtents(0);	// Just so other stuff gets updated
+		ClipItems();
+	}
+
+	/// <summary>
+	/// Repositions list items according to the
+	/// current scroll position, and adjusts for
+	/// any change in the items' extents.
+	/// </summary>
+	public void RepositionItems()
+	{
+		if (orientation == ORIENTATION.HORIZONTAL)
+			PositionHorizontally(true);
+		else
+			PositionVertically(true);
 
 		UpdateContentExtents(0);	// Just so other stuff gets updated
 		ClipItems();
 	}
 
 	// Positions list items horizontally.
-	protected void PositionHorizontally()
+	protected void PositionHorizontally(bool updateExtents)
 	{
 		// Will hold the leading edge of the list throughout
 		float edge = (viewableArea.x * -0.5f) + itemSpacing;
@@ -833,6 +872,9 @@ public class UIScrollList : MonoBehaviour, IUIObject
 
 		for(int i=0; i<items.Count; ++i)
 		{
+			if (updateExtents)
+				items[i].FindOuterEdges();
+
 			items[i].transform.localPosition = new Vector3(edge - items[i].TopLeftEdge.x, 0);
 			contentExtents += items[i].BottomRightEdge.x - items[i].TopLeftEdge.x + itemSpacing;
 			edge += items[i].BottomRightEdge.x - items[i].TopLeftEdge.x + itemSpacing;
@@ -843,7 +885,7 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	}
 
 	// Positions list items vertically.
-	protected void PositionVertically()
+	protected void PositionVertically(bool updateExtents)
 	{
 		// Will hold the leading edge of the list throughout
 		float edge = (viewableArea.y * 0.5f) - itemSpacing;
@@ -852,6 +894,9 @@ public class UIScrollList : MonoBehaviour, IUIObject
 
 		for (int i = 0; i < items.Count; ++i)
 		{
+			if (updateExtents)
+				items[i].FindOuterEdges();
+
 			items[i].transform.localPosition = new Vector3(0, edge - items[i].TopLeftEdge.y);
 			contentExtents += items[i].TopLeftEdge.y - items[i].BottomRightEdge.y + itemSpacing;
 			edge -= items[i].TopLeftEdge.y - items[i].BottomRightEdge.y + itemSpacing;
@@ -865,7 +910,7 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	// Clips list items to the viewable area.
 	protected void ClipItems()
 	{
-		if (mover == null || items.Count < 1)
+		if (mover == null || items.Count < 1 || !clipContents)
 			return;
 
 		IUIListObject firstItem = null;
@@ -1117,7 +1162,7 @@ public class UIScrollList : MonoBehaviour, IUIObject
 		DidClick(item);
 	}
 
-	// Called when a list item when it is clicked
+	// Called by a list button when it is clicked
 	public void DidClick(IUIListObject item)
 	{
 		if (scriptWithMethodToInvoke != null)
@@ -1131,7 +1176,7 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	// extends beyond the drag threshold.
 	public void ListDragged(POINTER_INFO ptr)
 	{
-		if (!touchScroll)
+		if (!touchScroll || !controlIsEnabled)
 			return;	// Ignore
 
 		// Calculate the pointer's motion relative to our control:
@@ -1213,7 +1258,7 @@ public class UIScrollList : MonoBehaviour, IUIObject
 			scrollDelta *= Mathf.Clamp01(1f + (target / scrollMax));
 		}
 
-		ScrollListTo(scrollPos + scrollDelta);
+		ScrollListTo_Internal(scrollPos + scrollDelta);
 
 		noTouch = false;
 		isScrolling = true;
@@ -1241,6 +1286,15 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	//---------------------------------------------
 	// Accessors:
 	//---------------------------------------------
+
+	/// <summary>
+	/// The length of the content, from start to end.
+	/// </summary>
+	public float ContentExtents
+	{
+		get { return contentExtents; }
+	}
+
 	/// <summary>
 	/// Accessor that returns a reference to the
 	/// currently selected item.  Null is returned
@@ -1253,6 +1307,10 @@ public class UIScrollList : MonoBehaviour, IUIObject
 		get { return selectedItem; }
 		set
 		{
+			// Unset the previous selection:
+			if (selectedItem != null)
+				selectedItem.selected = false;
+
 			if(value == null)
 			{
 				selectedItem = null;
@@ -1272,10 +1330,18 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	public void SetSelectedItem(int index)
 	{
 		if (index < 0 || index >= items.Count)
+		{
+			// Unset the previous selection:
+			if (selectedItem != null)
+				selectedItem.selected = false;
+
+			selectedItem = null;
 			return;
+		}
 
 		IUIListObject item = items[index];
 
+		// Unset the previous selection:
 		if (selectedItem != null)
 			selectedItem.selected = false;
 
@@ -1425,7 +1491,8 @@ public class UIScrollList : MonoBehaviour, IUIObject
 			if (ptr.evt == POINTER_INFO.INPUT_EVENT.TAP)
 				ptr.evt = POINTER_INFO.INPUT_EVENT.RELEASE;
 		}
-
+		else
+			ptr.isTap = true;
 
 		if (inputDelegate != null)
 			inputDelegate(ref ptr);
@@ -1459,6 +1526,10 @@ public class UIScrollList : MonoBehaviour, IUIObject
 
 	void Update()
 	{
+		timeDelta = Time.realtimeSinceStartup - lastTime;
+		lastTime = Time.realtimeSinceStartup;
+
+
 		if (cachedPos != transform.position ||
 			cachedRot != transform.rotation ||
 			cachedScale != transform.lossyScale)
@@ -1476,18 +1547,18 @@ public class UIScrollList : MonoBehaviour, IUIObject
 
 		if(isScrolling && noTouch)
 		{
-			scrollDelta -= (scrollDelta * scrollDecelCoef) * (Time.deltaTime / 0.166f);
+			scrollDelta -= (scrollDelta * scrollDecelCoef) * (timeDelta / 0.166f);
 
 			// See if we need to rebound from the edge:
 			if (scrollPos < 0)
 			{
-				scrollPos -= scrollPos * reboundSpeed * (Time.deltaTime / 0.166f);
+				scrollPos -= scrollPos * reboundSpeed * (timeDelta / 0.166f);
 				// Compute resistance:
 				scrollDelta *= Mathf.Clamp01(1f + (scrollPos / scrollMax));
 			}
 			else if (scrollPos > 1f)
 			{
-				scrollPos -= (scrollPos - 1f) * reboundSpeed * (Time.deltaTime / 0.166f);
+				scrollPos -= (scrollPos - 1f) * reboundSpeed * (timeDelta / 0.166f);
 				// Compute resistance:
 				scrollDelta *= Mathf.Clamp01(1f - (scrollPos - 1f) / scrollMax);
 			}
@@ -1499,7 +1570,7 @@ public class UIScrollList : MonoBehaviour, IUIObject
 					scrollPos = Mathf.Clamp01(scrollPos);
 			}
 
-			ScrollListTo(scrollPos + scrollDelta);
+			ScrollListTo_Internal(scrollPos + scrollDelta);
 
 
 			if (slider != null)
@@ -1597,23 +1668,38 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	}
 
 	public bool GotFocus() { return false; }
-	public void LostFocus() { }
-	public string GetInputText(ref KEYBOARD_INFO info) { return null; }
-	public string SetInputText(string text, ref int insert) { return null; }
 
-	public EZInputDelegate SetInputDelegate(EZInputDelegate del)
+	public void SetInputDelegate(EZInputDelegate del)
 	{
-		EZInputDelegate oldDel = inputDelegate;
 		inputDelegate = del;
-		return oldDel;
 	}
 
-	public EZValueChangedDelegate SetValueChangedDelegate(EZValueChangedDelegate del)
+	public void AddInputDelegate(EZInputDelegate del)
 	{
-		EZValueChangedDelegate oldDel = changeDelegate;
-		changeDelegate = del;
-		return oldDel;
+		inputDelegate += del;
 	}
+
+	public void RemoveInputDelegate(EZInputDelegate del)
+	{
+		inputDelegate -= del;
+	}
+
+
+	public void SetValueChangedDelegate(EZValueChangedDelegate del)
+	{
+		changeDelegate = del;
+	}
+
+	public void AddValueChangedDelegate(EZValueChangedDelegate del)
+	{
+		changeDelegate += del;
+	}
+
+	public void RemoveValueChangedDelegate(EZValueChangedDelegate del)
+	{
+		changeDelegate -= del;
+	}
+
 
 	void OnDrawGizmosSelected()
 	{

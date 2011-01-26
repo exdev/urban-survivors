@@ -174,7 +174,7 @@ public class EZTransition
 	protected EZLinkedList<EZLinkedListNode<GameObject>> subSubjects = new EZLinkedList<EZLinkedListNode<GameObject>>();
 
 	[System.NonSerialized]
-	protected List<OnTransitionEndDelegate> onEndDelegates = new List<OnTransitionEndDelegate>();
+	protected OnTransitionEndDelegate onEndDelegates;
 
 	// Used to tell if this transition has its own 
 	// values, or if those that exist are cloned 
@@ -202,9 +202,7 @@ public class EZTransition
 	/// <param name="del">Delegate to be called.</param>
 	public void AddTransitionEndDelegate(OnTransitionEndDelegate del)
 	{
-		if (onEndDelegates == null)
-			onEndDelegates = new List<OnTransitionEndDelegate>();
-		onEndDelegates.Add(del);
+		onEndDelegates += del;
 	}
 
 	/// <summary>
@@ -214,9 +212,7 @@ public class EZTransition
 	/// <param name="del">The delegate to be removed.</param>
 	public void RemoveTransitionEndDelegate(OnTransitionEndDelegate del)
 	{
-		if (onEndDelegates == null)
-			return;
-		onEndDelegates.Remove(del);
+		onEndDelegates -= del;
 	}
 
 	/// <summary>
@@ -331,8 +327,8 @@ public class EZTransition
 		idleAnims.Add(node);
 
 		// If we don't have any delegates, or this was a
-		// forced stopdon't bother continuing:
-		if (onEndDelegates.Count == 0 || forcedStop)
+		// forced stop, don't bother continuing:
+		if (onEndDelegates == null || forcedStop)
 			return;
 
 		// Look to see if we have any animations still running
@@ -391,9 +387,6 @@ public class EZTransition
 			else if (subSubjects.Count < 1)
 				return;
 		}
-
-		if (onEndDelegates == null)
-			onEndDelegates = new List<OnTransitionEndDelegate>();
 
 		// Ensure the transition isn't already running:
 		StopSafe();
@@ -509,6 +502,26 @@ public class EZTransition
 		runningAnims.Current = cur;
 	}
 
+	/// <summary>
+	/// Pauses all running transition elements.
+	/// </summary>
+	public void Pause()
+	{
+		EZLinkedListIterator<EZLinkedListNode<EZAnimation>> i;
+		for (i = runningAnims.Begin(); !i.Done; i.Next())
+			i.Current.val.paused = true;
+	}
+
+	/// <summary>
+	/// Unpauses all running transition elements.
+	/// </summary>
+	public void Unpause()
+	{
+		EZLinkedListIterator<EZLinkedListNode<EZAnimation>> i;
+		for (i = runningAnims.Begin(); !i.Done; i.Next())
+			i.Current.val.paused = false;
+	}
+
 	// Calls all our ending delegates
 	protected void CallEndDelegates()
 	{
@@ -517,9 +530,8 @@ public class EZTransition
 		if (forcedStop)
 			return;
 
-		for (int i = 0; i < onEndDelegates.Count; ++i)
-			if(onEndDelegates[i] != null)
-				onEndDelegates[i](this);
+		if(onEndDelegates != null)
+			onEndDelegates(this);
 	}
 
 	/// <summary>
@@ -986,7 +998,7 @@ public class EZAnimator : MonoBehaviour
 			{
 				ReturnAnimToPool(anim);
 			}
-			else
+			else if(anim.running) // Only add if still running
 			{
 				// Save a reference to this running animation:
 				animNode = t.AddRunningAnim();
@@ -1127,6 +1139,52 @@ public class EZAnimator : MonoBehaviour
 		Stop(obj, true);
 	}
 
+	/// <summary>
+	/// Ends all running animation elements, leaving them at
+	/// their destination/end states.
+	/// </summary>
+	public void EndAll()
+	{
+		for (EZLinkedListIterator<EZAnimation> i = animations.Begin(); !i.Done; i.Next())
+		{
+			i.Current.End();
+		}
+	}
+
+	/// <summary>
+	/// Stops all running animation elements in their
+	/// current state.
+	/// </summary>
+	public void StopAll()
+	{
+		for (EZLinkedListIterator<EZAnimation> i = animations.Begin(); !i.Done; i.Next())
+		{
+			i.Current.Stop();
+		}
+	}
+
+	/// <summary>
+	/// Pauses all running animation elements.
+	/// </summary>
+	public void PauseAll()
+	{
+		for (EZLinkedListIterator<EZAnimation> i = animations.Begin(); !i.Done; i.Next())
+		{
+			i.Current.paused = true;
+		}
+	}
+
+	/// <summary>
+	/// Unpauses all animation elements.
+	/// </summary>
+	public void UnpauseAll()
+	{
+		for (EZLinkedListIterator<EZAnimation> i = animations.Begin(); !i.Done; i.Next())
+		{
+			i.Current.paused = false;
+		}
+	}
+
 	public static int GetNumAnimations()
 	{
 		return animations.Count;
@@ -1165,7 +1223,7 @@ public abstract class EZAnimation : IEZLinkedListItem<EZAnimation>
 		FadeMaterial,
 
 		/// <summary>
-		/// Same as FadeMaterial, but only works on TextMeshes (3D Text)
+		/// Same as FadeMaterial, but only works on SpriteText objects.
 		/// </summary>
 		FadeText,
 
@@ -1301,6 +1359,8 @@ public abstract class EZAnimation : IEZLinkedListItem<EZAnimation>
 
     public bool running = false;                    // Indicates whether this animation is currently running
 
+	public bool paused = false;						// When set to true, the animation will not update
+
 	protected System.Object data;					// Data associated with this animation
 	protected ANIM_MODE m_mode;						// The mode of the animation (By, To, etc)
 	protected float direction = 1f;					// Used to control the direction of animation
@@ -1395,6 +1455,9 @@ public abstract class EZAnimation : IEZLinkedListItem<EZAnimation>
 	// Steps the animation:
 	public virtual bool Step(float timeDelta)
 	{
+		if (paused)
+			return true;
+
 		if (wait > 0)
 		{
 			wait -= timeDelta;
@@ -2064,7 +2127,9 @@ public class FadeSprite : EZAnimation
 
 	public override void _end()
 	{
-		sprite.SetColor(end);
+		if(sprite != null)
+			sprite.SetColor(end);
+
 		base._end();
 	}
 
@@ -2079,6 +2144,9 @@ public class FadeSprite : EZAnimation
 
 	protected override void DoAnim()
 	{
+		if (sprite == null)
+			_stop();
+
 		temp.r = interpolator(timeElapsed, start.r, delta.r, interval);
 		temp.g = interpolator(timeElapsed, start.g, delta.g, interval);
 		temp.b = interpolator(timeElapsed, start.b, delta.b, interval);
@@ -2197,6 +2265,10 @@ public class FadeSprite : EZAnimation
 		// Stop any existing animations of this type on the subject:
 		EZAnimator.instance.Stop(sprite, type, (mode == ANIM_MODE.By)?true:false);
 		EZAnimator.instance.AddAnimation(this);
+
+		// See if we need to set to an initial state:
+		if (mode == EZAnimation.ANIM_MODE.FromTo && delay == 0)
+			sprite.SetColor(start);
 	}
 
 	// Run the previous animation with the same parameters:
@@ -2248,7 +2320,9 @@ public class FadeMaterial : EZAnimation
 
 	public override void _end()
 	{
-		mat.color = end;
+		if(mat != null)
+			mat.color = end;
+
 		base._end();
 	}
 
@@ -2263,6 +2337,9 @@ public class FadeMaterial : EZAnimation
 
 	protected override void DoAnim()
 	{
+		if (mat == null)
+			_stop();
+
 		temp.r = interpolator(timeElapsed, start.r, delta.r, interval);
 		temp.g = interpolator(timeElapsed, start.g, delta.g, interval);
 		temp.b = interpolator(timeElapsed, start.b, delta.b, interval);
@@ -2382,6 +2459,10 @@ public class FadeMaterial : EZAnimation
 		// Stop any existing animations of this type on the subject:
 		EZAnimator.instance.Stop(mat, type, (mode == ANIM_MODE.By) ? true : false);
 		EZAnimator.instance.AddAnimation(this);
+
+		// See if we need to set to an initial state:
+		if (mode == EZAnimation.ANIM_MODE.FromTo && delay == 0)
+			mat.color = start;
 	}
 
 	// Run the previous animation with the same parameters:
@@ -2431,7 +2512,9 @@ public class FadeText : EZAnimation
 
 	public override void _end()
 	{
-		text.SetColor(end);
+		if(text != null)
+			text.SetColor(end);
+
 		base._end();
 	}
 
@@ -2446,6 +2529,9 @@ public class FadeText : EZAnimation
 
 	protected override void DoAnim()
 	{
+		if (text == null)
+			_stop();
+
 		temp.r = interpolator(timeElapsed, start.r, delta.r, interval);
 		temp.g = interpolator(timeElapsed, start.g, delta.g, interval);
 		temp.b = interpolator(timeElapsed, start.b, delta.b, interval);
@@ -2565,6 +2651,10 @@ public class FadeText : EZAnimation
 		// Stop any existing animations of this type on the subject:
 		EZAnimator.instance.Stop(text, type, (mode == ANIM_MODE.By)?true:false);
 		EZAnimator.instance.AddAnimation(this);
+
+		// See if we need to set to an initial state:
+		if (mode == EZAnimation.ANIM_MODE.FromTo && delay == 0)
+			text.SetColor(start);
 	}
 
     public FadeText() 
@@ -2593,7 +2683,9 @@ public class AnimateRotation : EZAnimation
 
 	public override void _end()
 	{
-		subTrans.localEulerAngles = end;
+		if(subTrans != null)
+			subTrans.localEulerAngles = end;
+
 		base._end();
 	}
 
@@ -2608,6 +2700,9 @@ public class AnimateRotation : EZAnimation
 
 	protected override void DoAnim()
 	{
+		if (subTrans == null)
+			_stop();
+			
 		temp.x = interpolator(timeElapsed, start.x, delta.x, interval);
 		temp.y = interpolator(timeElapsed, start.y, delta.y, interval);
 		temp.z = interpolator(timeElapsed, start.z, delta.z, interval);
@@ -2720,6 +2815,10 @@ public class AnimateRotation : EZAnimation
 		StartCommon();
 
 		EZAnimator.instance.AddAnimation(this);
+
+		// See if we need to set to an initial state:
+		if (mode == EZAnimation.ANIM_MODE.FromTo && delay == 0)
+			subTrans.localEulerAngles = start;
 	}
 
 	// Run the previous animation with the same parameters:
@@ -2768,7 +2867,9 @@ public class AnimatePosition : EZAnimation
 
 	public override void _end()
 	{
-		subTrans.localPosition = end;
+		if (subTrans != null)
+			subTrans.localPosition = end;
+
 		base._end();
 	}
 
@@ -2783,6 +2884,9 @@ public class AnimatePosition : EZAnimation
 
 	protected override void DoAnim()
 	{
+		if (subTrans == null)
+			_stop();
+
 		temp.x = interpolator(timeElapsed, start.x, delta.x, interval);
 		temp.y = interpolator(timeElapsed, start.y, delta.y, interval);
 		temp.z = interpolator(timeElapsed, start.z, delta.z, interval);
@@ -2895,6 +2999,10 @@ public class AnimatePosition : EZAnimation
 		StartCommon();
 
 		EZAnimator.instance.AddAnimation(this);
+
+		// See if we need to set to an initial state:
+		if (mode == EZAnimation.ANIM_MODE.FromTo && delay == 0)
+			subTrans.localPosition = start;
 	}
 
 	// Run the previous animation with the same parameters:
@@ -2943,7 +3051,9 @@ public class AnimateScale : EZAnimation
 
 	public override void _end()
 	{
-		subTrans.localScale = end;
+		if (subTrans != null)
+			subTrans.localScale = end;
+
 		base._end();
 	}
 
@@ -2958,6 +3068,9 @@ public class AnimateScale : EZAnimation
 
 	protected override void DoAnim()
 	{
+		if (subTrans == null)
+			_stop();
+
 		temp.x = interpolator(timeElapsed, start.x, delta.x, interval);
 		temp.y = interpolator(timeElapsed, start.y, delta.y, interval);
 		temp.z = interpolator(timeElapsed, start.z, delta.z, interval);
@@ -3070,6 +3183,10 @@ public class AnimateScale : EZAnimation
 		StartCommon();
 
 		EZAnimator.instance.AddAnimation(this);
+
+		// See if we need to set to an initial state:
+		if (mode == EZAnimation.ANIM_MODE.FromTo && delay == 0)
+			subTrans.localScale = start;
 	}
 
 	// Run the previous animation with the same parameters:
@@ -3119,12 +3236,17 @@ public class PunchPosition : EZAnimation
 
 	public override void _end()
 	{
-		subTrans.localPosition = start;
+		if (subTrans != null)
+			subTrans.localPosition = start;
+
 		base._end();
 	}
 
 	protected override void DoAnim()
 	{
+		if (subTrans == null)
+			_stop();
+
 		factor = timeElapsed / interval;
 		temp.x = start.x + punch(magnitude.x, factor);
 		temp.y = start.y + punch(magnitude.y, factor);
@@ -3240,12 +3362,17 @@ public class PunchScale : EZAnimation
 
 	public override void _end()
 	{
-		subTrans.localScale = start;
+		if (subTrans != null)
+			subTrans.localScale = start;
+
 		base._end();
 	}
 
 	protected override void DoAnim()
 	{
+		if (subTrans == null)
+			_stop();
+
 		factor = timeElapsed / interval;
 		temp.x = start.x + (punch(magnitude.x, factor));
 		temp.y = start.y + (punch(magnitude.y, factor));
@@ -3361,12 +3488,17 @@ public class PunchRotation : EZAnimation
 
 	public override void _end()
 	{
-		subTrans.localEulerAngles = start;
+		if (subTrans != null)
+			subTrans.localEulerAngles = start;
+
 		base._end();
 	}
 
 	protected override void DoAnim()
 	{
+		if (subTrans == null)
+			_stop();
+
 		factor = timeElapsed / interval;
 		temp.x = start.x + punch(magnitude.x, factor);
 		temp.y = start.y + punch(magnitude.y, factor);
@@ -3483,12 +3615,17 @@ public class Crash : EZAnimation
 
 	public override void _end()
 	{
-		subTrans.localPosition = start;
+		if (subTrans != null)
+			subTrans.localPosition = start;
+
 		base._end();
 	}
 
 	protected override void DoAnim()
 	{
+		if (subTrans == null)
+			_stop();
+
 		factor = timeElapsed / interval;
 
 		tempMag.x = magnitude.x - (factor * magnitude.x);
@@ -3613,12 +3750,17 @@ public class SmoothCrash : EZAnimation
 
 	public override void _end()
 	{
-		subTrans.localPosition = start;
+		if (subTrans != null)
+			subTrans.localPosition = start;
+
 		base._end();
 	}
 
 	protected override void DoAnim()
 	{
+		if (subTrans == null)
+			_stop();
+
 		// Take advantage of the commutative property by
 		// rolling 2*PI and the inverse(sorta) of our factor
 		// all into a single value:
@@ -3755,12 +3897,17 @@ public class Shake : EZAnimation
 
 	public override void _end()
 	{
-		subTrans.localPosition = start;
+		if (subTrans != null)
+			subTrans.localPosition = start;
+
 		base._end();
 	}
 
 	protected override void DoAnim()
 	{
+		if (subTrans == null)
+			_stop();
+
 		// Take advantage of the commutative property by
 		// rolling 2*PI and oscillations all into a single 
 		// value:
@@ -3892,12 +4039,17 @@ public class CrashRotation : EZAnimation
 
 	public override void _end()
 	{
-		subTrans.localEulerAngles = start;
+		if (subTrans != null)
+			subTrans.localEulerAngles = start;
+
 		base._end();
 	}
 
 	protected override void DoAnim()
 	{
+		if (subTrans == null)
+			_stop();
+
 		// Take advantage of the commutative property by
 		// rolling 2*PI and oscillations all into a single 
 		// value:
@@ -4035,12 +4187,17 @@ public class ShakeRotation : EZAnimation
 
 	public override void _end()
 	{
-		subTrans.localEulerAngles = start;
+		if (subTrans != null)
+			subTrans.localEulerAngles = start;
+
 		base._end();
 	}
 
 	protected override void DoAnim()
 	{
+		if (subTrans == null)
+			_stop();
+
 		// Take advantage of the commutative property by
 		// rolling 2*PI and oscillations all into a single 
 		// value:
@@ -4293,7 +4450,9 @@ public class FadeAudio : EZAnimation
 
 	public override void _end()
 	{
-		subject.volume = end;
+		if(subject != null)
+			subject.volume = end;
+
 		base._end();
 	}
 
@@ -4308,6 +4467,9 @@ public class FadeAudio : EZAnimation
 
 	protected override void DoAnim()
 	{
+		if (subject == null)
+			_stop();
+
 		subject.volume = interpolator(timeElapsed, start, delta, interval);
 	}
 
@@ -4416,6 +4578,10 @@ public class FadeAudio : EZAnimation
 
 		EZAnimator.instance.Stop(subject, type, (mode == ANIM_MODE.By)?true:false);
 		EZAnimator.instance.AddAnimation(this);
+
+		// See if we need to set to an initial state:
+		if (mode == EZAnimation.ANIM_MODE.FromTo && delay == 0)
+			subject.volume = start;
 	}
 
 	public FadeAudio()
@@ -4446,7 +4612,9 @@ public class TuneAudio : EZAnimation
 
 	public override void _end()
 	{
-		subject.volume = end;
+		if(subject != null)
+			subject.volume = end;
+
 		base._end();
 	}
 
@@ -4461,6 +4629,9 @@ public class TuneAudio : EZAnimation
 
 	protected override void DoAnim()
 	{
+		if (subject == null)
+			_stop();
+
 		subject.pitch = interpolator(timeElapsed, start, delta, interval);
 	}
 
@@ -4569,6 +4740,10 @@ public class TuneAudio : EZAnimation
 
 		EZAnimator.instance.Stop(subject, type, (mode == ANIM_MODE.By) ? true : false);
 		EZAnimator.instance.AddAnimation(this);
+
+		// See if we need to set to an initial state:
+		if (mode == EZAnimation.ANIM_MODE.FromTo && delay == 0)
+			subject.pitch = start;
 	}
 
 	public TuneAudio()
@@ -4652,7 +4827,7 @@ public class AnimParams
 
 	public virtual void DrawGUI(EZAnimation.ANIM_TYPE type, GameObject go, IGUIHelper gui, bool inspector)
 	{
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 		float spacing = 20f;
 		float indent = 10f;
 #else
@@ -4686,7 +4861,7 @@ public class AnimParams
 				pingPong = GUILayout.Toggle(pingPong, new GUIContent("PingPong","Ping-Pong: Causes the animated value to go back and forth as it loops."));
 			}
 		}
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 		else
 			GUILayout.FlexibleSpace();
 #endif
@@ -4729,7 +4904,7 @@ public class AnimParams
 
 		// If it is the right mode, it loops, and is the right
 		// type of animation, show the "resetOnRepeat" option:
-		if (mode == EZAnimation.ANIM_MODE.By && duration < 0 && (
+		if (/*mode == EZAnimation.ANIM_MODE.By &&*/ duration < 0 && (
 			type == EZAnimation.ANIM_TYPE.FadeMaterial ||
 			type == EZAnimation.ANIM_TYPE.FadeSprite ||
 			type == EZAnimation.ANIM_TYPE.FadeAudio ||
@@ -4741,7 +4916,7 @@ public class AnimParams
 		{
 			restartOnRepeat = GUILayout.Toggle(restartOnRepeat, new GUIContent("Restart on Loop","Resets the starting value on each loop iteration. Set this to false if you want something like continuous movement in the same direction without going back to the starting point."));
 		}
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 		else
 			GUILayout.FlexibleSpace();
 #endif

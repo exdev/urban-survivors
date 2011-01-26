@@ -49,6 +49,9 @@ public class SuperSpriteAnimElement
 
 			anim = sprite.GetAnim(animName);
 
+			if (anim == null)
+				Debug.LogError("SuperSprite error: No animation by the name of \"" + animName + "\" was found on sprite \"" + sprite.name + "\". Please verify the spelling and capitalization of the name, including any extra spaces, etc.");
+
 			if (wasDeactivated)
 				sprite.gameObject.active = false;
 		}
@@ -475,7 +478,7 @@ public class SuperSprite : MonoBehaviour
 
 
 	// Use this for initialization
-	void Start ()
+	public void Start ()
 	{
 		// Initialize animations:
 		for(int i=0; i<animations.Length; ++i)

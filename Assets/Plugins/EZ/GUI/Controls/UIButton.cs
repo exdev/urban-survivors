@@ -207,11 +207,11 @@ public class UIButton : AutoSpriteControlBase
 	//---------------------------------------------------
 	// Input handling:
 	//---------------------------------------------------
-	public override void OnInput(POINTER_INFO ptr)
+	public override void OnInput(ref POINTER_INFO ptr)
 	{
 		if (!m_controlIsEnabled || IsHidden())
 		{
-			base.OnInput(ptr);
+			base.OnInput(ref ptr);
 			return;
 		}
 
@@ -252,7 +252,7 @@ public class UIButton : AutoSpriteControlBase
 				break;
 		}
 
-		base.OnInput(ptr);
+		base.OnInput(ref ptr);
 
 		if (repeat)
 		{
@@ -359,6 +359,25 @@ public class UIButton : AutoSpriteControlBase
 
 			SetState((int)m_ctrlState);
 		}
+
+		// Since hiding while managed depends on
+		// setting our mesh extents to 0, and the
+		// foregoing code causes us to not be set
+		// to 0, re-hide ourselves:
+		if (managed && m_hidden)
+			Hide(true);
+	}
+
+	protected override void OnDisable()
+	{
+		base.OnDisable();
+
+		// Revert to our normal state, but if there isn't
+		// an EZAnimator, then we either don't need to
+		// revert, or we don't want to because the scene
+		// is closing:
+		if (EZAnimator.Exists())
+			SetControlState(CONTROL_STATE.NORMAL);
 	}
 
 	public override void Copy(SpriteRoot s)

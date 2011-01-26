@@ -499,6 +499,9 @@ public abstract class AutoSpriteBase : SpriteBase, ISpriteAggregator
 	/// <param name="frame">The zero-based index of the frame at which to start playing.</param>
 	public void PlayAnim(UVAnimation anim, int frame)
 	{
+		if (deleted)
+			return;
+
 		curAnim = anim;
 		curAnimIndex = curAnim.index;
 		curAnim.Reset();
@@ -513,7 +516,7 @@ public abstract class AutoSpriteBase : SpriteBase, ISpriteAggregator
 
 		// Only add to the animated list if
 		// the animation has more than 1 frame:
-		if (anim.GetFrameCount() > 1)
+		if (anim.GetFrameCount() > 1 || anim.onAnimEnd != UVAnimation.ANIM_END_ACTION.Do_Nothing)
 		{
 			StepAnim(0);
 			// Start coroutine

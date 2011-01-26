@@ -11,6 +11,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
 // class 
@@ -27,20 +28,17 @@ public class Player_girl : Player_base {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: Action_FollowTarget 
+    // Desc: Action_Move 
     // ------------------------------------------------------------------ 
 
-    class Action_FollowTarget : FSM.Action {
+    class Action_Move : FSM.Action {
         Player_girl playerGirl; 
-        Transform target;
 
-        public Action_FollowTarget ( Player_girl _playerGirl, Transform _target ) {
+        public Action_Move ( Player_girl _playerGirl ) {
             this.playerGirl = _playerGirl;
-            this.target = _target;
         }
 
         public override void exec () {
-            this.playerGirl.Seek(this.target.position);
             this.playerGirl.Act_Movement();
         }
     }
@@ -74,6 +72,22 @@ public class Player_girl : Player_base {
 
         public override void exec () {
             this.playerGirl.Act_Reloading();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_ActiveReloading 
+    // ------------------------------------------------------------------ 
+
+    class Action_ActiveReloading : FSM.Action {
+        Player_girl playerGirl; 
+
+        public Action_ActiveReloading ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override void exec () {
+            this.playerGirl.Act_ActiveReloading();
         }
     }
 
@@ -158,8 +172,7 @@ public class Player_girl : Player_base {
         }
 
         public override bool exec () {
-            ShootInfo shootInfo = this.playerGirl.GetShootInfo();
-            return this.playerGirl.IsPlayingAnim( shootInfo.reloadAnim );
+            return this.playerGirl.IsReloading();
         }
     }
 
@@ -184,6 +197,26 @@ public class Player_girl : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    class Condition_canReload : FSM.Condition {
+        Player_girl playerGirl = null;
+
+        public Condition_canReload ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override bool exec () {
+            ShootInfo shootInfo = this.playerGirl.GetShootInfo();
+            return ( shootInfo.isAmmoFull() == false &&
+                     shootInfo.NoBulletForReloading() == false &&
+                     this.playerGirl.IsReloading() == false
+                   );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     class Condition_isMoving : FSM.Condition {
         Player_girl playerGirl = null;
 
@@ -193,6 +226,38 @@ public class Player_girl : Player_base {
 
         public override bool exec () {
             return this.playerGirl.IsMoving();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Condition_isReloadButtonDown : FSM.Condition {
+        Player_girl playerGirl = null;
+
+        public Condition_isReloadButtonDown ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override bool exec () {
+            return this.playerGirl.ReloadButtonDown();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    class Condition_activeReloadTriggered : FSM.Condition {
+        Player_girl playerGirl = null;
+
+        public Condition_activeReloadTriggered ( Player_girl _playerGirl ) {
+            this.playerGirl = _playerGirl;
+        }
+
+        public override bool exec () {
+            return this.playerGirl.ActiveReloadTriggered();
         }
     }
 
@@ -265,7 +330,7 @@ public class Player_girl : Player_base {
         }
 
         // reset the internal state.
-        this.shootButtonTriggered = false;
+        this.lastHit.stunType = HitInfo.StunType.none;
     }
 
     // ------------------------------------------------------------------ 
@@ -307,7 +372,9 @@ public class Player_girl : Player_base {
 
         string[] anim_keys1 = { 
             "shootSMG",
-            "reload_smg"
+            "reload_smg",
+            "hit1",
+            "hit2"
         };
         foreach (string key in anim_keys1) {
             state = this.anim[key];
@@ -335,11 +402,11 @@ public class Player_girl : Player_base {
                                               new Action_PlayAnim(this.anim,"idle"), 
                                               null, 
                                               null );
-        // following
-        FSM.State state_following = new FSM.State( "following", 
-                                                   null,
-                                                   new Action_FollowTarget(this,this.followTarget.transform), 
-                                                   null );
+        // walk
+        FSM.State state_walk = new FSM.State( "walk", 
+                                              null,
+                                              new Action_Move(this), 
+                                              null );
         // idle shooting
         FSM.State state_idleShooting = new FSM.State( "idle_shooting", 
                                                       new Action_Shooting(this), 
@@ -348,17 +415,22 @@ public class Player_girl : Player_base {
         // walk shooting
         FSM.State state_walkShooting = new FSM.State( "walk_shooting", 
                                                       new Action_Shooting(this), 
-                                                      new Action_FollowTarget(this,this.followTarget.transform), 
+                                                      new Action_Move(this), 
                                                       null );
         // reloading
         FSM.State state_idleReloading = new FSM.State( "idle_reloading", 
                                                        new Action_Reloading(this), 
                                                        null,
                                                        null );
+        // active reloading
+        FSM.State state_idleActiveReloading = new FSM.State( "idle_active_reloading", 
+                                                             new Action_ActiveReloading(this), 
+                                                             null,
+                                                             null );
         // walk reloading
         FSM.State state_walkReloading = new FSM.State( "walk_reloading", 
                                                        new Action_Reloading(this), 
-                                                       new Action_FollowTarget(this,this.followTarget.transform), 
+                                                       new Action_Move(this), 
                                                        null );
         // down
         FSM.State state_down = new FSM.State( "Down", 
@@ -375,23 +447,33 @@ public class Player_girl : Player_base {
                                                null, // TODO: new Action_PlayAnim(this.anim,"getUp") 
                                                null,
                                                null );
+        // get stun
+        FSM.State state_onStun = new FSM.State( "OnStun", 
+                                               new Action_ActOnStun(this), 
+                                               null,
+                                               null );
 
         // ======================================================== 
         // condition 
         // ======================================================== 
 
-        FSM.Condition cond_isNearTarget = new Condition_TargetInRange( this.transform,
-                                                                       this.followTarget.transform,
-                                                                       this.followDistance );
-        FSM.Condition cond_isFarAwayTarget = new FSM.Condition_not(new Condition_TargetInRange( this.transform,
-                                                                                                this.followTarget.transform,
-                                                                                                this.followDistance * 1.2f ));
         FSM.Condition cond_isShootButtonTriggered = new Condition_isShootButtonTriggered(this);
         FSM.Condition cond_isNotShooting = new FSM.Condition_not( new Condition_isShooting(this) );
         FSM.Condition cond_isNotReloading = new FSM.Condition_not( new Condition_isReloading(this) );
         FSM.Condition cond_isOutOfAmmo = new Condition_isOutOfAmmo(this);
+        FSM.Condition cond_triggerReload = new FSM.Condition_and( new Condition_canReload(this),
+                                                                  new FSM.Condition_or ( new Condition_isOutOfAmmo(this),
+                                                                                         new Condition_isReloadButtonDown(this) )
+                                                                );
+        FSM.Condition cond_activeReloadTriggered = new Condition_activeReloadTriggered(this);
+
+        FSM.Condition cond_isOnStun = new Condition_isOnStun(this);
+        FSM.Condition cond_noHP = new Condition_noHP(this.playerInfo);
+
+        FSM.Condition cond_isMoving = new Condition_isMoving(this);
+        FSM.Condition cond_isNotMoving = new FSM.Condition_not(cond_isMoving);
+
         // DELME { 
-        // FSM.Condition cond_isMoving = new Condition_isMoving(this);
         // FSM.Condition cond_isShooting = new Condition_isShooting(this);
         // } DELME end 
 
@@ -399,44 +481,57 @@ public class Player_girl : Player_base {
         // setup transitions
         // ======================================================== 
 
-        FSM.Action action_FollowTarget = new Action_FollowTarget(this,this.followTarget.transform);
-        FSM.Action action_StopAndIdle = new FSM.Action_list( new FSM.Action[] {
-                                                             new Action_StopMoving(this), 
-                                                             new Action_PlayAnim(this.anim,"idle"), 
-                                                             }
-                                                           );
+        FSM.Action action_Move = new Action_Move(this);
+        FSM.Action action_Enable = new Action_EnableSteering(this);
+        FSM.Action action_Disable = new Action_DisableSteering(this);
+        FSM.Action action_Idle = new Action_PlayAnim(this.anim,"idle");
 
         // idle to ...
-        state_idle.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
-        state_idle.AddTransition( new FSM.Transition( state_following, cond_isFarAwayTarget, action_FollowTarget ) );
+        state_idle.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
+        state_idle.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
+        state_idle.AddTransition( new FSM.Transition( state_walk, cond_isMoving, action_Move ) );
         state_idle.AddTransition( new FSM.Transition( state_idleShooting, cond_isShootButtonTriggered, null ) );
+        state_idle.AddTransition( new FSM.Transition( state_idleReloading, cond_triggerReload, null ) );
 
-        // following to ...
-        state_following.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), action_StopAndIdle ) );
-        state_following.AddTransition( new FSM.Transition( state_idle, cond_isNearTarget, action_StopAndIdle ) );
-        state_following.AddTransition( new FSM.Transition( state_walkShooting, cond_isShootButtonTriggered, null ) );
+        // walk to ...
+        state_walk.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
+        state_walk.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
+        state_walk.AddTransition( new FSM.Transition( state_idle, cond_isNotMoving, action_Idle ) );
+        state_walk.AddTransition( new FSM.Transition( state_walkShooting, cond_isShootButtonTriggered, null ) );
+        state_walk.AddTransition( new FSM.Transition( state_walkReloading, cond_triggerReload, null ) );
 
         // idle shooting to ...
-        state_idleShooting.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
-        state_idleShooting.AddTransition( new FSM.Transition( state_idleReloading, cond_isOutOfAmmo, null ) );
+        state_idleShooting.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
+        state_idleShooting.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
+        state_idleShooting.AddTransition( new FSM.Transition( state_idleReloading, cond_triggerReload, null ) );
         state_idleShooting.AddTransition( new FSM.Transition( state_idle, cond_isNotShooting, null ) );
-        state_idleShooting.AddTransition( new FSM.Transition( state_walkShooting, cond_isFarAwayTarget, action_FollowTarget ) );
+        state_idleShooting.AddTransition( new FSM.Transition( state_walkShooting, cond_isMoving, action_Move ) );
 
         // walk shooting to ...
-        state_walkShooting.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), action_StopAndIdle ) );
-        state_walkShooting.AddTransition( new FSM.Transition( state_walkReloading, cond_isOutOfAmmo, null ) );
-        state_walkShooting.AddTransition( new FSM.Transition( state_following, cond_isNotShooting, null ) );
-        state_walkShooting.AddTransition( new FSM.Transition( state_idleShooting, cond_isNearTarget, action_StopAndIdle ) );
+        state_walkShooting.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
+        state_walkShooting.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
+        state_walkShooting.AddTransition( new FSM.Transition( state_walkReloading, cond_triggerReload, null ) );
+        state_walkShooting.AddTransition( new FSM.Transition( state_walk, cond_isNotShooting, null ) );
+        state_walkShooting.AddTransition( new FSM.Transition( state_idleShooting, cond_isNotMoving, action_Idle ) );
 
         // idle reload to ...
-        state_idleReloading.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), null ) );
+        state_idleReloading.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
+        state_idleReloading.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
         state_idleReloading.AddTransition( new FSM.Transition( state_idle, cond_isNotReloading, null ) );
-        state_idleReloading.AddTransition( new FSM.Transition( state_walkReloading, cond_isFarAwayTarget, action_FollowTarget ) );
+        state_idleReloading.AddTransition( new FSM.Transition( state_walkReloading, cond_isMoving, action_Move ) );
+        state_idleReloading.AddTransition( new FSM.Transition( state_idleActiveReloading, cond_activeReloadTriggered, null ) );
 
+        // idle active reload to ...
+        state_idleActiveReloading.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
+        state_idleActiveReloading.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
+        state_idleActiveReloading.AddTransition( new FSM.Transition( state_idle, cond_isNotReloading, null ) );
+        state_idleActiveReloading.AddTransition( new FSM.Transition( state_walkReloading, cond_isMoving, action_Move ) );
+    
         // walk reload to ...
-        state_walkReloading.AddTransition( new FSM.Transition( state_down, new Condition_noHP(this.playerInfo), action_StopAndIdle ) );
-        state_walkReloading.AddTransition( new FSM.Transition( state_following, cond_isNotReloading, null ) );
-        state_walkReloading.AddTransition( new FSM.Transition( state_idleReloading, cond_isNearTarget, action_StopAndIdle ) );
+        state_walkReloading.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
+        state_walkReloading.AddTransition( new FSM.Transition( state_onStun, cond_isOnStun, null ) );
+        state_walkReloading.AddTransition( new FSM.Transition( state_walk, cond_isNotReloading, null ) );
+        state_walkReloading.AddTransition( new FSM.Transition( state_idleReloading, cond_isNotMoving, action_Idle ) );
 
         // down to ...
         state_down.AddTransition( new FSM.Transition( state_downIdle, 
@@ -448,11 +543,19 @@ public class Player_girl : Player_base {
                                                           null ) );
         // getUp to ...
         state_getUp.AddTransition( new FSM.Transition( state_down, 
-                                                       new Condition_noHP( this.playerInfo ),
-                                                       null ) );
+                                                       cond_noHP,
+                                                       action_Disable ) );
         state_getUp.AddTransition( new FSM.Transition( state_idle, 
                                                        new FSM.Condition_not( new Condition_isPlayingAnim( this, "getUp" ) ), 
-                                                       null ) );
+                                                       action_Enable ) );
+        // on hit to ...
+        state_onStun.AddTransition( new FSM.Transition( state_down, cond_noHP, action_Disable ) );
+        state_onStun.AddTransition( new FSM.Transition ( state_idle, 
+                                                         new FSM.Condition_not(new Condition_isStunning(this) ),
+                                                         null ) );
+        state_onStun.AddTransition( new FSM.Transition ( state_onStun, 
+                                                         cond_isOnStun,
+                                                         null ) );
 
         // init fsm
         this.fsm.init(state_idle);
@@ -488,17 +591,7 @@ public class Player_girl : Player_base {
         this.aimDir = this.aimDir.normalized;
 
         // if we have weapon in hand.
-        if ( screenPad.CanFire() ) {
-            this.shootButtonTriggered = true;
-            // TODO { 
-            // if ( this.curWeapon ) {
-            //     Fire fire = this.curWeapon.GetComponent<Fire>();
-            //     if (fire) {
-            //         fire.Trigger();
-            //     }
-            // }
-            // } TODO end 
-        }
+        this.shootButtonTriggered = screenPad.CanShoot(); 
     }
 
     // ------------------------------------------------------------------ 
@@ -506,27 +599,87 @@ public class Player_girl : Player_base {
     // ------------------------------------------------------------------ 
 
     void ProcessMovement () {
-        // handle steering
         Vector3 force = Vector3.zero;
+        if ( this.steeringState != SteeringState.disable ) {
+
+            CharacterController fo = this.followTarget.collider as CharacterController;
+            Vector3 dir = (this.transform.position - fo.transform.position).normalized;
+            bool avoiding = false;
+
+            // process avoidance.
+            if ( Vector3.Dot ( fo.transform.forward, dir ) > -0.707f ) {
+
+                Vector3 newPos = this.transform.position + this.controller.velocity * Time.deltaTime;
+                Vector3 newFoPos = fo.transform.position + fo.velocity * Time.deltaTime;
+                float next_distance = (newPos - newFoPos).magnitude;
+                float minCollideDistance = fo.radius + this.controller.radius;
+
+                if ( next_distance <= minCollideDistance ) {
+                    force = GetSteering_Flee_MaxForces( this.followTarget.transform.position ); 
+                    if ( Vector3.Angle(force,fo.velocity) < 10.0f ) {
+                    }
+                    this.Avoid();
+                    avoiding = true;
+                }
+            }
+
+            // process following
+            if ( avoiding == false ) {
+                if ( Vector3.Dot ( fo.transform.forward, dir ) > -0.707f ) {
+                    this.Seek(this.followTarget.transform.position + this.followTarget.transform.forward * -this.followDistance );
+                }
+                else {
+                    float cur_distance = (this.transform.position - this.followTarget.transform.position).magnitude;
+                    // if we are far away target
+                    if ( cur_distance >= this.followDistance * 1.2f )
+                        this.Seek(this.followTarget.transform.position);
+                    else if ( cur_distance <= this.followDistance )
+                        this.Stop();
+                }
+            }
+        }
+
+        // handle steering
         if ( this.steeringState == SteeringState.seeking ) {
             force = GetSteering_Seek_MaxForces ( this.targetPos );
             force.y = 0.0f;
+            Act_Movement(); // HACK
         }
-        else if ( this.steeringState == SteeringState.braking ) {
-            ApplyBrakingForce(10.0f);
+        // HACK: should use behavior-tree fix this { 
+        else if ( this.steeringState == SteeringState.braking || 
+                  this.steeringState == SteeringState.disable ) {
+        // } HACK end 
+            ApplyBrakingForce();
         }
         ApplySteeringForce( force );
-
-        // DEBUG { 
-        // DebugHelper.DrawCircleY( this.followTarget.transform.position, this.followDistance, Color.yellow );
-        // } DEBUG end 
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public bool IsMoving () { return this.controller.velocity.sqrMagnitude > 0.0f; }
+    public bool IsMoving () { return this.steeringState != SteeringState.braking; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool ReloadButtonDown () { return screenPad.ReloadButtonDown(); }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool ActiveReloadTriggered () {
+        // TEMP HACK { 
+        ShootInfo shootInfo = this.GetShootInfo();
+        if ( this.IsPlayingAnim( shootInfo.reloadAnim ) ) {
+            if ( Input.GetKeyDown("t") )
+                return true;
+        }
+        return false;
+        // } TEMP HACK end 
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -538,53 +691,32 @@ public class Player_girl : Player_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnTriggerEnter ( Collider _other ) {
-        // don't do anything if player is down
-        if ( this.isDown )
-            return;
-
-        DamageInfo dmgInfo = null;
-        if ( _other.gameObject.layer == Layer.melee_enemy ) {
-            dmgInfo = _other.GetComponent<DamageInfo>();
-
-            if ( fxHitBite != null ) {
-                fxHitBite.transform.position = _other.transform.position;
-                fxHitBite.transform.rotation = _other.transform.rotation;
-                fxHitBite.particleEmitter.Emit();
-            }
-        }
-        else {
-            return;
-        }
-
-        // if we don't get damage info, just return
-        DebugHelper.Assert( dmgInfo, "can't find damage info for given layer" );
-        if ( dmgInfo == null ) {
-            return;
-        }
-
-        /*float dmgOutput =*/ DamageRule.Instance().CalculateDamage( this.playerInfo, dmgInfo );
-
+    public Vector2 GetAutoLockDir ( Vector2 _dir ) {
         // TODO { 
-        // // TODO { 
-        // // if ( dmgOutput < 20.0f )
-        // //     this.lastHit.stunType = HitInfo.StunType.light;
-        // // else if ( dmgOutput >= 20.0f )
-        // //     this.lastHit.stunType = HitInfo.StunType.normal;
-        // this.lastHit.stunType = HitInfo.StunType.normal;
-        // // } TODO end 
+        // Vector2 my_pos = new Vector2 ( this.transform.position.x, 
+        //                                this.transform.position.z );
+        // List<GameObject> enemies = GameRules.Instance().GetEnemies();
+        // foreach ( GameObject enemy in enemies ) {
+        //     CharacterController ctrl = enemy.collider as CharacterController;
+        //     if ( ctrl ) {
+        //         float radius = ctrl.radius; 
 
-        // this.lastHit.position = _other.transform.position;
-        // this.lastHit.normal = _other.transform.right;
-        // Vector3 dir = _other.transform.position - transform.position;
-        // dir.y = 0.0f;
-        // dir.Normalize();
-        // this.lastHit.knockBackForce = dir * DamageRule.Instance().KnockBackForce(dmgInfo.knockBackType);  
+        //         Vector2 min = new Vector2 ( enemy.collider.bounds.min.x,
+        //                                     enemy.collider.bounds.min.z );
+        //         Vector2 max = new Vector2 ( enemy.collider.bounds.max.x,
+        //                                     enemy.collider.bounds.max.z );
+        //         Vector2 dmin = min - my_pos; 
+        //         Vector2 dmax = max - my_pos; 
+        //         float deg1 = Vector2.Angle(_dir,dmin);
+        //         float deg2 = Vector2.Angle(_dir,dmax);
 
-        // // TODO: if hit light, face it { 
-        // // transform.forward = -_other.transform.forward;
-        // // } TODO end 
+        //         // DebugHelper.ScreenPrint("deg1: " + deg1);
+        //         // DebugHelper.ScreenPrint("deg2: " + deg2);
+        //     }
+        // }
         // } TODO end 
+        // TODO:
+        return _dir;
     }
 
     // ------------------------------------------------------------------ 
@@ -624,6 +756,10 @@ public class Player_girl : Player_base {
             if ( this.anim.IsPlaying(shootInfo.shootAnim) == false ) {
                 shootInfo.AdjustAnim(this.anim);
                 shootInfo.Fire();
+                // TODO: to use this way, you must rewrite the shoot system { 
+                // this.anim.Rewind(shootInfo.shootAnim);
+                // this.anim.CrossFade(shootInfo.shootAnim, 0.05f);
+                // } TODO end 
                 this.anim.Play(shootInfo.shootAnim);
             }
         }
@@ -636,10 +772,24 @@ public class Player_girl : Player_base {
     public void Act_Reloading () {
         ShootInfo shootInfo = this.GetShootInfo();
         if ( shootInfo ) {
+            shootInfo.ActiveReload(false);
             shootInfo.AdjustAnim(this.anim);
-            this.anim.Play(shootInfo.reloadAnim);
-            // TODO: HACK
-            shootInfo.Reload(shootInfo.capacity);
+            this.anim.CrossFade(shootInfo.reloadAnim);
+            shootInfo.Reload();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Act_ActiveReloading () {
+        ShootInfo shootInfo = this.GetShootInfo();
+        if ( shootInfo ) {
+            shootInfo.ActiveReload(true);
+            shootInfo.AdjustAnim(this.anim);
+            this.anim.CrossFade(shootInfo.reloadAnim);
+            shootInfo.Reload();
         }
     }
 
@@ -653,5 +803,24 @@ public class Player_girl : Player_base {
         // this.anim.CrossFade("fallDown", 0.3f, PlayMode.StopAll);
         this.anim.Play("fallDown", PlayMode.StopAll);
         StartCoroutine( WaitForRecover() );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnTriggerEnter ( Collider _other ) {
+        if ( base.ApplyDamage(_other) ) {
+            screenPad.gameObject.SendMessage ( "OnGirlHit" );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool IsReloading () {
+        ShootInfo shootInfo = this.GetShootInfo();
+        return this.IsPlayingAnim( shootInfo.reloadAnim );
     }
 }

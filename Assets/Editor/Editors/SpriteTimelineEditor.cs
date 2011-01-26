@@ -54,7 +54,7 @@ public class SpriteTimelineEditor : EditorWindow
 	[MenuItem("Window/Sprite Timeline &t")]
 	static public void ShowEditor()
 	{
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 		if (instance != null)
 		{
 			instance.Show(true);
@@ -84,14 +84,14 @@ public class SpriteTimelineEditor : EditorWindow
 
 		instance = (SpriteTimelineEditor)EditorWindow.GetWindow(typeof(SpriteTimelineEditor), false, "Sprite Timeline");
 
-		if(timelineInstance == null)
+		if (timelineInstance == null)
 			timelineInstance = new SpriteTimeline();
 
 		timelineInstance.Editor = instance;
-/*
-		timelineInstance.SetupSelection();
-		timelineInstance.SetupRects();
-*/
+		/*
+				timelineInstance.SetupSelection();
+				timelineInstance.SetupRects();
+		*/
 		timelineInstance.position = instance.position;
 
 		instance.ShowUtility();
@@ -103,14 +103,14 @@ public class SpriteTimelineEditor : EditorWindow
 
 	public void OnDisable()
 	{
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 		this.Close();
 #endif
 	}
 
 	public void OnCloseWindow()
 	{
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 		instance = null;
 		closing = true;
 		DestroyImmediate(this);
@@ -121,7 +121,7 @@ public class SpriteTimelineEditor : EditorWindow
 	// Relay events to our timeline editor, if available:
 	void OnSelectionChange()
 	{
-		if(timelineInstance != null)
+		if (timelineInstance != null)
 			timelineInstance.OnSelectionChange();
 	}
 
@@ -262,14 +262,14 @@ public class SpriteTimeline : ISTE
 		SetupSelection();
 
 		// Adjust our rects:
-// 		addBtnRect = new Rect(5, 5, 30, 20);
-// 		delBtnRect = new Rect(5, 30, 30, 20);
-// 		popupRect = new Rect(40, 5, 140, 20);
-// 		nameRect = new Rect(220, 5, 140, 20);
+		// 		addBtnRect = new Rect(5, 5, 30, 20);
+		// 		delBtnRect = new Rect(5, 30, 30, 20);
+		// 		popupRect = new Rect(40, 5, 140, 20);
+		// 		nameRect = new Rect(220, 5, 140, 20);
 
 		// Move the buttons left to align with the
 		// possible state name box:
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 		float diff = Mathf.Abs(loopCyclesRect.x - 20f);
 #else
 		float diff = Mathf.Abs(loopCyclesRect.x - 37f);
@@ -292,7 +292,7 @@ public class SpriteTimeline : ISTE
 
 		previewButtonRect.y = durationRect.y;
 		previewButtonRect.x = durationRect.xMax + 5f;
-//		staticTexRect = new Rect(40, 50, 200, 20);
+		//		staticTexRect = new Rect(40, 50, 200, 20);
 
 		// Position the timeline's top edge:
 		timelineTop = previewButtonRect.yMax + 5f;
@@ -301,7 +301,7 @@ public class SpriteTimeline : ISTE
 
 	public void SetupRects()
 	{
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 		addBtnRect = new Rect(5, 5, 30, 20);
 		delBtnRect = new Rect(5, 30, 30, 20);
 		popupRect = new Rect(40, 5, 140, 20);
@@ -319,7 +319,11 @@ public class SpriteTimeline : ISTE
 #else
 		addBtnRect = new Rect(5, 5, 20, 20);
 		delBtnRect = new Rect(24, 5, 20, 20);
+#if	(UNITY_3_0 || UNITY_3_1)
+		popupRect = new Rect(50, 5, 180, 20);
+#else
 		popupRect = new Rect(15, 5, 220, 20);
+#endif
 		nameLabel = new Rect(253, 5, 40, 20);
 		nameRect = new Rect(290, 5, 134, 20);
 		loopCyclesRect = new Rect(15, 30, 120, 20);
@@ -368,7 +372,7 @@ public class SpriteTimeline : ISTE
 	/*
 		void OnEnable()
 		{
-	#if UNITY_IPHONE && !UNITY_3_1
+	#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 			addBtnRect = new Rect(5, 5, 30, 30);
 			delBtnRect = new Rect(24, 5, 20, 20);
 			popupRect = new Rect(15, 5, 220, 20);
@@ -474,7 +478,7 @@ public class SpriteTimeline : ISTE
 		bottom = timelineTop;
 
 
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 		EditorGUIUtility.UseControlStyles();
 #endif
 
@@ -599,7 +603,7 @@ public class SpriteTimeline : ISTE
 		// Draw the static texture selection box:
 		if (sprite is PackedSprite)
 		{
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 			// Draw a "clear" button:
 			if(GUI.Button(clearRect, "X"))
 				((PackedSprite)sprite).staticTexGUID = System.Guid.Empty.ToString();
@@ -626,14 +630,14 @@ public class SpriteTimeline : ISTE
 		// view area:
 		GUILayout.Box(GUIContent.none, GUI.skin.label, GUILayout.Width(previewButtonRect.xMax), GUILayout.Height(animHeight + timelineTop + 10));
 
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 		oldColor = GUI.contentColor;
 		GUI.contentColor = Color.black;
 #endif
 
 
-		
-		if(sprite is PackedSprite)
+
+		if (sprite is PackedSprite)
 		{
 			// Clamp the selected animation:
 			selectedAnim = Mathf.Clamp(selectedAnim, 0, sprite.States.Length - 1);
@@ -668,7 +672,7 @@ public class SpriteTimeline : ISTE
 		}
 
 
-		
+
 		// Only draw this if there are frames:
 		if (sprite.States[selectedAnim].frameGUIDs.Length > 0)
 		{
@@ -697,7 +701,7 @@ public class SpriteTimeline : ISTE
 			EditorUtility.SetDirty(sprite.gameObject);
 
 
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 		GUI.contentColor = oldColor;
 #endif
 
@@ -750,7 +754,7 @@ public class SpriteTimeline : ISTE
 
 			texture.Scale = zoomCoef;
 
-			texture.OnGUI( (nonWindow?adjust:0) );
+			texture.OnGUI((nonWindow ? adjust : 0));
 
 			if (texture.Dragging)
 			{
@@ -788,7 +792,7 @@ public class SpriteTimeline : ISTE
 		// Update our bottom extent:
 		bottom = timelineViewportRect.yMax + spaceAbovePreview;
 
-		
+
 		// Draw our preview:
 		if (sprite.States[selectedAnim].frameGUIDs.Length > 0)
 		{
@@ -812,10 +816,10 @@ public class SpriteTimeline : ISTE
 				previewRect.y = previewRect.yMax + 5f;
 				previewRect.height = 20f;
 				// Ensure it is big enough to hold our text:
-				if(previewRect.width < 70f)
+				if (previewRect.width < 70f)
 				{
 					previewRect.width = 70f;
-					previewRect.x = (m_position.width/2f) - 35f;
+					previewRect.x = (m_position.width / 2f) - 35f;
 				}
 				GUI.Label(previewRect, "Frame: " + curPreviewTexture, centeredLabel);
 
@@ -834,7 +838,7 @@ public class SpriteTimeline : ISTE
 		if (eventType == EventType.DragUpdated || eventType == EventType.DragPerform)
 		{
 			// Ensure the drag/drop is within our timeline area:
-			if(Event.current.mousePosition.y >= timelineTop)
+			if (Event.current.mousePosition.y >= timelineTop)
 			{
 				// Show a copy icon on the drag
 				DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
@@ -887,8 +891,16 @@ public class SpriteTimeline : ISTE
 			}
 			else
 			{
-				selGO = null;
-				sprite = null;
+				// If another GameObject wasn't selected,
+				// don't change anything so we can drag
+				// textures in, etc.
+				// So only change if there is no activeObject
+				// (as opposed to activeGameObject):
+				if(Selection.activeObject == null)
+				{
+					selGO = null;
+					sprite = null;
+				}
 			}
 
 			// Select a safe value for our selected frame:
@@ -904,7 +916,7 @@ public class SpriteTimeline : ISTE
 				// the same number of frames in their selected anim
 				// would cause the list not to be updated:
 				//if (sprite.States.Length != animList.Length)
-					BuildAnimList();
+				BuildAnimList();
 
 				if (sprite.States.Length > 0)
 				{
@@ -1112,7 +1124,7 @@ public class SpriteTimeline : ISTE
 
 		for (int i = 0; i < sprite.States[selectedAnim].frameGUIDs.Length; ++i)
 		{
-			frameTex = (Texture2D) AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(sprite.States[selectedAnim].frameGUIDs[i]), typeof(Texture2D));
+			frameTex = (Texture2D)AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(sprite.States[selectedAnim].frameGUIDs[i]), typeof(Texture2D));
 			DraggableTexture tex = new DraggableTexture(frameTex, i, new Vector2(leftEdge, 0));
 
 			if (tex.texture != null)
@@ -1336,7 +1348,7 @@ public class DraggableTexture : GUIDraggableObject
 		if (selected)
 		{
 			Color oldBGColor = GUI.backgroundColor;
-#if UNITY_IPHONE && !UNITY_3_1
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
 			GUI.backgroundColor = new Color(1f, 0, 1f, 1f);
 #else
 			GUI.backgroundColor = new Color(1f, 0, 1f, 0.5f);

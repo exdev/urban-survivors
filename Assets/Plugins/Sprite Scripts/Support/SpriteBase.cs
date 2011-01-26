@@ -652,6 +652,9 @@ public class UVAnimation_Auto : UVAnimation
 	/// </summary>
 	public int totalCells;
 
+	// No-arg constructor:
+	public UVAnimation_Auto() {}
+
 	// Copy constructor:
 	public UVAnimation_Auto(UVAnimation_Auto anim) : base(anim)
 	{
@@ -1287,6 +1290,20 @@ public abstract class SpriteBase : SpriteRoot
 		animCompleteDelegate = null;
 	}
 
+	public override void Delete()
+	{
+		if (animating)
+		{
+			// Remove ourselves from the animating list.
+			RemoveFromAnimatedList();
+
+			// Leave "animating" set to true so that when
+			// we re-enable, we can pick up animating again:
+			animating = true;
+		}
+
+		base.Delete();
+	}
 
 	// Called when the GO is disabled or destroyed
 	protected override void OnDisable()
@@ -1342,7 +1359,7 @@ public abstract class SpriteBase : SpriteRoot
 	{
 		base.Hide(tf);
 
-		// If we're hidden, pause animation:
+		// If we're hideAtStart, pause animation:
 		if (tf)
 			PauseAnim();
 	}

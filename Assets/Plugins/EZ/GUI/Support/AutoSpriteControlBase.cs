@@ -125,6 +125,7 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 				go.layer = gameObject.layer;
 				go.transform.parent = transform;
 				go.transform.localPosition = Vector3.zero;
+				go.transform.localRotation = Quaternion.identity;
 				go.name = "control_text";
 
 				// Add a mesh renderer:
@@ -148,6 +149,12 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 				spriteText.alignment = defaultTextAlignment;
 				spriteText.pixelPerfect = true;
 				spriteText.SetCamera(renderCamera);
+
+				// Copy over our persistent state if this
+				// is runtime, otherwise, just let this
+				// get set in Start():
+				if(Application.isPlaying)
+					spriteText.Persistent = persistent;
 			}
 
 			spriteText.Text = text;
@@ -387,7 +394,7 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 	// Hide layers:
 	public override void Hide(bool tf)
 	{
-		// If we're hiding and not already hidden,
+		// If we're hiding and not already hideAtStart,
 		// save the current collider size and set
 		// it to zero.
 		if(!IsHidden() && tf)
@@ -444,14 +451,17 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 
 	public void Copy(IControl c, ControlCopyFlags flags)
 	{
-		Copy(c, ControlCopyFlags.All);
+		if (!(c is AutoSpriteControlBase))
+			return;
+
+		Copy((SpriteRoot)c, flags);
 	}
 
 
 	/// <summary>
 	/// Copies all of the specified control's settings
 	/// to this control, provided they are of the same
-	/// type.  Once exception is that layers are not
+	/// type.  One exception is that layers are not
 	/// copied as this would require a new allocation
 	/// and could negatively impact performance at
 	/// runtime.
@@ -465,7 +475,7 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 	/// <summary>
 	/// Copies all of the specified control's settings
 	/// to this control, provided they are of the same
-	/// type.  Once exception is that layers are not
+	/// type.  One exception is that layers are not
 	/// copied as this would require a new allocation
 	/// and could negatively impact performance at
 	/// runtime.
@@ -636,7 +646,8 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 			inputDelegate = c.inputDelegate;
 		}
 
-		if ((flags & ControlCopyFlags.State) == ControlCopyFlags.State)
+		if ((flags & ControlCopyFlags.State) == ControlCopyFlags.State ||
+			(flags & ControlCopyFlags.Appearance) == ControlCopyFlags.Appearance)
 		{
 			Container = c.Container;
 
@@ -679,6 +690,18 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 	}
 
 
+	protected override void OnEnable()
+	{
+		base.OnEnable();
+
+		// Since we hide a managed sprite by setting its
+		// vertices to 0,0,0, since we just re-enabled
+		// they will have been set to something else. So
+		// we need to re-set them by hiding again:
+		if (managed && m_spriteMesh != null && m_hidden)
+			m_spriteMesh.Hide(true);
+	}
+
 	protected override void OnDisable()
 	{
 		base.OnDisable();
@@ -714,7 +737,9 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 	/// </summary>
 	public virtual void UpdateCollider()
 	{
-		if (!(collider is BoxCollider) || IsHidden() || customCollider)
+		if (deleted || m_spriteMesh == null)
+			return;
+		if (!(collider is BoxCollider) || IsHidden() || m_spriteMesh == null || customCollider)
 			return;
 
 		Vector3[] verts = m_spriteMesh.vertices;
@@ -747,6 +772,9 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 	// taking all layers into account.
 	public virtual void FindOuterEdges()
 	{
+		if (deleted)
+			return;
+
 		// If we're being asked for our outline, then
 		// we need to have already started:
 		if (!m_started)
@@ -895,26 +923,40 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 	}
 
 	public virtual bool GotFocus()	{ return false; }
-	public virtual void LostFocus() {}
-	public virtual string GetInputText(ref KEYBOARD_INFO info) { return null; }
-	public virtual string SetInputText(string inputText, ref int insert) { return null; }
 
 	protected EZInputDelegate inputDelegate;
 	protected EZValueChangedDelegate changeDelegate;
-	public virtual EZInputDelegate SetInputDelegate(EZInputDelegate del)
+	public virtual void SetInputDelegate(EZInputDelegate del)
 	{
-		EZInputDelegate oldDel = inputDelegate;
 		inputDelegate = del;
-		return oldDel;
 	}
-	public virtual EZValueChangedDelegate SetValueChangedDelegate(EZValueChangedDelegate del)
+	public virtual void AddInputDelegate(EZInputDelegate del)
 	{
-		EZValueChangedDelegate oldDel = changeDelegate;
+		inputDelegate += del;
+	}
+	public virtual void RemoveInputDelegate(EZInputDelegate del)
+	{
+		inputDelegate -= del;
+	}
+	public virtual void SetValueChangedDelegate(EZValueChangedDelegate del)
+	{
 		changeDelegate = del;
-		return oldDel;
+	}
+	public virtual void AddValueChangedDelegate(EZValueChangedDelegate del)
+	{
+		changeDelegate += del;
+	}
+	public virtual void RemoveValueChangedDelegate(EZValueChangedDelegate del)
+	{
+		changeDelegate -= del;
 	}
 
-	public virtual void OnInput(POINTER_INFO ptr) 
+	public virtual void OnInput(POINTER_INFO ptr)
+	{
+		OnInput(ref ptr);
+	}
+
+	public virtual void OnInput(ref POINTER_INFO ptr) 
 	{
 		if(Container != null)
 		{

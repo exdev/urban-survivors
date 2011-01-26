@@ -43,6 +43,38 @@ public class Actor : Steer {
     }
 
     // ------------------------------------------------------------------ 
+    // Desc: Action_DisableSteering 
+    // ------------------------------------------------------------------ 
+
+    protected class Action_DisableSteering : FSM.Action {
+        Actor actor = null;
+
+        public Action_DisableSteering ( Actor _actor ) {
+            this.actor = _actor;
+        }
+
+        public override void exec () {
+            this.actor.DisableSteering();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_EnableSteering 
+    // ------------------------------------------------------------------ 
+
+    protected class Action_EnableSteering : FSM.Action {
+        Actor actor = null;
+
+        public Action_EnableSteering ( Actor _actor ) {
+            this.actor = _actor;
+        }
+
+        public override void exec () {
+            this.actor.Stop();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
@@ -86,11 +118,13 @@ public class Actor : Steer {
         moving,
         seeking,
         braking,
+        avoiding,
         disable,
     };
 
     public float StepSpeed = 0.5f;
 
+    protected HitInfo lastHit = new HitInfo();
     protected Animation anim = null;
     protected FSM fsm = new FSM();
     protected Vector3 targetPos;
@@ -169,6 +203,15 @@ public class Actor : Steer {
     public void Stop () {
         this.steeringState = SteeringState.braking;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Avoid () {
+        this.steeringState = SteeringState.avoiding;
+    }
+
 
     // ------------------------------------------------------------------ 
     // Desc: 

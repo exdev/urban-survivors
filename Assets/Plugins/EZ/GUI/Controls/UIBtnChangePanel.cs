@@ -70,7 +70,21 @@ public class UIBtnChangePanel : UIButton
 		/// <summary>
 		/// Go to the previous panel in the sequence.
 		/// </summary>
-		Back
+		Back,
+
+		/// <summary>
+		/// Works like BringIn, but skips the panel's 
+		/// transition, jumping immediately to its
+		/// end state).
+		/// </summary>
+		BringInImmediate,
+
+		/// <summary>
+		/// Works like DismissCurrent, but skips the panel's
+		/// transition, jumping immediately to its
+		/// end state).
+		/// </summary>
+		DismissImmediate
 	}
 
 	/// <summary>
@@ -88,11 +102,11 @@ public class UIBtnChangePanel : UIButton
 	/// </summary>
 	public string panel;
 
-	public override void OnInput(POINTER_INFO ptr)
+	public override void OnInput(ref POINTER_INFO ptr)
 	{
 		if (!m_controlIsEnabled || IsHidden())
 		{
-			base.OnInput(ptr);
+			base.OnInput(ref ptr);
 			return;
 		}
 
@@ -102,7 +116,7 @@ public class UIBtnChangePanel : UIButton
 			{
 				if (UIPanelManager.instance == null)
 				{
-					base.OnInput(ptr);
+					base.OnInput(ref ptr);
 					return;
 				}
 				else
@@ -111,7 +125,7 @@ public class UIBtnChangePanel : UIButton
 				// If we still have nothing, return:
 				if(panelManager == null)
 				{
-					base.OnInput(ptr);
+					base.OnInput(ref ptr);
 					return;
 				}
 			}
@@ -121,6 +135,9 @@ public class UIBtnChangePanel : UIButton
 			{
 				case ChangeType.BringIn:
 					panelManager.BringIn(panel);
+					break;
+				case ChangeType.BringInImmediate:
+					panelManager.BringInImmediate(panel);
 					break;
 				case ChangeType.BringInForward:
 					panelManager.BringIn(panel, UIPanelManager.MENU_DIRECTION.Forwards);
@@ -140,8 +157,13 @@ public class UIBtnChangePanel : UIButton
 				case ChangeType.DismissCurrent:
 					panelManager.Dismiss(UIPanelManager.MENU_DIRECTION.Forwards);
 					break;
+				case ChangeType.DismissImmediate:
+					panelManager.DismissImmediate(UIPanelManager.MENU_DIRECTION.Forwards);
+					break;
 				case ChangeType.Toggle:
-					if (string.Equals(panelManager.CurrentPanel.name, panel, System.StringComparison.CurrentCultureIgnoreCase))
+					if (panelManager != null &&
+						panelManager.CurrentPanel != null && 
+						string.Equals(panelManager.CurrentPanel.name, panel, System.StringComparison.CurrentCultureIgnoreCase))
 					{
 						panelManager.Dismiss(UIPanelManager.MENU_DIRECTION.Forwards);
 					}
@@ -159,7 +181,7 @@ public class UIBtnChangePanel : UIButton
 			}
 		}
 
-		base.OnInput(ptr);
+		base.OnInput(ref ptr);
 	}
 
 

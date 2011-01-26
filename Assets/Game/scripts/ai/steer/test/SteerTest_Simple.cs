@@ -47,7 +47,7 @@ public class SteerTest_Simple : Steer {
 
         float distance = (transform.position - DestPos).magnitude;
         if ( distance < 5.0f ) {
-            ApplyBrakingForce(1.0f);
+            ApplyBrakingForce();
         }
         else {
             force = force_seek;

@@ -30,7 +30,7 @@ public class Steer : MonoBehaviour {
 
     public float maxSpeed = 1.0f;
     public float maxForce = 0.1f;
-    public float maxBrakingForce = 1.0f;
+    public float brakingRate = 10.0f;
     public float mass = 1.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -187,11 +187,58 @@ public class Steer : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public Vector3 GetSteering_Flee_MaxForces ( Vector3 _pos ) {
+        Vector3 dir = (_pos - transform.position).normalized;
+        return -dir * this.maxForce;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public Vector3 GetSteering_Wander () {
         float speed = 12.0f * Time.deltaTime;
         this.wanderSide = this.wanderSide + speed * Random.Range(-1.0f,1.0f); 
         this.wanderSide = Mathf.Clamp ( this.wanderSide, -1.0f, 1.0f );
         return transform.right * this.wanderSide;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Vector3 GetSteering_AvoidObstacle ( float _minTimeToCollision, Collider _obstacle ) {
+        float ob_radius = _obstacle.bounds.size.x; 
+        Vector3 ob_center = _obstacle.transform.position;
+        float my_raidus = controller.radius;
+
+        // minimum distance to obstacle before avoidance is required
+        float minDistanceToCollision = _minTimeToCollision * this.curSpeed;
+        float minDistanceToCenter = minDistanceToCollision + ob_radius;
+
+        // contact distance: sum of radii of obstacle and vehicle
+        float totalRadius = ob_radius + my_raidus;
+
+        // obstacle center relative to vehicle position
+        Vector3 localOffset = ob_center - controller.transform.position;
+
+        // distance along vehicle's forward axis to obstacle's center
+        float forwardComponent = Vector3.Dot( localOffset, controller.transform.forward );
+        Vector3 forwardOffset = forwardComponent * controller.transform.forward;
+
+        // offset from forward axis to obstacle's center
+        Vector3 offForwardOffset = localOffset - forwardOffset;
+
+        // test to see if sphere overlaps with obstacle-free corridor
+        bool inCylinder = offForwardOffset.magnitude < totalRadius;
+        bool nearby = forwardComponent < minDistanceToCenter;
+        bool inFront = forwardComponent > 0;
+
+        // if all three conditions are met, steer away from sphere center
+        if (inCylinder && nearby && inFront)
+            return offForwardOffset * -1;
+        else
+            return Vector3.zero;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -212,15 +259,18 @@ public class Steer : MonoBehaviour {
         Vector3 newAcceleration = (clippedForce / this.mass);
         Vector3 newVelocity = this.Velocity();
 
-        // damp out abrupt changes and oscillations in steering acceleration
-        // (rate is proportional to time step, then clipped into useful range)
-        if ( Time.deltaTime > 0.0f ) {
-            float smoothRate = Mathf.Clamp (9.0f * Time.deltaTime, 0.15f, 0.4f);
-            smoothRate = Mathf.Clamp01(smoothRate);
-            this.smoothedAcceleration = Vector3.Lerp ( this.smoothedAcceleration, 
-                                                       newAcceleration, 
-                                                       smoothRate );
-        }
+        // jwu DISABLE { 
+        // // damp out abrupt changes and oscillations in steering acceleration
+        // // (rate is proportional to time step, then clipped into useful range)
+        // if ( Time.deltaTime > 0.0f ) {
+        //     float smoothRate = Mathf.Clamp (9.0f * Time.deltaTime, 0.15f, 0.4f);
+        //     smoothRate = Mathf.Clamp01(smoothRate);
+        //     this.smoothedAcceleration = Vector3.Lerp ( this.smoothedAcceleration, 
+        //                                                newAcceleration, 
+        //                                                smoothRate );
+        // }
+        this.smoothedAcceleration = newAcceleration;
+        // } jwu DISABLE end 
 
         // Euler integrate (per frame) acceleration into velocity
         newVelocity += this.smoothedAcceleration * Time.deltaTime;
@@ -263,11 +313,20 @@ public class Steer : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void ApplyBrakingForce ( float _brakingRate ) {
-        float rawBraking = this.curSpeed * _brakingRate;
+    public void ApplyBrakingForce () {
+        float rawBraking = this.curSpeed * this.brakingRate;
         float clipBraking = Mathf.Clamp( rawBraking, 0.0f, this.maxForce );
         this.curSpeed -= clipBraking * Time.deltaTime;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void BrakeImmediately () {
+        this.curSpeed = 0.0f;
+    }
+
     // } KEEPME end 
 
     // ------------------------------------------------------------------ 

@@ -336,7 +336,7 @@ public class UISlider : AutoSpriteControlBase
 				emptySprite.animations[0].SetAnim(states[1], 0);
 				emptySprite.PlayAnim(0, 0);
 			}
-			emptySprite.SetCamera(renderCamera);
+			emptySprite.renderCamera = renderCamera;
 			emptySprite.Hide(IsHidden());
 			
 			Value = m_value;
@@ -351,6 +351,13 @@ public class UISlider : AutoSpriteControlBase
 
 			SetState(0);
 		}
+
+		// Since hiding while managed depends on
+		// setting our mesh extents to 0, and the
+		// foregoing code causes us to not be set
+		// to 0, re-hide ourselves:
+		if (managed && m_hidden)
+			Hide(true);
 	}
 
 	public override void Copy(SpriteRoot s)
@@ -492,13 +499,30 @@ public class UISlider : AutoSpriteControlBase
 			changeDelegate(this);
 	}
 
-	public override EZInputDelegate SetInputDelegate(EZInputDelegate del)
+	public override void SetInputDelegate(EZInputDelegate del)
 	{
 		if(knob != null)
-			return knob.SetInputDelegate(del);
+			knob.SetInputDelegate(del);
 
-		return base.SetInputDelegate(del);
+		base.SetInputDelegate(del);
 	}
+
+	public override void AddInputDelegate(EZInputDelegate del)
+	{
+		if (knob != null)
+			knob.AddInputDelegate(del);
+
+		base.AddInputDelegate(del);
+	}
+
+	public override void RemoveInputDelegate(EZInputDelegate del)
+	{
+		if (knob != null)
+			knob.RemoveInputDelegate(del);
+
+		base.RemoveInputDelegate(del);
+	}
+
 
 	// Called to update the slider bar's appearance
 	protected void UpdateAppearance(float truncVal)
@@ -511,12 +535,12 @@ public class UISlider : AutoSpriteControlBase
 		// Truncate layers:
 		for (int i = 0; i < filledLayers.Length; ++i)
 		{
-			if (filledIndices[i] != -1)
+			//if (filledIndices[i] != -1)
 				filledLayers[i].TruncateRight(truncVal);
 		}
 		for (int i = 0; i < emptyLayers.Length; ++i)
 		{
-			if (emptyIndices[i] != -1)
+			//if (emptyIndices[i] != -1)
 				emptyLayers[i].TruncateLeft(1f - truncVal);
 		}
 	}

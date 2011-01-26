@@ -228,6 +228,25 @@ public abstract class UIPanelBase : MonoBehaviour, IUIContainer, IUIObject
 			subjects.Add(hash, go);
 		}
 
+		// Now find any SpriteText, since that's another common object type
+		// we'll want to transition:
+		Component[] texts = transform.GetComponentsInChildren(typeof(SpriteText), true);
+
+		for (int i = 0; i < texts.Length; ++i)
+		{
+			go = texts[i].gameObject;
+			hash = go.GetHashCode();
+
+			// Only add new objects:
+			if (subjects.ContainsKey(hash))
+				continue;
+
+			for (int j = 0; j < Transitions.list.Length; ++j)
+				Transitions.list[j].AddSubSubject(go);
+
+			subjects.Add(hash, go);
+		}
+
 
 		// Add our children IUIObjects to the list, and then
 		// see if we have any additional GameObjects to add:
@@ -403,6 +422,54 @@ public abstract class UIPanelBase : MonoBehaviour, IUIContainer, IUIObject
 	}
 
 	/// <summary>
+	/// Returns a reference to the transition at the specified index.
+	/// </summary>
+	/// <param name="index">The zero-based index of the transition to retrieve.</param>
+	/// <returns>Returns a reference to the transition at the specified index.  Null if none is found at the specified index.</returns>
+	public EZTransition GetTransition(int index)
+	{
+		if (Transitions == null)
+			return null;
+		if (Transitions.list == null)
+			return null;
+		if (Transitions.list.Length <= index || index < 0)
+			return null;
+
+		return Transitions.list[index];
+	}
+
+	/// <summary>
+	/// Returns a reference to the specified transition.
+	/// </summary>
+	/// <param name="transition">The enum identifying the transition to retrieve.</param>
+	/// <returns>Returns a reference to the specified transition.  Null if none is found.</returns>
+	public EZTransition GetTransition(UIPanelManager.SHOW_MODE transition)
+	{
+		return GetTransition((int)transition);
+	}
+
+	/// <summary>
+	/// Returns a reference to the specified transition.
+	/// </summary>
+	/// <param name="transName">The name of the transition to retrieve.</param>
+	/// <returns>Returns a reference to the specified transition.  Null if none is found.</returns>
+	public EZTransition GetTransition(string transName)
+	{
+		if (Transitions == null)
+			return null;
+		if (Transitions.list == null)
+			return null;
+
+		EZTransition[] list = Transitions.list;
+
+		for (int i = 0; i < list.Length; ++i)
+			if (string.Equals(list[i].name, transName, System.StringComparison.CurrentCultureIgnoreCase))
+				return list[i];
+
+		return null;
+	}
+
+	/// <summary>
 	/// Starts one of the panel's "bring in" or "dismiss" transitions.
 	/// </summary>
 	/// <param name="mode">The mode corresponding to the transition that should be played.</param>
@@ -488,7 +555,7 @@ public abstract class UIPanelBase : MonoBehaviour, IUIContainer, IUIObject
 			tempTransCompleteDel(this, transition);
 		tempTransCompleteDel = null;
 
-		if (blockInput[prevTransIndex])
+		if (blockInput[prevTransIndex] && UIManager.Exists())
 			UIManager.instance.UnlockInput();
 	}
 
@@ -553,23 +620,32 @@ public abstract class UIPanelBase : MonoBehaviour, IUIContainer, IUIObject
 	}
 
 	public bool GotFocus() { return false; }
-	public void LostFocus() { }
-	public string GetInputText(ref KEYBOARD_INFO info) { return null; }
-	public string SetInputText(string text, ref int insert) { return null; }
 
 	protected EZInputDelegate inputDelegate;
 	protected EZValueChangedDelegate changeDelegate;
-	public virtual EZInputDelegate SetInputDelegate(EZInputDelegate del)
+	public virtual void SetInputDelegate(EZInputDelegate del)
 	{
-		EZInputDelegate oldDel = inputDelegate;
 		inputDelegate = del;
-		return oldDel;
 	}
-	public virtual EZValueChangedDelegate SetValueChangedDelegate(EZValueChangedDelegate del)
+	public virtual void AddInputDelegate(EZInputDelegate del)
 	{
-		EZValueChangedDelegate oldDel = changeDelegate;
+		inputDelegate += del;
+	}
+	public virtual void RemoveInputDelegate(EZInputDelegate del)
+	{
+		inputDelegate -= del;
+	}
+	public virtual void SetValueChangedDelegate(EZValueChangedDelegate del)
+	{
 		changeDelegate = del;
-		return oldDel;
+	}
+	public virtual void AddValueChangedDelegate(EZValueChangedDelegate del)
+	{
+		changeDelegate += del;
+	}
+	public virtual void RemoveValueChangedDelegate(EZValueChangedDelegate del)
+	{
+		changeDelegate -= del;
 	}
 
 	public virtual void OnInput(POINTER_INFO ptr)

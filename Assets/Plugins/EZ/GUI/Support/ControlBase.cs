@@ -58,7 +58,7 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 	protected SpriteText.Anchor_Pos defaultTextAnchor = SpriteText.Anchor_Pos.Middle_Center;
 	protected SpriteText.Alignment_Type defaultTextAlignment = SpriteText.Alignment_Type.Center;
 
-	
+
 	/// <summary>
 	/// Sets the text to be displayed in this control.
 	/// </summary>
@@ -72,7 +72,7 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 
 			// See if we need to create a TextMesh and an
 			// object to host it:
-			if(spriteText == null)
+			if (spriteText == null)
 			{
 				if (text == "")
 					return;
@@ -82,7 +82,7 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 					Debug.LogWarning("Warning: No UIManager exists in the scene. A UIManager with a default font is required to automatically add text to a control.");
 					return;
 				}
-				else if(UIManager.instance.defaultFont == null)
+				else if (UIManager.instance.defaultFont == null)
 				{
 					Debug.LogWarning("Warning: No default font defined.  A UIManager object with a default font is required to automatically add text to a control.");
 					return;
@@ -93,6 +93,7 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 				go.layer = gameObject.layer;
 				go.transform.parent = transform;
 				go.transform.localPosition = Vector3.zero;
+				go.transform.localRotation = Quaternion.identity;
 				go.name = "control_text";
 
 				// Add a mesh renderer:
@@ -122,6 +123,9 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 		}
 	}
 
+	// Tracks whether we are using a pre-made collider.
+	protected bool customCollider;
+
 	/// <summary>
 	/// Can hold a reference to any data that the
 	/// developer wishes to be associated with
@@ -141,9 +145,21 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 	}
 
 
+	protected virtual void Awake()
+	{
+		if (collider != null)
+			customCollider = true;
+	}
+
+
 	// Adds a basic box collider to this control.
 	protected virtual void AddCollider()
 	{
+		// Don't create our own if a custom collider exists
+		if (customCollider)
+			return;
+
+		gameObject.AddComponent(typeof(BoxCollider));
 		UpdateCollider();
 	}
 
@@ -157,11 +173,10 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 	/// </summary>
 	public virtual void UpdateCollider()
 	{
-		if (!(collider is BoxCollider))
+		if (customCollider || !(collider is BoxCollider))
 			return;
 
-		Destroy(collider);
-		BoxCollider bc = (BoxCollider) gameObject.AddComponent(typeof(BoxCollider));
+		BoxCollider bc = (BoxCollider)collider;
 
 		if (includeTextInAutoCollider && spriteText != null)
 		{
@@ -194,7 +209,7 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 	public virtual bool controlIsEnabled
 	{
 		get { return m_controlIsEnabled; }
-		set	{ m_controlIsEnabled = value; }
+		set { m_controlIsEnabled = value; }
 	}
 
 	protected IUIContainer container;
@@ -202,9 +217,9 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 	public virtual IUIContainer Container
 	{
 		get { return container; }
-		set 
-		{ 
-			if(container != null)
+		set
+		{
+			if (container != null)
 			{
 				if (spriteText != null)
 					container.RemoveChild(spriteText.gameObject);
@@ -225,9 +240,9 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 		Transform t = transform.parent;
 		Transform c = ((Component)cont).transform;
 
-		while(t != null)
+		while (t != null)
 		{
-			if(t == c)
+			if (t == c)
 			{
 				Container = cont;
 				return true;
@@ -242,29 +257,38 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 		return false;
 	}
 
-	public virtual bool GotFocus()	{ return false; }
-	public virtual void LostFocus() {}
-	public virtual string GetInputText(ref KEYBOARD_INFO info) { return null; }
-	public virtual string SetInputText(string inputText, ref int insert) { return null; }
+	public virtual bool GotFocus() { return false; }
 
 	protected EZInputDelegate inputDelegate;
 	protected EZValueChangedDelegate changeDelegate;
-	public virtual EZInputDelegate SetInputDelegate(EZInputDelegate del)
+	public virtual void SetInputDelegate(EZInputDelegate del)
 	{
-		EZInputDelegate oldDel = inputDelegate;
 		inputDelegate = del;
-		return oldDel;
 	}
-	public virtual EZValueChangedDelegate SetValueChangedDelegate(EZValueChangedDelegate del)
+	public virtual void AddInputDelegate(EZInputDelegate del)
 	{
-		EZValueChangedDelegate oldDel = changeDelegate;
+		inputDelegate += del;
+	}
+	public virtual void RemoveInputDelegate(EZInputDelegate del)
+	{
+		inputDelegate -= del;
+	}
+	public virtual void SetValueChangedDelegate(EZValueChangedDelegate del)
+	{
 		changeDelegate = del;
-		return oldDel;
+	}
+	public virtual void AddValueChangedDelegate(EZValueChangedDelegate del)
+	{
+		changeDelegate += del;
+	}
+	public virtual void RemoveValueChangedDelegate(EZValueChangedDelegate del)
+	{
+		changeDelegate -= del;
 	}
 
-	public virtual void OnInput(POINTER_INFO ptr) 
+	public virtual void OnInput(POINTER_INFO ptr)
 	{
-		if(Container != null)
+		if (Container != null)
 		{
 			ptr.callerIsControl = true;
 			Container.OnInput(ptr);
@@ -289,7 +313,7 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 
 
 		// Copy transitions:
-		if( (flags & ControlCopyFlags.Transitions) == ControlCopyFlags.Transitions )
+		if ((flags & ControlCopyFlags.Transitions) == ControlCopyFlags.Transitions)
 		{
 			if (c is UIStateToggleBtn3D)
 			{
@@ -309,7 +333,7 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 		}
 
 
-		if( (flags & ControlCopyFlags.Text) == ControlCopyFlags.Text )
+		if ((flags & ControlCopyFlags.Text) == ControlCopyFlags.Text)
 		{
 			// See if we want to clone the other
 			// control's text mesh:
@@ -325,7 +349,7 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 			Text = c.Text;
 		}
 
-		if( (flags & ControlCopyFlags.Appearance) == ControlCopyFlags.Appearance )
+		if ((flags & ControlCopyFlags.Appearance) == ControlCopyFlags.Appearance)
 		{
 			// See if we can copy the other control's collider's settings:
 			if (collider.GetType() == c.collider.GetType())
@@ -366,13 +390,13 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 			}
 		}
 
-		if( (flags & ControlCopyFlags.Invocation) == ControlCopyFlags.Invocation )
+		if ((flags & ControlCopyFlags.Invocation) == ControlCopyFlags.Invocation)
 		{
 			changeDelegate = c.changeDelegate;
 			inputDelegate = c.inputDelegate;
 		}
 
-		if( (flags & ControlCopyFlags.State) == ControlCopyFlags.State )
+		if ((flags & ControlCopyFlags.State) == ControlCopyFlags.State)
 		{
 			Container = c.Container;
 
@@ -411,7 +435,7 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 
 	// Draws the UI for the control's properties
 	// just before the transition UI stuff is drawn.
-	public virtual void DrawPreTransitionUI(int selState, IGUIScriptSelector gui) {}
+	public virtual void DrawPreTransitionUI(int selState, IGUIScriptSelector gui) { }
 
 	// Returns an array of strings which are the
 	// names of the states/elements supported by
