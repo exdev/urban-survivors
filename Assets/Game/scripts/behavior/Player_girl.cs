@@ -462,7 +462,7 @@ public class Player_girl : Player_base {
         FSM.Condition cond_isNotReloading = new FSM.Condition_not( new Condition_isReloading(this) );
         FSM.Condition cond_isOutOfAmmo = new Condition_isOutOfAmmo(this);
         FSM.Condition cond_triggerReload = new FSM.Condition_and( new Condition_canReload(this),
-                                                                  new FSM.Condition_or ( new Condition_isOutOfAmmo(this),
+                                                                  new FSM.Condition_or ( cond_isOutOfAmmo,
                                                                                          new Condition_isReloadButtonDown(this) )
                                                                 );
         FSM.Condition cond_activeReloadTriggered = new Condition_activeReloadTriggered(this);
