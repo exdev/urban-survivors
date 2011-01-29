@@ -284,7 +284,7 @@ public class ScreenPad : MonoBehaviour {
                     Vector2 desiredDir = delta.normalized; 
                     // DISABLE: this.aimingDir = -delta.normalized; // this is old method, inverse needle
                     // adjust the aiming direction by 
-                    desiredDir = (GameRules.Instance().GetPlayerGirl() as Player_girl).GetAutoLockDir(desiredDir);
+                    desiredDir = (GameRules.Instance().GetPlayerGirl() as PlayerGirl).GetAutoLockDir(desiredDir);
                     this.aimingDir = desiredDir; 
                     this.shootCounter = this.shootingDuration;
                 }
@@ -295,7 +295,7 @@ public class ScreenPad : MonoBehaviour {
                 Vector2 girlScreenPos_v2 = new Vector2(girlScreenPos.x, girlScreenPos.y); 
                 Vector2 delta = new Vector2(Input.mousePosition.x,Input.mousePosition.y) - girlScreenPos_v2;
                 Vector2 desiredDir = delta.normalized; 
-                desiredDir = (GameRules.Instance().GetPlayerGirl() as Player_girl).GetAutoLockDir(desiredDir);
+                desiredDir = (GameRules.Instance().GetPlayerGirl() as PlayerGirl).GetAutoLockDir(desiredDir);
                 this.aimingDir = desiredDir;
             } // end if ( !this.useRemoteTouch )
 

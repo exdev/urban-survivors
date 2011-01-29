@@ -255,7 +255,8 @@ public class FSM {
         if ( this.cur_state == null ) {
             if ( this.init_state != null ) {
                 this.cur_state = this.init_state;
-                this.cur_actions.Add ( this.cur_state.entry_action );
+                if ( this.cur_state.entry_action != null )
+                    this.cur_actions.Add ( this.cur_state.entry_action );
             }
         }
         else {

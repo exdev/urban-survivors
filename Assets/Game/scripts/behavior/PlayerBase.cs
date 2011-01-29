@@ -1,5 +1,5 @@
 // ======================================================================================
-// File         : Player_base.cs
+// File         : PlayerBase.cs
 // Author       : Wu Jie 
 // Last Change  : 11/29/2010 | 21:21:45 PM | Monday,November
 // Description  : 
@@ -13,82 +13,13 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// class Player_base
+// class PlayerBase
 // 
 // Purpose: 
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
-public class Player_base : Actor {
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // conditions, actions
-    ///////////////////////////////////////////////////////////////////////////////
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    protected class Condition_isDown : FSM.Condition {
-        Player_base player = null;
-
-        public Condition_isDown ( Player_base _player ) {
-            this.player = _player;
-        }
-
-        public override bool exec () {
-            return player.IsDown();
-        }
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    protected class Condition_isStunning : FSM.Condition {
-        Player_base player = null;
-
-        public Condition_isStunning ( Player_base _player ) {
-            this.player = _player;
-        }
-
-        public override bool exec () {
-            return this.player.IsPlayingAnim("hit1") ||
-                this.player.IsPlayingAnim("hit2");
-        }
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    protected class Condition_isOnStun : FSM.Condition {
-        Player_base player = null;
-
-        public Condition_isOnStun ( Player_base _player ) {
-            this.player = _player;
-        }
-
-        public override bool exec () {
-            return this.player.isGetStun();
-        }
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc:
-    // ------------------------------------------------------------------ 
-
-    protected class Action_ActOnStun : FSM.Action {
-        Player_base player = null;
-
-        public Action_ActOnStun ( Player_base _player ) {
-            this.player = _player;
-        }
-
-        public override void exec () {
-            this.player.ActOnStun();
-        }
-    }
+public class PlayerBase : Actor {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -288,35 +219,5 @@ public class Player_base : Actor {
 
         return true;
     }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public bool isGetStun () {
-        return this.lastHit.stunType != HitInfo.StunType.none;
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public void ActOnStun () {
-        // NOTE: it could be possible we interupt to hit when boy is attacking.
-        AttackInfo atk_info = this.GetAttackInfo();
-        if ( atk_info != null && atk_info.curCombo != null )
-            atk_info.curCombo.attack_shape.active = false;
-
-        // HACK: simple random choose animation { 
-        // string[] names = {"hit1", "hit2"};
-        // string animName = names[Mathf.FloorToInt(Random.Range(0.0f,2.0f))];
-        // } HACK end 
-        string animName = "hit1";
-        if ( IsBehind( this.lastHit.position ) )
-            animName = "hit2";
-
-        this.anim.Rewind(animName);
-        this.anim.CrossFade(animName);
-    } 
 }
 

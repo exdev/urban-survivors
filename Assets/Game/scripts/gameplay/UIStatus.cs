@@ -50,9 +50,9 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     class Condition_canReload : FSM.Condition {
-        Player_girl girl;
+        PlayerGirl girl;
 
-        public Condition_canReload ( Player_girl _girl ) {
+        public Condition_canReload ( PlayerGirl _girl ) {
             this.girl = _girl;
         }
 
@@ -63,6 +63,38 @@ public class UIStatus : MonoBehaviour {
             return this.girl.IsReloading() == false && 
                 shootInfo.isAmmoFull() == false && 
                 shootInfo.NoBulletForReloading() == false;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_OnReload 
+    // ------------------------------------------------------------------ 
+
+    class Action_OnReload : FSM.Action {
+        UIStatus status; 
+
+        public Action_OnReload ( UIStatus _status ) {
+            this.status = _status;
+        }
+
+        public override void exec () {
+            this.status.OnReload();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: Action_OnActiveReload 
+    // ------------------------------------------------------------------ 
+
+    class Action_OnActiveReload : FSM.Action {
+        UIStatus status; 
+
+        public Action_OnActiveReload ( UIStatus _status ) {
+            this.status = _status;
+        }
+
+        public override void exec () {
+            this.status.OnActiveReload();
         }
     }
 
@@ -93,13 +125,7 @@ public class UIStatus : MonoBehaviour {
     protected Transform initBoyTrans; 
     protected Transform initGirlTrans; 
 
-    public enum ReloadBtnState {
-        accept_reload,
-        accept_activeReload,
-        disable
-    };
-    protected ReloadBtnState reloadBtnState = ReloadBtnState.accept_reload; 
-    protected ReloadBtnState lastReloadBtnState = ReloadBtnState.accept_reload; 
+    protected FSM fsm = new FSM();
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -112,12 +138,12 @@ public class UIStatus : MonoBehaviour {
     void InitFSM () {
         //
         Condition_isReloadButtonDown cond_isReloadButtonDown = new Condition_isReloadButtonDown(this.screenPad); 
-        Condition_canReload cond_canReload = new Condition_canReload( GameRules.Instance().GetPlayerGirl() as Player_girl ); 
+        Condition_canReload cond_canReload = new Condition_canReload( GameRules.Instance().GetPlayerGirl() as PlayerGirl ); 
 
         // TODO: we should process reload here, and send the reload message to girl, so that it can perform reload
         // TODO: same as boy.
-        // Action_onReload act_onReload = new Action_onReload(this);
-        // Action_onReload act_onActiveReload = new Action_onActiveReload(this);
+        FSM.Action act_onReload = new Action_OnReload(this);
+        FSM.Action act_onActiveReload = new Action_OnActiveReload(this);
 
         // accept_reload
         FSM.State state_acceptReload = new FSM.State( "accept_reload", 
@@ -135,14 +161,18 @@ public class UIStatus : MonoBehaviour {
                                                  null, 
                                                  null );
         //
+        state_acceptReload.AddTransition( new FSM.Transition( state_acceptActiveReload, cond_isReloadButtonDown, act_onReload ) );
         state_acceptReload.AddTransition( new FSM.Transition( state_disable, new FSM.Condition_not(cond_canReload), null ) );
-        state_acceptReload.AddTransition( new FSM.Transition( state_acceptActiveReload, cond_isReloadButtonDown, null /*act_onReload*/ ) );
 
         //
-        state_acceptActiveReload.AddTransition( new FSM.Transition( state_disable, cond_isReloadButtonDown, null /*act_onActiveReload*/ ) );
+        state_acceptActiveReload.AddTransition( new FSM.Transition( state_disable, cond_isReloadButtonDown, act_onActiveReload ) );
+        state_acceptActiveReload.AddTransition( new FSM.Transition( state_disable, new FSM.Condition_not(cond_canReload), null ) );
 
         //
         state_disable.AddTransition( new FSM.Transition( state_acceptReload, cond_canReload, null ) );
+
+        // init fsm
+        this.fsm.init(state_acceptReload);
     }
 
     // ------------------------------------------------------------------ 
@@ -189,7 +219,7 @@ public class UIStatus : MonoBehaviour {
         PlayerInfo boyInfo = GameRules.Instance().GetPlayerBoyInfo();
         this.boyProgressBar.Value = boyInfo.curHP/boyInfo.maxHP;
 
-        Player_girl girl = GameRules.Instance().GetPlayerGirl() as Player_girl;
+        PlayerGirl girl = GameRules.Instance().GetPlayerGirl() as PlayerGirl;
         PlayerInfo girlInfo = GameRules.Instance().GetPlayerGirlInfo();
         this.girlProgressBar.Value = 1.0f - girlInfo.curHP/girlInfo.maxHP;
 
@@ -224,8 +254,10 @@ public class UIStatus : MonoBehaviour {
             this.ActiveMovingZone(false);
 
         // melee button
-        if ( screenPad.MeleeButtonDown() )
+        if ( screenPad.MeleeButtonDown() ) {
             this.ActiveMeleeButton(true);
+            GameRules.Instance().GetPlayerBoy().SendMessage("OnMelee");
+        }
         else if ( screenPad.MeleeButtonUp() )
             this.ActiveMeleeButton(false);
 
@@ -287,9 +319,32 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void UpdateReloadButtonState () {
+        this.fsm.tick(); // update state machine
+        DebugHelper.ScreenPrint( this.fsm.CurrentState().name );
+
+        //
+        if ( this.fsm.CurrentState().name != "disable" ) {
+            if ( screenPad.ReloadButtonDown() ) {
+                reloadButton.PlayAnim("active");
+                reloadindEffect.PlayAnim("active");
+            }
+            else if ( screenPad.ReloadButtonUp() ) {
+                reloadButton.PlayAnimInReverse("active");
+                reloadindEffect.PlayAnimInReverse("active");
+            }
+        }
+        else {
+            reloadButton.PlayAnimInReverse("active");
+            reloadindEffect.PlayAnimInReverse("active");
+            reloadButton.color.a = 0.5f;
+            reloadButton.SetColor(reloadButton.color);
+            reloadindEffect.color.a = 0.2f;
+            reloadindEffect.SetColor(reloadindEffect.color);
+        }
+
         // this.lastReloadBtnState = this.reloadBtnState;
 
-        // Player_girl girl = GameRules.Instance().GetPlayerGirl() as Player_girl;
+        // PlayerGirl girl = GameRules.Instance().GetPlayerGirl() as PlayerGirl;
         // ShootInfo shootInfo = girl.GetShootInfo();
 
         // // get current reload button state
@@ -382,5 +437,21 @@ public class UIStatus : MonoBehaviour {
         this.girlFace.transform.rotation = this.initGirlTrans.rotation;
         iTween.ShakePosition(this.girlFace, 10.0f * Vector3.right, 0.5f );
         // iTween.ShakeRotation(this.girlFace, 30.0f * Vector3.forward, 0.5f );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void OnReload () {
+        GameRules.Instance().GetPlayerGirl().SendMessage("OnReload");
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void OnActiveReload () {
+        GameRules.Instance().GetPlayerGirl().SendMessage("OnActiveReload");
     }
 }

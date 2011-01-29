@@ -29,8 +29,8 @@ public class GameRules : MonoBehaviour {
 
     protected static GameRules instance  = null;
 
-    protected Player_base playerBoy = null;
-    protected Player_base playerGirl = null;
+    protected PlayerBase playerBoy = null;
+    protected PlayerBase playerGirl = null;
     protected GameObject startPoint = null;
     protected bool isGameOver = false;
     protected float restartCounter = 0.0f;
@@ -55,9 +55,9 @@ public class GameRules : MonoBehaviour {
 
             //
             GameObject goBoy = GameObject.FindWithTag("player_boy");
-            playerBoy = goBoy.GetComponent<Player_base>(); 
+            playerBoy = goBoy.GetComponent<PlayerBase>(); 
             GameObject goGirl = GameObject.FindWithTag("player_girl");
-            playerGirl = goGirl.GetComponent<Player_base>();
+            playerGirl = goGirl.GetComponent<PlayerBase>();
 
             //
             startPoint = GameObject.Find("StartPoint");
@@ -132,10 +132,10 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public Player_base GetPlayerBoy () { return playerBoy; }
+    public PlayerBase GetPlayerBoy () { return playerBoy; }
     public PlayerInfo GetPlayerBoyInfo () { return playerBoy.playerInfo; }
 
-    public Player_base GetPlayerGirl () { return playerGirl; }
+    public PlayerBase GetPlayerGirl () { return playerGirl; }
     public PlayerInfo GetPlayerGirlInfo () { return playerGirl.playerInfo; }
 
     // ------------------------------------------------------------------ 
@@ -227,7 +227,7 @@ public class GameRules : MonoBehaviour {
 
         GameObject[] players = GameRules.Instance().GetPlayers();
         foreach( GameObject player in players ) {
-            Player_base p = player.GetComponent<Player_base>();
+            PlayerBase p = player.GetComponent<PlayerBase>();
             if ( p.playerInfo.curHP <= 0.0f ) {
                 continue;
             }

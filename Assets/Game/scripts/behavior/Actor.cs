@@ -13,7 +13,7 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// class Player_base
+// class PlayerBase
 // 
 // Purpose: 
 // 
@@ -130,6 +130,9 @@ public class Actor : Steer {
     protected Vector3 targetPos;
     protected Vector3 moveDir;
     protected SteeringState steeringState = SteeringState.braking;
+
+    protected delegate void StateUpdate();
+    protected StateUpdate[] States = new StateUpdate[4]; // we allow for different layer states update at the same time.
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
