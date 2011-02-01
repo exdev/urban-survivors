@@ -11,6 +11,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
 // class 
@@ -22,6 +23,8 @@ public class Source_collider : Source_base {
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
+
+    public List<string> targetTags = new List<string>();
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -42,7 +45,21 @@ public class Source_collider : Source_base {
     // ------------------------------------------------------------------ 
 
     void OnTriggerEnter ( Collider _other ) {
-        if ( base.CanTrigger() ) {
+        bool isInTags = false;
+        if ( targetTags.Count != 0 ) {
+            foreach ( string tag in targetTags ) {
+                if ( _other.gameObject.tag == tag ) {
+                    isInTags = true;
+                    break;
+                }
+            }
+        }
+        else { // none means all.
+            isInTags = true;
+        }
+
+        //
+        if ( isInTags && base.CanTrigger() ) {
             base.Response();
         }
     }
