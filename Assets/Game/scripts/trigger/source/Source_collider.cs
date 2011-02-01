@@ -25,6 +25,12 @@ public class Source_collider : Source_base {
     ///////////////////////////////////////////////////////////////////////////////
 
     public List<string> targetTags = new List<string>();
+    public bool triggerWhenEnter = false; 
+    public bool triggerWhenExit = false; 
+    public float stayForSeconds = -1.0f; 
+    public float stayInterval = 1.0f; 
+
+    protected int numTargetInside = 0;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -44,11 +50,11 @@ public class Source_collider : Source_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnTriggerEnter ( Collider _other ) {
+    bool IsTargetInTags ( GameObject _go ) {
         bool isInTags = false;
         if ( targetTags.Count != 0 ) {
             foreach ( string tag in targetTags ) {
-                if ( _other.gameObject.tag == tag ) {
+                if ( _go.tag == tag ) {
                     isInTags = true;
                     break;
                 }
@@ -57,9 +63,52 @@ public class Source_collider : Source_base {
         else { // none means all.
             isInTags = true;
         }
+        return isInTags;
+    }
 
-        //
-        if ( isInTags && base.CanTrigger() ) {
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnTriggerEnter ( Collider _other ) {
+        if ( IsTargetInTags(_other.gameObject) ) {
+            ++numTargetInside;
+
+            if ( triggerWhenEnter ) {
+                DoTrigger();
+            }
+
+            // if the first target stay here
+            if ( numTargetInside == 1 && stayForSeconds >= 0.0f ) {
+                InvokeRepeating("DoTrigger", stayForSeconds, stayInterval);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnTriggerExit ( Collider _other ) {
+        if ( IsTargetInTags(_other.gameObject) ) {
+            --numTargetInside;
+
+            if ( numTargetInside == 0 ) {
+                CancelInvoke("DoTrigger");
+
+                if ( triggerWhenExit ) {
+                    DoTrigger();
+                }
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void DoTrigger () {
+        if ( base.CanTrigger() ) {
             base.Response();
         }
     }

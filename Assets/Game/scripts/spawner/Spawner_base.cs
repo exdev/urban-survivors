@@ -38,7 +38,12 @@ public class Spawner_base : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public virtual void exec () {}
+    public virtual void DoSpawn () {}
+    public void DoKill () {
+        foreach ( Object obj in existObjects ) {
+            Destroy(obj);
+        }
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 

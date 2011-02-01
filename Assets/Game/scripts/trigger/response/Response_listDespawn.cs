@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : Source_periodic.cs
+// File         : Response_listDespawn.cs
 // Author       : Wu Jie 
-// Last Change  : 10/30/2010 | 01:11:47 AM | Saturday,October
+// Last Change  : 02/01/2011 | 23:41:38 PM | Tuesday,February
 // Description  : 
 // ======================================================================================
 
@@ -13,17 +13,16 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// class 
+// Response_base
 ///////////////////////////////////////////////////////////////////////////////
 
-public class Source_periodic : Source_base {
+public class Response_listDespawn : Response_base {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public float StartTime = 0.0f;
-    public float IntervalTime = 0.0f;
+    public GameObject[] Spawners;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -33,28 +32,12 @@ public class Source_periodic : Source_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	protected override void Start () {
-        base.Start();
-        InvokeRepeating("DoTrigger", StartTime, IntervalTime);
-	}
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    protected virtual bool CheckCondition () {
-        return true;
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void DoTrigger () {
-        if ( base.CanTrigger() ) {
-            if ( CheckCondition() ) {
-                base.Response();
-            }
+	public override void exec () {
+        foreach ( GameObject go in Spawners ) {
+            Spawner_base spawn = go.GetComponent<Spawner_base>();
+            spawn.DoKill();
         }
     }
 }
+
+

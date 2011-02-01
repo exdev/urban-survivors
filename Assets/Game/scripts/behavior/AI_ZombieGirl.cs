@@ -65,7 +65,7 @@ public class AI_ZombieGirl : AI_ZombieBase {
         }
 
         public override void exec () {
-            this.zombieGirl.ActOnDead();
+            this.zombieGirl.OnDead();
         }
     }
 
@@ -267,7 +267,7 @@ public class AI_ZombieGirl : AI_ZombieBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void ActOnDead () {
+    public void OnDead () {
         fxDead.transform.position = this.transform.position;
         fxDead.transform.rotation = this.transform.rotation;
         fxDead.particleEmitter.Emit();

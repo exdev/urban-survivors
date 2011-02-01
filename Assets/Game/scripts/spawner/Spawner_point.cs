@@ -28,7 +28,7 @@ public class Spawner_point : Spawner_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public override void exec () {
+    public override void DoSpawn () {
         int amount = calcSpawnAmount();
         Object obj;
         while ( amount > 0 ) {

@@ -26,6 +26,7 @@ public class GameRules : MonoBehaviour {
 
     public float RestartForSeconds = 5.0f; 
     public bool multiPlayer = false;
+    public float enemyDeadFarAway = 10.0f;
 
     protected static GameRules instance  = null;
 
@@ -83,6 +84,20 @@ public class GameRules : MonoBehaviour {
             this.restartCounter -= Time.deltaTime;
             if ( this.restartCounter <= 0.0f ) {
                 Application.LoadLevel(0);
+            }
+        }
+
+        // kill enemies when far away than 
+        List<GameObject> enemies = GetEnemies ();
+        Vector3 boyPos = playerBoy.transform.position;
+        Vector3 girlPos = playerGirl.transform.position;
+
+        foreach ( GameObject go in enemies ) 
+        {
+            if ( (go.transform.position - boyPos).magnitude >= enemyDeadFarAway ||
+                 (go.transform.position - girlPos).magnitude >= enemyDeadFarAway ) 
+            {
+                Destroy(go);
             }
         }
     }
