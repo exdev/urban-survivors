@@ -30,11 +30,13 @@ public class Spawner_point : Spawner_base {
 
     public override void exec () {
         int amount = calcSpawnAmount();
+        Object obj;
         while ( amount > 0 ) {
             Vector2 offset = Random.insideUnitCircle * this.radius;
-            Instantiate( Prefab, 
-                         transform.position + new Vector3( offset.x, 0.0f, offset.y ),
-                         transform.rotation );
+            obj = Instantiate( Prefab, 
+                               transform.position + new Vector3( offset.x, 0.0f, offset.y ),
+                               transform.rotation );
+            this.existObjects.Add(obj);
             --amount;
         }
     }
