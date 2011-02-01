@@ -97,6 +97,23 @@ class DrawGizmos {
     }
 
     // ------------------------------------------------------------------ 
+    // Desc: Response_listDespawn
+    // ------------------------------------------------------------------ 
+
+    [DrawGizmo (GizmoType.Selected | GizmoType.Pickable)]
+    static void DrawPeriodicSource ( Response_listDespawn _c, GizmoType _gizmoType ) {
+        if ( EditorApplication.isPlaying ) return;
+
+        Gizmos.color = Color.blue;
+        foreach ( GameObject go in _c.Spawners ) {
+            if ( go == null )
+                continue;
+            Vector3 position = _c.transform.position;
+            Gizmos.DrawLine (position, go.transform.position);
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     // Desc: StartPoint
     // ------------------------------------------------------------------ 
 

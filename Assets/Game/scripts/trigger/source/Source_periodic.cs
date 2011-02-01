@@ -35,7 +35,7 @@ public class Source_periodic : Source_base {
 
 	protected override void Start () {
         base.Start();
-        StartCoroutine(StartCounter());
+        InvokeRepeating("DoTrigger", StartTime, IntervalTime);
 	}
 
     // ------------------------------------------------------------------ 
@@ -50,18 +50,8 @@ public class Source_periodic : Source_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    IEnumerator StartCounter () {
-        // if start time is zero, no need to wait.
-        if ( StartTime > 0.0f ) {
-            yield return new WaitForSeconds (StartTime);
-        }
-        if ( CheckCondition() ) {
-            base.Response();
-        }
-
-        // now enter the trigger loops
-        while ( base.CanTrigger() ) {
-            yield return new WaitForSeconds (IntervalTime);
+    void DoTrigger () {
+        if ( base.CanTrigger() ) {
             if ( CheckCondition() ) {
                 base.Response();
             }

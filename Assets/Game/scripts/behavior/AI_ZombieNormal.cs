@@ -71,7 +71,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
         }
 
         public override void exec () {
-            this.zombieNormal.ActOnDead();
+            this.zombieNormal.OnDead();
         }
     }
 
@@ -513,7 +513,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void ActOnDead () {
+    public void OnDead () {
         // DISABLE { 
         // Vector3 hitPos = this.lastHit.position;
         // hitPos.y = 0.0f;

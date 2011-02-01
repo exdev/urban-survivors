@@ -28,14 +28,16 @@ public class Spawner_zone : Spawner_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public override void exec () {
+    public override void DoSpawn () {
         int amount = calcSpawnAmount();
+        Object obj;
         while ( amount > 0 ) {
-            Instantiate( Prefab, 
-                         transform.position + new Vector3( Random.Range( -size.x * 0.5f, size.x * 0.5f ),
-                                                           Random.Range( -size.y * 0.5f, size.y * 0.5f ),
-                                                           Random.Range( -size.z * 0.5f, size.z * 0.5f ) ) , 
-                         transform.rotation );
+            obj = Instantiate( Prefab, 
+                               transform.position + new Vector3( Random.Range( -size.x * 0.5f, size.x * 0.5f ),
+                                                                 Random.Range( -size.y * 0.5f, size.y * 0.5f ),
+                                                                 Random.Range( -size.z * 0.5f, size.z * 0.5f ) ) , 
+                               transform.rotation );
+            this.existObjects.Add(obj);
             --amount;
         }
     }

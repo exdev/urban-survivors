@@ -35,7 +35,7 @@ public class Response_listSpawn : Response_base {
 	public override void exec () {
         foreach ( GameObject go in Spawners ) {
             Spawner_base spawn = go.GetComponent<Spawner_base>();
-            spawn.exec();
+            spawn.DoSpawn();
         }
     }
 }
