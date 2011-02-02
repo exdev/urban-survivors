@@ -107,8 +107,8 @@ public class UIStatus : MonoBehaviour {
     public GameObject boyFace = null; 
     public UIProgressBar girlProgressBar = null;
     public GameObject girlFace = null; 
-    public TextMesh restartCounterText = null;
-    public TextMesh bulletCounterText = null;
+    public SpriteText restartCounterText = null;
+    public SpriteText bulletCounterText = null;
 
     public PackedSprite aimingOutline = null;
     public PackedSprite aimingNeedle = null;
@@ -226,15 +226,22 @@ public class UIStatus : MonoBehaviour {
         if ( GameRules.Instance().IsGameOver() ) {
             gameOver.SetActiveRecursively(true);
             if ( this.restartCounterText )
-                this.restartCounterText.text = string.Format( "{0:0}", GameRules.Instance().RestartCounter() );
+                this.restartCounterText.Text = string.Format( "{0:0}", GameRules.Instance().RestartCounter() );
         }
 
         // update bullets
         if ( this.bulletCounterText ) {
             ShootInfo shootInfo = girl.GetShootInfo();
 
+			// bullet counter display color
+			if (shootInfo.CurBullets()<=10)
+				this.bulletCounterText.SetColor(Color.red);
+				else if (shootInfo.CurBullets()<=20)
+					this.bulletCounterText.SetColor(Color.yellow);
+			else this.bulletCounterText.SetColor(Color.white);
+			
             // curbullet / totalbullet
-            this.bulletCounterText.text = shootInfo.CurBullets() + "/" + shootInfo.RemainBullets();
+            this.bulletCounterText.Text = shootInfo.CurBullets() + "/" + shootInfo.RemainBullets();
         }
 
         // ======================================================== 
