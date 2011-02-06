@@ -26,79 +26,6 @@ using System.Collections;
 public class UIStatus : MonoBehaviour {
 
     ///////////////////////////////////////////////////////////////////////////////
-    // actions, conditions
-    ///////////////////////////////////////////////////////////////////////////////
-
-    // ------------------------------------------------------------------ 
-    // Desc: Condition_isReloadButtonDown 
-    // ------------------------------------------------------------------ 
-
-    class Condition_isReloadButtonDown : FSM.Condition {
-        ScreenPad screenPad = null;
-
-        public Condition_isReloadButtonDown ( ScreenPad _screenPad ) {
-            this.screenPad = _screenPad;
-        }
-
-        public override bool exec () {
-            return screenPad.ReloadButtonDown();
-        }
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: Condition_canReload 
-    // ------------------------------------------------------------------ 
-
-    class Condition_canReload : FSM.Condition {
-        PlayerGirl girl;
-
-        public Condition_canReload ( PlayerGirl _girl ) {
-            this.girl = _girl;
-        }
-
-        public override bool exec () {
-            ShootInfo shootInfo = this.girl.GetShootInfo();
-
-            // get current reload button state
-            return this.girl.IsReloading() == false && 
-                shootInfo.isAmmoFull() == false && 
-                shootInfo.NoBulletForReloading() == false;
-        }
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: Action_OnReload 
-    // ------------------------------------------------------------------ 
-
-    class Action_OnReload : FSM.Action {
-        UIStatus status; 
-
-        public Action_OnReload ( UIStatus _status ) {
-            this.status = _status;
-        }
-
-        public override void exec () {
-            this.status.OnReload();
-        }
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: Action_OnActiveReload 
-    // ------------------------------------------------------------------ 
-
-    class Action_OnActiveReload : FSM.Action {
-        UIStatus status; 
-
-        public Action_OnActiveReload ( UIStatus _status ) {
-            this.status = _status;
-        }
-
-        public override void exec () {
-            this.status.OnActiveReload();
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
@@ -125,55 +52,9 @@ public class UIStatus : MonoBehaviour {
     protected Transform initBoyTrans; 
     protected Transform initGirlTrans; 
 
-    protected FSM fsm = new FSM();
-
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void InitFSM () {
-        //
-        Condition_isReloadButtonDown cond_isReloadButtonDown = new Condition_isReloadButtonDown(this.screenPad); 
-        Condition_canReload cond_canReload = new Condition_canReload( GameRules.Instance().GetPlayerGirl() as PlayerGirl ); 
-
-        // TODO: we should process reload here, and send the reload message to girl, so that it can perform reload
-        // TODO: same as boy.
-        FSM.Action act_onReload = new Action_OnReload(this);
-        FSM.Action act_onActiveReload = new Action_OnActiveReload(this);
-
-        // accept_reload
-        FSM.State state_acceptReload = new FSM.State( "accept_reload", 
-                                                      null, 
-                                                      null, 
-                                                      null );
-        // accept_activeReload 
-        FSM.State state_acceptActiveReload = new FSM.State( "accept_activeReload", 
-                                                            null, 
-                                                            null, 
-                                                            null );
-        // disable
-        FSM.State state_disable = new FSM.State( "disable", 
-                                                 null, 
-                                                 null, 
-                                                 null );
-        //
-        state_acceptReload.AddTransition( new FSM.Transition( state_acceptActiveReload, cond_isReloadButtonDown, act_onReload ) );
-        state_acceptReload.AddTransition( new FSM.Transition( state_disable, new FSM.Condition_not(cond_canReload), null ) );
-
-        //
-        state_acceptActiveReload.AddTransition( new FSM.Transition( state_disable, cond_isReloadButtonDown, act_onActiveReload ) );
-        state_acceptActiveReload.AddTransition( new FSM.Transition( state_disable, new FSM.Condition_not(cond_canReload), null ) );
-
-        //
-        state_disable.AddTransition( new FSM.Transition( state_acceptReload, cond_canReload, null ) );
-
-        // init fsm
-        this.fsm.init(state_acceptReload);
-    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -198,9 +79,8 @@ public class UIStatus : MonoBehaviour {
         this.ActiveMeleeButton(false);
 
         // 
-        reloadButton.PlayAnimInReverse("active");
-        reloadindEffect.color.a = 0.5f;
-        reloadindEffect.SetColor(reloadindEffect.color);
+        // reloadindEffect.color.a = 0.5f;
+        // reloadindEffect.SetColor(reloadindEffect.color);
     }
 
     // ------------------------------------------------------------------ 
@@ -208,7 +88,6 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Start () {
-        InitFSM();
     }
 
     // ------------------------------------------------------------------ 
@@ -283,9 +162,9 @@ public class UIStatus : MonoBehaviour {
             aimingOutline.color.a = 1.0f;
             aimingOutline.SetColor(aimingOutline.color);
         } else {
-            aimingNeedle.color.a = 0.5f;
+            aimingNeedle.color.a = 0.3f;
             aimingNeedle.SetColor(aimingNeedle.color);
-            aimingOutline.color.a = 0.5f;
+            aimingOutline.color.a = 0.3f;
             aimingOutline.SetColor(aimingOutline.color);
         }
     }
@@ -301,9 +180,9 @@ public class UIStatus : MonoBehaviour {
             moveOutline.color.a = 1.0f;
             moveOutline.SetColor(moveOutline.color);
         } else {
-            moveAnalog.color.a = 0.5f;
+            moveAnalog.color.a = 0.3f;
             moveAnalog.SetColor(moveAnalog.color);
-            moveOutline.color.a = 0.5f;
+            moveOutline.color.a = 0.3f;
             moveOutline.SetColor(moveOutline.color);
         }
     }
@@ -314,10 +193,14 @@ public class UIStatus : MonoBehaviour {
 
     void ActiveMeleeButton ( bool _active ) {
         if ( _active ) {
-            meleeButton.PlayAnim("active");
+            meleeButton.color.a = 1.0f;
+            meleeButton.SetColor(meleeButton.color);
+            // meleeButton.PlayAnim("active");
         }
         else {
-            meleeButton.PlayAnimInReverse("active");
+            meleeButton.color.a = 0.3f;
+            meleeButton.SetColor(meleeButton.color);
+            // meleeButton.PlayAnimInReverse("active");
         }
     }
 
@@ -326,100 +209,7 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void UpdateReloadButtonState () {
-        this.fsm.tick(); // update state machine
-        DebugHelper.ScreenPrint( this.fsm.CurrentState().name );
-
-        //
-        if ( this.fsm.CurrentState().name != "disable" ) {
-            if ( screenPad.ReloadButtonDown() ) {
-                reloadButton.PlayAnim("active");
-                reloadindEffect.PlayAnim("active");
-            }
-            else if ( screenPad.ReloadButtonUp() ) {
-                reloadButton.PlayAnimInReverse("active");
-                reloadindEffect.PlayAnimInReverse("active");
-            }
-        }
-        else {
-            reloadButton.PlayAnimInReverse("active");
-            reloadindEffect.PlayAnimInReverse("active");
-            reloadButton.color.a = 0.5f;
-            reloadButton.SetColor(reloadButton.color);
-            reloadindEffect.color.a = 0.2f;
-            reloadindEffect.SetColor(reloadindEffect.color);
-        }
-
-        // this.lastReloadBtnState = this.reloadBtnState;
-
-        // PlayerGirl girl = GameRules.Instance().GetPlayerGirl() as PlayerGirl;
-        // ShootInfo shootInfo = girl.GetShootInfo();
-
-        // // get current reload button state
-        // if ( girl.IsReloading() == false && 
-        //      shootInfo.isAmmoFull() == false && 
-        //      shootInfo.NoBulletForReloading() == false ) 
-        // {
-        //     this.reloadBtnState = ReloadBtnState.accept_reload;
-        // }
-        // else if ( girl.IsReloading() && 
-        //           this.lastReloadBtnState != ReloadBtnState.disable ) {
-        //     this.reloadBtnState = ReloadBtnState.accept_activeReload;
-        // }
-        // else {
-        //     this.reloadBtnState = ReloadBtnState.disable;
-        // }
-
-        // // check if we need process 
-        // if ( this.lastReloadBtnState != this.reloadBtnState ) {
-        //     if ( this.reloadBtnState == ReloadBtnState.accept_reload ) {
-        //         reloadButton.color.a = 1.0f;
-        //         reloadButton.SetColor(reloadButton.color);
-        //         reloadindEffect.color.a = 0.5f;
-        //         reloadindEffect.SetColor(reloadindEffect.color);
-        //     }
-        //     else if ( this.reloadBtnState == ReloadBtnState.accept_activeReload ) {
-        //         Hashtable args = iTween.Hash( "amount", new Vector3(0.0f, 0.0f, 1.0f),
-        //                                       "time", 1.0f,
-        //                                       "easetype", iTween.EaseType.easeOutCubic, 
-        //                                       "looptype", iTween.LoopType.loop 
-        //                                     );
-        //         iTween.RotateBy ( reloadindEffect.gameObject, args );
-        //     }
-        // }
-        // else {
-        //     //
-        //     if ( this.reloadBtnState == ReloadBtnState.accept_activeReload ) {
-        //         if ( screenPad.ReloadButtonDown() ) {
-        //             iTween.Stop (reloadButton.gameObject, true);
-        //         }
-        //         else if ( screenPad.ReloadButtonUp() ) {
-        //             reloadButton.gameObject.transform.localScale = new Vector3(1.0f,1.0f,1.0f);
-        //             Hashtable args = iTween.Hash( "scale", new Vector3(1.5f,1.5f,1.0f),
-        //                                           "time", 0.5f,
-        //                                           "easetype", iTween.EaseType.easeOutCirc 
-        //                                         );
-        //             iTween.ScaleFrom ( reloadButton.gameObject, args );
-        //         }
-        //     } 
-        // }
-
-        // //
-        // if ( this.reloadBtnState != ReloadBtnState.disable ) {
-        //     if ( screenPad.ReloadButtonDown() ) {
-        //         reloadButton.PlayAnim("active");
-        //         reloadindEffect.PlayAnim("active");
-        //     }
-        //     else if ( screenPad.ReloadButtonUp() ) {
-        //         reloadButton.PlayAnimInReverse("active");
-        //         reloadindEffect.PlayAnimInReverse("active");
-        //     }
-        // }
-        // else {
-        //     reloadButton.color.a = 0.5f;
-        //     reloadButton.SetColor(reloadButton.color);
-        //     reloadindEffect.color.a = 0.2f;
-        //     reloadindEffect.SetColor(reloadindEffect.color);
-        // }
+        // TODO:
     }
 
     // ------------------------------------------------------------------ 
