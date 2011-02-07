@@ -300,7 +300,7 @@ public class PlayerGirl : PlayerBase {
 
         // go to reload
         if ( shootInfo.OutOfAmmo() && shootInfo.RemainBullets() > 0 ) {
-            this.OnReload();
+            screenPad.gameObject.SendMessage ( "OnReload" );
             return;
         }
 
@@ -561,5 +561,17 @@ public class PlayerGirl : PlayerBase {
 
             States[1] = UpdateReload;
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public float ReloadTime () {
+        ShootInfo shootInfo = this.GetShootInfo();
+        if ( shootInfo ) {
+            return this.anim[shootInfo.reloadAnim].length;
+        }
+        return 0.0f;
     }
 }

@@ -48,9 +48,16 @@ public class UIStatus : MonoBehaviour {
     public PackedSprite reloadButton = null;
     public PackedSprite reloadindEffect = null;
 
+    public PackedSprite activeReloadBar = null;
+    public PackedSprite activeReloadFloat = null;
+    public PackedSprite activeReloadZone = null;
+
     protected ScreenPad screenPad = null;
     protected Transform initBoyTrans; 
     protected Transform initGirlTrans; 
+
+    protected delegate void StateUpdate();
+    protected StateUpdate ReloadButtonState;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -73,14 +80,12 @@ public class UIStatus : MonoBehaviour {
         this.initBoyTrans = boyFace.transform;
         this.initGirlTrans = girlFace.transform;
 
+        this.HideActiveReloadBar();
+
         // 
         this.ActiveAimingZone(false);
         this.ActiveMovingZone(false);
         this.ActiveMeleeButton(false);
-
-        // 
-        // reloadindEffect.color.a = 0.5f;
-        // reloadindEffect.SetColor(reloadindEffect.color);
     }
 
     // ------------------------------------------------------------------ 
@@ -88,6 +93,8 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Start () {
+        DisableReloadButton();
+        ReloadButtonState = UpdateReloadDeactive;
     }
 
     // ------------------------------------------------------------------ 
@@ -148,7 +155,7 @@ public class UIStatus : MonoBehaviour {
             this.ActiveMeleeButton(false);
 
         // reload button
-        this.UpdateReloadButtonState();
+        ReloadButtonState();
     }
 
     // ------------------------------------------------------------------ 
@@ -208,8 +215,80 @@ public class UIStatus : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void UpdateReloadButtonState () {
-        // TODO:
+    void UpdateReloadDeactive () {
+        PlayerGirl girl = GameRules.Instance().GetPlayerGirl() as PlayerGirl;
+        ShootInfo shootInfo = girl.GetShootInfo();
+
+        if ( shootInfo.NoBulletForReloading() == false &&
+             shootInfo.isAmmoFull() == false )
+        {
+            EnableReloadButton ();
+            ReloadButtonState = UpdateAcceptReload;
+            return;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void UpdateAcceptReload () {
+        // reload button
+        if ( screenPad.ReloadButtonDown() ) {
+            this.OnReload();
+            return;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void UpdateAcceptActiveReload () {
+        PlayerGirl girl = GameRules.Instance().GetPlayerGirl() as PlayerGirl;
+
+        //
+        if ( girl.IsReloading() == false ) {
+            HideActiveReloadBar();
+            ReloadButtonState = UpdateReloadDeactive;
+            return;
+        }
+
+        //
+        if ( screenPad.ReloadButtonPressing() ) {
+            reloadButton.color.a = 1.0f;
+            reloadButton.SetColor(reloadButton.color);
+            reloadindEffect.color.a = 1.0f;
+            reloadindEffect.SetColor(reloadindEffect.color);
+        }
+        else {
+            reloadButton.color.a = 0.5f;
+            reloadButton.SetColor(reloadButton.color);
+            reloadindEffect.color.a = 0.5f;
+            reloadindEffect.SetColor(reloadindEffect.color);
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void DisableReloadButton () {
+        reloadButton.color.a = 0.1f;
+        reloadButton.SetColor(reloadButton.color);
+        reloadindEffect.color.a = 0.1f;
+        reloadindEffect.SetColor(reloadindEffect.color);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void EnableReloadButton () {
+        reloadButton.color.a = 0.5f;
+        reloadButton.SetColor(reloadButton.color);
+        reloadindEffect.color.a = 0.5f;
+        reloadindEffect.SetColor(reloadindEffect.color);
     }
 
     // ------------------------------------------------------------------ 
@@ -240,8 +319,83 @@ public class UIStatus : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public void HideActiveReloadBar () {
+        this.activeReloadBar.color.a = 0.0f;
+        activeReloadBar.SetColor(activeReloadBar.color);
+        this.activeReloadFloat.color.a = 0.0f;
+        activeReloadFloat.SetColor(activeReloadFloat.color);
+        this.activeReloadZone.color.a = 0.0f;
+        activeReloadZone.SetColor(activeReloadZone.color);
+
+        iTween.Stop ( this.activeReloadFloat.gameObject, "move" ); 
+        iTween.Stop ( this.reloadindEffect.gameObject, "rotate" ); 
+        this.reloadindEffect.transform.rotation = Quaternion.identity;
+    } 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void ShowActiveReloadBar () {
+        this.activeReloadBar.color.a = 1.0f;
+        activeReloadBar.SetColor(activeReloadBar.color);
+        this.activeReloadFloat.color.a = 1.0f;
+        activeReloadFloat.SetColor(activeReloadFloat.color);
+        this.activeReloadZone.color.a = 1.0f;
+        activeReloadZone.SetColor(activeReloadZone.color);
+
+        // reset the reload float.
+        this.activeReloadFloat.transform.position = 
+            new Vector3( this.activeReloadBar.transform.position.x - activeReloadBar.width * 0.5f,
+                         this.activeReloadFloat.transform.position.y,
+                         this.activeReloadFloat.transform.position.z );
+
+        // calculate and place active reload zone.
+        // TODO:
+    } 
+
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public void OnReload () {
-        GameRules.Instance().GetPlayerGirl().SendMessage("OnReload");
+        //
+        PlayerGirl girl = GameRules.Instance().GetPlayerGirl() as PlayerGirl;
+        // ShootInfo shootInfo = girl.GetShootInfo();
+        this.ShowActiveReloadBar();
+
+        {
+            // first enable the reload status
+            reloadButton.color.a = 1.0f;
+            reloadButton.SetColor(reloadButton.color);
+            reloadindEffect.color.a = 1.0f;
+            reloadindEffect.SetColor(reloadindEffect.color);
+
+            iTween.ScaleFrom ( this.reloadButton.gameObject, new Vector3( 1.5f, 1.5f, 1.5f ), 0.2f ); 
+            Hashtable args = iTween.Hash( "amount", Vector3.forward,
+                                          "time", 1.0f,
+                                          "easetype", iTween.EaseType.easeInOutQuad, 
+                                          "looptype", iTween.LoopType.loop 
+                                        );
+            iTween.RotateBy ( this.reloadindEffect.gameObject, args ); 
+        }
+
+        {
+            //
+            float reloadTime = girl.ReloadTime();
+            Vector3 newPos = this.activeReloadFloat.transform.position 
+                + new Vector3( activeReloadBar.width, 0.0f, 0.0f );
+            Hashtable args = iTween.Hash( "position", newPos,
+                                          "time", reloadTime,
+                                          "easetype", iTween.EaseType.easeOutQuart 
+                                        );
+            iTween.MoveTo ( this.activeReloadFloat.gameObject, args ); 
+
+            //
+            girl.SendMessage("OnReload");
+            this.ReloadButtonState = UpdateAcceptActiveReload;
+        }
     }
 
     // ------------------------------------------------------------------ 

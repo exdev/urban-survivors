@@ -230,6 +230,7 @@ public class ScreenPad : MonoBehaviour {
                     this.reloadButtonStat = 1;
                 else if ( Input.GetKeyUp(KeyCode.R) )
                     this.reloadButtonStat = 2;
+                this.reloadID = Input.GetKey(KeyCode.R) ? 1:-1; 
             } // end if ( !this.useRemoteTouch )
 
             // if there is no move, keep the moveAnalog at the center of the moveZone. 
@@ -343,6 +344,7 @@ public class ScreenPad : MonoBehaviour {
 
         public bool ReloadButtonDown () { return this.reloadButtonStat == 1; }
         public bool ReloadButtonUp () { return this.reloadButtonStat == 2; }
+        public bool ReloadButtonPressing () { return this.reloadID != -1; }
 
 #if UNITY_IPHONE
         // ------------------------------------------------------------------ 
