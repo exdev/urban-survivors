@@ -37,6 +37,9 @@ public class ShootInfo : MonoBehaviour {
     public int capacity = 10;
     public float activeReloadTime = 2.0f;
 
+    public Vector2 arRangeInPercentage = new Vector2( 0.0f, 1.0f );
+    public float arLengthInPercentage = 0.2f;
+
     protected int bullets = 10;
     protected int remainBullets = 100;
 
@@ -155,5 +158,23 @@ public class ShootInfo : MonoBehaviour {
 
     public void AddBullets ( int _bullets ) {
         this.remainBullets += _bullets;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Vector2 CalcActiveReloadZone () {
+        float pos = Random.Range( arRangeInPercentage.x, arRangeInPercentage.y );
+        float half_len = arLengthInPercentage * 0.5f; 
+        if ( pos + half_len > 1.0f )
+            return new Vector2( 1.0f - arLengthInPercentage, 
+                                1.0f );
+        if ( pos - half_len < 0.0f )
+            return new Vector2( 0.0f, 
+                                arLengthInPercentage );
+
+        return new Vector2( pos - half_len, 
+                            pos + half_len );
     }
 }

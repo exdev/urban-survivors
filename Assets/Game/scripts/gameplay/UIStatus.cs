@@ -148,11 +148,9 @@ public class UIStatus : MonoBehaviour {
 
         // melee button
         if ( screenPad.MeleeButtonDown() ) {
-            this.ActiveMeleeButton(true);
             GameRules.Instance().GetPlayerBoy().SendMessage("OnMelee");
         }
-        else if ( screenPad.MeleeButtonUp() )
-            this.ActiveMeleeButton(false);
+        this.ActiveMeleeButton(screenPad.MeleeButtonPressing());
 
         // reload button
         ReloadButtonState();
@@ -250,7 +248,14 @@ public class UIStatus : MonoBehaviour {
         //
         if ( girl.IsReloading() == false ) {
             HideActiveReloadBar();
+            DisableReloadButton();
             ReloadButtonState = UpdateReloadDeactive;
+            return;
+        }
+
+        //
+        if ( screenPad.ReloadButtonDown() ) {
+            this.OnActiveReload();
             return;
         }
 
@@ -345,13 +350,24 @@ public class UIStatus : MonoBehaviour {
         activeReloadZone.SetColor(activeReloadZone.color);
 
         // reset the reload float.
+        float left_worldpos = this.activeReloadBar.transform.position.x - activeReloadBar.width * 0.5f; 
         this.activeReloadFloat.transform.position = 
-            new Vector3( this.activeReloadBar.transform.position.x - activeReloadBar.width * 0.5f,
+            new Vector3( left_worldpos,
                          this.activeReloadFloat.transform.position.y,
                          this.activeReloadFloat.transform.position.z );
 
         // calculate and place active reload zone.
-        // TODO:
+        PlayerGirl girl = GameRules.Instance().GetPlayerGirl() as PlayerGirl;
+        ShootInfo shootInfo = girl.GetShootInfo();
+        Vector2 zoneInPercentage = shootInfo.CalcActiveReloadZone();
+
+        //
+        float left = activeReloadBar.width * zoneInPercentage.x; 
+        float right = activeReloadBar.width * zoneInPercentage.y; 
+        this.activeReloadZone.transform.position = new Vector3( left_worldpos + (left + right) * 0.5f,
+                                                                this.activeReloadZone.transform.position.y,
+                                                                this.activeReloadZone.transform.position.z );  
+        this.activeReloadZone.SetSize( right - left, this.activeReloadZone.height );
     } 
 
 
@@ -403,6 +419,24 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public void OnActiveReload () {
-        GameRules.Instance().GetPlayerGirl().SendMessage("OnActiveReload");
+        PlayerGirl girl = GameRules.Instance().GetPlayerGirl() as PlayerGirl;
+
+        float float_pos = this.activeReloadFloat.transform.position.x;
+        float min_arpos = this.activeReloadZone.transform.position.x
+            - this.activeReloadZone.width * 0.5f;
+        float max_arpos = this.activeReloadZone.transform.position.x
+            + this.activeReloadZone.width * 0.5f;
+
+        if ( float_pos >= min_arpos && float_pos <= max_arpos ) {
+            girl.SendMessage("OnActiveReload");
+            HideActiveReloadBar();
+            DisableReloadButton();
+            this.ReloadButtonState = UpdateReloadDeactive;
+        }
+        else {
+            HideActiveReloadBar();
+            DisableReloadButton();
+            this.ReloadButtonState = UpdateReloadDeactive;
+        }
     }
 }

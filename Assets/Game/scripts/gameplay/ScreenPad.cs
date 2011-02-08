@@ -231,6 +231,7 @@ public class ScreenPad : MonoBehaviour {
                 else if ( Input.GetKeyUp(KeyCode.R) )
                     this.reloadButtonStat = 2;
                 this.reloadID = Input.GetKey(KeyCode.R) ? 1:-1; 
+                this.meleeID = Input.GetKey(KeyCode.Space) ? 1:-1; 
             } // end if ( !this.useRemoteTouch )
 
             // if there is no move, keep the moveAnalog at the center of the moveZone. 
@@ -337,6 +338,7 @@ public class ScreenPad : MonoBehaviour {
 
         public bool MeleeButtonDown () { return this.meleeButtonStat == 1; }
         public bool MeleeButtonUp () { return this.meleeButtonStat == 2; }
+        public bool MeleeButtonPressing () { return this.meleeID != -1; }
 
         // ------------------------------------------------------------------ 
         // Desc: 
