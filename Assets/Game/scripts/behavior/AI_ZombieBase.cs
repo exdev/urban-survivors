@@ -95,17 +95,25 @@ public class AI_ZombieBase : Actor {
         }
     }
 
+    [System.Serializable]
+    public class DropItem {
+        public GameObject prefab;
+        public float probability;
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
     protected static GameObject fxHitBullet = null;
     protected static GameObject fxHitMelee = null;
+    protected Probability dropItemProbability = new Probability();
 
     public ZombieInfo zombieInfo = new ZombieInfo();
     public GameObject FX_HIT_bullet = null;
     public GameObject FX_HIT_melee = null;
     public float deadBodyKeepTime = 2.0f;
+    public DropItem[] dropItems;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -130,6 +138,13 @@ public class AI_ZombieBase : Actor {
 
 	protected new void Start () {
         base.Start();
+
+        float[] weights = new float[dropItems.Length]; 
+        for ( int i = 0; i < dropItems.Length; ++i ) {
+            weights[i] = dropItems[i].probability;
+        }
+        dropItemProbability.Init(weights);
+
         InitInfo();
     }
 
@@ -167,6 +182,16 @@ public class AI_ZombieBase : Actor {
         //
         DebugHelper.ScreenPrint ( "target pos = " + this.targetPos );
         DebugHelper.ScreenPrint ( "curHP = " + this.zombieInfo.curHP );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public virtual void OnDead () {
+        int i = dropItemProbability.GetIndex();
+        if ( dropItems[i].prefab )
+            GameObject.Instantiate( dropItems[i].prefab, transform.position, Quaternion.identity );
     }
 }
 

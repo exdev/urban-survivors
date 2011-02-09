@@ -513,7 +513,9 @@ public class AI_ZombieNormal : AI_ZombieBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void OnDead () {
+    override public void OnDead () {
+        base.OnDead();
+
         // DISABLE { 
         // Vector3 hitPos = this.lastHit.position;
         // hitPos.y = 0.0f;

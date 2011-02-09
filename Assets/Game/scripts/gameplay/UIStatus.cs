@@ -334,18 +334,25 @@ public class UIStatus : MonoBehaviour {
         iTween.Stop ( this.reloadindEffect.gameObject, "rotate" ); 
         this.reloadindEffect.transform.rotation = Quaternion.identity;
 
-        //
+        // For Designer { 
         if ( _failed ) {
+            // this code controls active reload bar failed color. 
+            // failed color
             activeReloadBar.SetColor( Color.red );
             activeReloadFloat.SetColor( Color.red );
             activeReloadZone.SetColor( Color.red );
+
+            // shake 
             iTween.ShakePosition( this.activeReloadBar.transform.parent.gameObject, 
                                   20.0f * Vector3.right, 
                                   0.5f );
+            // when play shake wait for the shake seconds then fade out.
             yield return new WaitForSeconds(0.5f);
         }
+        // } For Designer end 
 
-        //
+        // For Designer { 
+        // this code controls active reload bar color.alpha fade "from - to"
         Hashtable args1 = iTween.Hash( "from", 1.0f, 
                                        "to", 0.0f,
                                        "time", 0.4f,
@@ -354,14 +361,17 @@ public class UIStatus : MonoBehaviour {
                                        "onupdate", "ActiveReloadBarColorUpdate"
                                      );
         iTween.ValueTo ( this.gameObject, args1 );
+        // } For Designer end 
 
-        //
+        // For Designer { 
+        // this code controls active reload bar fade out scale.
         Hashtable args2 = iTween.Hash( "scale", new Vector3(1.0f, 3.0f, 1.0f),
                                        "time", 0.5f,
                                        "easetype", iTween.EaseType.easeOutCirc 
                                      );
         iTween.ScaleTo ( this.activeReloadBar.transform.parent.gameObject, 
                          args2 );
+        // } For Designer end 
     } 
 
     // ------------------------------------------------------------------ 
