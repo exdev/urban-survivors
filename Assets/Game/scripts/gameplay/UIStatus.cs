@@ -80,7 +80,10 @@ public class UIStatus : MonoBehaviour {
         this.initBoyTrans = boyFace.transform;
         this.initGirlTrans = girlFace.transform;
 
-        StartCoroutine(this.HideActiveReloadBar());
+        // hide active reload bar at the beginning
+        activeReloadBar.SetColor( new Color( 1.0f, 1.0f, 1.0f, 0.0f ) );
+        activeReloadFloat.SetColor( new Color( 1.0f, 1.0f, 1.0f, 0.0f ) );
+        activeReloadZone.SetColor( new Color( 1.0f, 1.0f, 1.0f, 0.0f ) );
 
         // 
         this.ActiveAimingZone(false);
@@ -334,8 +337,8 @@ public class UIStatus : MonoBehaviour {
         iTween.Stop ( this.reloadindEffect.gameObject, "rotate" ); 
         this.reloadindEffect.transform.rotation = Quaternion.identity;
 
-        // For Designer { 
         if ( _failed ) {
+            // For Designer: when failed active reload { 
             // this code controls active reload bar failed color. 
             // failed color
             activeReloadBar.SetColor( Color.red );
@@ -348,8 +351,21 @@ public class UIStatus : MonoBehaviour {
                                   0.5f );
             // when play shake wait for the shake seconds then fade out.
             yield return new WaitForSeconds(0.5f);
+            // } For Designer end 
         }
-        // } For Designer end 
+        else {
+            // NOTE: the color already white, you can't explosure color in Unity3d,
+            //       I suggest using one more texture/effect overlap the bar for presentation.
+            // For Designer: when succeeded active reload { 
+            // this code controls active reload bar fade out scale.
+            Hashtable args2 = iTween.Hash( "scale", new Vector3(1.5f, 2.0f, 1.0f),
+                                           "time", 0.2f,
+                                           "easetype", iTween.EaseType.bounce 
+                                         );
+            iTween.ScaleTo ( this.activeReloadBar.transform.parent.gameObject, 
+                             args2 );
+            // } For Designer end 
+        }
 
         // For Designer { 
         // this code controls active reload bar color.alpha fade "from - to"
@@ -362,28 +378,6 @@ public class UIStatus : MonoBehaviour {
                                      );
         iTween.ValueTo ( this.gameObject, args1 );
         // } For Designer end 
-
-        // For Designer { 
-        // this code controls active reload bar fade out scale.
-
-        Hashtable args2 = iTween.Hash( "scale", new Vector3(1.6f, 2.0f, 1.5f),
-                                       "time", 0.5f,
-                                       "easetype", iTween.EaseType.bounce 
-                                     );
-        iTween.ScaleTo ( this.activeReloadBar.transform.parent.gameObject, 
-                         args2 );
-        // } For Designer end 
-
-/*
-		//nantas: added color change to white when succeeded active reloading
-		Hashtable args3 = iTween.Hash( "color", Color.white, 
-			                           "time", 0.5f,
-			                           "easetype", iTween.EaseType.easeInQuad
-								
-			                         );
-		iTween.ColorTo ( this.gameObject, args3 );
-*/
-
     } 
 
     // ------------------------------------------------------------------ 
@@ -404,6 +398,9 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public void ShowActiveReloadBar () {
+        // reset all items
+        iTween.Stop ( this.activeReloadBar.transform.parent.gameObject );
+        iTween.Stop ( this.gameObject );
         this.activeReloadBar.transform.parent.localScale = new Vector3(1.0f,1.0f,1.0f);
         Color col = new Color( 1.0f, 1.0f, 1.0f, 0.0f );
         activeReloadBar.SetColor(col);
