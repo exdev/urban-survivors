@@ -90,7 +90,7 @@ public class PackedSprite : AutoSpriteBase
 	}
 
 
-	protected override void Start()
+	public override void Start()
 	{
 		base.Start();
 

@@ -28,6 +28,20 @@ Inheritance diagram for PackedSprite:</div>
 <tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a4f354b80a58bab8f31f7966750800e57">SPRITE_PLANE</a> </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a79b7138073d866284a170e4d8b3a9217">ANCHOR_METHOD</a> </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#aa6a06ad89a880accb25794e862733074">WINDING_ORDER</a> </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">HORIZONTAL_ALIGN</a> { <a class="el" href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">NONE</a>, 
+<a class="el" href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">LEFT</a>, 
+<a class="el" href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">RIGHT</a>, 
+<a class="el" href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">CENTER</a>
+ }</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>Specifies what the object will be aligned relative to on the horizontal axis. </p>
+ <a href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">VERTICAL_ALIGN</a> { <a class="el" href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">NONE</a>, 
+<a class="el" href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">TOP</a>, 
+<a class="el" href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">BOTTOM</a>, 
+<a class="el" href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">CENTER</a>
+ }</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>Specifies what the object will be aligned relative to on the vertical axis. </p>
+ <a href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">override void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_packed_sprite.html#aacf77a0e7bec7e5ab9bce73d02af5267">Copy</a> (<a class="el" href="class_sprite_root.html">SpriteRoot</a> s)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Copies all the attributes of another sprite.  <a href="#aacf77a0e7bec7e5ab9bce73d02af5267"></a><br/></td></tr>
@@ -101,6 +115,10 @@ Inheritance diagram for PackedSprite:</div>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the delegate to be called each frame of animation.  <a href="#ad31805dac2d46592bc30a95eabf899cb"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_base.html#a8849952300de0c69e246cea541d30e3a">SetSpriteResizedDelegate</a> (SpriteResizedDelegate del)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the delegate to be called when the sprite is resized.  <a href="#a8849952300de0c69e246cea541d30e3a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_base.html#acd1248c74ff3e79c75ba994512d6e117">AddSpriteResizedDelegate</a> (SpriteResizedDelegate del)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds the delegate to be called when the sprite is resized.  <a href="#acd1248c74ff3e79c75ba994512d6e117"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_base.html#a10f2bcae2161110b2acd5e5b9cca3300">RemoveSpriteresizedDelegate</a> (SpriteResizedDelegate del)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes the specified delegate from the list of those to be called when the sprite is resized.  <a href="#a10f2bcae2161110b2acd5e5b9cca3300"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_base.html#a2ac2df7765bc1baeb3643948024b30a1">SetFramerate</a> (float fps)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Changes the framerate at which the current animation plays. NOTE: This only has effect if called AFTER PlayAnim() is called. Otherwise, PlayAnim() sets the framerate to whatever is specified in the animation itself.  <a href="#a2ac2df7765bc1baeb3643948024b30a1"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_base.html#a88bdbcaa86cdd2e54908dae42dd79872">PauseAnim</a> ()</td></tr>
@@ -110,6 +128,12 @@ Inheritance diagram for PackedSprite:</div>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_base.html#ac98a457ace0eee0fecf82c8e089cc1a5">IsAnimating</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns whether the sprite is currently animating.  <a href="#ac98a457ace0eee0fecf82c8e089cc1a5"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">delegate void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a225681fbdb6d79c769c107293949f37f">SpriteResizedDelegate</a> (float newWidth, float newHeight, <a class="el" href="class_sprite_root.html">SpriteRoot</a> sprite)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a09d7f0014281fa0dcdd872c8ad4826a9">PositionOnScreen</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Repositions the object using the existing screen-space settings.  <a href="#a09d7f0014281fa0dcdd872c8ad4826a9"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a481a3e5c7d1b3370935564ca611fa9fe">PositionOnScreen</a> (int x, int y, float depth)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Positions the object using screen coordinates, according to the relativity settings stored in relativeToScreen.  <a href="#a481a3e5c7d1b3370935564ca611fa9fe"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#aabf07745fff23716a19e591a4d00ecb0">PositionOnScreen</a> (Vector3 pos)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Positions the object using screen coordinates, according to the relativity settings stored in relativeToScreen.  <a href="#aabf07745fff23716a19e591a4d00ecb0"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a3c11e0d03884e3af7b5040737f2064bd">CalcSize</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Recalculates the width and height of the sprite based upon the change in its UV dimensions (autoResize) or on the current camera's disposition (pixelPerfect).  <a href="#a3c11e0d03884e3af7b5040737f2064bd"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#adf9809122c570941ff132a9904dcc93c">SetSize</a> (float <a class="el" href="class_sprite_root.html#afeafcd5c4d1b332e1ff9260eee857145">width</a>, float <a class="el" href="class_sprite_root.html#a6bf98fa584df909a7864c4bccfda0b75">height</a>)</td></tr>
@@ -257,6 +281,37 @@ Inheritance diagram for PackedSprite:</div>
 
 </div>
 </div>
+<a class="anchor" id="ad31e772b9c659d24c829386c63f50566"></a><!-- doxytag: member="PackedSprite::HORIZONTAL_ALIGN" ref="ad31e772b9c659d24c829386c63f50566" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">SpriteRoot::HORIZONTAL_ALIGN</a><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Specifies what the object will be aligned relative to on the horizontal axis. </p>
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="ad31e772b9c659d24c829386c63f50566"></a><!-- doxytag: member="NONE" ref="ad31e772b9c659d24c829386c63f50566" args="" -->NONE</em>&nbsp;</td><td>
+<p>The object will not be repositioned along the X axis. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="ad31e772b9c659d24c829386c63f50566"></a><!-- doxytag: member="LEFT" ref="ad31e772b9c659d24c829386c63f50566" args="" -->LEFT</em>&nbsp;</td><td>
+<p>The X coordinate of screenPos will be interpreted as the number of pixels from the left edge of the screen. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="ad31e772b9c659d24c829386c63f50566"></a><!-- doxytag: member="RIGHT" ref="ad31e772b9c659d24c829386c63f50566" args="" -->RIGHT</em>&nbsp;</td><td>
+<p>The X coordinate of screenPos will be interpreted as the number of pixels from the right edge of the screen. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="ad31e772b9c659d24c829386c63f50566"></a><!-- doxytag: member="CENTER" ref="ad31e772b9c659d24c829386c63f50566" args="" -->CENTER</em>&nbsp;</td><td>
+<p>The X coordinate of screenPos will be interpreted as the number of pixels from the center of the screen. </p>
+</td></tr>
+</table>
+</dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a4f354b80a58bab8f31f7966750800e57"></a><!-- doxytag: member="PackedSprite::SPRITE_PLANE" ref="a4f354b80a58bab8f31f7966750800e57" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -268,6 +323,37 @@ Inheritance diagram for PackedSprite:</div>
 </div>
 <div class="memdoc">
 <p>The plane in which a sprite should be drawn. </p>
+
+</div>
+</div>
+<a class="anchor" id="af7a4d8ff195106468232a3e5a7d32c78"></a><!-- doxytag: member="PackedSprite::VERTICAL_ALIGN" ref="af7a4d8ff195106468232a3e5a7d32c78" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">SpriteRoot::VERTICAL_ALIGN</a><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Specifies what the object will be aligned relative to on the vertical axis. </p>
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="af7a4d8ff195106468232a3e5a7d32c78"></a><!-- doxytag: member="NONE" ref="af7a4d8ff195106468232a3e5a7d32c78" args="" -->NONE</em>&nbsp;</td><td>
+<p>The object will not be repositioned along the Y axis. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="af7a4d8ff195106468232a3e5a7d32c78"></a><!-- doxytag: member="TOP" ref="af7a4d8ff195106468232a3e5a7d32c78" args="" -->TOP</em>&nbsp;</td><td>
+<p>The Y coordinate of screenPos will be interpreted as the number of pixels from the top edge of the screen. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="af7a4d8ff195106468232a3e5a7d32c78"></a><!-- doxytag: member="BOTTOM" ref="af7a4d8ff195106468232a3e5a7d32c78" args="" -->BOTTOM</em>&nbsp;</td><td>
+<p>The Y coordinate of screenPos will be interpreted as the number of pixels from the bottom edge of the screen. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="af7a4d8ff195106468232a3e5a7d32c78"></a><!-- doxytag: member="CENTER" ref="af7a4d8ff195106468232a3e5a7d32c78" args="" -->CENTER</em>&nbsp;</td><td>
+<p>The Y coordinate of screenPos will be interpreted as the number of pixels from the center of the screen. </p>
+</td></tr>
+</table>
+</dd>
+</dl>
 
 </div>
 </div>
@@ -306,6 +392,32 @@ Inheritance diagram for PackedSprite:</div>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>anim</em>&nbsp;</td><td>The animation to add</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="acd1248c74ff3e79c75ba994512d6e117"></a><!-- doxytag: member="PackedSprite::AddSpriteResizedDelegate" ref="acd1248c74ff3e79c75ba994512d6e117" args="(SpriteResizedDelegate del)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteBase.AddSpriteResizedDelegate </td>
+          <td>(</td>
+          <td class="paramtype">SpriteResizedDelegate&nbsp;</td>
+          <td class="paramname"> <em>del</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Adds the delegate to be called when the sprite is resized. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>del</em>&nbsp;</td><td>A delegate to be called when the sprite is resized.</td></tr>
   </table>
   </dd>
 </dl>
@@ -1434,6 +1546,120 @@ Inheritance diagram for PackedSprite:</div>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>anim</em>&nbsp;</td><td>Reference to the animation to play in reverse.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="aabf07745fff23716a19e591a4d00ecb0"></a><!-- doxytag: member="PackedSprite::PositionOnScreen" ref="aabf07745fff23716a19e591a4d00ecb0" args="(Vector3 pos)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteRoot.PositionOnScreen </td>
+          <td>(</td>
+          <td class="paramtype">Vector3&nbsp;</td>
+          <td class="paramname"> <em>pos</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Positions the object using screen coordinates, according to the relativity settings stored in relativeToScreen. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pos</em>&nbsp;</td><td>The X and Y screen coordinates where the object should be positioned, as well as the Z coordinate which represents the distance in front of the camera.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a481a3e5c7d1b3370935564ca611fa9fe"></a><!-- doxytag: member="PackedSprite::PositionOnScreen" ref="a481a3e5c7d1b3370935564ca611fa9fe" args="(int x, int y, float depth)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteRoot.PositionOnScreen </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&nbsp;</td>
+          <td class="paramname"> <em>depth</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Positions the object using screen coordinates, according to the relativity settings stored in relativeToScreen. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>x</em>&nbsp;</td><td>The number of pixels in the X axis relative to the position specified in relativeToScreen.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>y</em>&nbsp;</td><td>The number of pixels in the Y axis relative to the position specified in relativeToScreen.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>depth</em>&nbsp;</td><td>The distance the object should be in front of the camera.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a09d7f0014281fa0dcdd872c8ad4826a9"></a><!-- doxytag: member="PackedSprite::PositionOnScreen" ref="a09d7f0014281fa0dcdd872c8ad4826a9" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteRoot.PositionOnScreen </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Repositions the object using the existing screen-space settings. </p>
+
+</div>
+</div>
+<a class="anchor" id="a10f2bcae2161110b2acd5e5b9cca3300"></a><!-- doxytag: member="PackedSprite::RemoveSpriteresizedDelegate" ref="a10f2bcae2161110b2acd5e5b9cca3300" args="(SpriteResizedDelegate del)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteBase.RemoveSpriteresizedDelegate </td>
+          <td>(</td>
+          <td class="paramtype">SpriteResizedDelegate&nbsp;</td>
+          <td class="paramname"> <em>del</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Removes the specified delegate from the list of those to be called when the sprite is resized. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>del</em>&nbsp;</td><td>The delegate to be removed.</td></tr>
   </table>
   </dd>
 </dl>
@@ -2752,7 +2978,7 @@ Inheritance diagram for PackedSprite:</div>
 <li>PackedSprite.cs</li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Oct 26 03:17:59 2010 for SpriteManager 2 by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Feb 1 18:05:16 2011 for SpriteManager 2 by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

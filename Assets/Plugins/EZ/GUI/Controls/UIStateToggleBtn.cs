@@ -188,6 +188,9 @@ public class UIStateToggleBtn : AutoSpriteControlBase
 	//---------------------------------------------------
 	public override void OnInput(ref POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		if (!m_controlIsEnabled || IsHidden())
 		{
 			base.OnInput(ref ptr);
@@ -225,7 +228,7 @@ public class UIStateToggleBtn : AutoSpriteControlBase
 		curStateIndex = defaultState;
 	}
 
-	protected override void Start()
+	public override void Start()
 	{
 		base.Start();
 

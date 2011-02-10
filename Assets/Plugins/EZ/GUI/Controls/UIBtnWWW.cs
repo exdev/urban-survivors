@@ -21,6 +21,9 @@ public class UIBtnWWW : UIButton
 
 	public override void OnInput(ref POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		base.OnInput(ref ptr);
 
 		if (!m_controlIsEnabled || IsHidden())

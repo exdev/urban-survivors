@@ -42,19 +42,19 @@
 	<div id="pageHeader"><!-- Start page header -->
 		<img src="../rw_common/images/anb_logo.png" width="64" height="60" alt="Site logo"/>
 		<h1>SpriteManager 2</h1>
-		<h2></h2>
+		<h2>Changing the world, one site at a time&hellip;</h2>
 	</div><!-- End page header -->
 	
 	<div id="contentContainer"><!-- Start main content wrapper -->
 		<div id="content"><!-- Start content -->
 			
 
-<!-- Stacks v1.3.1 -->
+<!-- Stacks v1.4.3 -->
 <div class='stacks_top'>
-<div id='stacks_out_848_page14' class='stacks_out'><div id='stacks_in_848_page14' class='stacks_in'>
+<div id='stacks_out_5759_page14' class='stacks_out'><div id='stacks_in_5759_page14' class='stacks_in'>
 <h1>Advanced Topics</h1><br /><span style="font-size:14px; font-weight:bold; "><a href="#anim_complete_del" rel="self">Anim-complete delegates</a></span><span style="font-size:14px; font-weight:bold; "><br /></span><span style="font-size:14px; font-weight:bold; "><a href="#resized_del" rel="self">Resized delegates</a></span><span style="font-size:14px; font-weight:bold; "><br /></span><span style="font-size:14px; font-weight:bold; "><a href="#anim_frame_del" rel="self">Per-frame delegates</a></span><span style="font-size:14px; font-weight:bold; "><br /></span><span style="font-size:14px; font-weight:bold; "><a href="#anim_pump_interval" rel="self">Animation Pump Interval</a></span><span style="font-size:14px; font-weight:bold; "><br /></span><span style="font-size:14px; font-weight:bold; "><a href="#use_delta_time" rel="self">Use Time.deltaTime</a></span>
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_850_page14' class='stacks_out'><div id='stacks_in_850_page14' class='stacks_in'>
+<div id='stacks_out_5761_page14' class='stacks_out'><div id='stacks_in_5761_page14' class='stacks_in'>
 
 <!--    Anchor Link Stack v1.0 by Joe Workman   -->
 
@@ -63,14 +63,14 @@
 <!-- End of Anchor Link Stack -->
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_851_page14' class='stacks_out'><div id='stacks_in_851_page14' class='stacks_in'>
+<div id='stacks_out_5762_page14' class='stacks_out'><div id='stacks_in_5762_page14' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:17px; font-weight:bold; ">Anim-complete delegates</span> <div id='stacks_out_854_page14' class='stacks_out'><div id='stacks_in_854_page14' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:17px; font-weight:bold; ">Anim-complete delegates</span> <div id='stacks_out_5765_page14' class='stacks_out'><div id='stacks_in_5765_page14' class='stacks_in'>
 Sometimes you may find that your game code needs to be notified when an animation is finished running.  This is where you want to use an <span style="font:12px Courier, mono; ">AnimCompleteDelegate</span>.  This is basically a function you write that you tell a sprite to call when any of its animations are finished playing.  Below is a sample snippet of code to demonstrate how this is used.
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_856_page14' class='stacks_out'><div id='stacks_in_856_page14' class='stacks_in'>
+<div id='stacks_out_5767_page14' class='stacks_out'><div id='stacks_in_5767_page14' class='stacks_in'>
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
 <script type="text/javascript" src="files/jquery-ui-1.7.2.custom.min.js"></script>
@@ -100,12 +100,12 @@ Sometimes you may find that your game code needs to be notified when an animatio
 		<li style="display: none"><a href="#tabs1-5"><object>Tab 5</object></a></li>
 		<li style="display: none"><a href="#tabs1-6"><object>Tab 6</object></a></li>
 	</ul>
-	<div id="tabs1-1"class='stacks_div tab1' ><div id='stacks_out_858_page14' class='stacks_out'><div id='stacks_in_858_page14' class='stacks_in'>
+	<div id="tabs1-1"class='stacks_div tab1' ><div id='stacks_out_5769_page14' class='stacks_out'><div id='stacks_in_5769_page14' class='stacks_in'>
 <code><i><font color="#9A1900">// Tell the sprite to call MyDelegate() whenever</font></i><br /><i><font color="#9A1900">// one of its animations complete:</font></i><br />sprite<font color="#990000">.</font><b><font color="#000000">SetAnimCompleteDelegate</font></b><font color="#990000">(</font>MyDelegate<font color="#990000">);</font><br /><br /><font color="#990000">...</font><br /><br /><font color="#009900">void</font> <b><font color="#000000">MyDelegate</font></b><font color="#990000">(</font>SpriteBase sprt<font color="#990000">)</font><br /><font color="#FF0000">{</font><br />&nbsp;&nbsp;&nbsp;&nbsp;Debug<font color="#990000">.</font><b><font color="#000000">Log</font></b><font color="#990000">(</font>sprt<font color="#990000">.</font>name <font color="#990000">+</font> <font color="#FF0000">" just finished playing its animation"</font><font color="#990000">);</font><br /><font color="#FF0000">}</font></code>
 
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></div>
-	<div id="tabs1-2"class='stacks_div tab2'><div id='stacks_out_861_page14' class='stacks_out'><div id='stacks_in_861_page14' class='stacks_in'>
+	<div id="tabs1-2"class='stacks_div tab2'><div id='stacks_out_5772_page14' class='stacks_out'><div id='stacks_in_5772_page14' class='stacks_in'>
 <code><i><font color="#9A1900">// Tell the sprite to call MyDelegate() whenever</font></i><br /><i><font color="#9A1900">// one of its animations complete:</font></i><br />sprite<font color="#990000">.</font><b><font color="#000000">SetAnimCompleteDelegate</font></b><font color="#990000">(</font>MyDelegate<font color="#990000">);</font><br /><br /><font color="#990000">...</font><br /><br /><b><font color="#0000FF">function</font></b> <b><font color="#000000">MyDelegate</font></b><font color="#990000">(</font>sprt <font color="#990000">:</font> SpriteBase<font color="#990000">)</font><br /><font color="#FF0000">{</font><br />&nbsp;&nbsp;&nbsp;&nbsp;Debug<font color="#990000">.</font><b><font color="#000000">Log</font></b><font color="#990000">(</font>sprt<font color="#990000">.</font>name <font color="#990000">+</font> <font color="#FF0000">" just finished playing its animation"</font><font color="#990000">);</font><br /><font color="#FF0000">}</font></code>
 
 <div class='stacks_clearer'></div></div></div>
@@ -125,7 +125,7 @@ Sometimes you may find that your game code needs to be notified when an animatio
 
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_867_page14' class='stacks_out'><div id='stacks_in_867_page14' class='stacks_in'>
+<div id='stacks_out_5778_page14' class='stacks_out'><div id='stacks_in_5778_page14' class='stacks_in'>
 
 <!--    Anchor Link Stack v1.0 by Joe Workman   -->
 
@@ -134,14 +134,14 @@ Sometimes you may find that your game code needs to be notified when an animatio
 <!-- End of Anchor Link Stack -->
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_868_page14' class='stacks_out'><div id='stacks_in_868_page14' class='stacks_in'>
+<div id='stacks_out_5779_page14' class='stacks_out'><div id='stacks_in_5779_page14' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:17px; font-weight:bold; ">Resized delegates</span> <div id='stacks_out_871_page14' class='stacks_out'><div id='stacks_in_871_page14' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:17px; font-weight:bold; ">Resized delegates</span> <div id='stacks_out_5782_page14' class='stacks_out'><div id='stacks_in_5782_page14' class='stacks_in'>
 Sometimes it is useful to know when the dimensions of your sprite have been resized, such as if you want to resize its collider, etc.  This is where you want to use an <span style="font:12px Courier, mono; ">SpriteResizedDelegate</span>.  This is basically a function you write that you tell a sprite to call when it gets resized as a result of playing an animation frame that has a different width/height from the previous one.  Below is a sample snippet of code to demonstrate how this is used.
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_873_page14' class='stacks_out'><div id='stacks_in_873_page14' class='stacks_in'>
+<div id='stacks_out_5784_page14' class='stacks_out'><div id='stacks_in_5784_page14' class='stacks_in'>
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
 <script type="text/javascript" src="files/jquery-ui-1.7.2.custom.min.js"></script>
@@ -171,12 +171,12 @@ Sometimes it is useful to know when the dimensions of your sprite have been resi
 		<li style="display: none"><a href="#tabs2-5"><object>Tab 5</object></a></li>
 		<li style="display: none"><a href="#tabs2-6"><object>Tab 6</object></a></li>
 	</ul>
-	<div id="tabs2-1"class='stacks_div tab1' ><div id='stacks_out_875_page14' class='stacks_out'><div id='stacks_in_875_page14' class='stacks_in'>
+	<div id="tabs2-1"class='stacks_div tab1' ><div id='stacks_out_5786_page14' class='stacks_out'><div id='stacks_in_5786_page14' class='stacks_in'>
 <code><i><font color="#9A1900">// Tell the sprite to call MyDelegate() whenever</font></i><br /><i><font color="#9A1900">// it is resized during an animation:</font></i><br />sprite<font color="#990000">.</font><b><font color="#000000">SetSpriteResizedDelegate</font></b><font color="#990000">(</font>MyDelegate<font color="#990000">);</font><br /><br /><font color="#990000">...</font><br /><br /><font color="#009900">void</font> <b><font color="#000000">MyDelegate</font></b><font color="#990000">(</font><font color="#009900">int</font> newWidth<font color="#990000">,</font> <font color="#009900">int</font> newHeight<font color="#990000">,</font> SpriteRoot sprt<font color="#990000">)</font><br /><font color="#FF0000">{</font><br />&nbsp;&nbsp;&nbsp;&nbsp;Debug<font color="#990000">.</font><b><font color="#000000">Log</font></b><font color="#990000">(</font>sprt<font color="#990000">.</font>name <font color="#990000">+</font> <font color="#FF0000">" is now "</font> <font color="#990000">+</font> newWidth <font color="#990000">+</font> <font color="#FF0000">"x"</font> <font color="#990000">+</font> newHeight<font color="#990000">);</font><br /><font color="#FF0000">}</font></code>
 
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></div>
-	<div id="tabs2-2"class='stacks_div tab2'><div id='stacks_out_878_page14' class='stacks_out'><div id='stacks_in_878_page14' class='stacks_in'>
+	<div id="tabs2-2"class='stacks_div tab2'><div id='stacks_out_5789_page14' class='stacks_out'><div id='stacks_in_5789_page14' class='stacks_in'>
 <code><i><font color="#9A1900">// Tell the sprite to call MyDelegate() whenever</font></i><br /><i><font color="#9A1900">// it is resized during an animation:</font></i><br />sprite<font color="#990000">.</font><b><font color="#000000">SetSpriteResizedDelegate</font></b><font color="#990000">(</font>MyDelegate<font color="#990000">);</font><br /><br /><font color="#990000">...</font><br /><br /><b><font color="#0000FF">function</font></b> <b><font color="#000000">MyDelegate</font></b><font color="#990000">(</font>newWidth <font color="#990000">:</font> <font color="#009900">int</font><font color="#990000">,</font> newHeight <font color="#990000">:</font> <font color="#009900">int</font><font color="#990000">,</font> sprt <font color="#990000">:</font> SpriteRoot<font color="#990000">)</font><br /><font color="#FF0000">{</font><br />&nbsp;&nbsp;&nbsp;&nbsp;Debug<font color="#990000">.</font><b><font color="#000000">Log</font></b><font color="#990000">(</font>sprt<font color="#990000">.</font>name <font color="#990000">+</font> <font color="#FF0000">" is now "</font> <font color="#990000">+</font> newWidth <font color="#990000">+</font> <font color="#FF0000">"x"</font> <font color="#990000">+</font> newHeight<font color="#990000">);</font><br /><font color="#FF0000">}</font></code>
 
 <div class='stacks_clearer'></div></div></div>
@@ -196,7 +196,7 @@ Sometimes it is useful to know when the dimensions of your sprite have been resi
 
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_884_page14' class='stacks_out'><div id='stacks_in_884_page14' class='stacks_in'>
+<div id='stacks_out_5795_page14' class='stacks_out'><div id='stacks_in_5795_page14' class='stacks_in'>
 
 <!--    Anchor Link Stack v1.0 by Joe Workman   -->
 
@@ -205,14 +205,14 @@ Sometimes it is useful to know when the dimensions of your sprite have been resi
 <!-- End of Anchor Link Stack -->
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_885_page14' class='stacks_out'><div id='stacks_in_885_page14' class='stacks_in'>
+<div id='stacks_out_5796_page14' class='stacks_out'><div id='stacks_in_5796_page14' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Per-frame delegates</span> <div id='stacks_out_888_page14' class='stacks_out'><div id='stacks_in_888_page14' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Per-frame delegates</span> <div id='stacks_out_5799_page14' class='stacks_out'><div id='stacks_in_5799_page14' class='stacks_in'>
 Sometimes you may want your code to be notified every time a sprite displays a new frame of animation.  For example, if you want a sound to play on a specific frame.  This is where you want to use an <span style="font:12px Courier, mono; ">AnimFrameDelegate</span>.  This is basically a function you write that you tell a sprite to call every time it changes frames in an animation.  Before you can make use of this type of delegate, you must first uncomment a line in one of the SpriteManager 2 scripts.  The reason is that there is a small overhead for checking to call a per-frame delegate, and so this has been disabled by default.  To enable this feature, uncomment the following line at the top of Sprite.cs (if using the <span style="font:12px Courier, mono; ">Sprite</span> class) or AutoSpriteBase.cs (if using <span style="font:12px Courier, mono; ">PackedSprites</span>):<br /><br /><span style="font:12px Courier, mono; ">#define SPRITE_FRAME_DELEGATE</span><br /><br />Below is a sample snippet of code to demonstrate how this is used.
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_890_page14' class='stacks_out'><div id='stacks_in_890_page14' class='stacks_in'>
+<div id='stacks_out_5801_page14' class='stacks_out'><div id='stacks_in_5801_page14' class='stacks_in'>
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
 <script type="text/javascript" src="files/jquery-ui-1.7.2.custom.min.js"></script>
@@ -242,12 +242,12 @@ Sometimes you may want your code to be notified every time a sprite displays a n
 		<li style="display: none"><a href="#tabs3-5"><object>Tab 5</object></a></li>
 		<li style="display: none"><a href="#tabs3-6"><object>Tab 6</object></a></li>
 	</ul>
-	<div id="tabs3-1"class='stacks_div tab1' ><div id='stacks_out_892_page14' class='stacks_out'><div id='stacks_in_892_page14' class='stacks_in'>
+	<div id="tabs3-1"class='stacks_div tab1' ><div id='stacks_out_5803_page14' class='stacks_out'><div id='stacks_in_5803_page14' class='stacks_in'>
 <code><i><font color="#9A1900">// Tell the sprite to call MyDelegate() whenever</font></i><br /><i><font color="#9A1900">// it displays a new animation frame:</font></i><br />sprite<font color="#990000">.</font><b><font color="#000000">SetAnimFrameDelegate</font></b><font color="#990000">(</font>MyDelegate<font color="#990000">);</font><br /><br /><font color="#990000">...</font><br /><br /><font color="#009900">void</font> <b><font color="#000000">MyDelegate</font></b><font color="#990000">(</font>SpriteRoot sprt<font color="#990000">,</font> <font color="#009900">int</font> frameNum<font color="#990000">)</font><br /><font color="#FF0000">{</font><br />&nbsp;&nbsp;&nbsp;&nbsp;Debug<font color="#990000">.</font><b><font color="#000000">Log</font></b><font color="#990000">(</font>sprt<font color="#990000">.</font>name <font color="#990000">+</font> <font color="#FF0000">" is now showing frame #"</font> <font color="#990000">+</font> frameNum<font color="#990000">);</font><br /><font color="#FF0000">}</font></code>
 
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></div>
-	<div id="tabs3-2"class='stacks_div tab2'><div id='stacks_out_895_page14' class='stacks_out'><div id='stacks_in_895_page14' class='stacks_in'>
+	<div id="tabs3-2"class='stacks_div tab2'><div id='stacks_out_5806_page14' class='stacks_out'><div id='stacks_in_5806_page14' class='stacks_in'>
 <code><i><font color="#9A1900">// Tell the sprite to call MyDelegate() whenever</font></i><br /><i><font color="#9A1900">// it displays a new animation frame:</font></i><br />sprite<font color="#990000">.</font><b><font color="#000000">SetAnimFrameDelegate</font></b><font color="#990000">(</font>MyDelegate<font color="#990000">);</font><br /><br /><font color="#990000">...</font><br /><br /><b><font color="#0000FF">function</font></b> <b><font color="#000000">MyDelegate</font></b><font color="#990000">(</font>sprt <font color="#990000">:</font> SpriteRoot<font color="#990000">,</font> frameNum <font color="#990000">:</font> <font color="#009900">int</font><font color="#990000">)</font><br /><font color="#FF0000">{</font><br />&nbsp;&nbsp;&nbsp;&nbsp;Debug<font color="#990000">.</font><b><font color="#000000">Log</font></b><font color="#990000">(</font>sprt<font color="#990000">.</font>name <font color="#990000">+</font> <font color="#FF0000">" is now showing frame #"</font> <font color="#990000">+</font> frameNum<font color="#990000">);</font><br /><font color="#FF0000">}</font></code>
 
 <div class='stacks_clearer'></div></div></div>
@@ -267,7 +267,7 @@ Sometimes you may want your code to be notified every time a sprite displays a n
 
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_901_page14' class='stacks_out'><div id='stacks_in_901_page14' class='stacks_in'>
+<div id='stacks_out_5812_page14' class='stacks_out'><div id='stacks_in_5812_page14' class='stacks_in'>
 
 <!--    Anchor Link Stack v1.0 by Joe Workman   -->
 
@@ -276,11 +276,11 @@ Sometimes you may want your code to be notified every time a sprite displays a n
 <!-- End of Anchor Link Stack -->
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_902_page14' class='stacks_out'><div id='stacks_in_902_page14' class='stacks_in'>
+<div id='stacks_out_5813_page14' class='stacks_out'><div id='stacks_in_5813_page14' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Animation Pump Interval</span> <div id='stacks_out_905_page14' class='stacks_out'><div id='stacks_in_905_page14' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Animation Pump Interval</span> <div id='stacks_out_5816_page14' class='stacks_out'><div id='stacks_in_5816_page14' class='stacks_in'>
 <span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; ">By default, the SpriteAnimationPump ticks every frame.  However, you can have it only run every so many seconds (or fraction of a second) by commenting out the following line in SpriteAnimationPump.cs:<br /><br /></span><span style="font:12px Courier, mono; ">#define PUMP_EVERY_FRAME</span><span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; "><br /><br />This will cause the </span><span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; font-weight:bold; color:#000FED;font-weight:bold; "><a href="scripting/class_sprite_animation_pump.html#ad3ac87f0163720906b70679c38d567e9" rel="self">animationPumpInterval</a></span><span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; "> to be used.  The </span><span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; font-weight:bold; color:#000FED;font-weight:bold; "><a href="scripting/class_sprite_animation_pump.html#ad3ac87f0163720906b70679c38d567e9" rel="self">animationPumpInterval</a></span><span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; "> value controls the rate at which the animation coroutine runs for all sprites. &nbsp;The rate stored in&nbsp;</span><span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; font-weight:bold; color:#000FED;font-weight:bold; "><a href="scripting/class_sprite_animation_pump.html#ad3ac87f0163720906b70679c38d567e9" rel="self">animationPumpInterval</a></span><span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; "> is given in seconds. &nbsp;The default value is 0.03333 (30 frames per second), but can be changed at run-time, or simply modified in the&nbsp;sourcecode for </span><span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; font-weight:bold; color:#000FED;font-weight:bold; "><u><a href="scripting/class_sprite_animation_pump.html" rel="self">SpriteAnimationPump</a></u></span><span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; ">. &nbsp;Increasing this value can lead to a significant improvement in performance when using large numbers of sprites (usually 100 or more on the iPhone), but can also degrade the apparent smoothness of your animations, depending on how high of a framerate you are using for your animations. &nbsp;If performance or appearance isn't satisfactory with the default value, try playing with it until you get what you are looking for. &nbsp;But in most cases, the default value should work well.</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
@@ -291,7 +291,7 @@ Sometimes you may want your code to be notified every time a sprite displays a n
 
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_907_page14' class='stacks_out'><div id='stacks_in_907_page14' class='stacks_in'>
+<div id='stacks_out_5818_page14' class='stacks_out'><div id='stacks_in_5818_page14' class='stacks_in'>
 
 <!--    Anchor Link Stack v1.0 by Joe Workman   -->
 
@@ -300,11 +300,11 @@ Sometimes you may want your code to be notified every time a sprite displays a n
 <!-- End of Anchor Link Stack -->
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_908_page14' class='stacks_out'><div id='stacks_in_908_page14' class='stacks_in'>
+<div id='stacks_out_5819_page14' class='stacks_out'><div id='stacks_in_5819_page14' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Use Time.deltaTime</span> <div id='stacks_out_911_page14' class='stacks_out'><div id='stacks_in_911_page14' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Use Time.deltaTime</span> <div id='stacks_out_5822_page14' class='stacks_out'><div id='stacks_in_5822_page14' class='stacks_in'>
 <span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; ">By design, the </span><span style="font:12px Courier, mono; ">SpriteAnimationPump</span><span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; "> uses the real time passed in your game to animate sprites.  This is so that you can still use animated sprites, and the like, in your pause menu (when Time.timeScale is set to 0).  However, if you want setting Time.timeScale = 0 to pause your sprite animations as well, uncomment the following line at the top of SpriteAnimationPump.cs:<br /><br /></span><span style="font:12px Courier, mono; ">#define USE_DELTA_TIME</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>

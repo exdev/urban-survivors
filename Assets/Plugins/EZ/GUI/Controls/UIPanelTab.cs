@@ -56,7 +56,7 @@ public class UIPanelTab : UIRadioBtn
 
 	protected bool panelIsShowing = true;
 
-	protected override void Start()
+	public override void Start()
 	{
 		base.Start();
 
@@ -89,6 +89,9 @@ public class UIPanelTab : UIRadioBtn
 
 	public override void OnInput(ref POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		base.OnInput(ref ptr);
 
 		if (!m_controlIsEnabled || IsHidden())

@@ -36,7 +36,7 @@ public static class FontStore
 			if (fonts[i].fontDef == fontDef)
 			{
 				if (!Application.isPlaying)
-					fonts[i] = new SpriteFont(fontDef); // Always for a reload
+					fonts[i] = new SpriteFont(fontDef); // Always force a reload
 
 				return fonts[i];
 			}

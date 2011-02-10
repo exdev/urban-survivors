@@ -113,6 +113,21 @@ public class UITextField : AutoSpriteControlBase, IKeyFocusable
 	/// </summary>
 	public Vector3 caretOffset = new Vector3(0,0,-0.1f);
 
+	/// <summary>
+	/// Sets whether a caret should be shown when running on
+	/// a mobile device (such as iOS).  It is recommended to
+	/// keep this set to false since, for example, the keyboard
+	/// on iOS has its own method of setting the insertion point,
+	/// and Unity does not expose information about this insertion
+	/// point, so if the EZ GUI caret is shown, there is no way for
+	/// it to stay in sync with where the insertion point actually 
+	/// is because Unity does not pass that information through.  
+	/// So it is better to just leave the caret disabled for mobile
+	/// devices and let the user use the built-in OS-specific text 
+	/// entry interface.
+	/// </summary>
+	public bool showCaretOnMobile = false;
+
 #if UNITY_IPHONE || UNITY_ANDROID
 	/// <summary>
 	/// The type of keyboard to display. (iPhone OS only)
@@ -194,6 +209,9 @@ public class UITextField : AutoSpriteControlBase, IKeyFocusable
 	//---------------------------------------------------
 	public override void OnInput(ref POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		if (!m_controlIsEnabled || IsHidden())
 		{
 			base.OnInput(ref ptr);
@@ -537,7 +555,7 @@ public class UITextField : AutoSpriteControlBase, IKeyFocusable
 		defaultTextAnchor = SpriteText.Anchor_Pos.Upper_Left;
 	}
 
-	protected override void Start()
+	public override void Start()
 	{
 		base.Start();
 
@@ -566,56 +584,16 @@ public class UITextField : AutoSpriteControlBase, IKeyFocusable
 			if (collider == null)
 				AddCollider();
 
-			// Create our caret and hide it by default:
-			GameObject go = new GameObject();
-			go.name = name + " - caret";
-			go.transform.parent = transform;
-			go.transform.localPosition = Vector3.zero;
-			go.transform.localRotation = Quaternion.identity;
-			go.transform.localScale = Vector3.one;
-			go.layer = gameObject.layer;
-			caret = (AutoSprite)go.AddComponent(typeof(AutoSprite));
-			caret.plane = plane;
-			caret.offset = caretOffset;
-			caret.SetAnchor(caretAnchor);
-			caret.persistent = persistent;
-			if (!managed)
+#if UNITY_3_0 || UNITY_3_1
+			// See if we should create our caret:
+			if (Application.platform == RuntimePlatform.IPhonePlayer)
 			{
-				if (caret.spriteMesh != null)
-					((SpriteMesh)caret.spriteMesh).material = renderer.sharedMaterial;
+				if (showCaretOnMobile)
+					CreateCaret();
 			}
 			else
-			{
-				if (manager != null)
-				{
-					caret.Managed = managed;
-					manager.AddSprite(caret);
-					caret.SetDrawLayer(drawLayer + 1);	// Caret should be drawn in front of the field graphic
-				}
-				else
-					Debug.LogError("Sprite on object \"" + name + "\" not assigned to a SpriteManager!");
-			}
-			caret.autoResize = autoResize;
-			if (pixelPerfect)
-				caret.pixelPerfect = pixelPerfect;
-			else
-				caret.SetSize(caretSize.x, caretSize.y);
-
-			if (states[1].spriteFrames.Length != 0)
-			{
-				caret.animations = new UVAnimation[1];
-				caret.animations[0] = new UVAnimation();
-				caret.animations[0].SetAnim(states[1], 0);
-				caret.PlayAnim(0, 0);
-			}
-			caret.SetCamera(renderCamera);
-			caret.Hide(true);
-			transitions[1].list[0].MainSubject = caret.gameObject;
-
-			PositionCaret();
-
-			if (container != null)
-				container.AddChild(caret.gameObject);
+#endif
+				CreateCaret();
 		}
 
 		cachedPos = transform.position;
@@ -629,6 +607,60 @@ public class UITextField : AutoSpriteControlBase, IKeyFocusable
 		// to 0, re-hide ourselves:
 		if (managed && m_hidden)
 			Hide(true);
+	}
+
+	protected void CreateCaret()
+	{
+		// Create our caret and hide it by default:
+		GameObject go = new GameObject();
+		go.name = name + " - caret";
+		go.transform.parent = transform;
+		go.transform.localPosition = Vector3.zero;
+		go.transform.localRotation = Quaternion.identity;
+		go.transform.localScale = Vector3.one;
+		go.layer = gameObject.layer;
+		caret = (AutoSprite)go.AddComponent(typeof(AutoSprite));
+		caret.plane = plane;
+		caret.offset = caretOffset;
+		caret.SetAnchor(caretAnchor);
+		caret.persistent = persistent;
+		if (!managed)
+		{
+			if (caret.spriteMesh != null)
+				((SpriteMesh)caret.spriteMesh).material = renderer.sharedMaterial;
+		}
+		else
+		{
+			if (manager != null)
+			{
+				caret.Managed = managed;
+				manager.AddSprite(caret);
+				caret.SetDrawLayer(drawLayer + 1);	// Caret should be drawn in front of the field graphic
+			}
+			else
+				Debug.LogError("Sprite on object \"" + name + "\" not assigned to a SpriteManager!");
+		}
+		caret.autoResize = autoResize;
+		if (pixelPerfect)
+			caret.pixelPerfect = pixelPerfect;
+		else
+			caret.SetSize(caretSize.x, caretSize.y);
+
+		if (states[1].spriteFrames.Length != 0)
+		{
+			caret.animations = new UVAnimation[1];
+			caret.animations[0] = new UVAnimation();
+			caret.animations[0].SetAnim(states[1], 0);
+			caret.PlayAnim(0, 0);
+		}
+		caret.SetCamera(renderCamera);
+		caret.Hide(true);
+		transitions[1].list[0].MainSubject = caret.gameObject;
+
+		PositionCaret();
+
+		if (container != null)
+			container.AddChild(caret.gameObject);
 	}
 
 	// Calculates the clipping rect for the text

@@ -42,20 +42,20 @@
 	<div id="pageHeader"><!-- Start page header -->
 		<img src="../rw_common/images/anb_logo.png" width="64" height="60" alt="Site logo"/>
 		<h1>EZ GUI</h1>
-		<h2></h2>
+		<h2>Changing the world, one site at a time&hellip;</h2>
 	</div><!-- End page header -->
 	
 	<div id="contentContainer"><!-- Start main content wrapper -->
 		<div id="content"><!-- Start content -->
 			
 
-<!-- Stacks v1.3.1 -->
+<!-- Stacks v1.4.3 -->
 <div class='stacks_top'>
-<div id='stacks_out_1118_page4' class='stacks_out'><div id='stacks_in_1118_page4' class='stacks_in'>
+<div id='stacks_out_1130_page4' class='stacks_out'><div id='stacks_in_1130_page4' class='stacks_in'>
 <h1>UIManager</h1><br />The <span style="font:12px Courier, mono; "><a href="../scripting/class_u_i_manager.html" rel="self">UIManager</a></span> class is an essential element of EZ GUI which polls for input and dispatches it to your various EZ GUI controls.  There should always be exactly one (1) GameObject with a <span style="font:12px Courier, mono; ">UIManager</span> script in any scene that contains EZ GUI controls.
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_1120_page4' class='stacks_out'><div id='stacks_in_1120_page4' class='stacks_in'>
-<link rel="stylesheet" type="text/css" media="screen" href="files/15.css"  />
+<div id='stacks_out_1132_page4' class='stacks_out'><div id='stacks_in_1132_page4' class='stacks_in'>
+<link rel="stylesheet" type="text/css" media="screen" href="files/16.css"  />
 <style type='text/css'> 
 .partitions_2_ td {
 	vertical-align:top;
@@ -67,158 +67,164 @@
 </style>
 <table class="partitions_2_" style="vertical-align: top; margin: auto; width:100%; border-collapse: collapse; border-spacing: 5px;" >
 	<tr class="row1">
-		<td style="width:20%; border-right-style:  ;"><div id='stacks_out_1122_page4' class='stacks_out'><div id='stacks_in_1122_page4' class='stacks_in'>
+		<td style="width:20%; border-right-style:  ;"><div id='stacks_out_1134_page4' class='stacks_out'><div id='stacks_in_1134_page4' class='stacks_in'>
 <strong>Pointer Type</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="width:50%; border-left-style:  ;"><div id='stacks_out_1125_page4' class='stacks_out'><div id='stacks_in_1125_page4' class='stacks_in'>
+		<td style="width:50%; border-left-style:  ;"><div id='stacks_out_1137_page4' class='stacks_out'><div id='stacks_in_1137_page4' class='stacks_in'>
 Sets the type of pointing device to be used.  You can use this to easily switch between mouse, touchpad, or ray input.  See the <a href="#pointer_types" rel="self">section below</a> on pointer type settings.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row2">
-		<td style="border-right-style:  ;"><div id='stacks_out_1128_page4' class='stacks_out'><div id='stacks_in_1128_page4' class='stacks_in'>
+		<td style="border-right-style:  ;"><div id='stacks_out_1140_page4' class='stacks_out'><div id='stacks_in_1140_page4' class='stacks_in'>
 <strong>Drag Threshold</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1131_page4' class='stacks_out'><div id='stacks_in_1131_page4' class='stacks_in'>
+		<td style="border-left-style:  ;"><div id='stacks_out_1143_page4' class='stacks_out'><div id='stacks_in_1143_page4' class='stacks_in'>
 This is the distance the input device must be dragged before it will no longer be considered a "tap".  For instance, if the user places their finger on a button and then drags beyond the Drag Threshold, then when they lift their finger again, it will not be considered a "tap" which triggers the button.  This is particularly important for scrollable lists of buttons.<br /><strong>NOTE:</strong> For <span style="font:12px Courier, mono; ">MOUSE</span> and <span style="font:12px Courier, mono; ">TOUCHPAD</span> pointer types, this is the distance in pixels.  For the <span style="font:12px Courier, mono; ">RAY</span> pointer type, this value is interpreted as world units.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row3">
-		<td style="border-right-style:  ;"><div id='stacks_out_1134_page4' class='stacks_out'><div id='stacks_in_1134_page4' class='stacks_in'>
+		<td style="border-right-style:  ;"><div id='stacks_out_1146_page4' class='stacks_out'><div id='stacks_in_1146_page4' class='stacks_in'>
 <strong>Ray Drag Threshold</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1137_page4' class='stacks_out'><div id='stacks_in_1137_page4' class='stacks_in'>
+		<td style="border-left-style:  ;"><div id='stacks_out_1149_page4' class='stacks_out'><div id='stacks_in_1149_page4' class='stacks_in'>
 This is similar to <span style="font:12px Courier, mono; ">dragThreshold</span> except instead of a distance in pixels, it is the world-distance between the endpoint of the <span style="font:12px Courier, mono; ">Ray</span> pointer (based on <span style="font:12px Courier, mono; ">rayDepth</span>) when the ray went active to the endpoint of the ray in successive frames.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row4">
-		<td style="border-right-style:  ;"><div id='stacks_out_1140_page4' class='stacks_out'><div id='stacks_in_1140_page4' class='stacks_in'>
+		<td style="border-right-style:  ;"><div id='stacks_out_1152_page4' class='stacks_out'><div id='stacks_in_1152_page4' class='stacks_in'>
 <strong>Mouse And Touch Depth</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1143_page4' class='stacks_out'><div id='stacks_in_1143_page4' class='stacks_in'>
+		<td style="border-left-style:  ;"><div id='stacks_out_1155_page4' class='stacks_out'><div id='stacks_in_1155_page4' class='stacks_in'>
 This specifies how far, in world units, into the scene (i.e. from the camera) to cast mouse and touchpad events into the scene.  Only modify this value if you wish to limit the player's "reach" into a 3D scene when using the mouse or touchpad for input.  The default is infinity.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row5">
-		<td style="border-right-style:  ;"><div id='stacks_out_1146_page4' class='stacks_out'><div id='stacks_in_1146_page4' class='stacks_in'>
+		<td style="border-right-style:  ;"><div id='stacks_out_1158_page4' class='stacks_out'><div id='stacks_in_1158_page4' class='stacks_in'>
 <strong>Ray Depth</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1149_page4' class='stacks_out'><div id='stacks_in_1149_page4' class='stacks_in'>
-This specifies how far, in world units, into the scene (i.e. from the camera) the <span style="font:12px Courier, mono; ">Ray</span> pointer type should extend.  Objects beyond this distance will not be triggered by the ray.
+		<td style="border-left-style:  ;"><div id='stacks_out_1161_page4' class='stacks_out'><div id='stacks_in_1161_page4' class='stacks_in'>
+This specifies how far, in world units, into the scene (i.e. from the camera) the <span style="font:12px Courier, mono; ">RAY</span> pointer type should extend.  Objects beyond this distance will not be triggered by the ray.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row6">
-		<td style="border-right-style:  ;"><div id='stacks_out_1152_page4' class='stacks_out'><div id='stacks_in_1152_page4' class='stacks_in'>
+		<td style="border-right-style:  ;"><div id='stacks_out_1164_page4' class='stacks_out'><div id='stacks_in_1164_page4' class='stacks_in'>
 <strong>Ray Mask</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1155_page4' class='stacks_out'><div id='stacks_in_1155_page4' class='stacks_in'>
-Determines which layers can be clicked/activated using the <span style="font:12px Courier, mono; ">Ray</span> pointer type.
+		<td style="border-left-style:  ;"><div id='stacks_out_1167_page4' class='stacks_out'><div id='stacks_in_1167_page4' class='stacks_in'>
+Determines which layers can be clicked/activated using the <span style="font:12px Courier, mono; ">RAY</span> pointer type.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row7">
-		<td style="border-right-style:  ;"><div id='stacks_out_1158_page4' class='stacks_out'><div id='stacks_in_1158_page4' class='stacks_in'>
+		<td style="border-right-style:  ;"><div id='stacks_out_1170_page4' class='stacks_out'><div id='stacks_in_1170_page4' class='stacks_in'>
 <strong>Focus With Ray</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1161_page4' class='stacks_out'><div id='stacks_in_1161_page4' class='stacks_in'>
-Sets whether the ray pointer (if any) should be used to set the keyboard focus, at the exclusion of the mouse/touchpad pointer(s).  Set this to false if you want to use the touchpad or mouse to set the keyboard focus, and set it to true if you instead want to set the focus using the ray pointer.
+		<td style="border-left-style:  ;"><div id='stacks_out_1173_page4' class='stacks_out'><div id='stacks_in_1173_page4' class='stacks_in'>
+Sets whether the <span style="font:12px Courier, mono; ">RAY</span> pointer (if any) should be used to set the keyboard focus, at the exclusion of the mouse/touchpad pointer(s).  Set this to false if you want to use the touchpad or mouse to set the keyboard focus, and set it to true if you instead want to set the focus using the ray pointer.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row8">
-		<td style="border-right-style:  ;"><div id='stacks_out_1164_page4' class='stacks_out'><div id='stacks_in_1164_page4' class='stacks_in'>
+		<td style="border-right-style:  ;"><div id='stacks_out_1176_page4' class='stacks_out'><div id='stacks_in_1176_page4' class='stacks_in'>
 <strong>Action Axis</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1167_page4' class='stacks_out'><div id='stacks_in_1167_page4' class='stacks_in'>
-For use with "Ray" pointer types.  This is the name of the "axis" in the input manager to use to activate the ray.  Essentially, this is the "axis" you want to use when the user wants to interact with the world.  Use this to setup a "use key", etc.  For more information on input axes or how to use the input manager, see the "Input" section of the Unity User Guide.<br /><strong>NOTE:</strong> If you do not plan to use Unity's input system for this purpose, be sure to set this value to an empty string.
+		<td style="border-left-style:  ;"><div id='stacks_out_1179_page4' class='stacks_out'><div id='stacks_in_1179_page4' class='stacks_in'>
+For use with <span style="font:12px Courier, mono; ">RAY</span> pointer types.  This is the name of the "axis" in the input manager to use to activate the ray.  Essentially, this is the "axis" you want to use when the user wants to interact with the world.  Use this to setup a "use key", etc.  For more information on input axes or how to use the input manager, see the "Input" section of the Unity User Guide.<br /><strong>NOTE:</strong> If you do not plan to use Unity's input system for this purpose, be sure to set this value to an empty string.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row9">
-		<td style="border-right-style:  ;"><div id='stacks_out_1170_page4' class='stacks_out'><div id='stacks_in_1170_page4' class='stacks_in'>
-<strong>Warn On Non UI Hits</strong>
+		<td style="border-right-style:  ;"><div id='stacks_out_4760_page4' class='stacks_out'><div id='stacks_in_4760_page4' class='stacks_in'>
+<strong>Input Outside Viewport</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1173_page4' class='stacks_out'><div id='stacks_in_1173_page4' class='stacks_in'>
-When checked, a warning will be logged to the console whenever a non-UI object in the scene is "hit" by an input event.  Use this when you want to make sure you have all of your layers setup correctly to mask out non-UI objects.
+		<td style="border-left-style:  ;"><div id='stacks_out_4762_page4' class='stacks_out'><div id='stacks_in_4762_page4' class='stacks_in'>
+Determines how input events that occur outside the game's viewport will be handled.  Possible settings are:<br /><br /><strong>Process_All</strong> - Process all input that occurs outside the game's viewport.<br /><br /><strong>Ignore</strong> - Ignore all input that occurs outside the game's viewport.  <strong>NOTE: </strong>This may lead to missing events, such as a pointer release that occurs outside the viewport.<br /><br /><strong>Move_Off (default)</strong> - If any pointer that moves outside the game's viewport has a current target object, that object is sent a <span style="font:12px Courier, mono; ">MOVE_OFF</span> or <span style="font:12px Courier, mono; ">RELEASE_OFF</span> (as appropriate) event.  Otherwise, it is ignored.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row10">
-		<td style="border-right-style:  ;"><div id='stacks_out_1176_page4' class='stacks_out'><div id='stacks_in_1176_page4' class='stacks_in'>
-<strong>UI Cameras</strong>
+		<td style="border-right-style:  ;"><div id='stacks_out_1182_page4' class='stacks_out'><div id='stacks_in_1182_page4' class='stacks_in'>
+<strong>Warn On Non UI Hits</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1179_page4' class='stacks_out'><div id='stacks_in_1179_page4' class='stacks_in'>
-A list of all the cameras to be used for detecting GUI input from the mouse and touchpad pointer types.  Each camera you assign can also have its own mask and ray depth setting.
+		<td style="border-left-style:  ;"><div id='stacks_out_1185_page4' class='stacks_out'><div id='stacks_in_1185_page4' class='stacks_in'>
+When checked, a warning will be logged to the console whenever a non-UI object in the scene is "hit" by an input event.  Use this when you want to make sure you have all of your layers setup correctly to mask out non-UI objects.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row11">
-		<td style="border-right-style:  ;"><div id='stacks_out_1182_page4' class='stacks_out'><div id='stacks_in_1182_page4' class='stacks_in'>
-<strong>Ray Camera</strong>
+		<td style="border-right-style:  ;"><div id='stacks_out_1188_page4' class='stacks_out'><div id='stacks_in_1188_page4' class='stacks_in'>
+<strong>UI Cameras</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1185_page4' class='stacks_out'><div id='stacks_in_1185_page4' class='stacks_in'>
-The camera to be used for the casting rays for the Ray pointer type, if using a camera other than the Main Camera.  Otherwise, you can leave this set to the default.
+		<td style="border-left-style:  ;"><div id='stacks_out_1191_page4' class='stacks_out'><div id='stacks_in_1191_page4' class='stacks_in'>
+A list of all the cameras to be used for detecting GUI input from the mouse and touchpad pointer types.  Each camera you assign can also have its own mask and ray depth setting.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row12">
-		<td style="border-right-style:  ;"><div id='stacks_out_1188_page4' class='stacks_out'><div id='stacks_in_1188_page4' class='stacks_in'>
-<strong>Block Input</strong>
+		<td style="border-right-style:  ;"><div id='stacks_out_1194_page4' class='stacks_out'><div id='stacks_in_1194_page4' class='stacks_in'>
+<strong>Ray Camera</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1191_page4' class='stacks_out'><div id='stacks_in_1191_page4' class='stacks_in'>
-When true, no input will be processed.  This is primarily used internally at runtime to disable input during transitions, etc.  But it can also be used in other situations when you want to prevent user input.
+		<td style="border-left-style:  ;"><div id='stacks_out_1197_page4' class='stacks_out'><div id='stacks_in_1197_page4' class='stacks_in'>
+The camera to be used for the casting rays for the <span style="font:12px Courier, mono; ">RAY</span> pointer type, if using a camera other than the Main Camera.  Otherwise, you can leave this set to the default.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row13">
-		<td style="border-right-style:  ;"><div id='stacks_out_1194_page4' class='stacks_out'><div id='stacks_in_1194_page4' class='stacks_in'>
-<strong>Default Font</strong>
+		<td style="border-right-style:  ;"><div id='stacks_out_1200_page4' class='stacks_out'><div id='stacks_in_1200_page4' class='stacks_in'>
+<strong>Block Input</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1197_page4' class='stacks_out'><div id='stacks_in_1197_page4' class='stacks_in'>
-Default font to use when automatically creating SpriteText labels for controls in edit-mode.
+		<td style="border-left-style:  ;"><div id='stacks_out_1203_page4' class='stacks_out'><div id='stacks_in_1203_page4' class='stacks_in'>
+When true, no input will be processed.  This is primarily used internally at runtime to disable input during transitions, etc.  But it can also be used in other situations when you want to prevent user input.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row14">
-		<td style="border-right-style:  ;"><div id='stacks_out_1200_page4' class='stacks_out'><div id='stacks_in_1200_page4' class='stacks_in'>
-<strong>Default Font Material</strong>
+		<td style="border-right-style:  ;"><div id='stacks_out_1206_page4' class='stacks_out'><div id='stacks_in_1206_page4' class='stacks_in'>
+<strong>Default Font</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1203_page4' class='stacks_out'><div id='stacks_in_1203_page4' class='stacks_in'>
-Default material use for the default font.
+		<td style="border-left-style:  ;"><div id='stacks_out_1209_page4' class='stacks_out'><div id='stacks_in_1209_page4' class='stacks_in'>
+Default font to use when automatically creating SpriteText labels for controls in edit-mode.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row15">
-		<td style="border-right-style:  ;"><div id='stacks_out_1206_page4' class='stacks_out'><div id='stacks_in_1206_page4' class='stacks_in'>
-<strong>[keyboard rotation flags] (iPhone only)</strong>
+		<td style="border-right-style:  ;"><div id='stacks_out_1212_page4' class='stacks_out'><div id='stacks_in_1212_page4' class='stacks_in'>
+<strong>Default Font Material</strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_1209_page4' class='stacks_out'><div id='stacks_in_1209_page4' class='stacks_in'>
-When using iPhone, there will appear here a list of flags allowing you to specify in which orientations to which the keyboard should be allowed to auto-rotate.
+		<td style="border-left-style:  ;"><div id='stacks_out_1215_page4' class='stacks_out'><div id='stacks_in_1215_page4' class='stacks_in'>
+Default material use for the default font.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row16">
-		<td style="border-right-style:  ;"><div class='slice empty out'><div class='slice empty in'></div></div><div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div class='slice empty out'><div class='slice empty in'></div></div><div class='stacks_clearer'></div></td>
+		<td style="border-right-style:  ;"><div id='stacks_out_1218_page4' class='stacks_out'><div id='stacks_in_1218_page4' class='stacks_in'>
+<strong>[keyboard rotation flags] (iPhone only)</strong>
+<div class='stacks_clearer'></div></div></div>
+<div class='stacks_clearer'></div></td>
+		<td style="border-left-style:  ;"><div id='stacks_out_1221_page4' class='stacks_out'><div id='stacks_in_1221_page4' class='stacks_in'>
+When using iPhone, there will appear here a list of flags allowing you to specify in which orientations to which the keyboard should be allowed to auto-rotate.
+<div class='stacks_clearer'></div></div></div>
+<div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row17">
 		<td style="border-right-style:  ;"><div class='slice empty out'><div class='slice empty in'></div></div><div class='stacks_clearer'></div></td>
@@ -238,7 +244,7 @@ When using iPhone, there will appear here a list of flags allowing you to specif
 	</tr>
 </table>
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_1221_page4' class='stacks_out'><div id='stacks_in_1221_page4' class='stacks_in'>
+<div id='stacks_out_1233_page4' class='stacks_out'><div id='stacks_in_1233_page4' class='stacks_in'>
 
 <!--    Anchor Link Stack v1.0 by Joe Workman   -->
 
@@ -247,11 +253,11 @@ When using iPhone, there will appear here a list of flags allowing you to specif
 <!-- End of Anchor Link Stack -->
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_1222_page4' class='stacks_out'><div id='stacks_in_1222_page4' class='stacks_in'>
+<div id='stacks_out_1234_page4' class='stacks_out'><div id='stacks_in_1234_page4' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Pointer Types</span> <div id='stacks_out_1225_page4' class='stacks_out'><div id='stacks_in_1225_page4' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Pointer Types</span> <div id='stacks_out_1237_page4' class='stacks_out'><div id='stacks_in_1237_page4' class='stacks_in'>
 There are currently 6 pointer type settings to choose from:<br /><ul class="disc"><li><span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">MOUSE</span></li><li><span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">TOUCHPAD</span></li><li><span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">AUTO_TOUCHPAD</span></li><li><span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">RAY</span></li><li><span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">MOUSE_AND_RAY</span></li><li><span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">TOUCHPAD_AND_RAY</span></li></ul><br />Mouse and Touchpad pointer types are pretty straight-forward.  When the user moves or clicks the mouse, or touches the touchpad, it just works.  The <span style="font:12px Courier, mono; ">MOUSE_AND_RAY</span> and <span style="font:12px Courier, mono; ">TOUCHPAD_AND_RAY</span> types combine <span style="font:12px Courier, mono; ">RAY</span> pointer type functionality with the <span style="font:12px Courier, mono; ">MOUSE</span> and <span style="font:12px Courier, mono; ">TOUCHPAD</span> types.  The AUTO_TOUCHPAD pointer type will automatically allow both mouse and touchpad input while in-editor, and automatically switches to TOUCHPAD when deployed to a touchpad-based device (iPhone, iPad, Android, etc).<br /><br /><span style="font-size:15px; font-weight:bold; ">The </span><span style="font:15px Courier, mono; font-weight:bold; font-weight:bold; ">RAY</span><span style="font-size:15px; font-weight:bold; "> pointer type</span><br /><br />The <span style="font:12px Courier, mono; ">RAY</span> pointer type is special in that it does not directly use the mouse or touchpad.  Rather, it projects a ray from the center of the screen (from the selected <em>UI Camera</em>) into the game scene a distance specified by the <em>Ray Depth</em> setting in <span style="font:12px Courier, mono; ">UIManager</span>.  This pointer type is useful for things like providing Doom 3-like in-world user interfaces in an FPS.  Use it to allow the user to use in-world objects such as keypad door locks, in-world control panels, etc.  This way, the player's crosshairs serve as their pointing device when they are near enough to an in-world UI object.<br /><br />Unlike the <span style="font:12px Courier, mono; ">MOUSE</span> and <span style="font:12px Courier, mono; ">TOUCHPAD</span> types, which are considered "active" whenever the left mouse button is pressed or the screen is touched, respectively, the <span style="font:12px Courier, mono; ">RAY</span> type is "active" when the input axis specified by <em>Action Axis</em> is active.  This allows you to present the player with a user-configurable input scheme.  The player can use Unity's input manager to setup what is effectively their "use/action" button/key.  (For more information on Unity's Input Manager, or how to setup an axis, see the "Input" section of the Unity User Guide.)  Alternatively, you can put the ray into an active state by either using the built-in <span style="font:12px Courier, mono; ">UIActionBtn</span> control type (useful for touchpad-based games), or by manually setting the ray's active state in-code by assigning one of three values to the <span style="font:12px Courier, mono; ">UIManager</span>'s <span style="font:12px Courier, mono; ">RayActive</span> property:<br /><br /><ul class="disc"><li><span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Inactive</span> - The ray is not active.</li><li><span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Momentary</span> - The ray is active for a single frame (a momentary "click").</li><li><span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Constant</span> - The ray is active until further notice.</li></ul><br />The <span style="font:12px Courier, mono; ">RAY</span> pointer type is very powerful for creating interactive worlds.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>

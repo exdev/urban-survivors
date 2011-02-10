@@ -89,6 +89,16 @@ public class SpriteText : MonoBehaviour
 	public float characterSize = 1f;
 
 	/// <summary>
+	/// An adjustable factor by which you can increase/decrease
+	/// the spacing between characters.  A value of 1.0 will
+	/// space characters exactly as described by the font.
+	/// Decreasing this value will place the characters closer
+	/// together, while increasing it will place them farther
+	/// apart.
+	/// </summary>
+	public float characterSpacing = 1f;
+
+	/// <summary>
 	/// The distance from one line to the next as a percentage
 	/// of characterSize.  Defaults to a distance that is
 	/// 1.1 times the height of a character. This has the effect
@@ -392,7 +402,7 @@ public class SpriteText : MonoBehaviour
 	}
 
 
-	protected virtual void Start()
+	public virtual void Start()
 	{
 		m_started = true;
 
@@ -496,7 +506,7 @@ public class SpriteText : MonoBehaviour
 
 		text = str;
 
-		if(System.String.IsNullOrEmpty(str))
+		if(System.String.IsNullOrEmpty(str) || spriteFont == null)
 		{
 			plainText = "";
 			displayString = "";
@@ -596,16 +606,16 @@ public class SpriteText : MonoBehaviour
 						displaySB.Append(str[i]);
 
 					if (i != lastPlainWhiteSpace+1 && i > 0)
-						spaceLeft -= spriteFont.GetWidth(str[i - 1], str[i]) * worldUnitsPerTexel;
+						spaceLeft -= spriteFont.GetWidth(str[i - 1], str[i]) * worldUnitsPerTexel * characterSpacing;
 					else
-						spaceLeft -= spriteFont.GetSpriteChar(str[i]).xAdvance * worldUnitsPerTexel;
+						spaceLeft -= spriteFont.GetSpriteChar(str[i]).xAdvance * worldUnitsPerTexel * characterSpacing;
 
 					if (spaceLeft < 0)
 					{
 						if (i == lastWhiteSpace)
 							spaceLeft = maxWidth;
 						else // The space left is what remains after our new linebreak:
-							spaceLeft = maxWidth - spriteFont.GetWidth(displaySB, lastWhiteSpace + 1, i) * worldUnitsPerTexel;
+							spaceLeft = maxWidth - spriteFont.GetWidth(displaySB, lastWhiteSpace + 1, i) * worldUnitsPerTexel * characterSpacing;
 
 						// If there still isn't any space left, the word itself is
 						// too long, so clip it at our width:
@@ -616,7 +626,7 @@ public class SpriteText : MonoBehaviour
 							if (displaySB.Length > 0)
 							{
 								displaySB.Insert(displaySB.Length - 1, '\n');
-								spaceLeft = maxWidth - spriteFont.GetSpriteChar(str[i]).xAdvance * worldUnitsPerTexel;
+								spaceLeft = maxWidth - spriteFont.GetSpriteChar(str[i]).xAdvance * worldUnitsPerTexel * characterSpacing;
 								newLineInserts.Add(new NewlineInsertInfo(i, 1));
 							}
 						}
@@ -721,10 +731,10 @@ public class SpriteText : MonoBehaviour
 
 					plainSB.Append(str[strOffset]);
 
-					if (strOffset != lastPlainWhiteSpace+1 && strOffset > 0)
-						spaceLeft -= spriteFont.GetWidth(str[strOffset - 1], str[strOffset]) * worldUnitsPerTexel;
+					if (strOffset != lastPlainWhiteSpace + 1 && strOffset > 0)
+						spaceLeft -= spriteFont.GetWidth(str[strOffset - 1], str[strOffset]) * worldUnitsPerTexel * characterSpacing;
 					else
-						spaceLeft -= spriteFont.GetSpriteChar(str[strOffset]).xAdvance * worldUnitsPerTexel;
+						spaceLeft -= spriteFont.GetSpriteChar(str[strOffset]).xAdvance * worldUnitsPerTexel * characterSpacing;
 
 					if (spaceLeft < 0)
 					{
@@ -733,7 +743,7 @@ public class SpriteText : MonoBehaviour
 						if (strOffset == lastPlainWhiteSpace)
 							spaceLeft = maxWidth;
 						else // The space left is what remains after our new linebreak:
-							spaceLeft = maxWidth - spriteFont.GetWidth(displaySB, lastWhiteSpace + 1, strOffset) * worldUnitsPerTexel;
+							spaceLeft = maxWidth - spriteFont.GetWidth(displaySB, lastWhiteSpace + 1, strOffset) * worldUnitsPerTexel * characterSpacing;
 
 						// If there still isn't any space left, the word itself is
 						// too long, so clip it at our width:
@@ -744,7 +754,7 @@ public class SpriteText : MonoBehaviour
 							if (displaySB.Length > 0)
 							{
 								displaySB.Insert(displaySB.Length - 1, '\n');
-								spaceLeft = maxWidth - spriteFont.GetSpriteChar(str[strOffset]).xAdvance * worldUnitsPerTexel;
+								spaceLeft = maxWidth - spriteFont.GetSpriteChar(str[strOffset]).xAdvance * worldUnitsPerTexel * characterSpacing;
 
 								newLineInserts.Add(new NewlineInsertInfo(plainSB.Length - 1, 1));
 
@@ -1190,7 +1200,7 @@ public class SpriteText : MonoBehaviour
 		// of the line.
 		Vector3 startPos = Vector3.zero;
 		float baseHeight = ((float)spriteFont.PixelSize) * worldUnitsPerTexel;
-		float width = spriteFont.GetWidth(displayString) * worldUnitsPerTexel;
+		float width = spriteFont.GetWidth(displayString) * worldUnitsPerTexel * characterSpacing;
 
 		totalWidth = width;
 
@@ -1231,7 +1241,7 @@ public class SpriteText : MonoBehaviour
 		// Find the width of each line:
 		for (int i = 0; i < lines.Length; ++i)
 		{
-			widths[i] = spriteFont.GetWidth(lines[i]) * worldUnitsPerTexel;
+			widths[i] = spriteFont.GetWidth(lines[i]) * worldUnitsPerTexel * characterSpacing;
 
 			// Find the longest line:
 			if (largestWidth < widths[i])
@@ -1477,9 +1487,9 @@ public class SpriteText : MonoBehaviour
 
 		for (int i = 1; i < txt.Length; ++i)
 		{
-			startPos.x += ch.xAdvance * worldUnitsPerTexel;
+			startPos.x += ch.xAdvance * worldUnitsPerTexel * characterSpacing;
 			ch = spriteFont.GetSpriteChar(txt[i]);
-			startPos.x += ch.GetKerning(txt[i - 1]) * worldUnitsPerTexel;
+			startPos.x += ch.GetKerning(txt[i - 1]) * worldUnitsPerTexel * characterSize;
 			pos = startPos + new Vector3(ch.xOffset * worldUnitsPerTexel, ch.yOffset * worldUnitsPerTexel);
 			BuildCharacter((charIdx + i) * 4, charIdx + i, pos, ref ch);
 		}
@@ -1622,6 +1632,11 @@ public class SpriteText : MonoBehaviour
 			EZAnimator.instance.Stop(gameObject);
 			EZAnimator.instance.Stop(this);
 		}
+	}
+
+	public virtual void OnDestroy()
+	{
+		Delete();
 	}
 
 	/// <summary>
@@ -2001,7 +2016,7 @@ public class SpriteText : MonoBehaviour
 		if(meshString.Length < 1)
 		{
 			float baseHeight = ((float)spriteFont.BaseHeight) * worldUnitsPerTexel;
-			return transform.TransformPoint(GetStartPos_SingleLine(baseHeight, 0) - Vector3.up * baseHeight);
+			return transform.TransformPoint(GetStartPos_SingleLine(baseHeight, 0).x, GetLineBaseline(1,1), offsetZ);
 		}
 
 		int numLines, lineNum, lineStart, lineEnd;
@@ -2021,7 +2036,7 @@ public class SpriteText : MonoBehaviour
 		if (charIndex < lineStart)
 			GetDisplayLineCount(charIndex-1, out lineNum, out lineStart, out lineEnd);
 
-		charX = spriteFont.GetWidth(displayString, lineStart, charIndex - leftSideOffset) * worldUnitsPerTexel;
+		charX = spriteFont.GetWidth(displayString, lineStart, charIndex - leftSideOffset) * worldUnitsPerTexel * characterSpacing;
 
 		// Adjust for the anchor if necessary:
 		switch(anchor)
@@ -2039,7 +2054,7 @@ public class SpriteText : MonoBehaviour
 					// Not implemented...too weird to be a likely use case
 				}
 				else  // Subtract half the line width:
-					charX -= spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel * 0.5f;
+					charX -= spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel * characterSpacing * 0.5f;
 				break;
 
 			case Anchor_Pos.Upper_Left:
@@ -2047,11 +2062,11 @@ public class SpriteText : MonoBehaviour
 			case Anchor_Pos.Lower_Left:
 				if(alignment == Alignment_Type.Center)
 				{
-					charX += (totalWidth * 0.5f) - (spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel * 0.5f);
+					charX += (totalWidth * 0.5f) - (spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel * characterSpacing * 0.5f);
 				}
 				else if(alignment == Alignment_Type.Right)
 				{
-					charX += totalWidth - (spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel);
+					charX += totalWidth - (spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel * characterSpacing);
 				}
 				else
 				{
@@ -2064,7 +2079,7 @@ public class SpriteText : MonoBehaviour
 			case Anchor_Pos.Lower_Right:
 				if(alignment == Alignment_Type.Center)
 				{
-					charX += (totalWidth * -0.5f) - (spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel * 0.5f);
+					charX += (totalWidth * -0.5f) - (spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel * characterSpacing * 0.5f);
 				}
 				else if(alignment == Alignment_Type.Left)
 				{
@@ -2072,7 +2087,7 @@ public class SpriteText : MonoBehaviour
 				}
 				else
 				{
-					charX += -1f * spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel;
+					charX += -1f * spriteFont.GetWidth(displayString, lineStart, lineEnd) * worldUnitsPerTexel * characterSpacing;
 				}
 				break;
 		}
@@ -2116,7 +2131,13 @@ public class SpriteText : MonoBehaviour
 	/// </summary>
 	public float BaseHeight
 	{
-		get { return spriteFont.BaseHeight * worldUnitsPerTexel; }
+		get 
+		{
+			if (spriteFont != null)
+				return spriteFont.BaseHeight * worldUnitsPerTexel;
+			else
+				return 0;
+		}
 	}
 
 	/// <summary>
@@ -2207,6 +2228,24 @@ public class SpriteText : MonoBehaviour
 		LayoutText();
 	}
 
+	/// <summary>
+	/// An adjustable factor by which you can increase/decrease
+	/// the spacing between characters.  A value of 1.0 will
+	/// space characters exactly as described by the font.
+	/// Decreasing this value will place the characters closer
+	/// together, while increasing it will place them farther
+	/// apart.
+	/// </summary>
+	public float CharacterSpacing
+	{
+		get { return characterSpacing; }
+		set
+		{
+			characterSpacing = value;
+			LayoutText();
+		}
+	}
+
 	// Used internally by any parent control
 	public IControl Parent
 	{
@@ -2287,7 +2326,7 @@ public class SpriteText : MonoBehaviour
 	// Included to work around the Unity bug where Start() is not
 	// called when reintering edit mode if play lasts for longer 
 	// than 10 seconds:
-#if (UNITY_3_0 || UNITY_3_1) && UNITY_EDITOR
+#if (UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9) && UNITY_EDITOR
 	void Update() {}
 #endif
 
@@ -2345,6 +2384,7 @@ public class SpriteTextMirror
 	public TextAsset font;
 	public float offsetZ;
 	public float characterSize;
+	public float characterSpacing;
 	public float lineSpacing;
 	public SpriteText.Anchor_Pos anchor;
 	public SpriteText.Alignment_Type alignment;
@@ -2372,6 +2412,7 @@ public class SpriteTextMirror
 		font = s.font;
 		offsetZ = s.offsetZ;
 		characterSize = s.characterSize;
+		characterSpacing = s.characterSpacing;
 		lineSpacing = s.lineSpacing;
 		anchor = s.anchor;
 		alignment = s.alignment;
@@ -2404,6 +2445,8 @@ public class SpriteTextMirror
 		if (s.offsetZ != offsetZ)
 			return true;
 		if (s.characterSize != characterSize)
+			return true;
+		if (s.characterSpacing != characterSpacing)
 			return true;
 		if (s.lineSpacing != lineSpacing)
 			return true;

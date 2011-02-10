@@ -203,7 +203,17 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 		base.Init();
 	}
 
-	protected override void Start()
+	public virtual bool IncludeTextInAutoCollider
+	{
+		get { return includeTextInAutoCollider; }
+		set
+		{
+			includeTextInAutoCollider = value;
+			UpdateCollider();
+		}
+	}
+
+	public override void Start()
 	{
 		base.Start();
 
@@ -213,7 +223,10 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 
 		// Make any associated text persistent if we are:
 		if (spriteText != null)
+		{
 			spriteText.Persistent = persistent;
+			spriteText.Parent = this;
+		}
 	}
 
 	// Truncate layers:
@@ -687,6 +700,8 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 			customCollider = true;
 
 		Init();
+
+		AddSpriteResizedDelegate(OnResize);
 	}
 
 
@@ -711,6 +726,12 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 			EZAnimator.instance.Stop(gameObject);
 			EZAnimator.instance.Stop(this);
 		}
+	}
+
+	// Called whenever the control changes size
+	protected void OnResize(float newWidth, float newHeight, SpriteRoot sprite)
+	{
+		UpdateCollider();
 	}
 
 
@@ -804,6 +825,9 @@ public abstract class AutoSpriteControlBase : AutoSpriteBase, IControl, IUIObjec
 			{
 				for (int j = 0; j < aggregateLayers[i].Length; ++j)
 				{
+					if (aggregateLayers[i][j].IsHidden() || !aggregateLayers[i][j].gameObject.active)
+						continue;
+
 					sm = aggregateLayers[i][j].transform.localToWorldMatrix;
 					tl = lm.MultiplyPoint3x4(sm.MultiplyPoint3x4(aggregateLayers[i][j].UnclippedTopLeft));
 					br = lm.MultiplyPoint3x4(sm.MultiplyPoint3x4(aggregateLayers[i][j].UnclippedBottomRight));

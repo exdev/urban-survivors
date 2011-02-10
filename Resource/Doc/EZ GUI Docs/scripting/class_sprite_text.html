@@ -17,6 +17,20 @@
 <tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#a1845cf5b8eb1bf497316db8a6236b2d4">Alignment_Type</a> </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>How the text will be aligned. </p>
  <a href="class_sprite_text.html#a1845cf5b8eb1bf497316db8a6236b2d4">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#a1b9be87fb9ad36860e31a0a10e2bb1b4">HORIZONTAL_ALIGN</a> { <a class="el" href="class_sprite_text.html#a1b9be87fb9ad36860e31a0a10e2bb1b4">NONE</a>, 
+<a class="el" href="class_sprite_text.html#a1b9be87fb9ad36860e31a0a10e2bb1b4">LEFT</a>, 
+<a class="el" href="class_sprite_text.html#a1b9be87fb9ad36860e31a0a10e2bb1b4">RIGHT</a>, 
+<a class="el" href="class_sprite_text.html#a1b9be87fb9ad36860e31a0a10e2bb1b4">CENTER</a>
+ }</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>Specifies what the object will be aligned relative to on the horizontal axis. </p>
+ <a href="class_sprite_text.html#a1b9be87fb9ad36860e31a0a10e2bb1b4">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#aac08154a8235138866870e2fa1e5c11d">VERTICAL_ALIGN</a> { <a class="el" href="class_sprite_text.html#aac08154a8235138866870e2fa1e5c11d">NONE</a>, 
+<a class="el" href="class_sprite_text.html#aac08154a8235138866870e2fa1e5c11d">TOP</a>, 
+<a class="el" href="class_sprite_text.html#aac08154a8235138866870e2fa1e5c11d">BOTTOM</a>, 
+<a class="el" href="class_sprite_text.html#aac08154a8235138866870e2fa1e5c11d">CENTER</a>
+ }</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>Specifies what the object will be aligned relative to on the vertical axis. </p>
+ <a href="class_sprite_text.html#aac08154a8235138866870e2fa1e5c11d">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#a493fa599881ad5f76c466018b7047c69">GetDisplayLineCount</a> (int charIndex, out int charLine, out int lineStart, out int lineEnd)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the number of lines actually being displayed, as opposed to the number of lines in the string assigned to the object. In other words, if word-wrapping is being used, the number of actual lines displayed may be more than the number of lines in the actual string. It also stores the line number of the character at the specified index in the string.  <a href="#a493fa599881ad5f76c466018b7047c69"></a><br/></td></tr>
@@ -24,6 +38,12 @@
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the number of lines actually being displayed, as opposed to the number of lines in the string assigned to the object. In other words, if word-wrapping is being used, the number of actual lines displayed may be more than the number of lines in the actual string.  <a href="#a2fa31c45ca5dc3e2c77ef7521e8e9882"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#aad81633dc43f7b2fb783021560f9b8f3">PlainIndexToDisplayIndex</a> (int plainCharIndex)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Converts a character index in the plain text string to a corresponding index in the display string.  <a href="#aad81633dc43f7b2fb783021560f9b8f3"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#a5ca1b81666b0222fee2244ae4e5e41c5">PositionOnScreen</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Repositions the object using the existing screen-space settings.  <a href="#a5ca1b81666b0222fee2244ae4e5e41c5"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#a6fb457f0617530aa8ac9115d53e3d0d6">PositionOnScreen</a> (int x, int y, float depth)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Positions the object using screen coordinates, according to the relativity settings stored in relativeToScreen.  <a href="#a6fb457f0617530aa8ac9115d53e3d0d6"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#a451341c1cfa493527ddd03198589fcbc">PositionOnScreen</a> (Vector3 pos)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Positions the object using screen coordinates, according to the relativity settings stored in relativeToScreen.  <a href="#a451341c1cfa493527ddd03198589fcbc"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#aec492cd973d45c120570fdc3a48053e5">Unclip</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes any clipping that is being applied to the text object.  <a href="#aec492cd973d45c120570fdc3a48053e5"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#ae234bc0e30cbbe7c977eb590d58011ba">Delete</a> ()</td></tr>
@@ -73,6 +93,8 @@
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The distance the text is to be offset along the local Z-axis from the GameObject's center.  <a href="#a07f49d57f09eee9694c5692e6d55fc43"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#a356c8ce1cafb104fbd38aad24e0fbb54">characterSize</a> = 1f</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The size, in world units, of a full-height character. All other characters will be sized proportionately.  <a href="#a356c8ce1cafb104fbd38aad24e0fbb54"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#a22799a253ea080976252c025f5c78c7a">characterSpacing</a> = 1f</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">An adjustable factor by which you can increase/decrease the spacing between characters. A value of 1.0 will space characters exactly as described by the font. Decreasing this value will place the characters closer together, while increasing it will place them farther apart. Ex: A value of 2.0 will cause there to be exactly twice as much space between characters as called for by the font itself (including kerning information).  <a href="#a22799a253ea080976252c025f5c78c7a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#ab10c06e8a89c2cbad446e7bda1dd3fdd">lineSpacing</a> = 1.1f</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The distance from one line to the next as a percentage of characterSize. Defaults to a distance that is 1.1 times the height of a character. This has the effect of creating a gap between lines that is 10% the height of a line.  <a href="#ab10c06e8a89c2cbad446e7bda1dd3fdd"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_sprite_text.html#ae65f66462a4b804966dda8b81c02c579">Anchor_Pos</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#aefaf0b2eb0b146dd417c31b72398abd7">anchor</a> = Anchor_Pos.Upper_Left</td></tr>
@@ -126,6 +148,8 @@
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the position of the top-left corner of the text's extremities.  <a href="#a70cdd739c430822e0f9ce87b25a9fa50"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">Vector3&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#a381c6f3f0be487148d0361cb7ab832bf">BottomRight</a><code> [get]</code></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the position of the bottom-right corner of the text's extremities.  <a href="#a381c6f3f0be487148d0361cb7ab832bf"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_text.html#aa0fbe39b1e6113274c9d7582c8fc532d">CharacterSpacing</a><code> [get, set]</code></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">An adjustable factor by which you can increase/decrease the spacing between characters. A value of 1.0 will space characters exactly as described by the font. Decreasing this value will place the characters closer together, while increasing it will place them farther apart.  <a href="#aa0fbe39b1e6113274c9d7582c8fc532d"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>A class that impelements sprite-based text. </p>
@@ -156,6 +180,68 @@
 </div>
 <div class="memdoc">
 <p>Which point of the text shares the position of the Transform. </p>
+
+</div>
+</div>
+<a class="anchor" id="a1b9be87fb9ad36860e31a0a10e2bb1b4"></a><!-- doxytag: member="SpriteText::HORIZONTAL_ALIGN" ref="a1b9be87fb9ad36860e31a0a10e2bb1b4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="class_sprite_text.html#a1b9be87fb9ad36860e31a0a10e2bb1b4">SpriteText::HORIZONTAL_ALIGN</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Specifies what the object will be aligned relative to on the horizontal axis. </p>
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="a1b9be87fb9ad36860e31a0a10e2bb1b4"></a><!-- doxytag: member="NONE" ref="a1b9be87fb9ad36860e31a0a10e2bb1b4" args="" -->NONE</em>&nbsp;</td><td>
+<p>The object will not be repositioned along the X axis. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a1b9be87fb9ad36860e31a0a10e2bb1b4"></a><!-- doxytag: member="LEFT" ref="a1b9be87fb9ad36860e31a0a10e2bb1b4" args="" -->LEFT</em>&nbsp;</td><td>
+<p>The X coordinate of screenPos will be interpreted as the number of pixels from the left edge of the screen. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a1b9be87fb9ad36860e31a0a10e2bb1b4"></a><!-- doxytag: member="RIGHT" ref="a1b9be87fb9ad36860e31a0a10e2bb1b4" args="" -->RIGHT</em>&nbsp;</td><td>
+<p>The X coordinate of screenPos will be interpreted as the number of pixels from the right edge of the screen. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a1b9be87fb9ad36860e31a0a10e2bb1b4"></a><!-- doxytag: member="CENTER" ref="a1b9be87fb9ad36860e31a0a10e2bb1b4" args="" -->CENTER</em>&nbsp;</td><td>
+<p>The X coordinate of screenPos will be interpreted as the number of pixels from the center of the screen. </p>
+</td></tr>
+</table>
+</dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="aac08154a8235138866870e2fa1e5c11d"></a><!-- doxytag: member="SpriteText::VERTICAL_ALIGN" ref="aac08154a8235138866870e2fa1e5c11d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="class_sprite_text.html#aac08154a8235138866870e2fa1e5c11d">SpriteText::VERTICAL_ALIGN</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Specifies what the object will be aligned relative to on the vertical axis. </p>
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="aac08154a8235138866870e2fa1e5c11d"></a><!-- doxytag: member="NONE" ref="aac08154a8235138866870e2fa1e5c11d" args="" -->NONE</em>&nbsp;</td><td>
+<p>The object will not be repositioned along the Y axis. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="aac08154a8235138866870e2fa1e5c11d"></a><!-- doxytag: member="TOP" ref="aac08154a8235138866870e2fa1e5c11d" args="" -->TOP</em>&nbsp;</td><td>
+<p>The Y coordinate of screenPos will be interpreted as the number of pixels from the top edge of the screen. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="aac08154a8235138866870e2fa1e5c11d"></a><!-- doxytag: member="BOTTOM" ref="aac08154a8235138866870e2fa1e5c11d" args="" -->BOTTOM</em>&nbsp;</td><td>
+<p>The Y coordinate of screenPos will be interpreted as the number of pixels from the bottom edge of the screen. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="aac08154a8235138866870e2fa1e5c11d"></a><!-- doxytag: member="CENTER" ref="aac08154a8235138866870e2fa1e5c11d" args="" -->CENTER</em>&nbsp;</td><td>
+<p>The Y coordinate of screenPos will be interpreted as the number of pixels from the center of the screen. </p>
+</td></tr>
+</table>
+</dd>
+</dl>
 
 </div>
 </div>
@@ -581,6 +667,94 @@
 
 </div>
 </div>
+<a class="anchor" id="a451341c1cfa493527ddd03198589fcbc"></a><!-- doxytag: member="SpriteText::PositionOnScreen" ref="a451341c1cfa493527ddd03198589fcbc" args="(Vector3 pos)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteText.PositionOnScreen </td>
+          <td>(</td>
+          <td class="paramtype">Vector3&nbsp;</td>
+          <td class="paramname"> <em>pos</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Positions the object using screen coordinates, according to the relativity settings stored in relativeToScreen. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pos</em>&nbsp;</td><td>The X and Y screen coordinates where the object should be positioned, as well as the Z coordinate which represents the distance in front of the camera.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a6fb457f0617530aa8ac9115d53e3d0d6"></a><!-- doxytag: member="SpriteText::PositionOnScreen" ref="a6fb457f0617530aa8ac9115d53e3d0d6" args="(int x, int y, float depth)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteText.PositionOnScreen </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&nbsp;</td>
+          <td class="paramname"> <em>depth</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Positions the object using screen coordinates, according to the relativity settings stored in relativeToScreen. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>x</em>&nbsp;</td><td>The number of pixels in the X axis relative to the position specified in relativeToScreen.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>y</em>&nbsp;</td><td>The number of pixels in the Y axis relative to the position specified in relativeToScreen.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>depth</em>&nbsp;</td><td>The distance the object should be in front of the camera.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a5ca1b81666b0222fee2244ae4e5e41c5"></a><!-- doxytag: member="SpriteText::PositionOnScreen" ref="a5ca1b81666b0222fee2244ae4e5e41c5" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteText.PositionOnScreen </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Repositions the object using the existing screen-space settings. </p>
+
+</div>
+</div>
 <a class="anchor" id="a847e7bc5cc50904efe9267c0908a8d4f"></a><!-- doxytag: member="SpriteText::SetAlignment" ref="a847e7bc5cc50904efe9267c0908a8d4f" args="(Alignment_Type a)" -->
 <div class="memitem">
 <div class="memproto">
@@ -874,6 +1048,21 @@
 
 </div>
 </div>
+<a class="anchor" id="a22799a253ea080976252c025f5c78c7a"></a><!-- doxytag: member="SpriteText::characterSpacing" ref="a22799a253ea080976252c025f5c78c7a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float <a class="el" href="class_sprite_text.html#a22799a253ea080976252c025f5c78c7a">SpriteText.characterSpacing</a> = 1f</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>An adjustable factor by which you can increase/decrease the spacing between characters. A value of 1.0 will space characters exactly as described by the font. Decreasing this value will place the characters closer together, while increasing it will place them farther apart. Ex: A value of 2.0 will cause there to be exactly twice as much space between characters as called for by the font itself (including kerning information). </p>
+
+</div>
+</div>
 <a class="anchor" id="a0a0f51841c0fad0ac792242b6a1cc61c"></a><!-- doxytag: member="SpriteText::color" ref="a0a0f51841c0fad0ac792242b6a1cc61c" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -1145,6 +1334,21 @@
 
 </div>
 </div>
+<a class="anchor" id="aa0fbe39b1e6113274c9d7582c8fc532d"></a><!-- doxytag: member="SpriteText::CharacterSpacing" ref="aa0fbe39b1e6113274c9d7582c8fc532d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float SpriteText.CharacterSpacing<code> [get, set]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>An adjustable factor by which you can increase/decrease the spacing between characters. A value of 1.0 will space characters exactly as described by the font. Decreasing this value will place the characters closer together, while increasing it will place them farther apart. </p>
+
+</div>
+</div>
 <a class="anchor" id="affafecbe3084be24986f6adc7a094435"></a><!-- doxytag: member="SpriteText::Clipped" ref="affafecbe3084be24986f6adc7a094435" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -1269,7 +1473,7 @@
 <li>SpriteText.cs</li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Nov 30 20:44:27 2010 for EZ GUI by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Feb 1 18:27:09 2011 for EZ GUI by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

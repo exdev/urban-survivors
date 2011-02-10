@@ -9,7 +9,7 @@
 		<key>page19</key>
 		<dict>
 			<key>CreationDate</key>
-			<date>2010-12-01T03:07:26Z</date>
+			<date>2011-02-02T00:57:12Z</date>
 			<key>DigestAlgorithm</key>
 			<string>MD5</string>
 			<key>DocumentGUID</key>
@@ -124,7 +124,7 @@
 					<key>Size</key>
 					<integer>2317</integer>
 				</dict>
-				<key>files/stacks_image_3604_1.png</key>
+				<key>files/stacks_image_3656_1.png</key>
 				<dict>
 					<key>Digest</key>
 					<data>
@@ -137,7 +137,7 @@
 				<dict>
 					<key>Digest</key>
 					<data>
-					aB0mze+DfKKQ95ODZ3FGTw==
+					Ujgwf1BP8KD6GTPxLrQJjQ==
 					</data>
 					<key>Size</key>
 					<integer>2673</integer>
@@ -155,10 +155,10 @@
 				<dict>
 					<key>Digest</key>
 					<data>
-					ovbk80EqQ0aQ7io08vGcwA==
+					OT+NVHyKvrA6dVPaP/gpvg==
 					</data>
 					<key>Size</key>
-					<integer>51023</integer>
+					<integer>51069</integer>
 				</dict>
 			</dict>
 			<key>PageID</key>

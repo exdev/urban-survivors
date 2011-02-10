@@ -40,4 +40,16 @@ public interface IUIContainer : IUIObject
 	/// </summary>
 	/// <param name="go">Object to be removed.</param>
 	void RemoveChild(GameObject go);
+
+	/// <summary>
+	/// Adds an object as a subject of the container's transitions.
+	/// </summary>
+	/// <param name="go">GameObject that is subject to the container's transitions.</param>
+	void AddSubject(GameObject go);
+
+	/// <summary>
+	/// Removes an object from being a subject of the container's transitions.
+	/// </summary>
+	/// <param name="go">GameObject that should no longer be subject to the container's transitions.</param>
+	void RemoveSubject(GameObject go);
 }

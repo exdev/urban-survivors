@@ -90,7 +90,7 @@ public class UIProgressBar : AutoSpriteControlBase
 	//---------------------------------------------------
 	public override void OnInput(ref POINTER_INFO ptr) {}
 
-	protected override void Start()
+	public override void Start()
 	{
 		base.Start();
 

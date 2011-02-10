@@ -77,6 +77,9 @@ public class UIListItem : UIButton, IUIListObject
 
 	public override void OnInput(ref POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		if (!m_controlIsEnabled /*|| IsHidden()*/)
 		{
 			//if (!IsHidden())
@@ -248,8 +251,9 @@ public class UIListItem : UIButton, IUIListObject
 			
 			// Inform the list we may have been resized,
 			// so it needs to reposition items:
-			if (spriteText.maxWidth > 0 && list != null)
-				list.PositionItems();
+			if (spriteText != null)
+				if (spriteText.maxWidth > 0 && list != null)
+					list.PositionItems();
 		}
 	}
 

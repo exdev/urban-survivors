@@ -197,6 +197,27 @@ public class UIButton : AutoSpriteControlBase
 	/// </summary>
 	public bool repeat;
 
+	/// <summary>
+	/// When set to true, the active state transition will
+	/// always run to completion even if the control changes
+	/// to another state while it is running.  Otherwise,
+	/// the active state transition will be aborted if the
+	/// control's state changes to another state while it is
+	/// running.
+	/// </summary>
+	public bool alwaysFinishActiveTransition = false;
+
+	// Tracks whether a follow-up transition is queued.
+	// This is used to transition to the current state
+	// from an active state transition that is finishing
+	// late because "alwaysFinishActiveTransition" is set
+	// to true.
+	protected bool transitionQueued = false;
+
+	// This holds the index of the transition of the current
+	// state that is to be run when the current late-finishing
+	// transition completes.
+	protected int nextTransition;
 
 	//---------------------------------------------------
 	// State tracking:
@@ -209,6 +230,9 @@ public class UIButton : AutoSpriteControlBase
 	//---------------------------------------------------
 	public override void OnInput(ref POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		if (!m_controlIsEnabled || IsHidden())
 		{
 			base.OnInput(ref ptr);
@@ -280,7 +304,7 @@ public class UIButton : AutoSpriteControlBase
 	//---------------------------------------------------
 	// Misc
 	//---------------------------------------------------
-	protected override void Start()
+	public override void Start()
 	{
 		base.Start();
 
@@ -376,8 +400,13 @@ public class UIButton : AutoSpriteControlBase
 		// an EZAnimator, then we either don't need to
 		// revert, or we don't want to because the scene
 		// is closing:
-		if (EZAnimator.Exists())
-			SetControlState(CONTROL_STATE.NORMAL);
+		if (EZAnimator.Exists() && !deleted)
+		{
+			if (controlState == CONTROL_STATE.DISABLED)
+				SetControlState(CONTROL_STATE.DISABLED);
+			else
+				SetControlState(CONTROL_STATE.NORMAL);
+		}
 	}
 
 	public override void Copy(SpriteRoot s)
@@ -460,25 +489,38 @@ public class UIButton : AutoSpriteControlBase
 				layers[i].Hide(true);
 		}
 
-		// End any current transition:
-		if (prevTransition != null)
-			prevTransition.StopSafe();
+		// Only stop our transition if it isn't an active state
+		// transition and we don't want it to run to completion:
+		if (!(alwaysFinishActiveTransition && 
+			(prevTransition == transitions[(int)UIButton.CONTROL_STATE.ACTIVE].list[0] ||
+			 prevTransition == transitions[(int)UIButton.CONTROL_STATE.ACTIVE].list[1])
+			))
+		{
+			// End any current transition:
+			if (prevTransition != null)
+				prevTransition.StopSafe();
 
-		// Start a new transition:
-		StartTransition((int)s, prevState);
+			// Start a new transition:
+			StartTransition((int)s, prevState);
+		}
+		else  // Else, have our desired transition run when the active transition is complete:
+		{
+			QueueTransition((int)s, (int)UIButton.CONTROL_STATE.ACTIVE);
+		}
 	}
 
-	// Starts the appropriate transition
-	protected void StartTransition(int newState, int prevState)
+	// Returns the desired transition to run next based
+	// upon the in-coming state and the previous state:
+	protected int DetermineNextTransition(int newState, int prevState)
 	{
 		int transIndex = 0;
 
 		// What state are we now in?
-		switch(newState)
+		switch (newState)
 		{
 			case 0:	// Normal
 				// Where did we come from?
-				switch(prevState)
+				switch (prevState)
 				{
 					case 1: // Over
 						transIndex = 0;
@@ -532,8 +574,46 @@ public class UIButton : AutoSpriteControlBase
 				break;
 		}
 
+		return transIndex;
+	}
+
+	// Starts the appropriate transition
+	protected void StartTransition(int newState, int prevState)
+	{
+		int transIndex = DetermineNextTransition(newState, prevState);
+
 		prevTransition = transitions[newState].list[transIndex];
 		prevTransition.Start();
+	}
+
+	// Queues a transition to play following the previous (currently-running) transition
+	protected void QueueTransition(int newState, int prevState)
+	{
+		if (deleted)
+			return;
+
+		nextTransition = DetermineNextTransition(newState, prevState);
+
+		// See if we've already queued to run a follow-up transition:
+		if (!transitionQueued)
+			 prevTransition.AddTransitionEndDelegate(RunFollowupTrans);
+
+		transitionQueued = true;
+	}
+
+	// Runs a follow-up transition to the one which just completed
+	protected void RunFollowupTrans(EZTransition trans)
+	{
+		if (deleted)
+		{
+			trans.RemoveTransitionEndDelegate(RunFollowupTrans);
+			return;
+		}
+
+		prevTransition = transitions[(int)controlState].list[nextTransition];
+		prevTransition.Start();
+		transitionQueued = false;
+		trans.RemoveTransitionEndDelegate(RunFollowupTrans);
 	}
 
 	// Sets the default UVs:

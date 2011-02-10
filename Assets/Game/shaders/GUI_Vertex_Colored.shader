@@ -8,7 +8,6 @@ Properties {
 Category {
 	Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
 	ZWrite Off
-	Alphatest Greater 0
 	Blend SrcAlpha OneMinusSrcAlpha 
 	SubShader {
 		Material {

@@ -309,6 +309,10 @@ public abstract class UIPanelBase : MonoBehaviour, IUIContainer, IUIObject
 			}
 		}
 
+		// Disable the new child if we are also disabled:
+		if (!gameObject.active)
+			go.SetActiveRecursively(false);
+
 		AddSubject(go);
 	}
 
@@ -475,6 +479,9 @@ public abstract class UIPanelBase : MonoBehaviour, IUIContainer, IUIObject
 	/// <param name="mode">The mode corresponding to the transition that should be played.</param>
 	public virtual void StartTransition(UIPanelManager.SHOW_MODE mode)
 	{
+		if (!m_started)
+			Start();
+
 		// Finish any pending transition:
 		if (prevTransition != null)
 			prevTransition.StopSafe();
@@ -507,6 +514,9 @@ public abstract class UIPanelBase : MonoBehaviour, IUIContainer, IUIObject
 	/// <param name="transName">The name of the transition to start.  Ex: "Bring In Forward"</param>
 	public virtual void StartTransition(string transName)
 	{
+		if (!m_started)
+			Start();
+
 		EZTransition[] list = Transitions.list;
 
 		for(int i=0; i < list.Length; ++i)
@@ -568,13 +578,13 @@ public abstract class UIPanelBase : MonoBehaviour, IUIContainer, IUIObject
 
 
 	/// <summary>
-	/// Temporarily sets up a delegate to be called when the next
+	/// Temporarily adds a delegate to be called when the next
 	/// transition completes.  This will be unset after it is called.
 	/// </summary>
 	/// <param name="del">Delegate to be called.</param>
-	public void SetTempTransitionDelegate(TransitionCompleteDelegate del)
+	public void AddTempTransitionDelegate(TransitionCompleteDelegate del)
 	{
-		tempTransCompleteDel = del;
+		tempTransCompleteDel += del;
 	}
 
 

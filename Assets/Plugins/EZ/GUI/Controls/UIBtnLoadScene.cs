@@ -28,11 +28,14 @@ public class UIBtnLoadScene : UIButton
 	// Called when the loading panel's transition ends.
 	public void LoadSceneDelegate(UIPanelBase panel, EZTransition trans)
 	{
-		LoadScene();
+		StartCoroutine(LoadScene());
 	}
 
 	public override void OnInput(ref POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		base.OnInput(ref ptr);
 
 		if (!m_controlIsEnabled || IsHidden())
@@ -43,24 +46,35 @@ public class UIBtnLoadScene : UIButton
 			if (loadingPanel != null)
 			{
 				UIPanelManager mgr = (UIPanelManager)loadingPanel.Container;
+
+				// Let us know when the panel is finished coming in:
+				loadingPanel.AddTempTransitionDelegate(LoadSceneDelegate);
+
 				if (mgr is UIPanelManager && mgr != null)
 				{
-					loadingPanel.SetTempTransitionDelegate(LoadSceneDelegate);
 					mgr.BringIn(loadingPanel);
 				}
 				else
 				{
-					Debug.LogWarning("No panel manager found for panel \"" + loadingPanel.name + "\"!");
+					loadingPanel.StartTransition(UIPanelManager.SHOW_MODE.BringInForward);
 				}
 			}
 			else
-				Invoke("LoadScene", delay);
+				Invoke("DoLoadScene", delay);
 		}
 	}
 
-	// Method that loads the scene:
-	protected void LoadScene()
+	protected void DoLoadScene()
 	{
+		StartCoroutine(LoadScene());
+	}
+
+	// Method that loads the scene:
+	protected IEnumerator LoadScene()
+	{
+		// Wait for the current frame to end first,
+		// thereby allowing any pending animations to complete:
+		yield return null;
 		Application.LoadLevel(scene);
 	}
 

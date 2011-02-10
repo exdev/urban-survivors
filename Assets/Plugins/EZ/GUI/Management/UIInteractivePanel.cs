@@ -90,6 +90,26 @@ public class UIInteractivePanel : UIPanelBase
 		if (inputDelegate != null)
 			inputDelegate(ref ptr);
 
+// Only check for out-of-viewport input if such is possible
+// (i.e. if we aren't on a hardware device where it is
+// impossible to have input outside the viewport)
+#if UNITY_EDITOR || !(UNITY_IPHONE || UNITY_ANDROID)
+		// See if the input should be considered a move-off
+		// because it is outside the viewport:
+		if (ptr.devicePos.x < 0 ||
+			ptr.devicePos.y < 0 ||
+			ptr.devicePos.x > ptr.camera.pixelWidth ||
+			ptr.devicePos.y > ptr.camera.pixelHeight)
+		{
+			if (m_panelState == STATE.OVER)
+				SetPanelState(STATE.NORMAL);
+
+			// Only continue if we are dragging the panel:
+			if (m_panelState != STATE.DRAGGING)
+				return;
+		}
+#endif
+
 		// Change the state if necessary:
 		switch(ptr.evt)
 		{

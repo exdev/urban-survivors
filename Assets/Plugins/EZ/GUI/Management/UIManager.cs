@@ -110,6 +110,13 @@ public struct POINTER_INFO
 	public POINTER_TYPE type;
 
 	/// <summary>
+	/// The camera with which this pointer was used.
+	/// This indicates which camera generated the
+	/// ray information.
+	/// </summary>
+	public Camera camera;
+
+	/// <summary>
 	/// ID of the pointer.
 	/// </summary>
 	public int id;
@@ -201,6 +208,7 @@ public struct POINTER_INFO
 	public void Copy(POINTER_INFO ptr)
 	{
 		type = ptr.type;
+		camera = ptr.camera;
 		id = ptr.id;
 		actionID = ptr.actionID;
 		evt = ptr.evt;
@@ -398,6 +406,49 @@ public class UIManager : MonoBehaviour
 		Constant
 	}
 
+	/// <remarks>
+	/// How input that occurs outside the viewport
+	/// should be treated.
+	/// </remarks>
+	public enum OUTSIDE_VIEWPORT
+	{
+		/// <summary>
+		/// Process all input that occurs outside
+		/// the game's viewport.
+		/// </summary>
+		Process_All,
+
+		/// <summary>
+		/// Ignore all input that occurs outside
+		/// the game's viewport.  NOTE: This may
+		/// lead to missing events, such as a
+		/// pointer release that occurs outside
+		/// the viewport.
+		/// </summary>
+		Ignore,
+
+		/// <summary>
+		/// If any pointer that moves outside the
+		/// game's viewport has a current target
+		/// object, that object is sent a MOVE_OFF
+		/// or RELEASE_OFF (as appropriate) event.
+		/// Otherwise, it is ignored.
+		/// </summary>
+		Move_Off
+	}
+
+	public struct NonUIHitInfo
+	{
+		public int ptrIndex;
+		public int camIndex;
+
+		public NonUIHitInfo(int pIndex, int cIndex)
+		{
+			ptrIndex = pIndex;
+			camIndex = cIndex;
+		}
+	}
+
 	// Delegate definition for pointer poller methods.
 	public delegate void PointerPollerDelegate();
 
@@ -461,6 +512,13 @@ public class UIManager : MonoBehaviour
 	/// do so will result in an exception being raised.
 	/// </summary>
 	public string actionAxis = "Fire1";
+
+	/// <summary>
+	/// Determines how input events that occur outside
+	/// the game's viewport will be handled.  Defaults
+	/// to Move_Off. <see cref="Move_Off"/>
+	/// </summary>
+	public OUTSIDE_VIEWPORT inputOutsideViewport = OUTSIDE_VIEWPORT.Move_Off;
 
 	/// <summary>
 	/// When set to true, a warning will be logged to
@@ -536,9 +594,11 @@ public class UIManager : MonoBehaviour
 
 	// Pointer-related stuff:
 	protected POINTER_INFO[,] pointers;			// Used to track the status of pointer devices (mouse pointer, finger touches, etc) (one array for each mouse/touchpad camera in use)
-	protected int[] nonUIHits;					// Holds a list of indices of all pointers hitting something other than a UI element for the current frame.
+	protected NonUIHitInfo[] nonUIHits;					// Holds a list of indices of all pointers hitting something other than a UI element for the current frame.
 	protected bool[] usedPointers;				// Used to track which pointers have been used by a camera already (have already hit a control)
+	protected bool[] usedNonUIHits;				// Same as usedPointers, but tracks which pointers are being "used" for non-UI hits, so we don't register multiple non-UI hits with the same pointer through different cameras.
 	protected int numPointers;					// The number of pointers we have elements for in the "pointers" arrays (one for each camera).
+	protected int numTouchPointers;				// The number of pointers which are part of our touchpad input detection (excludes any mouse or ray pointer)
 	protected int[] activePointers;				// Indices of active pointers (same for all cameras)
 	protected int numActivePointers;			// Holds the number of active pointers (this minus 1 indicates the index of the last valid index in activePointers)
 	protected int numNonUIHits;					// Holds the number of pointers hitting something other than the UI for the current frame.
@@ -581,12 +641,14 @@ public class UIManager : MonoBehaviour
 		else
 			s_Instance = this;
 
+#if (UNITY_IPHONE || UNITY_ANDROID)
 		// See if we're supposed to auto-switch to TOUCHPAD:
 		if (pointerType == POINTER_TYPE.AUTO_TOUCHPAD)
 		{
 			if (!Application.isEditor)
 				pointerType = POINTER_TYPE.TOUCHPAD;
 		}
+#endif
 
 		// Determine how many touches should be supported:
 		if (pointerType == POINTER_TYPE.TOUCHPAD || pointerType == POINTER_TYPE.TOUCHPAD_AND_RAY)
@@ -622,6 +684,16 @@ public class UIManager : MonoBehaviour
 		else
 			numTouches = 1;
 
+		// Now figure the number of touchpad-based pointers:
+		if (pointerType == POINTER_TYPE.AUTO_TOUCHPAD ||
+			pointerType == POINTER_TYPE.MOUSE ||
+			pointerType == POINTER_TYPE.MOUSE_AND_RAY)
+		{
+			numTouchPointers = numTouches - 1;
+		}
+		else
+			numTouchPointers = numTouches;
+
 		// Get a reference to the camera:
 		if (uiCameras.Length < 1)
 		{
@@ -642,13 +714,20 @@ public class UIManager : MonoBehaviour
 	void Start()
 	{
 		// Allocate our pointers, etc:
-		pointers = new POINTER_INFO[uiCameras.Length, numTouches];
 		numPointers = numTouches;
 		activePointers = new int[numTouches];
 		usedPointers = new bool[numPointers];
 
-		nonUIHits = new int[numTouches];
+		nonUIHits = new NonUIHitInfo[numTouches];
+		usedNonUIHits = new bool[numPointers];
 		numNonUIHits = 0;
+
+		SetupPointers();
+	}
+
+	protected void SetupPointers()
+	{
+		pointers = new POINTER_INFO[uiCameras.Length, numTouches];
 
 		// Get our raycasting object:
 		/*
@@ -670,6 +749,7 @@ public class UIManager : MonoBehaviour
 					pointers[i, 0].id = 0;
 					pointers[i, 0].rayDepth = uiCameras[i].rayDepth;
 					pointers[i, 0].layerMask = uiCameras[i].mask;
+					pointers[i, 0].camera = uiCameras[i].camera;
 					pointers[i, 0].type = POINTER_INFO.POINTER_TYPE.MOUSE;
 				}
 				break;
@@ -681,6 +761,7 @@ public class UIManager : MonoBehaviour
 						pointers[i, j].id = j;
 						pointers[i, j].rayDepth = uiCameras[i].rayDepth;
 						pointers[i, j].layerMask = uiCameras[i].mask;
+						pointers[i, j].camera = uiCameras[i].camera;
 						pointers[i, j].type = POINTER_INFO.POINTER_TYPE.TOUCHPAD;
 					}
 				break;
@@ -693,6 +774,7 @@ public class UIManager : MonoBehaviour
 						pointers[i, j].id = j;
 						pointers[i, j].rayDepth = uiCameras[i].rayDepth;
 						pointers[i, j].layerMask = uiCameras[i].mask;
+						pointers[i, j].camera = uiCameras[i].camera;
 						pointers[i, j].type = POINTER_INFO.POINTER_TYPE.TOUCHPAD;
 					}
 					pointers[i, numPointers - 1].type = POINTER_INFO.POINTER_TYPE.MOUSE;
@@ -705,6 +787,7 @@ public class UIManager : MonoBehaviour
 				rayPtr.id = 0;
 				rayPtr.rayDepth = rayDepth;
 				rayPtr.layerMask = rayMask;
+				rayPtr.camera = rayCamera;
 				break;
 			case POINTER_TYPE.MOUSE_AND_RAY:
 				pointerPoller = PollMouseRay;
@@ -716,12 +799,14 @@ public class UIManager : MonoBehaviour
 					pointers[i, 0].id = 0;
 					pointers[i, 0].rayDepth = uiCameras[i].rayDepth;
 					pointers[i, 0].layerMask = uiCameras[i].mask;
+					pointers[i, 0].camera = uiCameras[i].camera;
 					pointers[i, 0].type = POINTER_INFO.POINTER_TYPE.MOUSE;
 				}
 
 				rayPtr.type = POINTER_INFO.POINTER_TYPE.RAY;
 				rayPtr.rayDepth = rayDepth;
 				rayPtr.layerMask = rayMask;
+				rayPtr.camera = rayCamera;
 				break;
 			case POINTER_TYPE.TOUCHPAD_AND_RAY:
 				pointerPoller = PollTouchpadRay;
@@ -731,12 +816,14 @@ public class UIManager : MonoBehaviour
 						pointers[i, j].id = j;
 						pointers[i, j].rayDepth = uiCameras[i].rayDepth;
 						pointers[i, j].layerMask = uiCameras[i].mask;
+						pointers[i, j].camera = uiCameras[i].camera;
 						pointers[i, j].type = POINTER_INFO.POINTER_TYPE.TOUCHPAD;
 					}
 
 				rayPtr.type = POINTER_INFO.POINTER_TYPE.RAY;
 				rayPtr.rayDepth = rayDepth;
 				rayPtr.layerMask = rayMask;
+				rayPtr.camera = rayCamera;
 				break;
 			default:
 				Debug.LogError("ERROR: Invalid pointer type selected!");
@@ -828,17 +915,29 @@ public class UIManager : MonoBehaviour
 	}
 
 
-	protected void AddNonUIHit(int index)
+	protected void AddNonUIHit(int ptrIndex, int camIndex)
 	{
 		if (informNonUIHit == null)
 			return;
 
 		// See if this pointer was used by another camera:
-		if (usedPointers[index])
+		if (usedPointers[ptrIndex])
 			return;
 
+		// See if this pointer already hit a non-UI object:
+		if (usedNonUIHits[ptrIndex])
+			return;
+
+		// Mark that we've now used this pointer for a non-UI hit,
+		// so don't use it again later for another camera:
+		usedNonUIHits[ptrIndex] = true;
+
+		// See if this is a ray pointer (if so, ignore):
+		if (camIndex == -1)
+			return;
+
+		nonUIHits[numNonUIHits] = new NonUIHitInfo(ptrIndex, camIndex);
 		++numNonUIHits;
-		nonUIHits[numNonUIHits] = index;
 	}
 
 	protected void CallNonUIHitDelegate()
@@ -846,15 +945,101 @@ public class UIManager : MonoBehaviour
 		if(informNonUIHit == null)
 			return;
 
-		int index;
+		NonUIHitInfo info;
 
 		for (int i = 0; i < numNonUIHits; ++i)
 		{
-			index = nonUIHits[i];
-			if (usedPointers[index])
+			info = nonUIHits[i];
+
+			// Unset our flag:
+			usedNonUIHits[info.ptrIndex] = false;
+
+			if (usedPointers[info.ptrIndex])
 				continue;
-			informNonUIHit(pointers[0, index]);
+
+			informNonUIHit(pointers[info.camIndex, info.ptrIndex]);
 		}
+	}
+
+
+	/// <summary>
+	/// Adds the specified camera to the UI Cameras list at the specified index.
+	/// </summary>
+	/// <param name="cam">The camera to be added.</param>
+	/// <param name="mask">The layer mask for the camera.</param>
+	/// <param name="depth">The depth into the scene the pointer should reach.</param>
+	/// <param name="index">The index in the list where the camera should be added.
+	/// Note that cameras higher on the list (at a lower index value) process input before
+	/// cameras later in the list.</param>
+	public void AddCamera(Camera cam, LayerMask mask, float depth, int index)
+	{
+		EZCameraSettings[] cams = new EZCameraSettings[uiCameras.Length + 1];
+
+		// Keep the index in a valid range:
+		index = Mathf.Clamp(index, 0, uiCameras.Length + 1);
+
+		for (int i = 0, src = 0; i < uiCameras.Length; ++i, ++src)
+		{
+			if (i == index)
+			{
+				cams[i] = new EZCameraSettings();
+				cams[i].camera = cam;
+				cams[i].mask = mask;
+				cams[i].rayDepth = depth;
+				++src;
+			}
+			else
+				cams[i] = uiCameras[src];
+		}
+
+		uiCameras = cams;
+
+		SetupPointers();
+	}
+
+
+	/// <summary>
+	/// Removes the camera at the specified index from the UI Cameras
+	/// array.
+	/// </summary>
+	/// <param name="index">The index of the camera that should be removed.</param>
+	public void RemoveCamera(int index)
+	{
+		EZCameraSettings[] cams = new EZCameraSettings[uiCameras.Length - 1];
+
+		// Keep the index in a valid range:
+		index = Mathf.Clamp(index, 0, uiCameras.Length);
+
+		for (int i = 0, src = 0; i < uiCameras.Length; ++i, ++src)
+		{
+			if (i == index)
+			{
+				// Skip this one
+				++src;
+			}
+			else
+				cams[i] = uiCameras[src];
+		}
+
+		uiCameras = cams;
+
+		SetupPointers();
+	}
+
+
+	/// <summary>
+	/// Replaces the camera at the specified index with the specified camera.
+	/// </summary>
+	/// <param name="index">The index of the camera to be replaced.</param>
+	/// <param name="cam">The new camera that will replace the existing camera.</param>
+	public void ReplaceCamera(int index, Camera cam)
+	{
+		// Keep the index in a valid range:
+		index = Mathf.Clamp(index, 0, uiCameras.Length);
+
+		uiCameras[index].camera = cam;
+
+		SetupPointers();
 	}
 
 
@@ -926,27 +1111,33 @@ public class UIManager : MonoBehaviour
 		if (mouseTouchListeners != null)
 		{
 			for (int i = 0; i < uiCameras.Length; ++i)
-				for (int j = 0; j < numActivePointers; ++j)
+				if (uiCameras[i].camera.gameObject.active)
 				{
-					// Only handle a pointer in a successive camera if
-					// it didn't already get used by a previous camera:
-					if (!usedPointers[activePointers[j]])
+					for (int j = 0; j < numActivePointers; ++j)
 					{
-						DispatchHelper(ref pointers[i, activePointers[j]]);
-						if(mouseTouchListeners != null)
-							mouseTouchListeners(pointers[i, activePointers[j]]);
+						// Only handle a pointer in a successive camera if
+						// it didn't already get used by a previous camera:
+						if (!usedPointers[activePointers[j]])
+						{
+							DispatchHelper(ref pointers[i, activePointers[j]], i);
+							if (mouseTouchListeners != null)
+								mouseTouchListeners(pointers[i, activePointers[j]]);
+						}
 					}
 				}
 		}
 		else
 		{
 			for (int i = 0; i < uiCameras.Length; ++i)
-				for (int j = 0; j < numActivePointers; ++j)
+				if (uiCameras[i].camera.gameObject.active)
 				{
-					// Only handle a pointer in a successive camera if
-					// it didn't already get used by a previous camera:
-					if (!usedPointers[activePointers[j]])
-						DispatchHelper(ref pointers[i, activePointers[j]]);
+					for (int j = 0; j < numActivePointers; ++j)
+					{
+						// Only handle a pointer in a successive camera if
+						// it didn't already get used by a previous camera:
+						if (!usedPointers[activePointers[j]])
+							DispatchHelper(ref pointers[i, activePointers[j]], i);
+					}
 				}
 		}
 
@@ -955,7 +1146,7 @@ public class UIManager : MonoBehaviour
 			pointerType == POINTER_TYPE.MOUSE_AND_RAY ||
 			pointerType == POINTER_TYPE.TOUCHPAD_AND_RAY)
 		{
-			DispatchHelper(ref rayPtr);
+			DispatchHelper(ref rayPtr, -1);
 			if (rayListeners != null)
 				rayListeners(rayPtr);
 		}
@@ -968,8 +1159,49 @@ public class UIManager : MonoBehaviour
 			usedPointers[i] = false;
 	}
 
-	protected void DispatchHelper(ref POINTER_INFO curPtr)
+	protected void DispatchHelper(ref POINTER_INFO curPtr, int camIndex)
 	{
+// Only check for out-of-viewport input if such is possible
+// (i.e. if we aren't on a hardware device where it is
+// impossible to have input outside the viewport)
+#if UNITY_EDITOR || !(UNITY_IPHONE || UNITY_ANDROID)
+		// See if the input should be ignored:
+		if(inputOutsideViewport != OUTSIDE_VIEWPORT.Process_All)
+		{
+			// If the input is outside our viewport:
+			if (curPtr.devicePos.x < 0 ||
+				curPtr.devicePos.y < 0 ||
+				curPtr.devicePos.x > curPtr.camera.pixelWidth ||
+				curPtr.devicePos.y > curPtr.camera.pixelHeight)
+			{
+				// See how we should handle it:
+				if (inputOutsideViewport == OUTSIDE_VIEWPORT.Ignore)
+					return;
+
+				// Otherwise, see if the pointer has a target:
+				if (curPtr.targetObj == null)
+					return; // Ignore new input
+
+				tempPtr.Copy(curPtr);
+
+				if (curPtr.active)
+				{
+					tempPtr.evt = POINTER_INFO.INPUT_EVENT.RELEASE_OFF;
+					curPtr.targetObj.OnInput(tempPtr);
+				}
+				else
+				{
+					tempPtr.evt = POINTER_INFO.INPUT_EVENT.MOVE_OFF;
+					tempPtr.targetObj.OnInput(tempPtr);
+				}
+
+				// Lose the target:
+				curPtr.targetObj = null;
+				return;
+			}
+		}
+#endif
+		
 		switch (curPtr.evt)
 		{
 			case POINTER_INFO.INPUT_EVENT.DRAG:
@@ -991,6 +1223,12 @@ public class UIManager : MonoBehaviour
 						tempObj = (IUIObject)hit.collider.gameObject.GetComponent("IUIObject");
 #endif
 						curPtr.hitInfo = hit;
+
+						// See if we hit a non-UI object:
+						if (tempObj == null)
+						{
+							AddNonUIHit(curPtr.id, camIndex);
+						}
 					}
 					else
 						curPtr.hitInfo = default(RaycastHit);
@@ -1013,6 +1251,9 @@ public class UIManager : MonoBehaviour
 
 							curPtr.targetObj.OnInput(tempPtr);
 
+							// This pointer has now been used:
+							usedPointers[curPtr.id] = true;
+
 							// Don't change the targetObj if input is blocked
 							if(!blockInput)
 								curPtr.targetObj = tempObj;
@@ -1033,6 +1274,9 @@ public class UIManager : MonoBehaviour
 						// Tell our target about the event:
 						curPtr.targetObj.OnInput(curPtr);
 
+						// This pointer has now been used:
+						usedPointers[curPtr.id] = true;
+
 						// In this case we don't care about whether input
 						// is blocked because we want objects to still
 						// get notified of a release since it is likely
@@ -1045,23 +1289,24 @@ public class UIManager : MonoBehaviour
 						// processed.
 					}
 
-					// See if we hit a non-UI object:
-					if (tempObj == null)
-					{
-						AddNonUIHit(curPtr.id);
-					}
-
+					// If this is a touchpad pointer, set the target to null since
+					// it essentially no longer exists:
+					if (curPtr.type == POINTER_INFO.POINTER_TYPE.TOUCHPAD)
+						curPtr.targetObj = null;
 				}// Notify focus object:
 				else
 				{
 					if (Physics.Raycast(curPtr.ray, out hit, curPtr.rayDepth, curPtr.layerMask))
+					{
 						curPtr.hitInfo = hit;
 
-					if (curPtr.targetObj == null)
-					{
-						AddNonUIHit(curPtr.id);
+						if (curPtr.targetObj == null)
+							AddNonUIHit(curPtr.id, camIndex);
 					}
-					else if (!blockInput)
+					else
+						curPtr.hitInfo = default(RaycastHit);
+
+					if (curPtr.targetObj != null && !blockInput)
 					{
 						curPtr.targetObj.OnInput(curPtr);
 					}
@@ -1082,26 +1327,26 @@ public class UIManager : MonoBehaviour
 
 					curPtr.hitInfo = hit;
 
-					if (tempObj != null)
-					{
-						if (!blockInput)
-							tempObj.OnInput(curPtr);
-					}
-					else
+					// Check for a non-UI hit:
+					if(tempObj == null)
 					{
 						// Let any listener know the UI was not hit
-						AddNonUIHit(curPtr.id);
+						AddNonUIHit(curPtr.id, camIndex);
 						if (warnOnNonUiHits)
 							LogNonUIObjErr(hit.collider.gameObject);
 					}
-				} // Let any listener know the UI was not hit
-				else if (curPtr.targetObj != null && curPtr.active)
-				{
-					if (!blockInput)
-						curPtr.targetObj.OnInput(curPtr);
 				}
 				else 
-					AddNonUIHit(curPtr.id);
+				{
+					curPtr.hitInfo = default(RaycastHit);
+
+					// Let any listener know the UI was not hit
+					if (curPtr.targetObj != null && curPtr.active)
+					{
+						if (!blockInput)
+							curPtr.targetObj.OnInput(curPtr);
+					}
+				}
 
 
 				// If the mouse/touch isn't being held, then
@@ -1124,7 +1369,19 @@ public class UIManager : MonoBehaviour
 					// if the pointer wasn't held down and
 					// if input isn't blocked:
 					if (!blockInput)
+					{
 						curPtr.targetObj = tempObj;
+
+						// Now dispatch this input to the new target,
+						// if possible:
+						if(tempObj != null)
+							curPtr.targetObj.OnInput(curPtr);
+					}
+				}
+				else // Else dispatch input to the target object:
+				{
+					if (curPtr.targetObj != null && !blockInput)
+						curPtr.targetObj.OnInput(curPtr);
 				}
 				break;
 			case POINTER_INFO.INPUT_EVENT.PRESS:
@@ -1136,6 +1393,14 @@ public class UIManager : MonoBehaviour
 					// Else, get the component in a tolerant way:
 					tempObj = (IUIObject)hit.collider.gameObject.GetComponent("IUIObject");
 #endif
+					if (tempObj == null)
+					{
+						// Let any listener know the UI was not hit
+						AddNonUIHit(curPtr.id, camIndex);
+						if (warnOnNonUiHits)
+							LogNonUIObjErr(hit.collider.gameObject);
+					}
+
 					curPtr.hitInfo = hit;
 
 					// If this is different than the target obj:
@@ -1186,13 +1451,6 @@ public class UIManager : MonoBehaviour
 							curPtr.targetObj.OnInput(curPtr);
 						break;
 					}
-					else
-					{
-						// Let any listener know the UI was not hit
-						AddNonUIHit(curPtr.id);
-						if (warnOnNonUiHits)
-							LogNonUIObjErr(hit.collider.gameObject);
-					}
 
 					// Make sure this pointer is allowed to unset the focus:
 					if ((curPtr.type == POINTER_INFO.POINTER_TYPE.RAY) == focusWithRay)
@@ -1204,6 +1462,8 @@ public class UIManager : MonoBehaviour
 				}
 				else
 				{
+					curPtr.hitInfo = default(RaycastHit);
+
 					if (blockInput)
 					{
 						// If we clicked while input was blocked, lose the target
@@ -1230,9 +1490,6 @@ public class UIManager : MonoBehaviour
 					{
 						FocusObject = null;
 					}
-
-					// Let any listener know the UI was not hit
-					AddNonUIHit(curPtr.id);
 				}
 				break;
 		}
@@ -1250,6 +1507,8 @@ public class UIManager : MonoBehaviour
 		// each camera:
 		for (int i = 1; i < uiCameras.Length; ++i)
 		{
+			if (!uiCameras[i].camera.gameObject.active)
+				continue;
 			pointers[i, 0].Reuse(pointers[0, 0]);
 			pointers[i, 0].prevRay = pointers[i, 0].ray;
 			pointers[i, 0].ray = uiCameras[i].camera.ScreenPointToRay(pointers[i, 0].devicePos);
@@ -1259,15 +1518,24 @@ public class UIManager : MonoBehaviour
 	// Polls the mouse AND touchpad (Unity remote):
 	protected void PollMouseAndTouchpad()
 	{
+// If we have a touchpad input device:
+#if (UNITY_IPHONE || UNITY_ANDROID)
+		
 		PollTouchpad();
 
-		int mouseIndex = numTouches - 1;
-
-#if UNITY_IPHONE || UNITY_ANDROID
+	// See if we might also have a mouse:
+	#if UNITY_EDITOR
 		numActivePointers += 1; // Add one for the mouse that is always active
-#else
+	#endif
+
+#else // Else, we only have a mouse:
 		numActivePointers = 1; // Just the mouse
 #endif
+
+// If we have a mouse under any possible circumstances, poll it:
+#if UNITY_EDITOR || !(UNITY_IPHONE || UNITY_ANDROID)
+		int mouseIndex = numTouches - 1;
+
 		activePointers[numActivePointers - 1] = mouseIndex;
 
 		// Our mouse is the last pointer in the list:
@@ -1276,10 +1544,13 @@ public class UIManager : MonoBehaviour
 		// each camera:
 		for (int i = 1; i < uiCameras.Length; ++i)
 		{
+			if (!uiCameras[i].camera.gameObject.active)
+				continue;
 			pointers[i, mouseIndex].Reuse(pointers[0, mouseIndex]);
 			pointers[i, mouseIndex].prevRay = pointers[i, mouseIndex].ray;
 			pointers[i, mouseIndex].ray = uiCameras[i].camera.ScreenPointToRay(pointers[i, mouseIndex].devicePos);
 		}
+#endif
 	}
 
 	// Polls the mouse pointing device
@@ -1367,28 +1638,31 @@ public class UIManager : MonoBehaviour
 	{
 #if UNITY_IPHONE || UNITY_ANDROID
 
-#if (UNITY_3_0 || UNITY_3_1)
+#if (UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
 		Touch touch;
 #else
 		iPhoneTouch touch;
 #endif
 		int id;
 
-#if (UNITY_3_0 || UNITY_3_1)
-		numActivePointers = Input.touchCount;
+#if (UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
+		numActivePointers = Mathf.Min(numTouches, Input.touchCount);
 #else
-		numActivePointers = iPhoneInput.touchCount;
+		numActivePointers = Mathf.Min(numTouches, iPhoneInput.touchCount);
 #endif
 
 		// Process our touches:
 		for(int i=0; i<numActivePointers; ++i)
 		{
-#if (UNITY_3_0 || UNITY_3_1)
+#if (UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
 			touch = Input.GetTouch(i);
 #else
 			touch = iPhoneInput.GetTouch(i);
 #endif
 			id = touch.fingerId;
+
+			if(id >= numTouchPointers)
+				id = numTouchPointers - 1;
 
 			// Assign which pointer in our pointer 
 			// array is active here:
@@ -1397,7 +1671,7 @@ public class UIManager : MonoBehaviour
 			switch(touch.phase)
 			{
 				// Drag:
-#if (UNITY_3_0 || UNITY_3_1)
+#if (UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
 				case TouchPhase.Moved:
 #else
 				case iPhoneTouchPhase.Moved:
@@ -1416,7 +1690,7 @@ public class UIManager : MonoBehaviour
 					break;
 
 				// Press:
-#if (UNITY_3_0 || UNITY_3_1)
+#if (UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
 				case TouchPhase.Began:
 #else
 				case iPhoneTouchPhase.Began:
@@ -1430,7 +1704,7 @@ public class UIManager : MonoBehaviour
 					break;
 
 				// Release
-#if (UNITY_3_0 || UNITY_3_1)
+#if (UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
 				case TouchPhase.Ended:
 				case TouchPhase.Canceled:
 #else
@@ -1447,7 +1721,7 @@ public class UIManager : MonoBehaviour
 					break;
 
 				// No change:
-#if (UNITY_3_0 || UNITY_3_1)
+#if (UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
 				case TouchPhase.Stationary:
 #else
 				case iPhoneTouchPhase.Stationary:
@@ -1465,11 +1739,12 @@ public class UIManager : MonoBehaviour
 		// Make a copy of the pointers for
 		// each camera:
 		for (int i = 1; i < uiCameras.Length; ++i)
-			for (int j = 0; j < numPointers; ++j)
+			for (int j = 0; j < numActivePointers; ++j)
 			{
-				pointers[i, j].Reuse(pointers[0, j]);
-				pointers[i, j].prevRay = pointers[i, j].ray;
-				pointers[i, j].ray = uiCameras[i].camera.ScreenPointToRay(pointers[i, j].devicePos);
+				int ptrIdx = activePointers[j];
+				pointers[i, ptrIdx].Reuse(pointers[0, ptrIdx]);
+				pointers[i, ptrIdx].prevRay = pointers[i, ptrIdx].ray;
+				pointers[i, ptrIdx].ray = uiCameras[i].camera.ScreenPointToRay(pointers[i, ptrIdx].devicePos);
 			}
 #endif
 	}
@@ -1626,6 +1901,8 @@ public class UIManager : MonoBehaviour
 		if (Input.inputString.Length == 0)
 			return;
 
+		// Start with the actual content of the focus object:
+		controlText = ((IKeyFocusable)focusObj).Content;
 		insert = Mathf.Clamp(insert, 0, controlText.Length);
 
 		if (sb.Length > 0)

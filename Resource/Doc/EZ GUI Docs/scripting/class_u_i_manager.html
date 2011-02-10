@@ -27,6 +27,10 @@
 <a class="el" href="class_u_i_manager.html#a382cada0113cacb8eca3fccdd299c29d">Momentary</a>, 
 <a class="el" href="class_u_i_manager.html#a382cada0113cacb8eca3fccdd299c29d">Constant</a>
  }</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_manager.html#a23ffd15341a6579edd36fad5db75fc5b">OUTSIDE_VIEWPORT</a> { <a class="el" href="class_u_i_manager.html#a23ffd15341a6579edd36fad5db75fc5b">Process_All</a>, 
+<a class="el" href="class_u_i_manager.html#a23ffd15341a6579edd36fad5db75fc5b">Ignore</a>, 
+<a class="el" href="class_u_i_manager.html#a23ffd15341a6579edd36fad5db75fc5b">Move_Off</a>
+ }</td></tr>
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_manager.html#ae5787992a0cea731c4e65aa37a8fd21b">SetNonUIHitDelegate</a> (PointerInfoDelegate del)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the delegate to be called when a raycast is performed on an input event which hits a non-UI object. Use this when your game uses raycasts for non-UI game purposes but you don't want to waste performance with a redundant set of raycasts. NOTE: This will replace any previously registered delegates.  <a href="#ae5787992a0cea731c4e65aa37a8fd21b"></a><br/></td></tr>
@@ -42,6 +46,12 @@
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes a mouse/touchpad pointer listener.  <a href="#a9099b6ca265be54609e7d623cd61368b"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_manager.html#ae9a9c17e14425881afef9ca442433aae">RemoveRayPtrListener</a> (PointerInfoDelegate del)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes a mouse/touchpad pointer listener.  <a href="#ae9a9c17e14425881afef9ca442433aae"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_manager.html#a0c461682210236a07a12f5b28d039aa0">AddCamera</a> (Camera cam, LayerMask mask, float depth, int index)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds the specified camera to the UI Cameras list at the specified index.  <a href="#a0c461682210236a07a12f5b28d039aa0"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_manager.html#a71a6eeb93886c1c7d51c1e70c6c7076d">RemoveCamera</a> (int index)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes the camera at the specified index from the UI Cameras array.  <a href="#a71a6eeb93886c1c7d51c1e70c6c7076d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_manager.html#a3f54cec04b8c6dae9d9d476ebe451998">ReplaceCamera</a> (int index, Camera cam)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Replaces the camera at the specified index with the specified camera.  <a href="#a3f54cec04b8c6dae9d9d476ebe451998"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_manager.html#a811fcb8e2993cbf815f7801f270548fe">LockInput</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds a lock to the input. As long as there is at least one lock on input, input will not be processed. Use <a class="el" href="class_u_i_manager.html#a37a5084b6644c93c85459485f73ed68c" title="Removes a lock on input. Input will not be processed until all locks placed by LockInput()...">UnlockInput()</a> to release a lock. It is important to call <a class="el" href="class_u_i_manager.html#a37a5084b6644c93c85459485f73ed68c" title="Removes a lock on input. Input will not be processed until all locks placed by LockInput()...">UnlockInput()</a> as many times as <a class="el" href="class_u_i_manager.html#a811fcb8e2993cbf815f7801f270548fe" title="Adds a lock to the input. As long as there is at least one lock on input, input will...">LockInput()</a> for input processing to resume.  <a href="#a811fcb8e2993cbf815f7801f270548fe"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_manager.html#a37a5084b6644c93c85459485f73ed68c">UnlockInput</a> ()</td></tr>
@@ -61,6 +71,8 @@
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets whether the ray pointer (if any) should be used to set the keyboard focus, at the exclusion of the mouse/touchpad pointer(s). Set this to false if you want to use the touchpad or mouse to set the keyboard focus, and set it to true if you instead want to set the focus using the ray pointer.  <a href="#acde6c34a7d516dc53ce4c767a02a83f0"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_manager.html#ac76ea40efc9ab77e0f64fbcaa2a932d6">actionAxis</a> = &quot;Fire1&quot;</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Name of the virtual axis that is used when the input ray is to be active. NOTE: See the "Input" section of the Unity User Guide. Set this value to an empty string ("") if you will not be using an axis setup in Player Settings-&gt;Input and instead will use a <a class="el" href="class_u_i_action_btn.html">UIActionBtn</a> or call <a class="el" href="class_u_i_manager.html#ac9ecbf34100e97f606f59f991ebe2974" title="Used to set the active status of the ray. When set to Momentary or Constant, this...">RayActive()</a>. Failure to do so will result in an exception being raised.  <a href="#ac76ea40efc9ab77e0f64fbcaa2a932d6"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_u_i_manager.html#a23ffd15341a6579edd36fad5db75fc5b">OUTSIDE_VIEWPORT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_manager.html#ad188036db69a0a55a312bb5456810eed">inputOutsideViewport</a> = OUTSIDE_VIEWPORT.Move_Off</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Determines how input events that occur outside the game's viewport will be handled. Defaults to Move_Off. Move_Off.  <a href="#ad188036db69a0a55a312bb5456810eed"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_manager.html#afb30454e2e192f183b6ebd43e97d6114">warnOnNonUiHits</a> = true</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">When set to true, a warning will be logged to the console whenever a non-UI object is hit by an EZ GUI input raycast (either from mouse, touchpad, or ray pointer types).  <a href="#afb30454e2e192f183b6ebd43e97d6114"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_e_z_camera_settings.html">EZCameraSettings</a>[]&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_manager.html#a4ebf5d55757777a12ca9d474f93a19a2">uiCameras</a> = new <a class="el" href="class_e_z_camera_settings.html">EZCameraSettings</a>[1]</td></tr>
@@ -84,6 +96,33 @@
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p><a class="el" href="class_u_i_manager.html">UIManager</a> polls for input, and dispatches input events to controls in the scene. Exactly one <a class="el" href="class_u_i_manager.html">UIManager</a> object should be in each scene that contains EZ GUI controls. </p>
 <hr/><h2>Member Enumeration Documentation</h2>
+<a class="anchor" id="a23ffd15341a6579edd36fad5db75fc5b"></a><!-- doxytag: member="UIManager::OUTSIDE_VIEWPORT" ref="a23ffd15341a6579edd36fad5db75fc5b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="class_u_i_manager.html#a23ffd15341a6579edd36fad5db75fc5b">UIManager::OUTSIDE_VIEWPORT</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>How input that occurs outside the viewport should be treated. </p>
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="a23ffd15341a6579edd36fad5db75fc5b"></a><!-- doxytag: member="Process_All" ref="a23ffd15341a6579edd36fad5db75fc5b" args="" -->Process_All</em>&nbsp;</td><td>
+<p>Process all input that occurs outside the game's viewport. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a23ffd15341a6579edd36fad5db75fc5b"></a><!-- doxytag: member="Ignore" ref="a23ffd15341a6579edd36fad5db75fc5b" args="" -->Ignore</em>&nbsp;</td><td>
+<p>Ignore all input that occurs outside the game's viewport. NOTE: This may lead to missing events, such as a pointer release that occurs outside the viewport. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a23ffd15341a6579edd36fad5db75fc5b"></a><!-- doxytag: member="Move_Off" ref="a23ffd15341a6579edd36fad5db75fc5b" args="" -->Move_Off</em>&nbsp;</td><td>
+<p>If any pointer that moves outside the game's viewport has a current target object, that object is sent a MOVE_OFF or RELEASE_OFF (as appropriate) event. Otherwise, it is ignored. </p>
+</td></tr>
+</table>
+</dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="ab4e8d1e49532f4c5e8e05d684e30496f"></a><!-- doxytag: member="UIManager::POINTER_TYPE" ref="ab4e8d1e49532f4c5e8e05d684e30496f" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -148,6 +187,56 @@
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a0c461682210236a07a12f5b28d039aa0"></a><!-- doxytag: member="UIManager::AddCamera" ref="a0c461682210236a07a12f5b28d039aa0" args="(Camera cam, LayerMask mask, float depth, int index)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UIManager.AddCamera </td>
+          <td>(</td>
+          <td class="paramtype">Camera&nbsp;</td>
+          <td class="paramname"> <em>cam</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">LayerMask&nbsp;</td>
+          <td class="paramname"> <em>mask</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&nbsp;</td>
+          <td class="paramname"> <em>depth</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>index</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Adds the specified camera to the UI Cameras list at the specified index. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>cam</em>&nbsp;</td><td>The camera to be added.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>mask</em>&nbsp;</td><td>The layer mask for the camera.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>depth</em>&nbsp;</td><td>The depth into the scene the pointer should reach.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>index</em>&nbsp;</td><td>The index in the list where the camera should be added. Note that cameras higher on the list (at a lower index value) process input before cameras later in the list.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a0407b7aa7eb1cf2e2c78b3067f5b0607"></a><!-- doxytag: member="UIManager::AddMouseTouchPtrListener" ref="a0407b7aa7eb1cf2e2c78b3067f5b0607" args="(PointerInfoDelegate del)" -->
 <div class="memitem">
 <div class="memproto">
@@ -245,6 +334,32 @@
 
 </div>
 </div>
+<a class="anchor" id="a71a6eeb93886c1c7d51c1e70c6c7076d"></a><!-- doxytag: member="UIManager::RemoveCamera" ref="a71a6eeb93886c1c7d51c1e70c6c7076d" args="(int index)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UIManager.RemoveCamera </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>index</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Removes the camera at the specified index from the UI Cameras array. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>index</em>&nbsp;</td><td>The index of the camera that should be removed.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a9099b6ca265be54609e7d623cd61368b"></a><!-- doxytag: member="UIManager::RemoveMouseTouchPtrListener" ref="a9099b6ca265be54609e7d623cd61368b" args="(PointerInfoDelegate del)" -->
 <div class="memitem">
 <div class="memproto">
@@ -317,6 +432,42 @@
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>del</em>&nbsp;</td><td>Delegate to be removed.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a3f54cec04b8c6dae9d9d476ebe451998"></a><!-- doxytag: member="UIManager::ReplaceCamera" ref="a3f54cec04b8c6dae9d9d476ebe451998" args="(int index, Camera cam)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UIManager.ReplaceCamera </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Camera&nbsp;</td>
+          <td class="paramname"> <em>cam</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Replaces the camera at the specified index with the specified camera. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>index</em>&nbsp;</td><td>The index of the camera to be replaced.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cam</em>&nbsp;</td><td>The new camera that will replace the existing camera.</td></tr>
   </table>
   </dd>
 </dl>
@@ -456,6 +607,21 @@
 <div class="memdoc">
 
 <p>Sets whether the ray pointer (if any) should be used to set the keyboard focus, at the exclusion of the mouse/touchpad pointer(s). Set this to false if you want to use the touchpad or mouse to set the keyboard focus, and set it to true if you instead want to set the focus using the ray pointer. </p>
+
+</div>
+</div>
+<a class="anchor" id="ad188036db69a0a55a312bb5456810eed"></a><!-- doxytag: member="UIManager::inputOutsideViewport" ref="ad188036db69a0a55a312bb5456810eed" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_u_i_manager.html#a23ffd15341a6579edd36fad5db75fc5b">OUTSIDE_VIEWPORT</a> <a class="el" href="class_u_i_manager.html#ad188036db69a0a55a312bb5456810eed">UIManager.inputOutsideViewport</a> = OUTSIDE_VIEWPORT.Move_Off</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Determines how input events that occur outside the game's viewport will be handled. Defaults to Move_Off. Move_Off. </p>
 
 </div>
 </div>
@@ -614,7 +780,7 @@
 <li>UIManager.cs</li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Nov 30 20:44:27 2010 for EZ GUI by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Feb 1 18:27:10 2011 for EZ GUI by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

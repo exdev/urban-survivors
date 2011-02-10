@@ -70,7 +70,7 @@ public class Sprite : SpriteBase
 	}
 
 
-	protected override void Start()
+	public override void Start()
 	{
 		base.Start();
 
@@ -450,7 +450,7 @@ public class Sprite : SpriteBase
 	/// <param name="anim">A reference to the animation to play.</param>
 	public void PlayAnim(UVAnimation_Multi anim)
 	{
-		if (deleted)
+		if (deleted || !gameObject.active)
 			return;
 
 		curAnim = anim;
@@ -459,14 +459,21 @@ public class Sprite : SpriteBase
 
 		// Ensure the framerate is not 0 so we don't
 		// divide by zero:
-		anim.framerate = Mathf.Max(0.0001f, anim.framerate);
+		if (anim.framerate != 0.0f)
+		{
+			timeBetweenAnimFrames = 1f / anim.framerate;
+		}
+		else
+		{
+			timeBetweenAnimFrames = 1f; // Just some dummy value since it won't be used
+		}
 
-		timeBetweenAnimFrames = 1f / anim.framerate;
 		timeSinceLastFrame = timeBetweenAnimFrames;
 
 		// Only add to the animated list if
-		// the animation has more than 1 frame:
-		if (anim.GetFrameCount() > 1 || anim.onAnimEnd != UVAnimation.ANIM_END_ACTION.Do_Nothing)
+		// the animation has more than 1 frame
+		// or the framerate is non-zero:
+		if ((anim.GetFrameCount() > 1 || anim.onAnimEnd != UVAnimation.ANIM_END_ACTION.Do_Nothing) && anim.framerate != 0.0f)
 		{
 			StepAnim(0);
 			// Start coroutine

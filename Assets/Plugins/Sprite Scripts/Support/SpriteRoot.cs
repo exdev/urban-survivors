@@ -5,7 +5,7 @@
 
 
 // Screen-space positioning, ALPHA, subject to change
-//#define SCREEN_SPACE_POSITIONING
+#define SCREEN_SPACE_POSITIONING
 
 using UnityEngine;
 using System.Collections;
@@ -818,7 +818,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	// automatic sizing work:
 	protected Vector2 screenSize;				// The size of the screen in pixels
 	public Camera renderCamera;
-	protected Rect prevUVRect;					// The previous UV rect
+	protected Vector2 sizeUnitsPerUV;			// The width and height of the sprite, in local units, per UV. This is used with auto-resize to determine what the width/height of the sprite should be given its current UVs.
 	[HideInInspector]
 	public Vector2 pixelsPerUV;				// The number of pixels in both axes per UV unit
 	protected float worldUnitsPerScreenPixel;	// The number of world units in both axes per screen pixel
@@ -963,7 +963,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	}
 
 
-	protected virtual void Start()
+	public virtual void Start()
 	{
 		m_started = true;
 
@@ -989,12 +989,13 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 				((SpriteMesh)m_spriteMesh).SetPersistent();
 		}
 
-		prevUVRect = frameInfo.uvs;
-
 		if (m_spriteMesh == null && !managed)
 			AddMesh();
 
-		if(m_spriteMesh != null)
+		// Calculate our original dimensions per UV:
+		CalcSizeUnitsPerUV();
+
+		if (m_spriteMesh != null)
 		{
 			if (m_spriteMesh.texture != null)
 			{
@@ -1012,6 +1013,24 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 
 		if(hideAtStart)
 			Hide(true);
+	}
+
+
+	protected void CalcSizeUnitsPerUV()
+	{
+		Rect uvs = frameInfo.uvs;
+
+		// Avoid a divide-by-zero and the problem that will
+		// set our dimensions to 0 when the script
+		// is re-imported:
+		if(uvs.width == 0 || uvs.height == 0)
+		{
+			sizeUnitsPerUV = Vector2.zero;
+			return;
+		}
+
+		sizeUnitsPerUV.x = width / uvs.width;
+		sizeUnitsPerUV.y = height / uvs.height;
 	}
 
 
@@ -1134,9 +1153,25 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		//if (Application.isPlaying)
 		{
 			if (managed && manager != null && m_started)
+			{
+				SPRITE_FRAME oldFrame = frameInfo;
 				manager.AddSprite(this);
+				// Restore our previous frame info since
+				// AddSprite() re-inits our UVs:
+				frameInfo = oldFrame;
+				uvRect = frameInfo.uvs;
+				SetBleedCompensation();
+			}
 			else if (savedManager != null)
+			{
+				SPRITE_FRAME oldFrame = frameInfo;
 				savedManager.AddSprite(this);
+				// Restore our previous frame info since
+				// AddSprite() re-inits our UVs:
+				frameInfo = oldFrame;
+				uvRect = frameInfo.uvs;
+				SetBleedCompensation();
+			}
 		}
 	}
 
@@ -1155,6 +1190,11 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 				manager.RemoveSprite(this);
 			}
 		}
+	}
+
+	public virtual void OnDestroy()
+	{
+		Delete();
 	}
 
 #if SCREEN_SPACE_POSITIONING
@@ -1417,25 +1457,13 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 		}
 		else if (autoResize) // Else calculate the size based on the change in UV dimensions:
 		{
-			// Prevent divide by zero:
-			if (prevUVRect.width != 0 && prevUVRect.height != 0)
+			if (sizeUnitsPerUV.x != 0 && sizeUnitsPerUV.y != 0)
 			{
-				// Find the percentage change in the UV:
-				tempUV.x = frameInfo.uvs.width / prevUVRect.width;
-				tempUV.y = frameInfo.uvs.height / prevUVRect.height;
-
-				// Change the width and height accordingly:
-				width *= tempUV.x;
-				height *= tempUV.y;
+				// Change the width and height according to the new UV dimensions:
+				width = frameInfo.uvs.width * sizeUnitsPerUV.x;
+				height = frameInfo.uvs.height * sizeUnitsPerUV.y;
 			}
 		}
-
-		// Now that we've calculated the change,
-		// save the current UV rect so that if
-		// this method is called again without 
-		// there being a UV change, we don't
-		// continue to resize the sprite:
-		prevUVRect = frameInfo.uvs;
 
 		SetSize(width, height);
 	}
@@ -2390,7 +2418,7 @@ public abstract class SpriteRoot : MonoBehaviour, IEZLinkedListItem<SpriteRoot>
 	// Included to work around the Unity bug where Start() is not
 	// called when reintering edit mode if play lasts for longer 
 	// than 10 seconds:
-#if (UNITY_3_0 || UNITY_3_1) && UNITY_EDITOR
+#if (UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9) && UNITY_EDITOR
 	void Update() {}
 #endif
 

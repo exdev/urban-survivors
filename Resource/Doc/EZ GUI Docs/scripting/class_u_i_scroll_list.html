@@ -24,6 +24,15 @@ Inheritance diagram for UIScrollList:</div>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td colspan="2"><h2>Public Types</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_scroll_list.html#a710aca4e923de6ed6281630bcc9f3cbb">ORIENTATION</a> </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_scroll_list.html#a0126bf765b694f8e407162b98534d173">DIRECTION</a> { <a class="el" href="class_u_i_scroll_list.html#a0126bf765b694f8e407162b98534d173">TtoB_LtoR</a>, 
+<a class="el" href="class_u_i_scroll_list.html#a0126bf765b694f8e407162b98534d173">BtoT_RtoL</a>
+ }</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_scroll_list.html#a332ed90fa8a083cba2e10602d8e1d93d">ALIGNMENT</a> { <a class="el" href="class_u_i_scroll_list.html#a332ed90fa8a083cba2e10602d8e1d93d">LEFT_TOP</a>, 
+<a class="el" href="class_u_i_scroll_list.html#a332ed90fa8a083cba2e10602d8e1d93d">CENTER</a>, 
+<a class="el" href="class_u_i_scroll_list.html#a332ed90fa8a083cba2e10602d8e1d93d">RIGHT_BOTTOM</a>
+ }</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>Determines how items will be aligned within the list when added. </p>
+ <a href="class_u_i_scroll_list.html#a332ed90fa8a083cba2e10602d8e1d93d">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_scroll_list.html#a59378424024ef2095d8d1597ab5de576">ScrollListTo</a> (float pos)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Scrolls the list directly to the position indicated (0-1).  <a href="#a59378424024ef2095d8d1597ab5de576"></a><br/></td></tr>
@@ -81,10 +90,16 @@ Inheritance diagram for UIScrollList:</div>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">An optional slider control that will control the scroll position of the list.  <a href="#ac89f8ac0a0dc3f09914c7d60bd925349"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_u_i_scroll_list.html#a710aca4e923de6ed6281630bcc9f3cbb">ORIENTATION</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_scroll_list.html#a8ab50fb7bd8b849eb218773832008b5e">orientation</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The orientation of the list - horizontal or vertical.  <a href="#a8ab50fb7bd8b849eb218773832008b5e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_u_i_scroll_list.html#a0126bf765b694f8e407162b98534d173">DIRECTION</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_scroll_list.html#a6076799827de9d889fd89fae5f36f88f">direction</a> = DIRECTION.TtoB_LtoR</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Determines whether items will be added to the list from top-to-bottom and left-to-right, or from bottom-to-top and right-to-left. See <a class="el" href="class_u_i_scroll_list.html#a0126bf765b694f8e407162b98534d173">UIScrollList.DIRECTION</a> [<a class="el" href="class_u_i_scroll_list.html#a0126bf765b694f8e407162b98534d173">DIRECTION</a>].  <a href="#a6076799827de9d889fd89fae5f36f88f"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_u_i_scroll_list.html#a332ed90fa8a083cba2e10602d8e1d93d">ALIGNMENT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_scroll_list.html#a0dc26547673894aa81215d6794130558">alignment</a> = ALIGNMENT.CENTER</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Determines how the items will be aligned in the list when added. See <a class="el" href="class_u_i_scroll_list.html#a332ed90fa8a083cba2e10602d8e1d93d" title="Determines how items will be aligned within the list when added.">UIScrollList.ALIGNMENT</a> [<a class="el" href="class_u_i_scroll_list.html#a332ed90fa8a083cba2e10602d8e1d93d" title="Determines how items will be aligned within the list when added.">ALIGNMENT</a>].  <a href="#a0dc26547673894aa81215d6794130558"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">Vector2&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_scroll_list.html#a2487aae95bb958550e480ae322f8815b">viewableArea</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The extents of the viewable area, in local space units. The contents of the list will be clipped to this area. Ex: If an area of 10x10 is specified, the list contents will be clipped 5 units above the center of the scroll list's GameObject, 5 units below, and 5 units on either side.  <a href="#a2487aae95bb958550e480ae322f8815b"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_scroll_list.html#a7b7479a84ae19af4246c2d0673bed9cb">itemSpacing</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Empty space to put between each list item.  <a href="#a7b7479a84ae19af4246c2d0673bed9cb"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_scroll_list.html#a90a54f7eb7db9a054c39f16be014eedd">spacingAtEnds</a> = true</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">When set to true, the itemSpacing value will be applied before the first item, and after the last so as to "pad" the first and last items a bit from the edge. If false, the first and last items will be flush with the edges of the viewable area.  <a href="#a90a54f7eb7db9a054c39f16be014eedd"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_scroll_list.html#afac874e40dbe1eeacc368452e8dff367">activateWhenAdding</a> = true</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">When true, items added or inserted to this list will be activated recursively. This is STRONGLY recommended when using managed sprites/controls.  <a href="#afac874e40dbe1eeacc368452e8dff367"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_scroll_list.html#a2705776ae0e91f675a484ce1cea56ef0">clipContents</a> = true</td></tr>
@@ -118,6 +133,58 @@ Inheritance diagram for UIScrollList:</div>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>Acts as a container of list items (basically buttons) and manages them in such a manner as to allow the user to scroll through the list. NOTE: For proper appearance, list items should each be of uniform width when the list is vertical, and of uniform height when the list is horizontal. Besides that, list items can vary in size. </p>
 <hr/><h2>Member Enumeration Documentation</h2>
+<a class="anchor" id="a332ed90fa8a083cba2e10602d8e1d93d"></a><!-- doxytag: member="UIScrollList::ALIGNMENT" ref="a332ed90fa8a083cba2e10602d8e1d93d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="class_u_i_scroll_list.html#a332ed90fa8a083cba2e10602d8e1d93d">UIScrollList::ALIGNMENT</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Determines how items will be aligned within the list when added. </p>
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="a332ed90fa8a083cba2e10602d8e1d93d"></a><!-- doxytag: member="LEFT_TOP" ref="a332ed90fa8a083cba2e10602d8e1d93d" args="" -->LEFT_TOP</em>&nbsp;</td><td>
+<p>Items will be aligned to the left edge of the viewable area (if vertical), or the top edge (if horizontal). </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a332ed90fa8a083cba2e10602d8e1d93d"></a><!-- doxytag: member="CENTER" ref="a332ed90fa8a083cba2e10602d8e1d93d" args="" -->CENTER</em>&nbsp;</td><td>
+<p>Items will be centered within the viewable area. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a332ed90fa8a083cba2e10602d8e1d93d"></a><!-- doxytag: member="RIGHT_BOTTOM" ref="a332ed90fa8a083cba2e10602d8e1d93d" args="" -->RIGHT_BOTTOM</em>&nbsp;</td><td>
+<p>Items will be aligned to the right edge of the viewable area (if vertical), or the bottom edge (if horizontal). </p>
+</td></tr>
+</table>
+</dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a0126bf765b694f8e407162b98534d173"></a><!-- doxytag: member="UIScrollList::DIRECTION" ref="a0126bf765b694f8e407162b98534d173" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="class_u_i_scroll_list.html#a0126bf765b694f8e407162b98534d173">UIScrollList::DIRECTION</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Determines whether items will be added to the list from top-to-bottom and left-to-right, or from bottom-to-top and right-to-left. </p>
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="a0126bf765b694f8e407162b98534d173"></a><!-- doxytag: member="TtoB_LtoR" ref="a0126bf765b694f8e407162b98534d173" args="" -->TtoB_LtoR</em>&nbsp;</td><td>
+<p>Items will be added top-to-bottom, or left-to-right, depending on orientation. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a0126bf765b694f8e407162b98534d173"></a><!-- doxytag: member="BtoT_RtoL" ref="a0126bf765b694f8e407162b98534d173" args="" -->BtoT_RtoL</em>&nbsp;</td><td>
+<p>Items will be added bottom-to-top, or left-to-right, depending on orientation. </p>
+</td></tr>
+</table>
+</dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a710aca4e923de6ed6281630bcc9f3cbb"></a><!-- doxytag: member="UIScrollList::ORIENTATION" ref="a710aca4e923de6ed6281630bcc9f3cbb" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -895,6 +962,21 @@ Inheritance diagram for UIScrollList:</div>
 
 </div>
 </div>
+<a class="anchor" id="a0dc26547673894aa81215d6794130558"></a><!-- doxytag: member="UIScrollList::alignment" ref="a0dc26547673894aa81215d6794130558" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_u_i_scroll_list.html#a332ed90fa8a083cba2e10602d8e1d93d">ALIGNMENT</a> <a class="el" href="class_u_i_scroll_list.html#a0dc26547673894aa81215d6794130558">UIScrollList.alignment</a> = ALIGNMENT.CENTER</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Determines how the items will be aligned in the list when added. See <a class="el" href="class_u_i_scroll_list.html#a332ed90fa8a083cba2e10602d8e1d93d" title="Determines how items will be aligned within the list when added.">UIScrollList.ALIGNMENT</a> [<a class="el" href="class_u_i_scroll_list.html#a332ed90fa8a083cba2e10602d8e1d93d" title="Determines how items will be aligned within the list when added.">ALIGNMENT</a>]. </p>
+
+</div>
+</div>
 <a class="anchor" id="a2705776ae0e91f675a484ce1cea56ef0"></a><!-- doxytag: member="UIScrollList::clipContents" ref="a2705776ae0e91f675a484ce1cea56ef0" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -922,6 +1004,21 @@ Inheritance diagram for UIScrollList:</div>
 <div class="memdoc">
 
 <p>When true, items will be clipped each frame in which it is detected that the list has moved, rotated, or scaled. Use this if you are having clipping errors after scaling, rotating, etc, a list as part of a panel transition, etc. Leave set to false otherwise to improve performance. </p>
+
+</div>
+</div>
+<a class="anchor" id="a6076799827de9d889fd89fae5f36f88f"></a><!-- doxytag: member="UIScrollList::direction" ref="a6076799827de9d889fd89fae5f36f88f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_u_i_scroll_list.html#a0126bf765b694f8e407162b98534d173">DIRECTION</a> <a class="el" href="class_u_i_scroll_list.html#a6076799827de9d889fd89fae5f36f88f">UIScrollList.direction</a> = DIRECTION.TtoB_LtoR</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Determines whether items will be added to the list from top-to-bottom and left-to-right, or from bottom-to-top and right-to-left. See <a class="el" href="class_u_i_scroll_list.html#a0126bf765b694f8e407162b98534d173">UIScrollList.DIRECTION</a> [<a class="el" href="class_u_i_scroll_list.html#a0126bf765b694f8e407162b98534d173">DIRECTION</a>]. </p>
 
 </div>
 </div>
@@ -1060,6 +1157,21 @@ Inheritance diagram for UIScrollList:</div>
 
 </div>
 </div>
+<a class="anchor" id="a90a54f7eb7db9a054c39f16be014eedd"></a><!-- doxytag: member="UIScrollList::spacingAtEnds" ref="a90a54f7eb7db9a054c39f16be014eedd" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_u_i_scroll_list.html#a90a54f7eb7db9a054c39f16be014eedd">UIScrollList.spacingAtEnds</a> = true</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>When set to true, the itemSpacing value will be applied before the first item, and after the last so as to "pad" the first and last items a bit from the edge. If false, the first and last items will be flush with the edges of the viewable area. </p>
+
+</div>
+</div>
 <a class="anchor" id="a4199c6bb9b91e89cf02670ba8c79bbbe"></a><!-- doxytag: member="UIScrollList::touchScroll" ref="a4199c6bb9b91e89cf02670ba8c79bbbe" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -1172,7 +1284,7 @@ Inheritance diagram for UIScrollList:</div>
 <li>UIScrollList.cs</li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Nov 30 20:44:28 2010 for EZ GUI by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Feb 1 18:27:11 2011 for EZ GUI by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

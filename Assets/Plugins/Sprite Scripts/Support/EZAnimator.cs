@@ -3,7 +3,8 @@
 //	All rights reserved
 //-----------------------------------------------------------------
 
-#define PUMP_ALWAYS_RUNNING	// Sets the pump to run once per frame and does not suspend.  This is the recommended method.
+#define COROUTINE_PUMP		// Tells EZAnimator to use a coroutine for the animation pump.  Otherwise, Update() is used.
+#define PUMP_ALWAYS_RUNNING	// Sets the pump to run once per frame and does not suspend.  This is the recommended method.  Commenting this line out will have no effect if COROUTINE_PUMP is also commented out.
 #define STOP_ON_LEVEL_LOAD	// Stop animation when a new level is loaded (this is to be safe so that objects that are destroyed on load are not attempted to be animated)
 // #define USE_DELTA_TIME	// Base animation on Time.deltaTime instead of Time.realtimeSinceStartup
 
@@ -509,7 +510,7 @@ public class EZTransition
 	{
 		EZLinkedListIterator<EZLinkedListNode<EZAnimation>> i;
 		for (i = runningAnims.Begin(); !i.Done; i.Next())
-			i.Current.val.paused = true;
+			i.Current.val.Paused = true;
 	}
 
 	/// <summary>
@@ -519,7 +520,7 @@ public class EZTransition
 	{
 		EZLinkedListIterator<EZLinkedListNode<EZAnimation>> i;
 		for (i = runningAnims.Begin(); !i.Done; i.Next())
-			i.Current.val.paused = false;
+			i.Current.val.Paused = false;
 	}
 
 	// Calls all our ending delegates
@@ -703,6 +704,12 @@ public class EZAnimator : MonoBehaviour
 	// Tells us when the coroutine has run its course.
 	protected static bool pumpIsDone = true;
 
+	// Stuff used in our animation pump:
+	protected static float startTime = Time.realtimeSinceStartup;
+	protected static float time;
+	protected static float elapsed;
+	protected static EZAnimation anim;
+
 
 	// Working vars:
 	int i;
@@ -733,13 +740,12 @@ public class EZAnimator : MonoBehaviour
 #endif
 	}
 
+// Decide whether to use the coroutine pump, or the Update() pump:
+#if COROUTINE_PUMP
+
 	// Actually runs the animations:
 	protected static IEnumerator AnimPump()
 	{
-		float startTime = Time.realtimeSinceStartup;
-		float time;
-		float elapsed;
-		EZAnimation anim;
 		EZLinkedListIterator<EZAnimation> i = animations.Begin();
 
 		pumpIsDone = false;
@@ -786,6 +792,40 @@ public class EZAnimator : MonoBehaviour
 		pumpIsDone = true;
 	}
 
+#else
+
+	// Update() version of our animation pump:
+	void Update()
+	{
+		EZLinkedListIterator<EZAnimation> i = animations.Begin();
+
+#if !USE_DELTA_TIME
+		// Realtime time tracking
+		time = Time.realtimeSinceStartup;
+		elapsed = time - startTime;
+		startTime = time;
+		// END Realtime time tracking
+#else
+			// deltaTime time tracking
+			elapsed = Time.deltaTime;
+			// END deltaTime time tracking
+#endif
+		for (i.Begin(animations); !i.Done; i.NextNoRemove())
+		{
+			// If the animation is done, remove it:
+			if (!i.Current.Step(elapsed))
+			{
+				anim = i.Current;
+				animations.Remove(anim);
+
+				// Add the animation object to our free pool:
+				ReturnAnimToPool(anim);
+			}
+		}
+	}
+
+#endif
+
 
 	/// <summary>
 	/// Starts the animation pump coroutine.
@@ -796,13 +836,16 @@ public class EZAnimator : MonoBehaviour
 	/// </summary>
 	public void StartAnimationPump()
 	{
-		if (!pumpIsRunning)
+#if COROUTINE_PUMP
+		if (!pumpIsRunning && gameObject.active)
 		{
 			pumpIsRunning = true;
 			StartCoroutine(PumpStarter());
 		}
+#endif
 	}
 
+#if COROUTINE_PUMP
 	// Coroutine that gets the pump started:
 	protected IEnumerator PumpStarter()
 	{
@@ -811,6 +854,7 @@ public class EZAnimator : MonoBehaviour
 
 		StartCoroutine(AnimPump());
 	}
+#endif
 
 	/// <summary>
 	/// Stops the animation pump from running.
@@ -1170,7 +1214,7 @@ public class EZAnimator : MonoBehaviour
 	{
 		for (EZLinkedListIterator<EZAnimation> i = animations.Begin(); !i.Done; i.Next())
 		{
-			i.Current.paused = true;
+			i.Current.Paused = true;
 		}
 	}
 
@@ -1181,7 +1225,7 @@ public class EZAnimator : MonoBehaviour
 	{
 		for (EZLinkedListIterator<EZAnimation> i = animations.Begin(); !i.Done; i.Next())
 		{
-			i.Current.paused = false;
+			i.Current.Paused = false;
 		}
 	}
 
@@ -1359,7 +1403,7 @@ public abstract class EZAnimation : IEZLinkedListItem<EZAnimation>
 
     public bool running = false;                    // Indicates whether this animation is currently running
 
-	public bool paused = false;						// When set to true, the animation will not update
+	protected bool m_paused = false;				// When set to true, the animation will not update
 
 	protected System.Object data;					// Data associated with this animation
 	protected ANIM_MODE m_mode;						// The mode of the animation (By, To, etc)
@@ -1398,6 +1442,15 @@ public abstract class EZAnimation : IEZLinkedListItem<EZAnimation>
 	public float Wait
 	{
 		get { return wait; }
+	}
+
+	/// <summary>
+	/// Determines whether the animation is currently paused.
+	/// </summary>
+	public bool Paused
+	{
+		get { return m_paused; }
+		set { m_paused = (running && value); }
 	}
 
 	/// <summary>
@@ -1455,7 +1508,7 @@ public abstract class EZAnimation : IEZLinkedListItem<EZAnimation>
 	// Steps the animation:
 	public virtual bool Step(float timeDelta)
 	{
-		if (paused)
+		if (m_paused)
 			return true;
 
 		if (wait > 0)
@@ -1470,6 +1523,9 @@ public abstract class EZAnimation : IEZLinkedListItem<EZAnimation>
 
 				// Take the overage off our timeDelta:
 				timeDelta -= (timeDelta + wait);
+
+				// Call our method that handles things when the wait is done:
+				WaitDone();
 			}
 			else
 				return true;
@@ -1535,6 +1591,7 @@ public abstract class EZAnimation : IEZLinkedListItem<EZAnimation>
 	public void _stop()
 	{
 		running = false;
+		Paused = false;
 		if (completedDelegate != null)
 			completedDelegate(this);
 	}
@@ -1575,6 +1632,13 @@ public abstract class EZAnimation : IEZLinkedListItem<EZAnimation>
 	/// <returns>Returns a reference to the subject of the animation.</returns>
 	public abstract System.Object GetSubject();
 
+	// Can be overridden by subclasses to do stuff
+	// that needs to be done as soon as the delay/wait
+	// is finished elapsing:
+	protected virtual void WaitDone()
+	{
+	}
+
 
 	// Performs common starting operations
 	protected void StartCommon()
@@ -1589,6 +1653,7 @@ public abstract class EZAnimation : IEZLinkedListItem<EZAnimation>
 
 		direction = 1f;
 		timeElapsed = 0;
+		Paused = false;
 	}
 
 	/// <remarks>
@@ -2142,6 +2207,17 @@ public class FadeSprite : EZAnimation
 		}
 	}
 
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		if(Mode == ANIM_MODE.By)
+		{
+			// Get the most up-to-date state starting:
+			start = sprite.color;
+		}
+	}
+
 	protected override void DoAnim()
 	{
 		if (sprite == null)
@@ -2332,6 +2408,17 @@ public class FadeMaterial : EZAnimation
 		{
 			start = end;
 			end = start + delta;
+		}
+	}
+
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		if (Mode == ANIM_MODE.By)
+		{
+			// Get the most up-to-date state starting:
+			start = mat.color;
 		}
 	}
 
@@ -2527,6 +2614,17 @@ public class FadeText : EZAnimation
 		}
 	}
 
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		if (Mode == ANIM_MODE.By)
+		{
+			// Get the most up-to-date state starting:
+			start = text.color;
+		}
+	}
+
 	protected override void DoAnim()
 	{
 		if (text == null)
@@ -2695,6 +2793,17 @@ public class AnimateRotation : EZAnimation
 		{
 			start = end;
 			end = start + delta;
+		}
+	}
+
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		if (Mode == ANIM_MODE.By)
+		{
+			// Get the most up-to-date state starting:
+			start = subTrans.localEulerAngles;
 		}
 	}
 
@@ -2882,6 +2991,17 @@ public class AnimatePosition : EZAnimation
 		}
 	}
 
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		if (Mode == ANIM_MODE.By)
+		{
+			// Get the most up-to-date state starting:
+			start = subTrans.localPosition;
+		}
+	}
+
 	protected override void DoAnim()
 	{
 		if (subTrans == null)
@@ -3066,6 +3186,17 @@ public class AnimateScale : EZAnimation
 		}
 	}
 
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		if (Mode == ANIM_MODE.By)
+		{
+			// Get the most up-to-date state starting:
+			start = subTrans.localScale;
+		}
+	}
+
 	protected override void DoAnim()
 	{
 		if (subTrans == null)
@@ -3242,6 +3373,14 @@ public class PunchPosition : EZAnimation
 		base._end();
 	}
 
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		// Get the most up-to-date state starting:
+		start = subTrans.localPosition;
+	}
+
 	protected override void DoAnim()
 	{
 		if (subTrans == null)
@@ -3366,6 +3505,14 @@ public class PunchScale : EZAnimation
 			subTrans.localScale = start;
 
 		base._end();
+	}
+
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		// Get the most up-to-date state starting:
+		start = subTrans.localScale;
 	}
 
 	protected override void DoAnim()
@@ -3494,6 +3641,14 @@ public class PunchRotation : EZAnimation
 		base._end();
 	}
 
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		// Get the most up-to-date state starting:
+		start = subTrans.localEulerAngles;
+	}
+
 	protected override void DoAnim()
 	{
 		if (subTrans == null)
@@ -3619,6 +3774,14 @@ public class Crash : EZAnimation
 			subTrans.localPosition = start;
 
 		base._end();
+	}
+
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		// Get the most up-to-date position before starting:
+		start = subTrans.localPosition;
 	}
 
 	protected override void DoAnim()
@@ -3754,6 +3917,14 @@ public class SmoothCrash : EZAnimation
 			subTrans.localPosition = start;
 
 		base._end();
+	}
+
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		// Get the most up-to-date state starting:
+		start = subTrans.localPosition;
 	}
 
 	protected override void DoAnim()
@@ -3903,6 +4074,14 @@ public class Shake : EZAnimation
 		base._end();
 	}
 
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		// Get the most up-to-date state starting:
+		start = subTrans.localPosition;
+	}
+
 	protected override void DoAnim()
 	{
 		if (subTrans == null)
@@ -4043,6 +4222,14 @@ public class CrashRotation : EZAnimation
 			subTrans.localEulerAngles = start;
 
 		base._end();
+	}
+
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		// Get the most up-to-date state starting:
+		start = subTrans.localEulerAngles;
 	}
 
 	protected override void DoAnim()
@@ -4191,6 +4378,14 @@ public class ShakeRotation : EZAnimation
 			subTrans.localEulerAngles = start;
 
 		base._end();
+	}
+
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		// Get the most up-to-date state starting:
+		start = subTrans.localEulerAngles;
 	}
 
 	protected override void DoAnim()
@@ -4465,6 +4660,17 @@ public class FadeAudio : EZAnimation
 		}
 	}
 
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		if (Mode == ANIM_MODE.By)
+		{
+			// Get the most up-to-date state starting:
+			start = subject.volume;
+		}
+	}
+
 	protected override void DoAnim()
 	{
 		if (subject == null)
@@ -4624,6 +4830,17 @@ public class TuneAudio : EZAnimation
 		{
 			start = end;
 			end = start + delta;
+		}
+	}
+
+	protected override void WaitDone()
+	{
+		base.WaitDone();
+
+		if (Mode == ANIM_MODE.By)
+		{
+			// Get the most up-to-date state starting:
+			start = subject.pitch;
 		}
 	}
 
@@ -4827,7 +5044,7 @@ public class AnimParams
 
 	public virtual void DrawGUI(EZAnimation.ANIM_TYPE type, GameObject go, IGUIHelper gui, bool inspector)
 	{
-#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
 		float spacing = 20f;
 		float indent = 10f;
 #else
@@ -4861,7 +5078,7 @@ public class AnimParams
 				pingPong = GUILayout.Toggle(pingPong, new GUIContent("PingPong","Ping-Pong: Causes the animated value to go back and forth as it loops."));
 			}
 		}
-#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
 		else
 			GUILayout.FlexibleSpace();
 #endif
@@ -4916,7 +5133,7 @@ public class AnimParams
 		{
 			restartOnRepeat = GUILayout.Toggle(restartOnRepeat, new GUIContent("Restart on Loop","Resets the starting value on each loop iteration. Set this to false if you want something like continuous movement in the same direction without going back to the starting point."));
 		}
-#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
 		else
 			GUILayout.FlexibleSpace();
 #endif

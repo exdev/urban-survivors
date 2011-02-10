@@ -47,7 +47,7 @@ public class SimpleSprite : SpriteRoot
 	}
 
 
-	protected override void Start()
+	public override void Start()
 	{
 		base.Start();
 	}

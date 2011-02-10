@@ -104,6 +104,9 @@ public class UIBtnChangePanel : UIButton
 
 	public override void OnInput(ref POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		if (!m_controlIsEnabled || IsHidden())
 		{
 			base.OnInput(ref ptr);

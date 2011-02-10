@@ -172,6 +172,9 @@ public class UIButton3D : ControlBase
 	//---------------------------------------------------
 	public override void OnInput(POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		if (!m_controlIsEnabled)
 		{
 			base.OnInput(ptr);
@@ -243,7 +246,7 @@ public class UIButton3D : ControlBase
 	//---------------------------------------------------
 	// Misc
 	//---------------------------------------------------
-	protected virtual void Start()
+	public override void Start()
 	{
 		// Runtime init stuff:
 		if(Application.isPlaying)

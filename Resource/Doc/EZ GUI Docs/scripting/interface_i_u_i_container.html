@@ -33,6 +33,10 @@ Inheritance diagram for IUIContainer:</div>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reference to the parent UIView.  <a href="#adb2c651dc40071283847e02623231a16"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_i_u_i_container.html#a53b678fb2e4be7cc61e7f51b701c1199">RemoveChild</a> (GameObject go)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes an object as a child of the container.  <a href="#a53b678fb2e4be7cc61e7f51b701c1199"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_i_u_i_container.html#ade511ccff94779c1c937a3d49bf85b96">AddSubject</a> (GameObject go)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds an object as a subject of the container's transitions.  <a href="#ade511ccff94779c1c937a3d49bf85b96"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_i_u_i_container.html#a1fa662ab3778562f600231e8fb3017cd">RemoveSubject</a> (GameObject go)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes an object from being a subject of the container's transitions.  <a href="#a1fa662ab3778562f600231e8fb3017cd"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_i_u_i_object.html#aeebf917cc2038d9223b65756f5eb9f25">OnInput</a> (<a class="el" href="struct_p_o_i_n_t_e_r___i_n_f_o.html">POINTER_INFO</a> ptr)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">This is where input handling code should go in any derived class.  <a href="#aeebf917cc2038d9223b65756f5eb9f25"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_i_u_i_object.html#af69fa50323763146001ea47d8c61d277">AddInputDelegate</a> (EZInputDelegate del)</td></tr>
@@ -104,6 +108,34 @@ Inheritance diagram for IUIContainer:</div>
 </dl>
 
 <p>Implemented in <a class="el" href="class_u_i_scroll_list.html#a12cfa48c8b4330c600ed7bdfa6a5013f">UIScrollList</a>, <a class="el" href="class_u_i_slider.html#a99bc1c893e118927d8cbf392a667d173">UISlider</a>, <a class="el" href="class_u_i_panel_manager.html#ad9b325e3c4010e57bf84c5a00ea47a3a">UIPanelManager</a>, and <a class="el" href="class_u_i_panel_base.html#a3614d2babfd844b9f44e52a371dbc79f">UIPanelBase</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ade511ccff94779c1c937a3d49bf85b96"></a><!-- doxytag: member="IUIContainer::AddSubject" ref="ade511ccff94779c1c937a3d49bf85b96" args="(GameObject go)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IUIContainer.AddSubject </td>
+          <td>(</td>
+          <td class="paramtype">GameObject&nbsp;</td>
+          <td class="paramname"> <em>go</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Adds an object as a subject of the container's transitions. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>go</em>&nbsp;</td><td>GameObject that is subject to the container's transitions.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="class_u_i_list_item_container.html#a1b214aeeb26753aa26ff61e4b70e899f">UIListItemContainer</a>, <a class="el" href="class_u_i_panel_manager.html#aa86b59c44e33feb7f9c53849813d1454">UIPanelManager</a>, and <a class="el" href="class_u_i_panel_base.html#af02c03a0cef21c58e018dbb312f1bdcd">UIPanelBase</a>.</p>
 
 </div>
 </div>
@@ -219,6 +251,34 @@ Inheritance diagram for IUIContainer:</div>
 
 </div>
 </div>
+<a class="anchor" id="a1fa662ab3778562f600231e8fb3017cd"></a><!-- doxytag: member="IUIContainer::RemoveSubject" ref="a1fa662ab3778562f600231e8fb3017cd" args="(GameObject go)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IUIContainer.RemoveSubject </td>
+          <td>(</td>
+          <td class="paramtype">GameObject&nbsp;</td>
+          <td class="paramname"> <em>go</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Removes an object from being a subject of the container's transitions. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>go</em>&nbsp;</td><td>GameObject that should no longer be subject to the container's transitions.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="class_u_i_list_item_container.html#aec0c81d27e48af11d0cf4e49efa22e98">UIListItemContainer</a>, <a class="el" href="class_u_i_panel_manager.html#a2063bda9f83915fed8edf7e92bff6b7b">UIPanelManager</a>, and <a class="el" href="class_u_i_panel_base.html#a00f5d526244c85666613763ad742549c">UIPanelBase</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="aee45553fc05a22697388b9895c026bc8"></a><!-- doxytag: member="IUIContainer::RemoveValueChangedDelegate" ref="aee45553fc05a22697388b9895c026bc8" args="(EZValueChangedDelegate del)" -->
 <div class="memitem">
 <div class="memproto">
@@ -269,7 +329,7 @@ Inheritance diagram for IUIContainer:</div>
 <li>IUIContainer.cs</li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Nov 30 20:44:26 2010 for EZ GUI by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Feb 1 18:27:08 2011 for EZ GUI by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

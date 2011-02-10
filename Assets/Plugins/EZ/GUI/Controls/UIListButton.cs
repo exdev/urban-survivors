@@ -18,6 +18,9 @@ public class UIListButton : UIListItem
 {
 	public override void OnInput(ref POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		if (!m_controlIsEnabled /*|| IsHidden()*/)
 		{
 //			if (!IsHidden())

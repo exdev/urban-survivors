@@ -9,7 +9,7 @@
 		<key>page17</key>
 		<dict>
 			<key>CreationDate</key>
-			<date>2010-12-01T03:07:26Z</date>
+			<date>2011-02-02T00:57:11Z</date>
 			<key>DigestAlgorithm</key>
 			<string>MD5</string>
 			<key>DocumentGUID</key>
@@ -299,7 +299,7 @@
 				<dict>
 					<key>Digest</key>
 					<data>
-					XIpE+zjWkICn2AXrjptkaw==
+					Q6DuJ/av74AleggJCSs4Qw==
 					</data>
 					<key>Size</key>
 					<integer>2047</integer>
@@ -317,10 +317,10 @@
 				<dict>
 					<key>Digest</key>
 					<data>
-					x4FES/w27BPR7maJel/5Fg==
+					ZEL6FPtYJoYFJsfO8pEr7w==
 					</data>
 					<key>Size</key>
-					<integer>20647</integer>
+					<integer>20693</integer>
 				</dict>
 			</dict>
 			<key>PageID</key>

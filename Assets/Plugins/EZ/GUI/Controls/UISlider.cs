@@ -193,7 +193,7 @@ public class UISlider : AutoSpriteControlBase
 		m_value = defaultValue;
 	}
 
-	protected override void Start()
+	public override void Start()
 	{
 		base.Start();
 

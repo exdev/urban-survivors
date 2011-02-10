@@ -1423,6 +1423,24 @@ public abstract class SpriteBase : SpriteRoot
 		resizedDelegate = del;
 	}
 
+	/// <summary>
+	/// Adds the delegate to be called when the sprite is resized.
+	/// </summary>
+	/// <param name="del">A delegate to be called when the sprite is resized.</param>
+	public void AddSpriteResizedDelegate(SpriteResizedDelegate del)
+	{
+		resizedDelegate += del;
+	}
+
+	/// <summary>
+	/// Removes the specified delegate from the list of those to be called when the sprite is resized.
+	/// </summary>
+	/// <param name="del">The delegate to be removed.</param>
+	public void RemoveSpriteresizedDelegate(SpriteResizedDelegate del)
+	{
+		resizedDelegate -= del;
+	}
+
 	public virtual bool StepAnim(float time) { return false; }
 
 	public virtual void PlayAnim(int index) { }
@@ -1494,8 +1512,9 @@ public abstract class SpriteBase : SpriteRoot
 // 			SpriteAnimationPump.Instance.StartAnimationPump();
 		
 		// If we're already animating, then we're
-		// already in the list, no need to add again:
-		if (animating || !Application.isPlaying)
+		// already in the list, no need to add again.
+		// Also, if we're inactive, also don't add:
+		if (animating || !Application.isPlaying || !gameObject.active)
 			return;
 
 		animating = true;

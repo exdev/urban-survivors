@@ -9,7 +9,7 @@
 		<key>page23</key>
 		<dict>
 			<key>CreationDate</key>
-			<date>2010-12-01T03:07:25Z</date>
+			<date>2011-02-02T00:57:10Z</date>
 			<key>DigestAlgorithm</key>
 			<string>MD5</string>
 			<key>DocumentGUID</key>
@@ -223,7 +223,7 @@
 					<key>Size</key>
 					<integer>57254</integer>
 				</dict>
-				<key>files/stacks_image_3129_1.png</key>
+				<key>files/stacks_image_3173_1.png</key>
 				<dict>
 					<key>Digest</key>
 					<data>
@@ -232,7 +232,7 @@
 					<key>Size</key>
 					<integer>17484</integer>
 				</dict>
-				<key>files/stacks_image_3133_1.png</key>
+				<key>files/stacks_image_3177_1.png</key>
 				<dict>
 					<key>Digest</key>
 					<data>
@@ -245,7 +245,7 @@
 				<dict>
 					<key>Digest</key>
 					<data>
-					sWM62FZc7hwNJIaHr1bNVg==
+					t0/lWwK5Jvq/MJjkE81ZhA==
 					</data>
 					<key>Size</key>
 					<integer>2764</integer>
@@ -263,10 +263,10 @@
 				<dict>
 					<key>Digest</key>
 					<data>
-					eVA9sDVNGXF84I9bnJ9ChA==
+					ZCm+MqEthkJjznYrYZOSbQ==
 					</data>
 					<key>Size</key>
-					<integer>48533</integer>
+					<integer>48579</integer>
 				</dict>
 			</dict>
 			<key>PageID</key>

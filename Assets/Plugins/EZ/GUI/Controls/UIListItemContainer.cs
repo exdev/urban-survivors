@@ -36,7 +36,7 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 
 
 	// Use this for initialization
-	public virtual void Start () 
+	public override void Start () 
 	{
 		// Only run start once!
 		if (m_started)
@@ -79,6 +79,10 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 			}
 			else // Just add it:
 				uiObjs.Add(obj);
+
+			// Add the object as a subject of our container:
+			if (container != null)
+				container.AddSubject(obj.gameObject);
 		}
 
 		//----------------------------------------------------
@@ -114,6 +118,10 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 #endif
 #endif
 			textObjs.Add(txt);
+
+			// Add the object as a subject of our container:
+			if (container != null)
+				container.AddSubject(txt.gameObject);
 		}
 	}
 
@@ -128,6 +136,10 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 			{
 				if (((AutoSpriteControlBase)obj).Container != (IUIContainer)this)
 					((AutoSpriteControlBase)obj).Container = this;
+
+				// Add the object as a subject of our container:
+				if (container != null)
+					container.AddSubject(go);
 			}
 			uiObjs.Add(obj);
 		}
@@ -137,6 +149,10 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 			if (txt != null)
 			{
 				textObjs.Add(txt);
+
+				// Add the object as a subject of our container:
+				if (container != null)
+					container.AddSubject(go);
 			}
 		}
 	}
@@ -159,6 +175,10 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 			if (obj is AutoSpriteControlBase)
 				if (((AutoSpriteControlBase)obj).Container == (IUIContainer)this)
 					((AutoSpriteControlBase)obj).Container = null;
+
+			// Remove the object as a subject of our container:
+			if (container != null)
+				container.RemoveSubject(go);
 		}
 		else
 		{
@@ -173,9 +193,50 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 						break;
 					}
 				}
+
+				// Remove the object as a subject of our container:
+				if (container != null)
+					container.RemoveSubject(go);
 			}
 		}
 	}
+
+	public void AddSubject(GameObject go)
+	{
+		// Do nothing
+	}
+
+	public void RemoveSubject(GameObject go)
+	{
+		// Do nothing
+	}
+
+	
+	public override IUIContainer Container
+	{
+		get { return base.Container; }
+		set
+		{
+			if (container != null)
+			{
+				for (int i = 0; i < uiObjs.Count; ++i)
+					container.RemoveSubject(uiObjs[i].gameObject);
+				for (int i = 0; i < textObjs.Count; ++i)
+					container.RemoveSubject(textObjs[i].gameObject);
+			}
+
+			if (value != null)
+			{
+				for (int i = 0; i < uiObjs.Count; ++i)
+					value.AddSubject(uiObjs[i].gameObject);
+				for (int i = 0; i < textObjs.Count; ++i)
+					value.AddSubject(textObjs[i].gameObject);
+			}
+
+			base.Container = value;
+		}
+	}
+
 
 	/// <summary>
 	/// Makes the specified GameObject a child of
@@ -226,6 +287,9 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 
 	public override void OnInput(POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		if (!m_controlIsEnabled)
 		{
 			switch (ptr.evt)
@@ -344,6 +408,9 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 		// Search SpriteText objects:
 		for (int i = 0; i < textObjs.Count; ++i)
 		{
+			if (textObjs[i].IsHidden() || !textObjs[i].gameObject.active)
+				continue;
+
 			sm = textObjs[i].transform.localToWorldMatrix;
 			tl = lm.MultiplyPoint3x4(sm.MultiplyPoint3x4(textObjs[i].UnclippedTopLeft));
 			br = lm.MultiplyPoint3x4(sm.MultiplyPoint3x4(textObjs[i].UnclippedBottomRight));
@@ -356,6 +423,9 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 		// Search sprites and controls:
 		for (int i = 0; i < uiObjs.Count; ++i)
 		{
+			if (uiObjs[i].IsHidden() || !uiObjs[i].gameObject.active)
+				continue;
+
 			sm = uiObjs[i].transform.localToWorldMatrix;
 
 			if (uiObjs[i] is AutoSpriteControlBase)
@@ -481,8 +551,9 @@ public class UIListItemContainer : ControlBase, IUIListObject, IUIContainer
 
 			// Inform the list we may have been resized,
 			// so it needs to reposition items:
-			if (spriteText.maxWidth > 0 && list != null)
-				list.PositionItems();
+			if(spriteText != null)
+				if (spriteText.maxWidth > 0 && list != null)
+					list.PositionItems();
 		}
 	}
 

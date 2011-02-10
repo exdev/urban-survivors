@@ -26,6 +26,20 @@ Inheritance diagram for UIPanelTab:</div>
 <tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a4f354b80a58bab8f31f7966750800e57">SPRITE_PLANE</a> </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a79b7138073d866284a170e4d8b3a9217">ANCHOR_METHOD</a> </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#aa6a06ad89a880accb25794e862733074">WINDING_ORDER</a> </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">HORIZONTAL_ALIGN</a> { <a class="el" href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">NONE</a>, 
+<a class="el" href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">LEFT</a>, 
+<a class="el" href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">RIGHT</a>, 
+<a class="el" href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">CENTER</a>
+ }</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>Specifies what the object will be aligned relative to on the horizontal axis. </p>
+ <a href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">VERTICAL_ALIGN</a> { <a class="el" href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">NONE</a>, 
+<a class="el" href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">TOP</a>, 
+<a class="el" href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">BOTTOM</a>, 
+<a class="el" href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">CENTER</a>
+ }</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>Specifies what the object will be aligned relative to on the vertical axis. </p>
+ <a href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">override void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_panel_tab.html#a078e8f4496541c309bdc9a3ce2a42409">Copy</a> (<a class="el" href="class_sprite_root.html">SpriteRoot</a> s)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Copies all the attributes of another sprite.  <a href="#a078e8f4496541c309bdc9a3ce2a42409"></a><br/></td></tr>
@@ -35,8 +49,12 @@ Inheritance diagram for UIPanelTab:</div>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Copies the the specified control.  <a href="#a6d4ed9fb745a353a176e1222dc689de3"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_i_control.html#a23fa6274e3a2cfd64acbb31b336fa208">Copy</a> (IControl c, ControlCopyFlags flags)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Copies the specified parts of the specified control.  <a href="#a23fa6274e3a2cfd64acbb31b336fa208"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_radio_btn.html#a763e0b715327c52306b4889d5e4e72b4">SetGroup</a> (GameObject parent)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Makes the radio button a part of the specified group and it will thenceforth be mutually exclusive to all other radio buttons in the same group.  <a href="#a763e0b715327c52306b4889d5e4e72b4"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_radio_btn.html#a8d6c5bc97bbc710e6cd7a17bd4f827df">SetGroup</a> (Transform parent)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Makes the radio button a part of the specified group and it will thenceforth be mutually exclusive to all other radio buttons in the same group.  <a href="#a8d6c5bc97bbc710e6cd7a17bd4f827df"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_radio_btn.html#a2f4e84f7b0596d4fc1841bcaa7a8d80a">SetGroup</a> (int groupID)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Makes the radio button a part of the specified group and it will thenceforth be mutually exclusive to all other radio buttons in the same group.  <a href="#a2f4e84f7b0596d4fc1841bcaa7a8d80a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_auto_sprite_control_base.html#a0fb97744935800a9d471d38d2520e855">UpdateCollider</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Updates the collider of the control so that it encompasses the extents of the control's content. NOTE: To include the control's associated text in the calculation, be sure to check the includeTextInAutoCollider box.  <a href="#a0fb97744935800a9d471d38d2520e855"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">override void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_auto_sprite_base.html#a1e221c6a3483a077d381b276ede895d0">Clear</a> ()</td></tr>
@@ -101,6 +119,10 @@ Inheritance diagram for UIPanelTab:</div>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the delegate to be called each frame of animation.  <a href="#ad31805dac2d46592bc30a95eabf899cb"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_base.html#a8849952300de0c69e246cea541d30e3a">SetSpriteResizedDelegate</a> (SpriteResizedDelegate del)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the delegate to be called when the sprite is resized.  <a href="#a8849952300de0c69e246cea541d30e3a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_base.html#acd1248c74ff3e79c75ba994512d6e117">AddSpriteResizedDelegate</a> (SpriteResizedDelegate del)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds the delegate to be called when the sprite is resized.  <a href="#acd1248c74ff3e79c75ba994512d6e117"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_base.html#a10f2bcae2161110b2acd5e5b9cca3300">RemoveSpriteresizedDelegate</a> (SpriteResizedDelegate del)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes the specified delegate from the list of those to be called when the sprite is resized.  <a href="#a10f2bcae2161110b2acd5e5b9cca3300"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_base.html#a2ac2df7765bc1baeb3643948024b30a1">SetFramerate</a> (float fps)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Changes the framerate at which the current animation plays. NOTE: This only has effect if called AFTER PlayAnim() is called. Otherwise, PlayAnim() sets the framerate to whatever is specified in the animation itself.  <a href="#a2ac2df7765bc1baeb3643948024b30a1"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_base.html#a88bdbcaa86cdd2e54908dae42dd79872">PauseAnim</a> ()</td></tr>
@@ -110,6 +132,12 @@ Inheritance diagram for UIPanelTab:</div>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_base.html#ac98a457ace0eee0fecf82c8e089cc1a5">IsAnimating</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns whether the sprite is currently animating.  <a href="#ac98a457ace0eee0fecf82c8e089cc1a5"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">delegate void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a225681fbdb6d79c769c107293949f37f">SpriteResizedDelegate</a> (float newWidth, float newHeight, <a class="el" href="class_sprite_root.html">SpriteRoot</a> sprite)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a09d7f0014281fa0dcdd872c8ad4826a9">PositionOnScreen</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Repositions the object using the existing screen-space settings.  <a href="#a09d7f0014281fa0dcdd872c8ad4826a9"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a481a3e5c7d1b3370935564ca611fa9fe">PositionOnScreen</a> (int x, int y, float depth)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Positions the object using screen coordinates, according to the relativity settings stored in relativeToScreen.  <a href="#a481a3e5c7d1b3370935564ca611fa9fe"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#aabf07745fff23716a19e591a4d00ecb0">PositionOnScreen</a> (Vector3 pos)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Positions the object using screen coordinates, according to the relativity settings stored in relativeToScreen.  <a href="#aabf07745fff23716a19e591a4d00ecb0"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a3c11e0d03884e3af7b5040737f2064bd">CalcSize</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Recalculates the width and height of the sprite based upon the change in its UV dimensions (autoResize) or on the current camera's disposition (pixelPerfect).  <a href="#a3c11e0d03884e3af7b5040737f2064bd"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#adf9809122c570941ff132a9904dcc93c">SetSize</a> (float <a class="el" href="class_sprite_root.html#afeafcd5c4d1b332e1ff9260eee857145">width</a>, float <a class="el" href="class_sprite_root.html#a6bf98fa584df909a7864c4bccfda0b75">height</a>)</td></tr>
@@ -168,6 +196,10 @@ Inheritance diagram for UIPanelTab:</div>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reference to the panel to show/hide.  <a href="#ad2676e6edf5192385b70484decbe1611"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_panel_tab.html#a585744cade548fc9e7a5639e45bb116c">panelShowingAtStart</a> = true</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Indicates whether the associated panel is to be considered to be showing at the start. This value is only used if the panel is not associated with a <a class="el" href="class_u_i_panel_manager.html">UIPanelManager</a>. This allows toggling to keep track of when the panel needs to be shown or dismissed.  <a href="#a585744cade548fc9e7a5639e45bb116c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_radio_btn.html#aeedf0b2b62540f8290ceb66df0281352">useParentForGrouping</a> = true</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">When true, the radio button will group itself with other radio buttons based on whether they share the same parent GameObject.  <a href="#aeedf0b2b62540f8290ceb66df0281352"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_radio_btn.html#a4914a789f7188722883e5787712c4f46">radioGroup</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The numbered group to which this radio button belongs. Buttons that share a group will be mutually exclusive to one another. This value is only available if RADIOBTN_USE_PARENT is not defined. Otherwise, by default, radio buttons group themselves according to a common parent GameObject.  <a href="#a4914a789f7188722883e5787712c4f46"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_radio_btn.html#a2930dbd99050b39b9be74311342fddfb">defaultValue</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The default value of the button.  <a href="#a2930dbd99050b39b9be74311342fddfb"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_sprite_root.html">SpriteRoot</a>[]&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_radio_btn.html#a764aa7c131fe32f3f982f9214f448f45">layers</a> = new <a class="el" href="class_sprite_root.html">SpriteRoot</a>[0]</td></tr>
@@ -232,9 +264,6 @@ Inheritance diagram for UIPanelTab:</div>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The color to be used by all four of the sprite's vertices. This can be used to color, highlight, or fade the sprite. Be sure to use a vertex-colored shader for this to have an effect.  <a href="#a206a1db950fc52aaef5b535a7b1a938a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_root.html#a9905374808829c2c6a15ffeb0170bf52">hideAtStart</a> = false</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Whether the sprite will be hideAtStart when it starts.  <a href="#a9905374808829c2c6a15ffeb0170bf52"></a><br/></td></tr>
-<tr><td colspan="2"><h2>Protected Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">RadioBtnGroup&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_radio_btn.html#ab50cb90c93a4d0f36658a18cc594ce16">group</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The numbered group to which this radio button belongs. Buttons that share a group will be mutually exclusive to one another. This value is only available if RADIOBTN_USE_PARENT is not defined. Otherwise, by default, radio buttons group themselves according to a common parent GameObject.  <a href="#ab50cb90c93a4d0f36658a18cc594ce16"></a><br/></td></tr>
 <tr><td colspan="2"><h2>Properties</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">override bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_radio_btn.html#a8f9be90bd5a2656526a70d24c26fae5b">controlIsEnabled</a><code> [get, set]</code></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Controls whether this control is in an enabled state or not. If it is not, input is not processed. This can also be used to cause a control to take on a "grayed out" appearance when disabled.  <a href="#a8f9be90bd5a2656526a70d24c26fae5b"></a><br/></td></tr>
@@ -285,6 +314,37 @@ Inheritance diagram for UIPanelTab:</div>
 
 </div>
 </div>
+<a class="anchor" id="ad31e772b9c659d24c829386c63f50566"></a><!-- doxytag: member="UIPanelTab::HORIZONTAL_ALIGN" ref="ad31e772b9c659d24c829386c63f50566" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="class_sprite_root.html#ad31e772b9c659d24c829386c63f50566">SpriteRoot::HORIZONTAL_ALIGN</a><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Specifies what the object will be aligned relative to on the horizontal axis. </p>
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="ad31e772b9c659d24c829386c63f50566"></a><!-- doxytag: member="NONE" ref="ad31e772b9c659d24c829386c63f50566" args="" -->NONE</em>&nbsp;</td><td>
+<p>The object will not be repositioned along the X axis. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="ad31e772b9c659d24c829386c63f50566"></a><!-- doxytag: member="LEFT" ref="ad31e772b9c659d24c829386c63f50566" args="" -->LEFT</em>&nbsp;</td><td>
+<p>The X coordinate of screenPos will be interpreted as the number of pixels from the left edge of the screen. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="ad31e772b9c659d24c829386c63f50566"></a><!-- doxytag: member="RIGHT" ref="ad31e772b9c659d24c829386c63f50566" args="" -->RIGHT</em>&nbsp;</td><td>
+<p>The X coordinate of screenPos will be interpreted as the number of pixels from the right edge of the screen. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="ad31e772b9c659d24c829386c63f50566"></a><!-- doxytag: member="CENTER" ref="ad31e772b9c659d24c829386c63f50566" args="" -->CENTER</em>&nbsp;</td><td>
+<p>The X coordinate of screenPos will be interpreted as the number of pixels from the center of the screen. </p>
+</td></tr>
+</table>
+</dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a4f354b80a58bab8f31f7966750800e57"></a><!-- doxytag: member="UIPanelTab::SPRITE_PLANE" ref="a4f354b80a58bab8f31f7966750800e57" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -296,6 +356,37 @@ Inheritance diagram for UIPanelTab:</div>
 </div>
 <div class="memdoc">
 <p>The plane in which a sprite should be drawn. </p>
+
+</div>
+</div>
+<a class="anchor" id="af7a4d8ff195106468232a3e5a7d32c78"></a><!-- doxytag: member="UIPanelTab::VERTICAL_ALIGN" ref="af7a4d8ff195106468232a3e5a7d32c78" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="class_sprite_root.html#af7a4d8ff195106468232a3e5a7d32c78">SpriteRoot::VERTICAL_ALIGN</a><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Specifies what the object will be aligned relative to on the vertical axis. </p>
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="af7a4d8ff195106468232a3e5a7d32c78"></a><!-- doxytag: member="NONE" ref="af7a4d8ff195106468232a3e5a7d32c78" args="" -->NONE</em>&nbsp;</td><td>
+<p>The object will not be repositioned along the Y axis. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="af7a4d8ff195106468232a3e5a7d32c78"></a><!-- doxytag: member="TOP" ref="af7a4d8ff195106468232a3e5a7d32c78" args="" -->TOP</em>&nbsp;</td><td>
+<p>The Y coordinate of screenPos will be interpreted as the number of pixels from the top edge of the screen. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="af7a4d8ff195106468232a3e5a7d32c78"></a><!-- doxytag: member="BOTTOM" ref="af7a4d8ff195106468232a3e5a7d32c78" args="" -->BOTTOM</em>&nbsp;</td><td>
+<p>The Y coordinate of screenPos will be interpreted as the number of pixels from the bottom edge of the screen. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="af7a4d8ff195106468232a3e5a7d32c78"></a><!-- doxytag: member="CENTER" ref="af7a4d8ff195106468232a3e5a7d32c78" args="" -->CENTER</em>&nbsp;</td><td>
+<p>The Y coordinate of screenPos will be interpreted as the number of pixels from the center of the screen. </p>
+</td></tr>
+</table>
+</dd>
+</dl>
 
 </div>
 </div>
@@ -314,6 +405,32 @@ Inheritance diagram for UIPanelTab:</div>
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="acd1248c74ff3e79c75ba994512d6e117"></a><!-- doxytag: member="UIPanelTab::AddSpriteResizedDelegate" ref="acd1248c74ff3e79c75ba994512d6e117" args="(SpriteResizedDelegate del)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteBase.AddSpriteResizedDelegate </td>
+          <td>(</td>
+          <td class="paramtype">SpriteResizedDelegate&nbsp;</td>
+          <td class="paramname"> <em>del</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Adds the delegate to be called when the sprite is resized. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>del</em>&nbsp;</td><td>A delegate to be called when the sprite is resized.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="ae05f863c7be4bdd30515bb335472deb9"></a><!-- doxytag: member="UIPanelTab::AnimCompleteDelegate" ref="ae05f863c7be4bdd30515bb335472deb9" args="(SpriteBase sprite)" -->
 <div class="memitem">
 <div class="memproto">
@@ -1443,6 +1560,120 @@ Inheritance diagram for UIPanelTab:</div>
 
 </div>
 </div>
+<a class="anchor" id="aabf07745fff23716a19e591a4d00ecb0"></a><!-- doxytag: member="UIPanelTab::PositionOnScreen" ref="aabf07745fff23716a19e591a4d00ecb0" args="(Vector3 pos)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteRoot.PositionOnScreen </td>
+          <td>(</td>
+          <td class="paramtype">Vector3&nbsp;</td>
+          <td class="paramname"> <em>pos</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Positions the object using screen coordinates, according to the relativity settings stored in relativeToScreen. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>pos</em>&nbsp;</td><td>The X and Y screen coordinates where the object should be positioned, as well as the Z coordinate which represents the distance in front of the camera.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a481a3e5c7d1b3370935564ca611fa9fe"></a><!-- doxytag: member="UIPanelTab::PositionOnScreen" ref="a481a3e5c7d1b3370935564ca611fa9fe" args="(int x, int y, float depth)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteRoot.PositionOnScreen </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&nbsp;</td>
+          <td class="paramname"> <em>depth</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Positions the object using screen coordinates, according to the relativity settings stored in relativeToScreen. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>x</em>&nbsp;</td><td>The number of pixels in the X axis relative to the position specified in relativeToScreen.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>y</em>&nbsp;</td><td>The number of pixels in the Y axis relative to the position specified in relativeToScreen.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>depth</em>&nbsp;</td><td>The distance the object should be in front of the camera.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a09d7f0014281fa0dcdd872c8ad4826a9"></a><!-- doxytag: member="UIPanelTab::PositionOnScreen" ref="a09d7f0014281fa0dcdd872c8ad4826a9" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteRoot.PositionOnScreen </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Repositions the object using the existing screen-space settings. </p>
+
+</div>
+</div>
+<a class="anchor" id="a10f2bcae2161110b2acd5e5b9cca3300"></a><!-- doxytag: member="UIPanelTab::RemoveSpriteresizedDelegate" ref="a10f2bcae2161110b2acd5e5b9cca3300" args="(SpriteResizedDelegate del)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SpriteBase.RemoveSpriteresizedDelegate </td>
+          <td>(</td>
+          <td class="paramtype">SpriteResizedDelegate&nbsp;</td>
+          <td class="paramname"> <em>del</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Removes the specified delegate from the list of those to be called when the sprite is resized. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>del</em>&nbsp;</td><td>The delegate to be removed.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a8b88afbf9c807629620803fc9e0fb982"></a><!-- doxytag: member="UIPanelTab::RevertToStatic" ref="a8b88afbf9c807629620803fc9e0fb982" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -1721,6 +1952,32 @@ Inheritance diagram for UIPanelTab:</div>
 
 </div>
 </div>
+<a class="anchor" id="a2f4e84f7b0596d4fc1841bcaa7a8d80a"></a><!-- doxytag: member="UIPanelTab::SetGroup" ref="a2f4e84f7b0596d4fc1841bcaa7a8d80a" args="(int groupID)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UIRadioBtn.SetGroup </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>groupID</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Makes the radio button a part of the specified group and it will thenceforth be mutually exclusive to all other radio buttons in the same group. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ID</em>&nbsp;</td><td>The ID of the group to which this radio will be assigned. Can be an arbitrary integer, or if useParentForGrouping is true, the hashcode of the parent transform.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a8d6c5bc97bbc710e6cd7a17bd4f827df"></a><!-- doxytag: member="UIPanelTab::SetGroup" ref="a8d6c5bc97bbc710e6cd7a17bd4f827df" args="(Transform parent)" -->
 <div class="memitem">
 <div class="memproto">
@@ -1740,7 +1997,33 @@ Inheritance diagram for UIPanelTab:</div>
 <p>Makes the radio button a part of the specified group and it will thenceforth be mutually exclusive to all other radio buttons in the same group. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>parent</em>&nbsp;</td><td>The object that will be made the parent of the radio button.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ID</em>&nbsp;</td><td>The parent transform of the radio button.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a763e0b715327c52306b4889d5e4e72b4"></a><!-- doxytag: member="UIPanelTab::SetGroup" ref="a763e0b715327c52306b4889d5e4e72b4" args="(GameObject parent)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UIRadioBtn.SetGroup </td>
+          <td>(</td>
+          <td class="paramtype">GameObject&nbsp;</td>
+          <td class="paramname"> <em>parent</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Makes the radio button a part of the specified group and it will thenceforth be mutually exclusive to all other radio buttons in the same group. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ID</em>&nbsp;</td><td>The parent object of the radio button.</td></tr>
   </table>
   </dd>
 </dl>
@@ -2326,21 +2609,6 @@ Inheritance diagram for UIPanelTab:</div>
 
 </div>
 </div>
-<a class="anchor" id="ab50cb90c93a4d0f36658a18cc594ce16"></a><!-- doxytag: member="UIPanelTab::group" ref="ab50cb90c93a4d0f36658a18cc594ce16" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">RadioBtnGroup <a class="el" href="class_u_i_radio_btn.html#ab50cb90c93a4d0f36658a18cc594ce16">UIRadioBtn.group</a><code> [protected, inherited]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>The numbered group to which this radio button belongs. Buttons that share a group will be mutually exclusive to one another. This value is only available if RADIOBTN_USE_PARENT is not defined. Otherwise, by default, radio buttons group themselves according to a common parent GameObject. </p>
-
-</div>
-</div>
 <a class="anchor" id="a6bf98fa584df909a7864c4bccfda0b75"></a><!-- doxytag: member="UIPanelTab::height" ref="a6bf98fa584df909a7864c4bccfda0b75" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -2566,6 +2834,21 @@ Inheritance diagram for UIPanelTab:</div>
 
 </div>
 </div>
+<a class="anchor" id="a4914a789f7188722883e5787712c4f46"></a><!-- doxytag: member="UIPanelTab::radioGroup" ref="a4914a789f7188722883e5787712c4f46" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="class_u_i_radio_btn.html#a4914a789f7188722883e5787712c4f46">UIRadioBtn.radioGroup</a><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>The numbered group to which this radio button belongs. Buttons that share a group will be mutually exclusive to one another. This value is only available if RADIOBTN_USE_PARENT is not defined. Otherwise, by default, radio buttons group themselves according to a common parent GameObject. </p>
+
+</div>
+</div>
 <a class="anchor" id="a648a31069a97f14e370d7e8c072b1798"></a><!-- doxytag: member="UIPanelTab::scriptWithMethodToInvoke" ref="a648a31069a97f14e370d7e8c072b1798" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -2653,6 +2936,21 @@ Inheritance diagram for UIPanelTab:</div>
 <div class="memdoc">
 
 <p>When true, the button will toggle the associated panel on and off with each press of the tab. </p>
+
+</div>
+</div>
+<a class="anchor" id="aeedf0b2b62540f8290ceb66df0281352"></a><!-- doxytag: member="UIPanelTab::useParentForGrouping" ref="aeedf0b2b62540f8290ceb66df0281352" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_u_i_radio_btn.html#aeedf0b2b62540f8290ceb66df0281352">UIRadioBtn.useParentForGrouping</a> = true<code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>When true, the radio button will group itself with other radio buttons based on whether they share the same parent GameObject. </p>
 
 </div>
 </div>
@@ -2937,7 +3235,7 @@ Inheritance diagram for UIPanelTab:</div>
 <li>UIPanelTab.cs</li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Nov 30 20:44:28 2010 for EZ GUI by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Feb 1 18:27:11 2011 for EZ GUI by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

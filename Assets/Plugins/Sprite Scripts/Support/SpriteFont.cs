@@ -41,7 +41,11 @@ public struct SpriteChar
 	/// The key is the previous character, and the value is 
 	/// the kerning amount, in pixels.
 	/// </summary>
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
+	public Hashtable kernings;
+#else
 	public Dictionary<char, float> kernings;
+#endif
 
 	/// <summary>
 	/// Gets the kerning amount given the previous character.
@@ -54,7 +58,13 @@ public struct SpriteChar
 			return 0;
 
 		float amount = 0;
+
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
+		if (!kernings.ContainsKey(prevChar))
+			amount = (float) kernings[prevChar];
+#else
 		kernings.TryGetValue(prevChar, out amount);
+#endif
 		return amount;
 	}
 }
@@ -76,7 +86,7 @@ public class SpriteFont
 
 	// Maps character IDs to that character's
 	// index in the array.
-#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
 	protected Hashtable charMap = new Hashtable();
 #else
 	protected Dictionary<char, int>charMap = new Dictionary<char, int>();
@@ -123,6 +133,41 @@ public class SpriteFont
 		get { return pxSize; }
 	}
 
+	protected float charSpacing = 1f;
+	/// <summary>
+	/// An adjustable factor by which you can increase/decrease
+	/// the spacing between characters.  A value of 1.0 will
+	/// space characters exactly as described by the font.
+	/// Decreasing this value will place the characters closer
+	/// together, while increasing it will place them farther
+	/// apart.
+	/// </summary>
+	public float CharacterSpacing
+	{
+		get { return charSpacing; }
+		set 
+		{
+			float oldVal = charSpacing;
+			charSpacing = value;
+ 
+			// Only update things if the value has changed:
+			if(oldVal != charSpacing)
+			{
+				if (chars != null)
+				{
+					for (int i = 0; i < chars.Length; ++i)
+					{
+						chars[i].xAdvance *= charSpacing;
+
+						if(chars[i].kernings != null)
+							foreach (char key in chars[i].kernings.Keys)
+								chars[i].kernings[key] *= charSpacing;
+					}
+				}
+			}
+		}
+	}
+
 	// Working vars:
 	int kerningsCount;
 
@@ -165,6 +210,14 @@ public class SpriteFont
 		while (pos < lines.Length && c < kerningsCount)
 			if (KerningParser(lines[pos++]))
 				++c; // Tally another kerning
+
+		// Now apply any character spacing
+		// (setting it temporarily to another
+		// value incase this was set in-script
+		// before the file was parsed):
+		float tempSpacing = charSpacing;
+		charSpacing = 0;
+		CharacterSpacing = tempSpacing;
 	}
 
 	// Finds a line that starts with "tag" and passes that line
@@ -190,7 +243,7 @@ public class SpriteFont
 
 	// Returns the index of the field matching
 	// the specified label
-	int FindField(string label, string[] fields, int pos)
+	int FindField(string label, string[] fields, int pos, bool logError)
 	{
 		for(; pos<fields.Length; ++pos)
 		{
@@ -198,8 +251,23 @@ public class SpriteFont
 				return pos;
 		}
 
-		Debug.LogError("Missing \"" + label + "\" field in font definition file \"" + fontDef.name + "\". Please check the file or re-create it.");
-		return pos;
+		if(logError)
+		{
+			Debug.LogError("Missing \"" + label + "\" field in font definition file \"" + fontDef.name + "\". Please check the file or re-create it.");
+			return pos;
+		}
+		else
+			return -1;
+	}
+
+	int FindField(string label, string[] fields, int pos)
+	{
+		return FindField(label, fields, pos, true);
+	}
+
+	int FindFieldOptional(string label, string[] fields, int pos)
+	{
+		return FindField(label, fields, pos, false);
 	}
 
 	// Parses the font definition header.
@@ -212,6 +280,10 @@ public class SpriteFont
 
 		index = FindField("size", vals, index);
 		pxSize = Mathf.Abs(int.Parse(vals[index + 1]));
+
+		index = FindFieldOptional("charSpacing", vals, index);
+		if (index != -1)
+			charSpacing = Mathf.Abs(float.Parse(vals[index + 1]));
 	}
 
 	// Parses the "common" line
@@ -328,7 +400,11 @@ public class SpriteFont
 		SpriteChar ch = GetSpriteChar(Convert.ToChar(second));
 
 		if (ch.kernings == null)
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
+			ch.kernings = new Hashtable();
+#else
 			ch.kernings = new Dictionary<char, float>();
+#endif
 
 		ch.kernings.Add(Convert.ToChar(first), (float)amount);
 
@@ -346,14 +422,14 @@ public class SpriteFont
 	public SpriteChar GetSpriteChar(char ch)
 	{
 		int index;
-#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
 		if (!charMap.ContainsKey(ch))
 #else
 		if (!charMap.TryGetValue(ch, out index))
 #endif
 			return default(SpriteChar); // Character not found
 
-#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1)
+#if UNITY_IPHONE && !(UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5 || UNITY_3_6 || UNITY_3_7 || UNITY_3_8 || UNITY_3_9)
 		index = (int) charMap[ch];
 		return chars[index];
 #else

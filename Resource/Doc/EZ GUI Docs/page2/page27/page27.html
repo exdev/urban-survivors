@@ -44,36 +44,36 @@
 	<div id="pageHeader"><!-- Start page header -->
 		<img src="../../rw_common/images/anb_logo.png" width="64" height="60" alt="Site logo"/>
 		<h1>EZ GUI</h1>
-		<h2></h2>
+		<h2>Changing the world, one site at a time&hellip;</h2>
 	</div><!-- End page header -->
 	
 	<div id="contentContainer"><!-- Start main content wrapper -->
 		<div id="content"><!-- Start content -->
 			
 
-<!-- Stacks v1.3.1 -->
+<!-- Stacks v1.4.3 -->
 <div class='stacks_top'>
-<div id='stacks_out_2512_page27' class='stacks_out'><div id='stacks_in_2512_page27' class='stacks_in'>
+<div id='stacks_out_4765_page27' class='stacks_out'><div id='stacks_in_4765_page27' class='stacks_in'>
 <h1>Label</h1><a href="#classes" rel="self">Class</a><br /><a href="#interactivity" rel="self">Interactivity</a><br /><a href="#properties" rel="self">Control-specific Properties</a><br /><a href="#states" rel="self">States</a><br /><br>
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_2514_page27' class='stacks_out'><div id='stacks_in_2514_page27' class='stacks_in'>
+<div id='stacks_out_4767_page27' class='stacks_out'><div id='stacks_in_4767_page27' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Overview</span><br /> <div id='stacks_out_2517_page27' class='stacks_out'><div id='stacks_in_2517_page27' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Overview</span><br /> <div id='stacks_out_4770_page27' class='stacks_out'><div id='stacks_in_4770_page27' class='stacks_in'>
 The Label component (<span style="font:12px Courier, mono; ">SpriteText</span>) provides basic single-line or multi-line text display.<br /><br />Text entered into a <span style="font:12px Courier, mono; ">SpriteText</span> can be colored in-editor either using its Color setting, or by adding color tags to the text entered via the editor.  Color tags follow the following hexadecimal format:<br /><br />[#RRGGBBAA]		(ex: [#FF000080] is bright red with 50% transparency)<br />or<br />[#RRGGBB]		(ex: [#FF0000] is bright red opaque)<br /><br />As you can see, the alpha component is optional, and if omitted, opaque is assumed.  An example use of this would be:<br />"Roses are [#FF0000]red, violets are [#00FF00]blue."<br /><br />The above string would set "Roses are" to whatever color is specified in the <span style="font:12px Courier, mono; ">SpriteText</span>'s Color field.  "red, violates are" would be colored red, and "blue." will e colored blue.<br /><br />You can also add color in-line with your text through code by simply "adding" <span style="font:12px Courier, mono; ">Colors</span> to the string:
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_2519_page27' class='stacks_out'><div id='stacks_in_2519_page27' class='stacks_in'>
+<div id='stacks_out_4772_page27' class='stacks_out'><div id='stacks_in_4772_page27' class='stacks_in'>
 <code><i><font color="#9A1900">// Outputs a string where the last word "red" is colored red</font></i><br />myLabel<font color="#990000">.</font>Text <font color="#990000">=</font> <font color="#FF0000">"The following word is "</font> <font color="#990000">+</font> Color<font color="#990000">.</font>red <font color="#990000">+</font> <font color="#FF0000">"red"</font><font color="#990000">;</font></code>
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_2521_page27' class='stacks_out'><div id='stacks_in_2521_page27' class='stacks_in'>
+<div id='stacks_out_4774_page27' class='stacks_out'><div id='stacks_in_4774_page27' class='stacks_in'>
 Note that text that precedes a color tag is colored by the "global" color setting specified in the <span style="font:12px Courier, mono; ">SpriteText</span>'s color field.  All text text follows a color tag will be colored by that tag until another tag is encountered.
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_2523_page27' class='stacks_out'><div id='stacks_in_2523_page27' class='stacks_in'>
+<div id='stacks_out_4776_page27' class='stacks_out'><div id='stacks_in_4776_page27' class='stacks_in'>
 <span style="font-size:14px; font-weight:bold; ">An important note on colors:</span><br />It is important to note that the method used for coloring is to tint characters using vertex colors.  As such, for accurate color reproduction, your font needs to have white letters.  It can then be colored to any desired color from there.  If your font is black, for example, it cannot be made any shade lighter than that.
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_2525_page27' class='stacks_out'><div id='stacks_in_2525_page27' class='stacks_in'>
+<div id='stacks_out_4778_page27' class='stacks_out'><div id='stacks_in_4778_page27' class='stacks_in'>
 <span style="font-size:14px; font-weight:bold; ">Alignment and Anchoring</span><br />There may sometimes be confusion as to the role played by the Alignment and Anchor settings.  These settings behave identically to those of Unity's <span style="font:12px Courier, mono; ">TextMesh</span> (3D Text), so if you are familiar with those, you should have no difficulty.  Basically, whenever text is entered into a <span style="font:12px Courier, mono; ">SpriteText</span>, an "area" of text begins to grow as the text is filled in.  If the anchor is set, for example, to Upper_Left, then the upper-left corner of this "area" will be aligned with the <span style="font:12px Courier, mono; ">SpriteText</span>'s GameObject's center point.  This is the function of the Anchor setting.<br /><br />When there is only a single line of text, depending on your anchor settings, it is difficult to notice any effect of the Alignment setting, as the "area" of a single line of text is fitted tightly to its edges in any case.  Where you will begin to see a difference is when the text has multiple lines.<br /><br /><span style="font-size:14px; font-weight:bold; ">Basic Setup</span><br />To get up and running with a <span style="font:12px Courier, mono; ">SpriteText</span>, you just need to assign a font definition (<span style="font:12px Courier, mono; ">TextAsset</span>) to its Font field, and a material to its Mesh Renderer.  Now just enter some text in the Text field.  To learn more about creating the necessary font definition file and font atlas, see <a href="../../page28/page28.html" rel="self" title="Creating Fonts">Creating Fonts</a>.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
@@ -84,7 +84,7 @@ Note that text that precedes a color tag is colored by the "global" color settin
 
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_2527_page27' class='stacks_out'><div id='stacks_in_2527_page27' class='stacks_in'>
+<div id='stacks_out_4780_page27' class='stacks_out'><div id='stacks_in_4780_page27' class='stacks_in'>
 
 <!--    Anchor Link Stack v1.0 by Joe Workman   -->
 
@@ -93,11 +93,11 @@ Note that text that precedes a color tag is colored by the "global" color settin
 <!-- End of Anchor Link Stack -->
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_2528_page27' class='stacks_out'><div id='stacks_in_2528_page27' class='stacks_in'>
+<div id='stacks_out_4781_page27' class='stacks_out'><div id='stacks_in_4781_page27' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Class</span> <div id='stacks_out_2531_page27' class='stacks_out'><div id='stacks_in_2531_page27' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Class</span> <div id='stacks_out_4784_page27' class='stacks_out'><div id='stacks_in_4784_page27' class='stacks_in'>
 <span style="font:12px Courier, mono; "><a href="../../scripting/class_sprite_text.html" rel="self">SpriteText</a></span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
@@ -108,7 +108,7 @@ Note that text that precedes a color tag is colored by the "global" color settin
 
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_2533_page27' class='stacks_out'><div id='stacks_in_2533_page27' class='stacks_in'>
+<div id='stacks_out_4786_page27' class='stacks_out'><div id='stacks_in_4786_page27' class='stacks_in'>
 
 <!--    Anchor Link Stack v1.0 by Joe Workman   -->
 
@@ -117,11 +117,11 @@ Note that text that precedes a color tag is colored by the "global" color settin
 <!-- End of Anchor Link Stack -->
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_2534_page27' class='stacks_out'><div id='stacks_in_2534_page27' class='stacks_in'>
+<div id='stacks_out_4787_page27' class='stacks_out'><div id='stacks_in_4787_page27' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Interactivity</span> <div id='stacks_out_2537_page27' class='stacks_out'><div id='stacks_in_2537_page27' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Interactivity</span> <div id='stacks_out_4790_page27' class='stacks_out'><div id='stacks_in_4790_page27' class='stacks_in'>
 You can set/retrieve the textual contents of the control by accessing its <span style="font:12px Courier, mono; ">.Text</span> property from script.<br /><br />You can set the "global" color of the text using its <span style="font:12px Courier, mono; ">.SetColor()</span> method.  <strong>NOTE:</strong> The global color will be overridden by any color tags in the text (assuming parsing of color tags is enabled).
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
@@ -132,7 +132,7 @@ You can set/retrieve the textual contents of the control by accessing its <span 
 
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_2539_page27' class='stacks_out'><div id='stacks_in_2539_page27' class='stacks_in'>
+<div id='stacks_out_4792_page27' class='stacks_out'><div id='stacks_in_4792_page27' class='stacks_in'>
 
 <!--    Anchor Link Stack v1.0 by Joe Workman   -->
 
@@ -141,12 +141,12 @@ You can set/retrieve the textual contents of the control by accessing its <span 
 <!-- End of Anchor Link Stack -->
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_2540_page27' class='stacks_out'><div id='stacks_in_2540_page27' class='stacks_in'>
+<div id='stacks_out_4793_page27' class='stacks_out'><div id='stacks_in_4793_page27' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Control-specific Properties</span> <div id='stacks_out_2543_page27' class='stacks_out'><div id='stacks_in_2543_page27' class='stacks_in'>
-<link rel="stylesheet" type="text/css" media="screen" href="files/17.css"  />
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Control-specific Properties</span> <div id='stacks_out_4796_page27' class='stacks_out'><div id='stacks_in_4796_page27' class='stacks_in'>
+<link rel="stylesheet" type="text/css" media="screen" href="files/18.css"  />
 <style type='text/css'> 
 .partitions_2_properties td {
 	vertical-align:top;
@@ -158,178 +158,184 @@ You can set/retrieve the textual contents of the control by accessing its <span 
 </style>
 <table class="partitions_2_properties" style="vertical-align: top; margin: auto; width:100%; border-collapse: collapse; border-spacing: 5px;" >
 	<tr class="row1">
-		<td style="width:20%; border-right-style:  ;"><div id='stacks_out_2545_page27' class='stacks_out'><div id='stacks_in_2545_page27' class='stacks_in'>
+		<td style="width:20%; border-right-style:  ;"><div id='stacks_out_4798_page27' class='stacks_out'><div id='stacks_in_4798_page27' class='stacks_in'>
 <span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Text</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="width:auto%; border-left-style:  ;"><div id='stacks_out_2548_page27' class='stacks_out'><div id='stacks_in_2548_page27' class='stacks_in'>
+		<td style="width:auto%; border-left-style:  ;"><div id='stacks_out_4801_page27' class='stacks_out'><div id='stacks_in_4801_page27' class='stacks_in'>
 The text that should appear in the control.  You can enter color tags here to color specific parts of the text.  See notes above.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row2">
-		<td style="border-right-style:  ;"><div id='stacks_out_2551_page27' class='stacks_out'><div id='stacks_in_2551_page27' class='stacks_in'>
+		<td style="border-right-style:  ;"><div id='stacks_out_4804_page27' class='stacks_out'><div id='stacks_in_4804_page27' class='stacks_in'>
 <span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Offset Z</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2554_page27' class='stacks_out'><div id='stacks_in_2554_page27' class='stacks_in'>
+		<td style="border-left-style:  ;"><div id='stacks_out_4807_page27' class='stacks_out'><div id='stacks_in_4807_page27' class='stacks_in'>
 This is the distance along the Z-axis that the text will be offset from its origin.  Setting this can be useful to avoid text conflicting and getting hidden by objects close behind it.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row3">
-		<td style="border-right-style:  ;"><div id='stacks_out_2557_page27' class='stacks_out'><div id='stacks_in_2557_page27' class='stacks_in'>
+		<td style="border-right-style:  ;"><div id='stacks_out_4810_page27' class='stacks_out'><div id='stacks_in_4810_page27' class='stacks_in'>
 <span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Character Size</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2560_page27' class='stacks_out'><div id='stacks_in_2560_page27' class='stacks_in'>
+		<td style="border-left-style:  ;"><div id='stacks_out_4813_page27' class='stacks_out'><div id='stacks_in_4813_page27' class='stacks_in'>
 This is the size, in world units, of a typical capital letter (a letter that extends from the baseline to the top of the line).  This will be calculated automatically if pixel-perfect is used.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row4">
-		<td style="border-right-style:  ;"><div id='stacks_out_2563_page27' class='stacks_out'><div id='stacks_in_2563_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Line Spacing</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4905_page27' class='stacks_out'><div id='stacks_in_4905_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Character Spacing</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2566_page27' class='stacks_out'><div id='stacks_in_2566_page27' class='stacks_in'>
-This is the percentage of a full-height line that will exist from the top of one line to the top of the next.  For example, if a value of 1 is specified, then the distance from the top of one line to the next will be exactly the same as the height of the line, meaning the two lines of text, depending on content, could touch.  This value defaults to 1.1, meaning that an additional 10% (.1) of the line's height will be placed between lines.
+		<td style="border-left-style:  ;"><div id='stacks_out_4907_page27' class='stacks_out'><div id='stacks_in_4907_page27' class='stacks_in'>
+An adjustable factor by which you can increase/decrease the spacing between characters.  A value of 1.0 will space characters exactly as described by the font.  Decreasing this value will place the characters closer together, while increasing it will place them farther apart.  Ex: A value of 2.0 will cause there to be exactly twice as much space between characters as called for by the font itself (including kerning information).
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row5">
-		<td style="border-right-style:  ;"><div id='stacks_out_2569_page27' class='stacks_out'><div id='stacks_in_2569_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Anchor</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4816_page27' class='stacks_out'><div id='stacks_in_4816_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Line Spacing</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2572_page27' class='stacks_out'><div id='stacks_in_2572_page27' class='stacks_in'>
-This indicates where the text "area" will be anchored relative to the GameObject's center point.  See the notes on Anchor and Alignment above.
+		<td style="border-left-style:  ;"><div id='stacks_out_4819_page27' class='stacks_out'><div id='stacks_in_4819_page27' class='stacks_in'>
+This is the percentage of a full-height line that will exist from the top of one line to the top of the next.  For example, if a value of 1 is specified, then the distance from the top of one line to the next will be exactly the same as the height of the line, meaning the two lines of text, depending on content, could touch.  This value defaults to 1.1, meaning that an additional 10% (.1) of the line's height will be placed between lines.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row6">
-		<td style="border-right-style:  ;"><div id='stacks_out_2575_page27' class='stacks_out'><div id='stacks_in_2575_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Alignment</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4822_page27' class='stacks_out'><div id='stacks_in_4822_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Anchor</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2578_page27' class='stacks_out'><div id='stacks_in_2578_page27' class='stacks_in'>
-How the text will be aligned within the text "area".  i.e. Left, Center, Right.  See the notes on Anchor and Alignment above.
+		<td style="border-left-style:  ;"><div id='stacks_out_4825_page27' class='stacks_out'><div id='stacks_in_4825_page27' class='stacks_in'>
+This indicates where the text "area" will be anchored relative to the GameObject's center point.  See the notes on Anchor and Alignment above.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row7">
-		<td style="border-right-style:  ;"><div id='stacks_out_2581_page27' class='stacks_out'><div id='stacks_in_2581_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Tab Size</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4828_page27' class='stacks_out'><div id='stacks_in_4828_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Alignment</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2584_page27' class='stacks_out'><div id='stacks_in_2584_page27' class='stacks_in'>
-The number of spaces that will be inserted when a tab character is encountered in the string.
+		<td style="border-left-style:  ;"><div id='stacks_out_4831_page27' class='stacks_out'><div id='stacks_in_4831_page27' class='stacks_in'>
+How the text will be aligned within the text "area".  i.e. Left, Center, Right.  See the notes on Anchor and Alignment above.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row8">
-		<td style="border-right-style:  ;"><div id='stacks_out_2587_page27' class='stacks_out'><div id='stacks_in_2587_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Font</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4834_page27' class='stacks_out'><div id='stacks_in_4834_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Tab Size</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2590_page27' class='stacks_out'><div id='stacks_in_2590_page27' class='stacks_in'>
-References the font definition file to use for the text.  This file is a <span style="font:12px Courier, mono; ">TextAsset</span> that you generate.  See <a href="../../page28/page28.html" rel="self" title="Creating Fonts">Creating Fonts</a> for more details.
+		<td style="border-left-style:  ;"><div id='stacks_out_4837_page27' class='stacks_out'><div id='stacks_in_4837_page27' class='stacks_in'>
+The number of spaces that will be inserted when a tab character is encountered in the string.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row9">
-		<td style="border-right-style:  ;"><div id='stacks_out_2593_page27' class='stacks_out'><div id='stacks_in_2593_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Color</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4840_page27' class='stacks_out'><div id='stacks_in_4840_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Font</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2596_page27' class='stacks_out'><div id='stacks_in_2596_page27' class='stacks_in'>
-The "global" color of the text.  This is overridden by any color tags in-line in the text.  See the notes above regarding coloring.
+		<td style="border-left-style:  ;"><div id='stacks_out_4843_page27' class='stacks_out'><div id='stacks_in_4843_page27' class='stacks_in'>
+References the font definition file to use for the text.  This file is a <span style="font:12px Courier, mono; ">TextAsset</span> that you generate.  See <a href="../../page28/page28.html" rel="self" title="Creating Fonts">Creating Fonts</a> for more details.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row10">
-		<td style="border-right-style:  ;"><div id='stacks_out_2599_page27' class='stacks_out'><div id='stacks_in_2599_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Pixel Perfect</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4846_page27' class='stacks_out'><div id='stacks_in_4846_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Color</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2602_page27' class='stacks_out'><div id='stacks_in_2602_page27' class='stacks_in'>
-When checked, the Character Size (see above) will be automatically calculated so that there is a 1:1 font pixel to screen pixel correlation.
+		<td style="border-left-style:  ;"><div id='stacks_out_4849_page27' class='stacks_out'><div id='stacks_in_4849_page27' class='stacks_in'>
+The "global" color of the text.  This is overridden by any color tags in-line in the text.  See the notes above regarding coloring.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row11">
-		<td style="border-right-style:  ;"><div id='stacks_out_2605_page27' class='stacks_out'><div id='stacks_in_2605_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Max Width</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4852_page27' class='stacks_out'><div id='stacks_in_4852_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Pixel Perfect</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2608_page27' class='stacks_out'><div id='stacks_in_2608_page27' class='stacks_in'>
-When set to 0, there is no limit to the width of the text displayed.  Otherwise, this value indicates the width, in world space units, that the text is allowed to be.  If it exceeds this width, the text will be word-wrapped to the next line.
+		<td style="border-left-style:  ;"><div id='stacks_out_4855_page27' class='stacks_out'><div id='stacks_in_4855_page27' class='stacks_in'>
+When checked, the Character Size (see above) will be automatically calculated so that there is a 1:1 font pixel to screen pixel correlation.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row12">
-		<td style="border-right-style:  ;"><div id='stacks_out_2611_page27' class='stacks_out'><div id='stacks_in_2611_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Dynamic Length</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4858_page27' class='stacks_out'><div id='stacks_in_4858_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Max Width</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2614_page27' class='stacks_out'><div id='stacks_in_2614_page27' class='stacks_in'>
-This setting is reserved for future use.  It presently has no effect.
+		<td style="border-left-style:  ;"><div id='stacks_out_4861_page27' class='stacks_out'><div id='stacks_in_4861_page27' class='stacks_in'>
+When set to 0, there is no limit to the width of the text displayed.  Otherwise, this value indicates the width, in world space units, that the text is allowed to be.  If it exceeds this width, the text will be word-wrapped to the next line.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row13">
-		<td style="border-right-style:  ;"><div id='stacks_out_2617_page27' class='stacks_out'><div id='stacks_in_2617_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Remove Unsupported Characters</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4864_page27' class='stacks_out'><div id='stacks_in_4864_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Dynamic Length</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2620_page27' class='stacks_out'><div id='stacks_in_2620_page27' class='stacks_in'>
-When checked, any characters which are not defined in your font definition will be rejected and will not be attempted to be displayed.
+		<td style="border-left-style:  ;"><div id='stacks_out_4867_page27' class='stacks_out'><div id='stacks_in_4867_page27' class='stacks_in'>
+This setting is reserved for future use.  It presently has no effect.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row14">
-		<td style="border-right-style:  ;"><div id='stacks_out_2623_page27' class='stacks_out'><div id='stacks_in_2623_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Parse Color Tags</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4870_page27' class='stacks_out'><div id='stacks_in_4870_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Remove Unsupported Characters</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2626_page27' class='stacks_out'><div id='stacks_in_2626_page27' class='stacks_in'>
-When this option is enabled, color tags will be parsed from the text.  However, if it is unchecked, color tags will be ignored.  This is useful for things like player name fields.
+		<td style="border-left-style:  ;"><div id='stacks_out_4873_page27' class='stacks_out'><div id='stacks_in_4873_page27' class='stacks_in'>
+When checked, any characters which are not defined in your font definition will be rejected and will not be attempted to be displayed.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row15">
-		<td style="border-right-style:  ;"><div id='stacks_out_2629_page27' class='stacks_out'><div id='stacks_in_2629_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Render Camera</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4876_page27' class='stacks_out'><div id='stacks_in_4876_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Parse Color Tags</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2632_page27' class='stacks_out'><div id='stacks_in_2632_page27' class='stacks_in'>
-The camera that will render this text.  This is important when using pixel-perfect as the size calculation is based upon the camera.
+		<td style="border-left-style:  ;"><div id='stacks_out_4879_page27' class='stacks_out'><div id='stacks_in_4879_page27' class='stacks_in'>
+When this option is enabled, color tags will be parsed from the text.  However, if it is unchecked, color tags will be ignored.  This is useful for things like player name fields.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row16">
-		<td style="border-right-style:  ;"><div id='stacks_out_2635_page27' class='stacks_out'><div id='stacks_in_2635_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Hide At Start</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4882_page27' class='stacks_out'><div id='stacks_in_4882_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Render Camera</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2638_page27' class='stacks_out'><div id='stacks_in_2638_page27' class='stacks_in'>
-When checked, the object will not be rendered at start.
+		<td style="border-left-style:  ;"><div id='stacks_out_4885_page27' class='stacks_out'><div id='stacks_in_4885_page27' class='stacks_in'>
+The camera that will render this text.  This is important when using pixel-perfect as the size calculation is based upon the camera.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row17">
-		<td style="border-right-style:  ;"><div id='stacks_out_2641_page27' class='stacks_out'><div id='stacks_in_2641_page27' class='stacks_in'>
-<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Persistent</span>
+		<td style="border-right-style:  ;"><div id='stacks_out_4888_page27' class='stacks_out'><div id='stacks_in_4888_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Hide At Start</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div id='stacks_out_2644_page27' class='stacks_out'><div id='stacks_in_2644_page27' class='stacks_in'>
-Check this box if the object should survive level loading.  Otherwise, when you load a new level/scene, it will be automatically destroyed along with the rest of the existing scene.
+		<td style="border-left-style:  ;"><div id='stacks_out_4891_page27' class='stacks_out'><div id='stacks_in_4891_page27' class='stacks_in'>
+When checked, the object will not be rendered at start.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row18">
-		<td style="border-right-style:  ;"><div class='slice empty out'><div class='slice empty in'></div></div><div class='stacks_clearer'></div></td>
-		<td style="border-left-style:  ;"><div class='slice empty out'><div class='slice empty in'></div></div><div class='stacks_clearer'></div></td>
+		<td style="border-right-style:  ;"><div id='stacks_out_4894_page27' class='stacks_out'><div id='stacks_in_4894_page27' class='stacks_in'>
+<span style="font:12px Courier, mono; font-weight:bold; font-weight:bold; ">Persistent</span>
+<div class='stacks_clearer'></div></div></div>
+<div class='stacks_clearer'></div></td>
+		<td style="border-left-style:  ;"><div id='stacks_out_4897_page27' class='stacks_out'><div id='stacks_in_4897_page27' class='stacks_in'>
+Check this box if the object should survive level loading.  Otherwise, when you load a new level/scene, it will be automatically destroyed along with the rest of the existing scene.
+<div class='stacks_clearer'></div></div></div>
+<div class='stacks_clearer'></div></td>
 	</tr>
 	<tr class="row19">
 		<td style="border-right-style:  ;"><div class='slice empty out'><div class='slice empty in'></div></div><div class='stacks_clearer'></div></td>

@@ -78,6 +78,22 @@ public interface IControl
 	}
 
 	/// <summary>
+	/// Sets and retrieves whether any associated text
+	/// should be taken into account when generating
+	/// a collider for the control automatically.
+	/// </summary>
+	bool IncludeTextInAutoCollider
+	{
+		get;
+		set;
+	}
+
+	/// <summary>
+	/// Updates any auto-generated collider for the control.
+	/// </summary>
+	void UpdateCollider();
+
+	/// <summary>
 	/// Copies the the specified control.
 	/// </summary>
 	/// <param name="c">The control to be copied.</param>

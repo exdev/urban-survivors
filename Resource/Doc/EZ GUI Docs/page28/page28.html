@@ -42,20 +42,20 @@
 	<div id="pageHeader"><!-- Start page header -->
 		<img src="../rw_common/images/anb_logo.png" width="64" height="60" alt="Site logo"/>
 		<h1>EZ GUI</h1>
-		<h2></h2>
+		<h2>Changing the world, one site at a time&hellip;</h2>
 	</div><!-- End page header -->
 	
 	<div id="contentContainer"><!-- Start main content wrapper -->
 		<div id="content"><!-- Start content -->
 			
 
-<!-- Stacks v1.3.1 -->
+<!-- Stacks v1.4.3 -->
 <div class='stacks_top'>
-<div id='stacks_out_2749_page28' class='stacks_out'><div id='stacks_in_2749_page28' class='stacks_in'>
+<div id='stacks_out_2793_page28' class='stacks_out'><div id='stacks_in_2793_page28' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><h1>Creating Fonts</h1> <div id='stacks_out_2752_page28' class='stacks_out'><div id='stacks_in_2752_page28' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><h1>Creating Fonts</h1> <div id='stacks_out_2796_page28' class='stacks_out'><div id='stacks_in_2796_page28' class='stacks_in'>
 EZ GUI features its own integrated text in the form of <span style="font:12px Courier, mono; "><a href="../page2/page27/page27.html" rel="self" title="Label">SpriteText</a></span>.  This offers much more flexibility than Unity's built-in TextMesh (3D Text) component.  To create a font for use with EZ GUI's integrated text, you will start by creating the font atlas.  One of the benefits you will realize in EZ GUI's approach is that you can generate font atlases that only contain the characters you will use, letting you save lots of valuable texture memory that would otherwise be consumed with graphics never used in your game.  It is also easier to add post-processing and artistic effects to your font graphics since you have direct access to the font texture.<br /><br />There are two free, third-party tools you may use to generate such font atlases:<br /><br /><strong>Hiero (Cross-platform [Java]):</strong><br /><a href="http://slick.cokeandcode.com/demos/hiero.jnlp" rel="self">http://slick.cokeandcode.com/demos/hiero.jnlp</a><br /><br /><strong>Angel Code's Bitmap Font Generator (Windows only):</strong><br /><a href="http://www.angelcode.com/products/bmfont/" rel="self">http://www.angelcode.com/products/bmfont/</a><br /><br />Below you will find guides to using each of these tools:<br /><strong><a href="../page28/page29/page29.html" rel="self" title="Creating Fonts with Hiero">Creating Fonts with Hiero</a></strong><br /><strong><a href="../page28/page30/page30.html" rel="self" title="Creating Fonts with Hiero Copy">Creating Fonts with BMFont</a></strong>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>
@@ -66,11 +66,11 @@ EZ GUI features its own integrated text in the form of <span style="font:12px Co
 
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_2754_page28' class='stacks_out'><div id='stacks_in_2754_page28' class='stacks_in'>
+<div id='stacks_out_2798_page28' class='stacks_out'><div id='stacks_in_2798_page28' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><h1>Using Fonts</h1> <div id='stacks_out_2757_page28' class='stacks_out'><div id='stacks_in_2757_page28' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><h1>Using Fonts</h1> <div id='stacks_out_2801_page28' class='stacks_out'><div id='stacks_in_2801_page28' class='stacks_in'>
 Once you have created your font assets, now you need to bring them into your Unity project:<br /><br /><strong>1.</strong> In Unity, drag in your font atlas texture and your font definition file (with the .txt extension).<br /><br /><strong>2.</strong> You will want to create a material for your font. It is recommended to use the included "Font Material" as a base. Just duplicate it and click on its texture setting and assign it to your font texture.<br /><br /><strong>3.</strong> If you want your controls to be able to automatically generate a <span style="font:12px Courier, mono; ">SpriteText</span> object in-editor, you will want to assign the font definition file (.txt file) to the "Default Font" field of the <span style="font:12px Courier, mono; ">UIManager</span> object in your scene, and the font's material to the "Default Font Material" field of the <span style="font:12px Courier, mono; ">UIManager</span>. If you are setting up an individual stand-alone <span style="font:12px Courier, mono; ">SpriteText</span> object, just select your font definition file (.txt file) in the <span style="font:12px Courier, mono; ">SpriteText</span>'s "Font" field, and set its mesh renderer's material to use the font material you created.<br /><br />You are now ready to type text into your control or <span style="font:12px Courier, mono; ">SpriteText</span>'s "Text" field.
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>

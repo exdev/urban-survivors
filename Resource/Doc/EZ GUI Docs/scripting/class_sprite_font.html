@@ -44,6 +44,8 @@
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The distance, in pixels, from the absolute top of a line to the baseline:.  <a href="#a2a924deba2a895588dbfcd594fb15c2e"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_font.html#ab1b3b5f838bfb158ebe67056aee6a4a0">PixelSize</a><code> [get]</code></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The size (height) of the font, in pixels. This is the height, in pixels of a full-height character.  <a href="#ab1b3b5f838bfb158ebe67056aee6a4a0"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sprite_font.html#a40a42245f059176c9a12fdb6fa281767">CharacterSpacing</a><code> [get, set]</code></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">An adjustable factor by which you can increase/decrease the spacing between characters. A value of 1.0 will space characters exactly as described by the font. Decreasing this value will place the characters closer together, while increasing it will place them farther apart.  <a href="#a40a42245f059176c9a12fdb6fa281767"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>A class that holds information about a font intended for use with <a class="el" href="class_sprite_text.html">SpriteText</a>. </p>
@@ -381,6 +383,21 @@
 
 </div>
 </div>
+<a class="anchor" id="a40a42245f059176c9a12fdb6fa281767"></a><!-- doxytag: member="SpriteFont::CharacterSpacing" ref="a40a42245f059176c9a12fdb6fa281767" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float SpriteFont.CharacterSpacing<code> [get, set]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>An adjustable factor by which you can increase/decrease the spacing between characters. A value of 1.0 will space characters exactly as described by the font. Decreasing this value will place the characters closer together, while increasing it will place them farther apart. </p>
+
+</div>
+</div>
 <a class="anchor" id="a40f2b72330ff4ee3e926b7f6dc28554c"></a><!-- doxytag: member="SpriteFont::LineHeight" ref="a40f2b72330ff4ee3e926b7f6dc28554c" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -415,7 +432,7 @@
 <li>SpriteFont.cs</li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Nov 30 20:44:26 2010 for EZ GUI by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Feb 1 18:27:09 2011 for EZ GUI by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

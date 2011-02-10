@@ -59,8 +59,8 @@ Inheritance diagram for UIBistateInteractivePanel:</div>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns a reference to the specified transition.  <a href="#a3fec5a30e9c609a4e4f3ec70e32b66f0"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_panel_base.html#a7ca1ed828ebd4b0e6ca5de97d7e7928d">StartTransition</a> (string transName)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Starts the transition matching the specified name (case-insensitive).  <a href="#a7ca1ed828ebd4b0e6ca5de97d7e7928d"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_panel_base.html#a25eaa6d9e84f4a0d6cc3ca68cdb3ea05">SetTempTransitionDelegate</a> (TransitionCompleteDelegate del)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Temporarily sets up a delegate to be called when the next transition completes. This will be unset after it is called.  <a href="#a25eaa6d9e84f4a0d6cc3ca68cdb3ea05"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_panel_base.html#aeb8919ef189123a91d9fccbf89e4b16a">AddTempTransitionDelegate</a> (TransitionCompleteDelegate del)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Temporarily adds a delegate to be called when the next transition completes. This will be unset after it is called.  <a href="#aeb8919ef189123a91d9fccbf89e4b16a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_panel_base.html#a3614d2babfd844b9f44e52a371dbc79f">AddInputDelegate</a> (EZInputDelegate del)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds a method to be called when input occurs (input is forwarded from <a class="el" href="class_u_i_panel_base.html#ac19ff5d56d08c4715f41a4dd7b9e9358" title="This is where input handling code should go in any derived class.">OnInput()</a>).  <a href="#a3614d2babfd844b9f44e52a371dbc79f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_panel_base.html#abbe4871b3b4617db5ba335a9a66a2e93">RemoveInputDelegate</a> (EZInputDelegate del)</td></tr>
@@ -208,6 +208,34 @@ Inheritance diagram for UIBistateInteractivePanel:</div>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>go</em>&nbsp;</td><td>GameObject to be added as a subject.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="interface_i_u_i_container.html#ade511ccff94779c1c937a3d49bf85b96">IUIContainer</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aeb8919ef189123a91d9fccbf89e4b16a"></a><!-- doxytag: member="UIBistateInteractivePanel::AddTempTransitionDelegate" ref="aeb8919ef189123a91d9fccbf89e4b16a" args="(TransitionCompleteDelegate del)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UIPanelBase.AddTempTransitionDelegate </td>
+          <td>(</td>
+          <td class="paramtype">TransitionCompleteDelegate&nbsp;</td>
+          <td class="paramname"> <em>del</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Temporarily adds a delegate to be called when the next transition completes. This will be unset after it is called. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>del</em>&nbsp;</td><td>Delegate to be called.</td></tr>
   </table>
   </dd>
 </dl>
@@ -557,6 +585,8 @@ Inheritance diagram for UIBistateInteractivePanel:</div>
   </dd>
 </dl>
 
+<p>Implements <a class="el" href="interface_i_u_i_container.html#a1fa662ab3778562f600231e8fb3017cd">IUIContainer</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="ad110d3b551361f63bc174846ff6d2e16"></a><!-- doxytag: member="UIBistateInteractivePanel::RemoveValueChangedDelegate" ref="ad110d3b551361f63bc174846ff6d2e16" args="(EZValueChangedDelegate del)" -->
@@ -603,32 +633,6 @@ Inheritance diagram for UIBistateInteractivePanel:</div>
 <div class="memdoc">
 
 <p>Reveals the panel by invoking its Bring In Forward transition. </p>
-
-</div>
-</div>
-<a class="anchor" id="a25eaa6d9e84f4a0d6cc3ca68cdb3ea05"></a><!-- doxytag: member="UIBistateInteractivePanel::SetTempTransitionDelegate" ref="a25eaa6d9e84f4a0d6cc3ca68cdb3ea05" args="(TransitionCompleteDelegate del)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void UIPanelBase.SetTempTransitionDelegate </td>
-          <td>(</td>
-          <td class="paramtype">TransitionCompleteDelegate&nbsp;</td>
-          <td class="paramname"> <em>del</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [inherited]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Temporarily sets up a delegate to be called when the next transition completes. This will be unset after it is called. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>del</em>&nbsp;</td><td>Delegate to be called.</td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>
@@ -926,7 +930,7 @@ Inheritance diagram for UIBistateInteractivePanel:</div>
 <li>UIBistateInteractivePanel.cs</li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Nov 30 20:44:27 2010 for EZ GUI by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Feb 1 18:27:09 2011 for EZ GUI by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

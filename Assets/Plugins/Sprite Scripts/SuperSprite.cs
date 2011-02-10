@@ -27,7 +27,7 @@ public class SuperSpriteAnimElement
 	/// The name of the animation to play.
 	/// </summary>
 	public string animName;
-	
+
 	// The actual reference to the desired
 	// animation.
 	[HideInInspector]
@@ -41,7 +41,7 @@ public class SuperSpriteAnimElement
 		{
 			// See if we need to activate our sprite
 			// to work with it:
-			if(!sprite.gameObject.active)
+			if (!sprite.gameObject.active)
 			{
 				wasDeactivated = true;
 				sprite.gameObject.active = true;
@@ -115,7 +115,7 @@ public class SuperSpriteAnim
 		/// </summary>
 		Destroy
 	};
-	
+
 	public delegate void AnimCompletedDelegate(SuperSpriteAnim anim);
 
 	/// <summary>
@@ -188,9 +188,9 @@ public class SuperSpriteAnim
 
 		List<SuperSpriteAnimElement> anims = new List<SuperSpriteAnimElement>();
 
-		for(int i=0; i<spriteAnims.Length; ++i)
+		for (int i = 0; i < spriteAnims.Length; ++i)
 			if (spriteAnims[i] != null)
-				if(spriteAnims[i].sprite != null)
+				if (spriteAnims[i].sprite != null)
 				{
 					spriteAnims[i].Init();
 
@@ -198,7 +198,7 @@ public class SuperSpriteAnim
 					// so we don't have to check them
 					// constantly later on:
 					anims.Add(spriteAnims[i]);
-					
+
 					// Hide each sprite by default:
 					HideSprite(spriteAnims[i].sprite, true);
 				}
@@ -280,7 +280,7 @@ public class SuperSpriteAnim
 			HideSprite(sp, true);
 			curAnim += stepDir;
 		}
-		
+
 		// Proceed to play the next animation:
 		HideSprite(spriteAnims[curAnim].sprite, false);
 		spriteAnims[curAnim].sprite.SetAnimCompleteDelegate(AnimFinished);
@@ -312,13 +312,13 @@ public class SuperSpriteAnim
 	/// </summary>
 	public void Play()
 	{
-// 		if(pingPong)
-// 		{	// Setup our last anim to loop back properly:
-// 			spriteAnims[spriteAnims.Length - 1].anim.loopReverse = true;
-// 		}
+		// 		if(pingPong)
+		// 		{	// Setup our last anim to loop back properly:
+		// 			spriteAnims[spriteAnims.Length - 1].anim.loopReverse = true;
+		// 		}
 
 		isRunning = true;
-		
+
 		// Register our ending delegate:
 		spriteAnims[curAnim].sprite.SetAnimCompleteDelegate(AnimFinished);
 
@@ -333,7 +333,7 @@ public class SuperSpriteAnim
 	{
 		isRunning = false;
 		spriteAnims[curAnim].sprite.StopAnim();
-		
+
 		// Unset our delegate:
 		spriteAnims[curAnim].sprite.SetAnimCompleteDelegate(null);
 	}
@@ -371,12 +371,12 @@ public class SuperSpriteAnim
 	/// </summary>
 	public SpriteBase CurrentSprite
 	{
-		get 
+		get
 		{
 			if (curAnim < 0 || curAnim >= spriteAnims.Length)
 				return null;
 
-			return spriteAnims[curAnim].sprite; 
+			return spriteAnims[curAnim].sprite;
 		}
 	}
 
@@ -423,7 +423,7 @@ public class SuperSpriteAnim
 	/// </summary>
 	public void Delete()
 	{
-		for(int i=0; i<spriteAnims.Length; ++i)
+		for (int i = 0; i < spriteAnims.Length; ++i)
 			if (spriteAnims[i].sprite != null)
 			{
 				spriteAnims[i].sprite.Delete();
@@ -442,7 +442,7 @@ public class SuperSpriteAnim
 /// though they were a single sprite.
 /// </remarks>
 [System.Serializable]
-public class SuperSprite : MonoBehaviour 
+public class SuperSprite : MonoBehaviour
 {
 	/// <remarks>
 	/// Defines a delegate that can be called upon animation completion.
@@ -476,12 +476,18 @@ public class SuperSprite : MonoBehaviour
 
 	protected AnimCompleteDelegate animCompleteDelegate;
 
+	protected bool m_started = false;
+
 
 	// Use this for initialization
-	public void Start ()
+	public void Start()
 	{
+		if (m_started)
+			return;
+		m_started = true;
+
 		// Initialize animations:
-		for(int i=0; i<animations.Length; ++i)
+		for (int i = 0; i < animations.Length; ++i)
 			if (animations[i] != null)
 			{
 				animations[i].Init(i, AnimFinished);
@@ -497,6 +503,9 @@ public class SuperSprite : MonoBehaviour
 	/// <param name="anim">The SuperSprite animation to be played.</param>
 	public void PlayAnim(SuperSpriteAnim anim)
 	{
+		if (!m_started)
+			Start();
+
 		if (curAnim != null)
 			curAnim.Hide(true);
 
@@ -525,8 +534,8 @@ public class SuperSprite : MonoBehaviour
 	/// <param name="anim">The name of the SuperSprite animation to be played.</param>
 	public void PlayAnim(string anim)
 	{
-		for(int i=0; i<animations.Length; ++i)
-			if(animations[i].name == anim)
+		for (int i = 0; i < animations.Length; ++i)
+			if (animations[i].name == anim)
 			{
 				PlayAnim(animations[i]);
 				return;
@@ -715,9 +724,9 @@ public class SuperSprite : MonoBehaviour
 			animCompleteDelegate(this);
 
 		// Handle the OnAnimEnd action:
-		if(curAnim != null)
+		if (curAnim != null)
 		{
-			switch(curAnim.onAnimEnd)
+			switch (curAnim.onAnimEnd)
 			{
 				case SuperSpriteAnim.ANIM_END_ACTION.Play_Default_Anim:
 					PlayAnim(defaultAnim);

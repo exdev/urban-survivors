@@ -42,23 +42,23 @@
 	<div id="pageHeader"><!-- Start page header -->
 		<img src="../../rw_common/images/anb_logo.png" width="64" height="60" alt="Site logo"/>
 		<h1>EZ GUI</h1>
-		<h2></h2>
+		<h2>Changing the world, one site at a time&hellip;</h2>
 	</div><!-- End page header -->
 	
 	<div id="contentContainer"><!-- Start main content wrapper -->
 		<div id="content"><!-- Start content -->
 			
 
-<!-- Stacks v1.3.1 -->
+<!-- Stacks v1.4.3 -->
 <div class='stacks_top'>
-<div id='stacks_out_3247_page15' class='stacks_out'><div id='stacks_in_3247_page15' class='stacks_in'>
+<div id='stacks_out_3291_page15' class='stacks_out'><div id='stacks_in_3291_page15' class='stacks_in'>
 <h1>Input Delegates</h1>
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_3249_page15' class='stacks_out'><div id='stacks_in_3249_page15' class='stacks_in'>
+<div id='stacks_out_3293_page15' class='stacks_out'><div id='stacks_in_3293_page15' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Overview</span> <div id='stacks_out_3252_page15' class='stacks_out'><div id='stacks_in_3252_page15' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Overview</span> <div id='stacks_out_3296_page15' class='stacks_out'><div id='stacks_in_3296_page15' class='stacks_in'>
 Most controls allow you to "listen" to the raw input they receive from user actions by passing a delegate to the control's <span style="font:12px Courier, mono; "><a href="../../scripting/interface_i_u_i_object.html#af69fa50323763146001ea47d8c61d277" rel="self">AddInputDelegate()</a></span> method.  Such a delegate must conform to the <span style="font:12px Courier, mono; ">EZInputDelegate</span> definition:<br /><br /><code><i><font color="#9A1900">// C#</font></i><br /><font color="#009900">void</font> <b><font color="#000000">EZInputDelegate</font></b><font color="#990000">(</font>ref POINTER_INFO ptr<font color="#990000">)</font></code>
 <br /><br />This delegate receives a reference to the <a href="../../scripting/struct_p_o_i_n_t_e_r___i_n_f_o.html" rel="self">POINTER_INFO</a> object which pertains to the control being "listened" to.  The delegate will be called <strong><em>before</em></strong> the control itself performs processing.  This affords you the opportunity to modify the <span style="font:12px Courier, mono; ">ptr</span> variable as necessary, or otherwise take action to alter the behavior of the control.<br /><br />For more information, see <span style="font:12px Courier, mono; ">POINTER_INFO</span> in the <a href="../../page6/page6.html" rel="self" title="Scripting Reference">Scripting Reference</a>.
 <div class='stacks_clearer'></div></div></div>
@@ -70,32 +70,32 @@ Most controls allow you to "listen" to the raw input they receive from user acti
 
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_3254_page15' class='stacks_out'><div id='stacks_in_3254_page15' class='stacks_in'>
+<div id='stacks_out_3298_page15' class='stacks_out'><div id='stacks_in_3298_page15' class='stacks_in'>
 <div class="table" style="margin-right: auto;margin-left: auto;margin-bottom: 10px;">
 	<table style="vertical-align: top;" >
 	<tr>
-		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Example</span> <div id='stacks_out_3257_page15' class='stacks_out'><div id='stacks_in_3257_page15' class='stacks_in'>
+		<td style="width:%id=column1_width%%; vertical-align: top; border: 2px solid #EBEBEB; -moz-border-radius: 20px; -webkit-border-radius: 20px; -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5); -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);padding: 12px; background: url(files/img1.jpg) repeat-x 0 bottom; background-color:#FFFFFF;"><span style="font-size:15px; font-weight:bold; ">Example</span> <div id='stacks_out_3301_page15' class='stacks_out'><div id='stacks_in_3301_page15' class='stacks_in'>
 <span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; ">First, we'll define our delegate somewhere in one of our scripts. </span><span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; font-weight:bold; font-weight:bold; ">NOTE:</span><span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; "> Because of limitations in JavaScript/UnityScript, input delegates must be written in C#:</span>
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_3259_page15' class='stacks_out'><div id='stacks_in_3259_page15' class='stacks_in'>
+<div id='stacks_out_3303_page15' class='stacks_out'><div id='stacks_in_3303_page15' class='stacks_in'>
 <code><font color="#009900">void</font> <b><font color="#000000">MyDelegate</font></b><font color="#990000">(</font>ref POINTER_INFO ptr<font color="#990000">)</font><br /><font color="#FF0000">{</font><br />&nbsp; &nbsp;<i><font color="#9A1900">// Display a message in the console if</font></i><br />&nbsp; &nbsp;<i><font color="#9A1900">// the pointer is dragged over the control:</font></i><br />&nbsp; &nbsp;<b><font color="#0000FF">if</font></b><font color="#990000">(</font>ptr<font color="#990000">.</font>evt <font color="#990000">==</font> POINTER_INFO<font color="#990000">.</font>INPUT_EVENT<font color="#990000">.</font>DRAG<font color="#990000">)</font><br />&nbsp; &nbsp; &nbsp; Debug<font color="#990000">.</font><b><font color="#000000">Log</font></b><font color="#990000">(</font><font color="#FF0000">"Dragged!"</font><font color="#990000">);</font><br /><font color="#FF0000">}</font></code>
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_3261_page15' class='stacks_out'><div id='stacks_in_3261_page15' class='stacks_in'>
+<div id='stacks_out_3305_page15' class='stacks_out'><div id='stacks_in_3305_page15' class='stacks_in'>
 <span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; ">The above code checks to see if the pointer event (.evt) is a drag event. Now we must tell our control about this delegate for it to be called:</span>
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_3263_page15' class='stacks_out'><div id='stacks_in_3263_page15' class='stacks_in'>
+<div id='stacks_out_3307_page15' class='stacks_out'><div id='stacks_in_3307_page15' class='stacks_in'>
 <code><font color="#009900">void</font> <b><font color="#000000">Start</font></b><font color="#990000">()</font><br /><font color="#FF0000">{</font><br />&nbsp; &nbsp;<i><font color="#9A1900">// Get a reference to our control script:</font></i><br />&nbsp; &nbsp;IUIObject control <font color="#990000">=</font> <font color="#990000">(</font>IUIObject<font color="#990000">)</font> <b><font color="#000000">GetComponent</font></b><font color="#990000">(</font><b><font color="#000000">typeof</font></b><font color="#990000">(</font>IUIObject<font color="#990000">));</font><br />&nbsp; &nbsp;<br />&nbsp; &nbsp;<i><font color="#9A1900">// Tell the control to call our method when it receives input:</font></i><br />&nbsp; &nbsp;control<font color="#990000">.</font><b><font color="#000000">AddInputDelegate</font></b><font color="#990000">(</font>MyDelegate<font color="#990000">);</font><br /><font color="#FF0000">}</font></code>
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_3265_page15' class='stacks_out'><div id='stacks_in_3265_page15' class='stacks_in'>
+<div id='stacks_out_3309_page15' class='stacks_out'><div id='stacks_in_3309_page15' class='stacks_in'>
 <span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; ">That's all there is to it.<br /><br />No suppose we have a button and want it not to enter the "OVER" state by ignoring the MOVE event. We can "ignore" certain events by fooling the control into thinking the event is something other than what it is, simply by changing the value stored in the POINTER_INFO variable, like so:</span>
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_3267_page15' class='stacks_out'><div id='stacks_in_3267_page15' class='stacks_in'>
+<div id='stacks_out_3311_page15' class='stacks_out'><div id='stacks_in_3311_page15' class='stacks_in'>
 <code><font color="#009900">void</font> <b><font color="#000000">MyDelegate</font></b><font color="#990000">(</font>ref POINTER_INFO ptr<font color="#990000">)</font><br /><font color="#FF0000">{</font><br />&nbsp; &nbsp;<b><font color="#0000FF">if</font></b><font color="#990000">(</font>ptr<font color="#990000">.</font>evt <font color="#990000">==</font> POINTER_INFO<font color="#990000">.</font>INPUT_EVENT<font color="#990000">.</font>MOVE<font color="#990000">)</font><br />&nbsp; &nbsp; &nbsp; ptr<font color="#990000">.</font>evt <font color="#990000">=</font> POINTER_INFO<font color="#990000">.</font>INPUT_EVENT<font color="#990000">.</font>NO_CHANGE<font color="#990000">;</font><br /><font color="#FF0000">}</font></code>
 
 <div class='stacks_clearer'></div></div></div>
-<div id='stacks_out_3269_page15' class='stacks_out'><div id='stacks_in_3269_page15' class='stacks_in'>
+<div id='stacks_out_3313_page15' class='stacks_out'><div id='stacks_in_3313_page15' class='stacks_in'>
 <span style="font:12px &#39;Lucida Grande&#39;, LucidaGrande, Verdana, sans-serif; ">Here we've changed the event to a "NO_CHANGE" event, which will be be ignored by the button.<br /><br />There is almost no limit to how you can extend the functionality or behavior of EZ GUI controls using input delegates.</span>
 <div class='stacks_clearer'></div></div></div>
 <div class='stacks_clearer'></div></td>

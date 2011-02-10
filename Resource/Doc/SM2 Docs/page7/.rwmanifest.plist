@@ -9,7 +9,7 @@
 		<key>page7</key>
 		<dict>
 			<key>CreationDate</key>
-			<date>2010-12-01T02:39:00Z</date>
+			<date>2011-02-02T00:57:23Z</date>
 			<key>DigestAlgorithm</key>
 			<string>MD5</string>
 			<key>DocumentGUID</key>
@@ -119,10 +119,10 @@
 				<dict>
 					<key>Digest</key>
 					<data>
-					QpvF4BYRP5nTYtRuvr8fuw==
+					7kpp/KvfaGEozl2nayzk6g==
 					</data>
 					<key>Size</key>
-					<integer>316</integer>
+					<integer>320</integer>
 				</dict>
 				<key>files/stacks_page_page7.js</key>
 				<dict>
@@ -137,10 +137,10 @@
 				<dict>
 					<key>Digest</key>
 					<data>
-					xFjC63uTVSwvfWibmXpZCg==
+					RPvU6ikSYwI5ehVySTNHpw==
 					</data>
 					<key>Size</key>
-					<integer>11899</integer>
+					<integer>11955</integer>
 				</dict>
 			</dict>
 			<key>PageID</key>

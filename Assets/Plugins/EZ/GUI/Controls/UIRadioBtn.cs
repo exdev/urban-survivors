@@ -4,23 +4,116 @@
 //-----------------------------------------------------------------
 
 
-// When defined, uses the parent GameObject
-// as the grouping method
-#define RADIOBTN_USE_PARENT
-
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 
+// Definition of a radio button interface
+public interface IRadioButton
+{
+	bool Value
+	{
+		get;
+		set;
+	}
+
+	string name
+	{
+		get;
+		set;
+	}
+}
+
+
+/// <summary>
+/// A class which encapsulates all that is required to track
+/// and manage radio buttons as a group.
+/// </summary>
 public class RadioBtnGroup
 {
-#if RADIOBTN_USE_PARENT
-	public Transform groupID;
-#else
+	static List<RadioBtnGroup> groups = new List<RadioBtnGroup>();
+
+	public RadioBtnGroup(int id)
+	{
+		groupID = id;
+		groups.Add(this);
+	}
+
+	~RadioBtnGroup()
+	{
+		groups.Remove(this);
+	}
+
 	public int groupID;
-#endif
+
 	public ArrayList buttons = new ArrayList();
+
+	/// <summary>
+	/// Returns a reference to the selected radio button for
+	/// the specified group.
+	/// </summary>
+	/// <param name="id">The parent GameObject of the radio buttons.</param>
+	/// <returns>A reference to the currently selected (true) radio button.  Null if none is set to true.</returns>
+	public static IRadioButton GetSelected(GameObject go)
+	{
+		return GetSelected(go.transform.GetHashCode());
+	}
+
+	/// <summary>
+	/// Returns a reference to the selected radio button for
+	/// the specified group.
+	/// </summary>
+	/// <param name="id">The ID of the group (either an arbitrary integer ID, or the hashcode of a radio button's parent transform, depending on the settings).</param>
+	/// <returns>A reference to the currently selected (true) radio button.  Null if none is set to true.</returns>
+	public static IRadioButton GetSelected(int id)
+	{
+		RadioBtnGroup group = null;
+
+		for (int i = 0; i < groups.Count; ++i)
+		{
+			if(groups[i].groupID == id)
+			{
+				group = groups[i];
+				break;
+			}
+		}
+
+		if(group == null)
+			return null;
+
+		for (int i = 0; i < group.buttons.Count; ++i)
+			if (((IRadioButton)group.buttons[i]).Value)
+				return (IRadioButton)group.buttons[i];
+
+		return null;
+	}
+
+	/// <summary>
+	/// Returns a reference to the radio button group
+	/// specified by "id".
+	/// </summary>
+	/// <param name="id">The ID of the group (either an arbitrary integer ID, or the hashcode of a radio button's parent transform, depending on the settings).</param>
+	/// <returns>Returns a reference to the group with the specified ID.</returns>
+	public static RadioBtnGroup GetGroup(int id)
+	{
+		RadioBtnGroup group= null;
+
+		for (int i = 0; i < groups.Count; ++i)
+		{
+			if(groups[i].groupID == id)
+			{
+				group = groups[i];
+				break;
+			}
+		}
+
+		if (group == null)
+			group = new RadioBtnGroup(id);
+
+		return group;
+	}
 }
 
 
@@ -29,7 +122,7 @@ public class RadioBtnGroup
 /// among of set of mutually exclusive options.
 /// </remarks>
 [AddComponentMenu("EZ GUI/Controls/Radio Button")]
-public class UIRadioBtn : AutoSpriteControlBase
+public class UIRadioBtn : AutoSpriteControlBase, IRadioButton
 {
 	protected enum CONTROL_STATE
 	{
@@ -41,15 +134,6 @@ public class UIRadioBtn : AutoSpriteControlBase
 	// Keeps track of the control's state
 	CONTROL_STATE state;
 
-
-	//---------------------------------------------
-	// Static members - used to synchronize buttons
-	//---------------------------------------------
-
-	// Array of arrays of buttons. Each element is
-	// a RadioBtnGroup, which holds the group number
-	// and its list of buttons.
-	static ArrayList buttonGroups = new ArrayList();
 
 	//---------------------------------------------
 	// End Static members
@@ -80,6 +164,7 @@ public class UIRadioBtn : AutoSpriteControlBase
 		get { return btnValue; }
 		set
 		{
+			bool prevValue = btnValue;
 			btnValue = value;
 
 			// Pop out the other buttons in the group:
@@ -88,9 +173,24 @@ public class UIRadioBtn : AutoSpriteControlBase
 
 			// Update the button's visual state:
 			SetButtonState();
+
+			// If the value changed:
+			if (prevValue != btnValue)
+			{
+				// Notify our change delegate:
+				if (changeDelegate != null)
+					changeDelegate(this);
+			}
 		}
 	}
 
+
+	/// <summary>
+	/// When true, the radio button will group itself with other
+	/// radio buttons based on whether they share the same
+	/// parent GameObject.
+	/// </summary>
+	public bool useParentForGrouping = true;
 
 
 	/// <summary>
@@ -101,9 +201,8 @@ public class UIRadioBtn : AutoSpriteControlBase
 	/// is not defined.  Otherwise, by default, radio buttons
 	/// group themselves according to a common parent GameObject.
 	/// </summary>
-#if !RADIOBTN_USE_PARENT
 	public int radioGroup;
-#endif
+
 
 	// Reference to the group that contains this
 	// radio button.
@@ -260,6 +359,9 @@ public class UIRadioBtn : AutoSpriteControlBase
 	//---------------------------------------------------
 	public override void OnInput(ref POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		if (!m_controlIsEnabled || IsHidden())
 		{
 			base.OnInput(ref ptr);
@@ -329,6 +431,7 @@ public class UIRadioBtn : AutoSpriteControlBase
 	//---------------------------------------------------
 	// Misc
 	//---------------------------------------------------
+/*
 	protected override void OnEnable()
 	{
 		base.OnEnable();
@@ -339,10 +442,12 @@ public class UIRadioBtn : AutoSpriteControlBase
 		SetGroup(radioGroup);
 #endif
 	}
+ */
 
-	protected override void OnDisable()
+
+	public override void OnDestroy()
 	{
-		base.OnDisable();
+		base.OnDestroy();
 
 		if (group == null)
 			return;
@@ -358,12 +463,30 @@ public class UIRadioBtn : AutoSpriteControlBase
 	/// and it will thenceforth be mutually exclusive to all
 	/// other radio buttons in the same group.
 	/// </summary>
-	/// <param name="parent">The object that will be made the parent of the radio button.</param>
-#if RADIOBTN_USE_PARENT
+	/// <param name="ID">The parent object of the radio button.</param>
+	public void SetGroup(GameObject parent)
+	{
+		SetGroup(parent.transform.GetHashCode());
+	}
+
+	/// <summary>
+	/// Makes the radio button a part of the specified group
+	/// and it will thenceforth be mutually exclusive to all
+	/// other radio buttons in the same group.
+	/// </summary>
+	/// <param name="ID">The parent transform of the radio button.</param>
 	public void SetGroup(Transform parent)
-#else
+	{
+		SetGroup(parent.GetHashCode());
+	}
+
+	/// <summary>
+	/// Makes the radio button a part of the specified group
+	/// and it will thenceforth be mutually exclusive to all
+	/// other radio buttons in the same group.
+	/// </summary>
+	/// <param name="ID">The ID of the group to which this radio will be assigned.  Can be an arbitrary integer, or if useParentForGrouping is true, the hashcode of the parent transform.</param>
 	public void SetGroup(int groupID)
-#endif
 	{
 		// Remove from any existing group first:
 		if (group != null)
@@ -372,41 +495,15 @@ public class UIRadioBtn : AutoSpriteControlBase
 			group = null;
 		}
 
-#if RADIOBTN_USE_PARENT
-		// This line makes Unity iPhone crash:
-		//transform.parent = parent;
-#else
 		radioGroup = groupID;
-#endif
 
+		group = RadioBtnGroup.GetGroup(groupID);
 
-		// Add self to a button group:
-		for (int i = 0; i < buttonGroups.Count; ++i)
-		{
-#if RADIOBTN_USE_PARENT
-			if (((RadioBtnGroup)buttonGroups[i]).groupID == transform.parent)
-#else
-			if(((RadioBtnGroup)buttonGroups[i]).groupID == radioGroup)
-#endif
-			{
-				group = ((RadioBtnGroup)buttonGroups[i]);
-				group.buttons.Add(this);
-				if (btnValue)
-					PopOtherButtonsInGroup();
-			}
-		}
-		// If we didn't find a matching group, add a new one:
-		if (group == null)
-		{
-			group = new RadioBtnGroup();
-#if RADIOBTN_USE_PARENT
-			group.groupID = transform.parent;
-#else
-			group.groupID = radioGroup;
-#endif
-			group.buttons.Add(this);
-			buttonGroups.Add(group);
-		}
+		// Add self to the button group:
+		group.buttons.Add(this);
+
+		if (btnValue)
+			PopOtherButtonsInGroup();
 	}
 
 
@@ -417,7 +514,7 @@ public class UIRadioBtn : AutoSpriteControlBase
 		btnValue = defaultValue;
 	}
 
-	protected override void Start()
+	public override void Start()
 	{
 		base.Start();
 
@@ -485,6 +582,11 @@ public class UIRadioBtn : AutoSpriteControlBase
 				AddCollider();
 
 			Value = btnValue;
+
+			if (useParentForGrouping && transform.parent != null)
+				SetGroup(transform.parent.GetHashCode());
+			else
+				SetGroup(radioGroup);
 		}
 
 		// Since hiding while managed depends on
@@ -557,10 +659,6 @@ public class UIRadioBtn : AutoSpriteControlBase
 			prevTransition.StopSafe();
 
 		StartTransition(index, prevState);
-
-		// Notify our change delegate:
-		if (changeDelegate != null)
-			changeDelegate(this);
 	}
 
 	// Starts the appropriate transition

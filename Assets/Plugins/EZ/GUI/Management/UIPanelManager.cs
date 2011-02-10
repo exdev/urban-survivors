@@ -216,6 +216,16 @@ public class UIPanelManager : MonoBehaviour, IUIContainer
 		p.Container = null;
 	}
 
+	public void AddSubject(GameObject go)
+	{
+		// Do nothing
+	}
+
+	public void RemoveSubject(GameObject go)
+	{
+		// Do nothing
+	}
+
 
 	/// <summary>
 	/// Makes the specified GameObject a child of

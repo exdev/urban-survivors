@@ -38,6 +38,10 @@ Inheritance diagram for UIPanelManager:</div>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reference to the parent UIView.  <a href="#acdf0e9c57f4ab1dde5d65e772126be98"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_panel_manager.html#a7cb549ee66d85ee89fa029efd295278c">RemoveChild</a> (GameObject go)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes an object as a child of the container.  <a href="#a7cb549ee66d85ee89fa029efd295278c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_panel_manager.html#aa86b59c44e33feb7f9c53849813d1454">AddSubject</a> (GameObject go)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds an object as a subject of the container's transitions.  <a href="#aa86b59c44e33feb7f9c53849813d1454"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_panel_manager.html#a2063bda9f83915fed8edf7e92bff6b7b">RemoveSubject</a> (GameObject go)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes an object from being a subject of the container's transitions.  <a href="#a2063bda9f83915fed8edf7e92bff6b7b"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_panel_manager.html#a03ac5112d792435d77818f920ae8efc6">MakeChild</a> (GameObject go)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Makes the specified GameObject a child of the panel manager, as well as makes it a child of the panel manager's transform.  <a href="#a03ac5112d792435d77818f920ae8efc6"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_u_i_panel_manager.html#a9393c959e0f5e28f321fcc7623c4a52c">MoveForward</a> ()</td></tr>
@@ -225,6 +229,34 @@ Inheritance diagram for UIPanelManager:</div>
 </dl>
 
 <p>Implements <a class="el" href="interface_i_u_i_object.html#af69fa50323763146001ea47d8c61d277">IUIObject</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa86b59c44e33feb7f9c53849813d1454"></a><!-- doxytag: member="UIPanelManager::AddSubject" ref="aa86b59c44e33feb7f9c53849813d1454" args="(GameObject go)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UIPanelManager.AddSubject </td>
+          <td>(</td>
+          <td class="paramtype">GameObject&nbsp;</td>
+          <td class="paramname"> <em>go</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Adds an object as a subject of the container's transitions. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>go</em>&nbsp;</td><td>GameObject that is subject to the container's transitions.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="interface_i_u_i_container.html#ade511ccff94779c1c937a3d49bf85b96">IUIContainer</a>.</p>
 
 </div>
 </div>
@@ -905,6 +937,34 @@ Inheritance diagram for UIPanelManager:</div>
 
 </div>
 </div>
+<a class="anchor" id="a2063bda9f83915fed8edf7e92bff6b7b"></a><!-- doxytag: member="UIPanelManager::RemoveSubject" ref="a2063bda9f83915fed8edf7e92bff6b7b" args="(GameObject go)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UIPanelManager.RemoveSubject </td>
+          <td>(</td>
+          <td class="paramtype">GameObject&nbsp;</td>
+          <td class="paramname"> <em>go</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Removes an object from being a subject of the container's transitions. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>go</em>&nbsp;</td><td>GameObject that should no longer be subject to the container's transitions.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="interface_i_u_i_container.html#a1fa662ab3778562f600231e8fb3017cd">IUIContainer</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a1c10115e4b450eda28530d037d461a00"></a><!-- doxytag: member="UIPanelManager::RemoveValueChangedDelegate" ref="a1c10115e4b450eda28530d037d461a00" args="(EZValueChangedDelegate del)" -->
 <div class="memitem">
 <div class="memproto">
@@ -1076,7 +1136,7 @@ Inheritance diagram for UIPanelManager:</div>
 <li>UIPanelManager.cs</li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Nov 30 20:44:27 2010 for EZ GUI by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on Tue Feb 1 18:27:11 2011 for EZ GUI by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

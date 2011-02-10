@@ -58,6 +58,9 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 	protected SpriteText.Anchor_Pos defaultTextAnchor = SpriteText.Anchor_Pos.Middle_Center;
 	protected SpriteText.Alignment_Type defaultTextAlignment = SpriteText.Alignment_Type.Center;
 
+	// Lets us keep track of whether we've been destroyed
+	protected bool deleted = false;
+
 
 	/// <summary>
 	/// Sets the text to be displayed in this control.
@@ -144,11 +147,26 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 		set { data = value; }
 	}
 
+	public virtual bool IncludeTextInAutoCollider
+	{
+		get { return includeTextInAutoCollider; }
+		set
+		{
+			includeTextInAutoCollider = value;
+			UpdateCollider();
+		}
+	}
 
 	protected virtual void Awake()
 	{
 		if (collider != null)
 			customCollider = true;
+	}
+
+	public virtual void Start()
+	{
+		if (spriteText != null)
+			spriteText.Parent = this;
 	}
 
 
@@ -293,6 +311,11 @@ public abstract class ControlBase : MonoBehaviour, IControl, IUIObject
 			ptr.callerIsControl = true;
 			Container.OnInput(ptr);
 		}
+	}
+
+	public virtual void OnDestroy()
+	{
+		deleted = true;
 	}
 
 

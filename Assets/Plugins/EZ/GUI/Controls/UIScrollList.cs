@@ -198,6 +198,53 @@ public class UIScrollList : MonoBehaviour, IUIObject
 		VERTICAL
 	};
 
+	/// <remarks>
+	/// Determines whether items will be added to the
+	/// list from top-to-bottom and left-to-right, or
+	/// from bottom-to-top and right-to-left.
+	/// </remarks>
+	public enum DIRECTION
+	{
+		/// <summary>
+		/// Items will be added top-to-bottom, or
+		/// left-to-right, depending on orientation.
+		/// </summary>
+		TtoB_LtoR,
+
+		/// <summary>
+		/// Items will be added bottom-to-top, or
+		/// left-to-right, depending on orientation.
+		/// </summary>
+		BtoT_RtoL
+	}
+
+	/// <summary>
+	/// Determines how items will be aligned within
+	/// the list when added.
+	/// </summary>
+	public enum ALIGNMENT
+	{
+		/// <summary>
+		/// Items will be aligned to the left edge
+		/// of the viewable area (if vertical), or
+		/// the top edge (if horizontal).
+		/// </summary>
+		LEFT_TOP,
+
+		/// <summary>
+		/// Items will be centered within the
+		/// viewable area.
+		/// </summary>
+		CENTER,
+
+		/// <summary>
+		/// Items will be aligned to the right edge
+		/// of the viewable area (if vertical), or
+		/// the bottom edge (if horizontal).
+		/// </summary>
+		RIGHT_BOTTOM
+	}
+
 
 	/// <summary>
 	/// When true, scrolling will operate like a
@@ -222,6 +269,20 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	public ORIENTATION orientation;
 
 	/// <summary>
+	/// Determines whether items will be added to the
+	/// list from top-to-bottom and left-to-right, or
+	/// from bottom-to-top and right-to-left.
+	/// See UIScrollList.DIRECTION [<see cref="DIRECTION"/>]
+	/// </summary>
+	public DIRECTION direction = DIRECTION.TtoB_LtoR;
+
+	/// <summary>
+	/// Determines how the items will be aligned in the
+	/// list when added.  See UIScrollList.ALIGNMENT [<see cref="ALIGNMENT"/>]
+	/// </summary>
+	public ALIGNMENT alignment = ALIGNMENT.CENTER;
+
+	/// <summary>
 	/// The extents of the viewable area, in local
 	/// space units.  The contents of the list will
 	/// be clipped to this area. Ex: If an area of
@@ -239,6 +300,15 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	/// Empty space to put between each list item.
 	/// </summary>
 	public float itemSpacing;
+
+	/// <summary>
+	/// When set to true, the itemSpacing value will be
+	/// applied before the first item, and after the last
+	/// so as to "pad" the first and last items a bit from
+	/// the edge.  If false, the first and last items will
+	/// be flush with the edges of the viewable area.
+	/// </summary>
+	public bool spacingAtEnds = true;
 
 	/// <summary>
 	/// When true, items added or inserted to this list will
@@ -379,6 +449,9 @@ public class UIScrollList : MonoBehaviour, IUIObject
 		mover.transform.localPosition = Vector3.zero;
 		mover.transform.localRotation = Quaternion.identity;
 		mover.transform.localScale = Vector3.one;
+
+		if (direction == DIRECTION.BtoT_RtoL)
+			scrollPos = 1f; // We start at the bottom in this case
 	}
 
 	void Start()
@@ -459,19 +532,26 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	protected void ScrollListTo_Internal(float pos)
 	{
 		float amtOfPlay;
+		float addlSpacing = spacingAtEnds ? itemSpacing : 0;
 
 		if (float.IsNaN(pos))
 			return; // Ignore since the viewing area exactly matches our content, no need to scroll anyway
 
 		if (orientation == ORIENTATION.VERTICAL)
 		{
-			amtOfPlay = ((contentExtents + itemSpacing) - viewableArea.y);
-			mover.transform.localPosition = (Vector3.up * Mathf.Clamp(amtOfPlay, 0, amtOfPlay) * pos);
+			amtOfPlay = ((contentExtents + addlSpacing) - viewableArea.y);
+
+			float directionFactor = (direction == DIRECTION.TtoB_LtoR) ? (1f) : (-1f);
+
+			mover.transform.localPosition = (Vector3.up * directionFactor * Mathf.Clamp(amtOfPlay, 0, amtOfPlay) * pos);
 		}
 		else
 		{
-			amtOfPlay = ((contentExtents + itemSpacing) - viewableArea.x);
-			mover.transform.localPosition = (Vector3.right * Mathf.Clamp(amtOfPlay, 0, amtOfPlay) * -pos);
+			amtOfPlay = ((contentExtents + addlSpacing) - viewableArea.x);
+
+			float directionFactor = (direction == DIRECTION.TtoB_LtoR) ? (-1f) : (1f);
+
+			mover.transform.localPosition = (Vector3.right * directionFactor * Mathf.Clamp(amtOfPlay, 0, amtOfPlay) * pos);
 		}
 		scrollPos = pos;
 		ClipItems();
@@ -564,11 +644,10 @@ public class UIScrollList : MonoBehaviour, IUIObject
 		// wrong.
 		item.transform.localPosition = Vector3.zero;
 
-
-		if(text != null)
-			item.Text = text;
-
 		item.SetList(this);
+
+		if (text != null)
+			item.Text = text;
 
 		// Compute the edges of the item:
 		item.FindOuterEdges();
@@ -586,34 +665,94 @@ public class UIScrollList : MonoBehaviour, IUIObject
 		// See if we can just add it to the end:
 		if(position == items.Count)
 		{
+			float x=0, y=0;
+			bool addItemSpacing = false;
+
 			if (orientation == ORIENTATION.HORIZONTAL)
 			{
-
+				// Find the X-coordinate:
 				if (items.Count > 0)
 				{
+					addItemSpacing = true; // We will be adding itemSpacing
+
 					lastItem = items[items.Count - 1];
-					item.transform.localPosition = new Vector3(lastItem.transform.localPosition.x + lastItem.BottomRightEdge.x + itemSpacing - item.TopLeftEdge.x, 0);
+
+					if (direction == DIRECTION.TtoB_LtoR)
+						x = lastItem.transform.localPosition.x + lastItem.BottomRightEdge.x + itemSpacing - item.TopLeftEdge.x;
+					else
+						x = lastItem.transform.localPosition.x - lastItem.BottomRightEdge.x - itemSpacing + item.TopLeftEdge.x;
 				}
 				else
 				{
-					item.transform.localPosition = new Vector3((viewableArea.x * -0.5f) - item.TopLeftEdge.x + itemSpacing, 0);
+					if (spacingAtEnds)
+						addItemSpacing = true; // We will be adding itemSpacing
+
+					if (direction == DIRECTION.TtoB_LtoR)
+						x = (viewableArea.x * -0.5f) - item.TopLeftEdge.x + ((spacingAtEnds) ? (itemSpacing) : (0));
+					else
+						x = (viewableArea.x * 0.5f) + item.TopLeftEdge.x - ((spacingAtEnds) ? (itemSpacing) : (0));
 				}
 
-				contentDelta = item.BottomRightEdge.x - item.TopLeftEdge.x + itemSpacing;
+				// Find the Y-coordinate:
+				switch(alignment)
+				{
+					case ALIGNMENT.CENTER:
+						y = 0;
+						break;
+					case ALIGNMENT.LEFT_TOP:
+						y = (viewableArea.y * 0.5f) - item.TopLeftEdge.y;
+						break;
+					case ALIGNMENT.RIGHT_BOTTOM:
+						y = (viewableArea.y * -0.5f) - item.BottomRightEdge.y;
+						break;
+				}
+
+				contentDelta = item.BottomRightEdge.x - item.TopLeftEdge.x + ((addItemSpacing) ? (itemSpacing) : (0));
 			}
 			else
 			{
+				// Determine the Y-coordinate:
 				if (items.Count > 0)
 				{
+					addItemSpacing = true; // We will be adding itemSpacing
+
 					lastItem = items[items.Count - 1];
-					item.transform.localPosition = new Vector3(0, lastItem.transform.localPosition.y + lastItem.BottomRightEdge.y - itemSpacing - item.TopLeftEdge.y);
+
+					if(direction == DIRECTION.TtoB_LtoR)
+						y = lastItem.transform.localPosition.y + lastItem.BottomRightEdge.y - itemSpacing - item.TopLeftEdge.y;
+					else
+						y = lastItem.transform.localPosition.y - lastItem.BottomRightEdge.y + itemSpacing + item.TopLeftEdge.y;
 				}
 				else
 				{
-					item.transform.localPosition = new Vector3(0, (viewableArea.y * 0.5f) - item.TopLeftEdge.y - itemSpacing);
+					if (spacingAtEnds)
+						addItemSpacing = true; // We will be adding itemSpacing
+
+					if(direction == DIRECTION.TtoB_LtoR)
+						y = (viewableArea.y * 0.5f) - item.TopLeftEdge.y - ((spacingAtEnds) ? (itemSpacing) : (0));
+					else
+						y = (viewableArea.y * -0.5f) + item.TopLeftEdge.y + ((spacingAtEnds) ? (itemSpacing) : (0));
 				}
-				contentDelta = item.TopLeftEdge.y - item.BottomRightEdge.y + itemSpacing;
+
+				// Determine the X-coordinate:
+				switch(alignment)
+				{
+					case ALIGNMENT.CENTER:
+						x = 0;
+						break;
+					case ALIGNMENT.LEFT_TOP:
+						x = (viewableArea.x * -0.5f) - item.TopLeftEdge.x;
+						break;
+					case ALIGNMENT.RIGHT_BOTTOM:
+						x = (viewableArea.x * 0.5f) - item.BottomRightEdge.x;
+						break;
+				}
+
+				contentDelta = item.TopLeftEdge.y - item.BottomRightEdge.y + ((addItemSpacing) ? (itemSpacing) : (0));
 			}
+
+			// Position the new item:
+			item.transform.localPosition = new Vector3(x, y);
 
 			item.Index = items.Count;
 			items.Add(item);
@@ -811,21 +950,23 @@ public class UIScrollList : MonoBehaviour, IUIObject
 		float oldAmtOfPlay;
 		float newAmtOfPlay;
 
+		float addlSpacing = (spacingAtEnds ? itemSpacing : 0);
+
 		contentExtents += change;
 
 		if (orientation == ORIENTATION.HORIZONTAL)
 		{
 			// Adjust the scroll position:
-			oldAmtOfPlay = ((contentExtents - change + itemSpacing) - viewableArea.x);
-			newAmtOfPlay = ((contentExtents + itemSpacing) - viewableArea.x);
-			scrollMax = (viewableArea.x / ((contentExtents + itemSpacing) - viewableArea.x)) * overscrollAllowance;
+			oldAmtOfPlay = ((contentExtents - change + addlSpacing) - viewableArea.x);
+			newAmtOfPlay = ((contentExtents + addlSpacing) - viewableArea.x);
+			scrollMax = (viewableArea.x / ((contentExtents + addlSpacing) - viewableArea.x)) * overscrollAllowance;
 		}
 		else
 		{
 			// Adjust the scroll position:
-			oldAmtOfPlay = ((contentExtents - change + itemSpacing) - viewableArea.y);
-			newAmtOfPlay = ((contentExtents + itemSpacing) - viewableArea.y);
-			scrollMax = (viewableArea.y / ((contentExtents + itemSpacing) - viewableArea.y)) * overscrollAllowance;
+			oldAmtOfPlay = ((contentExtents - change + addlSpacing) - viewableArea.y);
+			newAmtOfPlay = ((contentExtents + addlSpacing) - viewableArea.y);
+			scrollMax = (viewableArea.y / ((contentExtents + addlSpacing) - viewableArea.y)) * overscrollAllowance;
 		}
 
 		ScrollListTo_Internal(Mathf.Clamp01((oldAmtOfPlay * scrollPos) / newAmtOfPlay));
@@ -866,21 +1007,49 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	protected void PositionHorizontally(bool updateExtents)
 	{
 		// Will hold the leading edge of the list throughout
-		float edge = (viewableArea.x * -0.5f) + itemSpacing;
+		float edge;
 
 		contentExtents = 0;
 
-		for(int i=0; i<items.Count; ++i)
+		if(direction == DIRECTION.TtoB_LtoR)
 		{
-			if (updateExtents)
-				items[i].FindOuterEdges();
+			edge = (viewableArea.x * -0.5f) + ((spacingAtEnds) ? (itemSpacing) : (0));
 
-			items[i].transform.localPosition = new Vector3(edge - items[i].TopLeftEdge.x, 0);
-			contentExtents += items[i].BottomRightEdge.x - items[i].TopLeftEdge.x + itemSpacing;
-			edge += items[i].BottomRightEdge.x - items[i].TopLeftEdge.x + itemSpacing;
+			for (int i = 0; i < items.Count; ++i)
+			{
+				if (updateExtents)
+					items[i].FindOuterEdges();
 
-			// Assign indices:
-			items[i].Index = i;
+				items[i].transform.localPosition = new Vector3(edge - items[i].TopLeftEdge.x, 0);
+				contentExtents += items[i].BottomRightEdge.x - items[i].TopLeftEdge.x + itemSpacing;
+				edge += items[i].BottomRightEdge.x - items[i].TopLeftEdge.x + itemSpacing;
+
+				// Assign indices:
+				items[i].Index = i;
+			}
+
+			if (!spacingAtEnds)
+				contentExtents -= itemSpacing;
+		}
+		else
+		{
+			edge = (viewableArea.x * 0.5f) - ((spacingAtEnds) ? (itemSpacing) : (0));
+
+			for (int i = 0; i < items.Count; ++i)
+			{
+				if (updateExtents)
+					items[i].FindOuterEdges();
+
+				items[i].transform.localPosition = new Vector3(edge + items[i].BottomRightEdge.x, 0);
+				contentExtents += items[i].BottomRightEdge.x - items[i].TopLeftEdge.x + itemSpacing;
+				edge -= items[i].BottomRightEdge.x - items[i].TopLeftEdge.x + itemSpacing;
+
+				// Assign indices:
+				items[i].Index = i;
+			}
+
+			if (!spacingAtEnds)
+				contentExtents -= itemSpacing;
 		}
 	}
 
@@ -888,21 +1057,49 @@ public class UIScrollList : MonoBehaviour, IUIObject
 	protected void PositionVertically(bool updateExtents)
 	{
 		// Will hold the leading edge of the list throughout
-		float edge = (viewableArea.y * 0.5f) - itemSpacing;
+		float edge;
 
 		contentExtents = 0;
 
-		for (int i = 0; i < items.Count; ++i)
+		if(direction == DIRECTION.TtoB_LtoR)
 		{
-			if (updateExtents)
-				items[i].FindOuterEdges();
+			edge = (viewableArea.y * 0.5f) - ((spacingAtEnds) ? (itemSpacing) : (0));
 
-			items[i].transform.localPosition = new Vector3(0, edge - items[i].TopLeftEdge.y);
-			contentExtents += items[i].TopLeftEdge.y - items[i].BottomRightEdge.y + itemSpacing;
-			edge -= items[i].TopLeftEdge.y - items[i].BottomRightEdge.y + itemSpacing;
+			for (int i = 0; i < items.Count; ++i)
+			{
+				if (updateExtents)
+					items[i].FindOuterEdges();
 
-			// Assign indices:
-			items[i].Index = i;
+				items[i].transform.localPosition = new Vector3(0, edge - items[i].TopLeftEdge.y);
+				contentExtents += items[i].TopLeftEdge.y - items[i].BottomRightEdge.y + itemSpacing;
+				edge -= items[i].TopLeftEdge.y - items[i].BottomRightEdge.y + itemSpacing;
+
+				// Assign indices:
+				items[i].Index = i;
+			}
+
+			if (!spacingAtEnds)
+				contentExtents -= itemSpacing;
+		}
+		else
+		{
+			edge = (viewableArea.y * -0.5f) + ((spacingAtEnds) ? (itemSpacing) : (0));
+
+			for (int i = 0; i < items.Count; ++i)
+			{
+				if (updateExtents)
+					items[i].FindOuterEdges();
+
+				items[i].transform.localPosition = new Vector3(0, edge + items[i].BottomRightEdge.y);
+				contentExtents += items[i].TopLeftEdge.y - items[i].BottomRightEdge.y + itemSpacing;
+				edge += items[i].TopLeftEdge.y - items[i].BottomRightEdge.y + itemSpacing;
+
+				// Assign indices:
+				items[i].Index = i;
+			}
+
+			if (!spacingAtEnds)
+				contentExtents -= itemSpacing;
 		}
 	}
 
@@ -921,7 +1118,7 @@ public class UIScrollList : MonoBehaviour, IUIObject
 		{
 			float moverOffset = mover.transform.localPosition.x;
 			float itemOffset;
-			// Calculate the visible edges insider the mover's local space:
+			// Calculate the visible edges inside the mover's local space:
 			float leftVisibleEdge = (viewableArea.x * -0.5f) - moverOffset;
 			float rightVisibleEdge = (viewableArea.x * 0.5f) - moverOffset;
 
@@ -929,72 +1126,150 @@ public class UIScrollList : MonoBehaviour, IUIObject
 			// Start looking at our approximate scroll position:
 			int index = (int)(((float)(items.Count - 1)) * Mathf.Clamp01(scrollPos));
 			
-			// See if the first item we checked is to the right
-			// of our left-most viewable edge:
-			itemOffset = items[index].transform.localPosition.x;
-			if (items[index].BottomRightEdge.x + itemOffset >= leftVisibleEdge)
+			if(direction == DIRECTION.TtoB_LtoR)
 			{
-				// Search backward until we find one that is not:
-				for (index-=1; index > -1 ; --index)
+				// See if the first item we checked is to the right
+				// of our left-most viewable edge:
+				itemOffset = items[index].transform.localPosition.x;
+				if (items[index].BottomRightEdge.x + itemOffset >= leftVisibleEdge)
 				{
-					itemOffset = items[index].transform.localPosition.x;
-					if (items[index].BottomRightEdge.x + itemOffset < leftVisibleEdge)
-						break;
+					// Search backward until we find one that is not:
+					for (index -= 1; index > -1; --index)
+					{
+						itemOffset = items[index].transform.localPosition.x;
+						if (items[index].BottomRightEdge.x + itemOffset < leftVisibleEdge)
+							break;
+					}
+
+					// The previous item is the one we're looking for:
+					firstItem = items[index + 1];
+				}
+				else
+				{
+					// Search forward until we find the first visible item:
+					for (; index < items.Count; ++index)
+					{
+						itemOffset = items[index].transform.localPosition.x;
+						if (items[index].BottomRightEdge.x + itemOffset >= leftVisibleEdge)
+						{
+							// We've found our first visible item:
+							firstItem = items[index];
+							break;
+						}
+					}
 				}
 
-				// The previous item is the one we're looking for:
-				firstItem = items[index + 1];
-			}
-			else
-			{
-				// Search forward until we find the first visible item:
-				for (; index < items.Count; ++index)
+
+				if (firstItem != null)
 				{
-					itemOffset = items[index].transform.localPosition.x;
-					if (items[index].BottomRightEdge.x + itemOffset >= leftVisibleEdge)
+					// Add the first visible item to our list and clip it:
+					tempVisItems.Add(firstItem);
+					if (!firstItem.gameObject.active)
+						firstItem.gameObject.SetActiveRecursively(true);
+					firstItem.Hide(false);
+					firstItem.ClippingRect = clientClippingRect;
+
+					// See if this is the only visible item:
+					itemOffset = firstItem.transform.localPosition.x;
+					if (firstItem.BottomRightEdge.x + itemOffset < rightVisibleEdge)
 					{
-						// We've found our first visible item:
-						firstItem = items[index];
-						break;
+						// Now search forward until we find an item that is outside
+						// the viewable area:
+						for (index = firstItem.Index + 1; index < items.Count; ++index)
+						{
+							itemOffset = items[index].transform.localPosition.x;
+							if (items[index].BottomRightEdge.x + itemOffset >= rightVisibleEdge)
+							{
+								// We've found the last visible item
+								if (!items[index].gameObject.active)
+									items[index].gameObject.SetActiveRecursively(true);
+								items[index].Hide(false);
+								items[index].ClippingRect = clientClippingRect;
+								tempVisItems.Add(items[index]);
+								break;
+							}
+							else
+							{
+								if (!items[index].gameObject.active)
+									items[index].gameObject.SetActiveRecursively(true);
+								items[index].Hide(false);
+								items[index].Clipped = false;
+								tempVisItems.Add(items[index]);
+							}
+						}
 					}
 				}
 			}
-
-			if(firstItem != null)
+			else
 			{
-				// Add the first visible item to our list and clip it:
-				tempVisItems.Add(firstItem);
-				if (!firstItem.gameObject.active)
-					firstItem.gameObject.SetActiveRecursively(true);
-				firstItem.Hide(false);
-				firstItem.ClippingRect = clientClippingRect;
-
-				// See if this is the only visible item:
-				itemOffset = firstItem.transform.localPosition.x;
-				if (firstItem.BottomRightEdge.x + itemOffset < rightVisibleEdge)
+				// See if the first item we checked is to the left
+				// of our right-most viewable edge:
+				itemOffset = items[index].transform.localPosition.x;
+				if (items[index].TopLeftEdge.x - itemOffset <= rightVisibleEdge)
 				{
-					// Now search forward until we find an item that is outside
-					// the viewable area:
-					for (index = firstItem.Index + 1; index < items.Count; ++index)
+					// Search backward until we find one that is not:
+					for (index -= 1; index > -1; --index)
 					{
 						itemOffset = items[index].transform.localPosition.x;
-						if (items[index].BottomRightEdge.x + itemOffset >= rightVisibleEdge)
+						if (items[index].TopLeftEdge.x - itemOffset > rightVisibleEdge)
+							break;
+					}
+
+					// The previous item is the one we're looking for:
+					firstItem = items[index + 1];
+				}
+				else
+				{
+					// Search forward until we find the first visible item:
+					for (; index < items.Count; ++index)
+					{
+						itemOffset = items[index].transform.localPosition.x;
+						if (items[index].TopLeftEdge.x - itemOffset <= rightVisibleEdge)
 						{
-							// We've found the last visible item
-							if (!items[index].gameObject.active)
-								items[index].gameObject.SetActiveRecursively(true);
-							items[index].Hide(false);
-							items[index].ClippingRect = clientClippingRect;
-							tempVisItems.Add(items[index]);
+							// We've found our first visible item:
+							firstItem = items[index];
 							break;
 						}
-						else
+					}
+				}
+
+
+				if (firstItem != null)
+				{
+					// Add the first visible item to our list and clip it:
+					tempVisItems.Add(firstItem);
+					if (!firstItem.gameObject.active)
+						firstItem.gameObject.SetActiveRecursively(true);
+					firstItem.Hide(false);
+					firstItem.ClippingRect = clientClippingRect;
+
+					// See if this is the only visible item:
+					itemOffset = firstItem.transform.localPosition.x;
+					if (firstItem.TopLeftEdge.x - itemOffset > leftVisibleEdge)
+					{
+						// Now search forward until we find an item that is outside
+						// the viewable area:
+						for (index = firstItem.Index + 1; index < items.Count; ++index)
 						{
-							if (!items[index].gameObject.active)
-								items[index].gameObject.SetActiveRecursively(true);
-							items[index].Hide(false);
-							items[index].Clipped = false;
-							tempVisItems.Add(items[index]);
+							itemOffset = items[index].transform.localPosition.x;
+							if (items[index].TopLeftEdge.x - itemOffset <= leftVisibleEdge)
+							{
+								// We've found the last visible item
+								if (!items[index].gameObject.active)
+									items[index].gameObject.SetActiveRecursively(true);
+								items[index].Hide(false);
+								items[index].ClippingRect = clientClippingRect;
+								tempVisItems.Add(items[index]);
+								break;
+							}
+							else
+							{
+								if (!items[index].gameObject.active)
+									items[index].gameObject.SetActiveRecursively(true);
+								items[index].Hide(false);
+								items[index].Clipped = false;
+								tempVisItems.Add(items[index]);
+							}
 						}
 					}
 				}
@@ -1004,7 +1279,7 @@ public class UIScrollList : MonoBehaviour, IUIObject
 		{
 			float moverOffset = mover.transform.localPosition.y;
 			float itemOffset;
-			// Calculate the visible edges insider the mover's local space:
+			// Calculate the visible edges inside the mover's local space:
 			float topVisibleEdge = (viewableArea.y * 0.5f) - moverOffset;
 			float bottomVisibleEdge = (viewableArea.y * -0.5f) - moverOffset;
 
@@ -1012,72 +1287,150 @@ public class UIScrollList : MonoBehaviour, IUIObject
 			// Start looking at our approximate scroll position:
 			int index = (int)(((float)(items.Count-1)) * Mathf.Clamp01(scrollPos));
 
-			// See if the first item we checked is below
-			// our top-most viewable edge:
-			itemOffset = items[index].transform.localPosition.y;
-			if (items[index].BottomRightEdge.y + itemOffset <= topVisibleEdge)
+			if (direction == DIRECTION.TtoB_LtoR)
 			{
-				// Search backward until we find one that is not:
-				for (index -= 1; index > -1; --index)
+				// See if the first item we checked is below
+				// our top-most viewable edge:
+				itemOffset = items[index].transform.localPosition.y;
+				if (items[index].BottomRightEdge.y + itemOffset <= topVisibleEdge)
 				{
-					itemOffset = items[index].transform.localPosition.y;
-					if (items[index].BottomRightEdge.y + itemOffset > topVisibleEdge)
-						break;
+					// Search backward until we find one that is not:
+					for (index -= 1; index > -1; --index)
+					{
+						itemOffset = items[index].transform.localPosition.y;
+						if (items[index].BottomRightEdge.y + itemOffset > topVisibleEdge)
+							break;
+					}
+
+					// The previous item is the one we're looking for:
+					firstItem = items[index + 1];
+				}
+				else
+				{
+					// Search forward until we find the first visible item:
+					for (; index < items.Count; ++index)
+					{
+						itemOffset = items[index].transform.localPosition.y;
+						if (items[index].BottomRightEdge.y + itemOffset <= topVisibleEdge)
+						{
+							// We've found our first visible item:
+							firstItem = items[index];
+							break;
+						}
+					}
 				}
 
-				// The previous item is the one we're looking for:
-				firstItem = items[index + 1];
-			}
-			else
-			{
-				// Search forward until we find the first visible item:
-				for (; index < items.Count; ++index)
+
+				if (firstItem != null)
 				{
-					itemOffset = items[index].transform.localPosition.y;
-					if (items[index].BottomRightEdge.y + itemOffset <= topVisibleEdge)
+					// Add the first visible item to our list and clip it:
+					tempVisItems.Add(firstItem);
+					if (!firstItem.gameObject.active)
+						firstItem.gameObject.SetActiveRecursively(true);
+					firstItem.Hide(false);
+					firstItem.ClippingRect = clientClippingRect;
+
+					// See if this is the only visible item:
+					itemOffset = firstItem.transform.localPosition.y;
+					if (firstItem.BottomRightEdge.y + itemOffset > bottomVisibleEdge)
 					{
-						// We've found our first visible item:
-						firstItem = items[index];
-						break;
+						// Now search forward until we find an item that is outside
+						// the viewable area:
+						for (index = firstItem.Index + 1; index < items.Count; ++index)
+						{
+							itemOffset = items[index].transform.localPosition.y;
+							if (items[index].BottomRightEdge.y + itemOffset <= bottomVisibleEdge)
+							{
+								// We've found the last visible item
+								if (!items[index].gameObject.active)
+									items[index].gameObject.SetActiveRecursively(true);
+								items[index].Hide(false);
+								items[index].ClippingRect = clientClippingRect;
+								tempVisItems.Add(items[index]);
+								break;
+							}
+							else
+							{
+								if (!items[index].gameObject.active)
+									items[index].gameObject.SetActiveRecursively(true);
+								items[index].Hide(false);
+								items[index].Clipped = false;
+								tempVisItems.Add(items[index]);
+							}
+						}
 					}
 				}
 			}
-
-			if(firstItem != null)
+			else
 			{
-				// Add the first visible item to our list and clip it:
-				tempVisItems.Add(firstItem);
-				if (!firstItem.gameObject.active)
-					firstItem.gameObject.SetActiveRecursively(true);
-				firstItem.Hide(false);
-				firstItem.ClippingRect = clientClippingRect;
-
-				// See if this is the only visible item:
-				itemOffset = firstItem.transform.localPosition.y;
-				if (firstItem.BottomRightEdge.y + itemOffset > bottomVisibleEdge)
+				// See if the first item we checked is above
+				// our bottom-most viewable edge:
+				itemOffset = items[index].transform.localPosition.y;
+				if (items[index].TopLeftEdge.y + itemOffset >= bottomVisibleEdge)
 				{
-					// Now search forward until we find an item that is outside
-					// the viewable area:
-					for (index = firstItem.Index + 1; index < items.Count; ++index)
+					// Search backward until we find one that is not:
+					for (index -= 1; index > -1; --index)
 					{
 						itemOffset = items[index].transform.localPosition.y;
-						if (items[index].BottomRightEdge.y + itemOffset <= bottomVisibleEdge)
+						if (items[index].TopLeftEdge.y + itemOffset < bottomVisibleEdge)
+							break;
+					}
+
+					// The previous item is the one we're looking for:
+					firstItem = items[index + 1];
+				}
+				else
+				{
+					// Search forward until we find the first visible item:
+					for (; index < items.Count; ++index)
+					{
+						itemOffset = items[index].transform.localPosition.y;
+						if (items[index].TopLeftEdge.y + itemOffset >= bottomVisibleEdge)
 						{
-							// We've found the last visible item
-							if (!items[index].gameObject.active)
-								items[index].gameObject.SetActiveRecursively(true);
-							items[index].Hide(false);
-							items[index].ClippingRect = clientClippingRect;
-							tempVisItems.Add(items[index]);
+							// We've found our first visible item:
+							firstItem = items[index];
 							break;
 						}
-						else
+					}
+				}
+
+
+				if (firstItem != null)
+				{
+					// Add the first visible item to our list and clip it:
+					tempVisItems.Add(firstItem);
+					if (!firstItem.gameObject.active)
+						firstItem.gameObject.SetActiveRecursively(true);
+					firstItem.Hide(false);
+					firstItem.ClippingRect = clientClippingRect;
+
+					// See if this is the only visible item:
+					itemOffset = firstItem.transform.localPosition.y;
+					if (firstItem.TopLeftEdge.y + itemOffset < topVisibleEdge)
+					{
+						// Now search forward until we find an item that is outside
+						// the viewable area:
+						for (index = firstItem.Index + 1; index < items.Count; ++index)
 						{
-							if (!items[index].gameObject.active)
-								items[index].gameObject.SetActiveRecursively(true);
-							items[index].Hide(false);
-							items[index].Clipped = false;
-							tempVisItems.Add(items[index]);
+							itemOffset = items[index].transform.localPosition.y;
+							if (items[index].TopLeftEdge.y + itemOffset >= topVisibleEdge)
+							{
+								// We've found the last visible item
+								if (!items[index].gameObject.active)
+									items[index].gameObject.SetActiveRecursively(true);
+								items[index].Hide(false);
+								items[index].ClippingRect = clientClippingRect;
+								tempVisItems.Add(items[index]);
+								break;
+							}
+							else
+							{
+								if (!items[index].gameObject.active)
+									items[index].gameObject.SetActiveRecursively(true);
+								items[index].Hide(false);
+								items[index].Clipped = false;
+								tempVisItems.Add(items[index]);
+							}
 						}
 					}
 				}
@@ -1207,16 +1560,18 @@ public class UIScrollList : MonoBehaviour, IUIObject
 
 		ptrVector = inputPoint1 - inputPoint2;
 
+		float addlSpacing = spacingAtEnds ? itemSpacing : 0;
+
 		// Find what percentage of our content 
 		// extent this value represents:
 		if (orientation == ORIENTATION.HORIZONTAL)
 		{
-			scrollDelta = (-ptrVector.x) / ((contentExtents + itemSpacing) - viewableArea.x);
+			scrollDelta = (-ptrVector.x) / ((contentExtents + addlSpacing) - viewableArea.x);
 			scrollDelta *= transform.localScale.x;
 		}
 		else
 		{
-			scrollDelta = ptrVector.y / ((contentExtents + itemSpacing) - viewableArea.y);
+			scrollDelta = ptrVector.y / ((contentExtents + addlSpacing) - viewableArea.y);
 			scrollDelta *= transform.localScale.y;
 		}
 
@@ -1257,6 +1612,11 @@ public class UIScrollList : MonoBehaviour, IUIObject
 		{
 			scrollDelta *= Mathf.Clamp01(1f + (target / scrollMax));
 		}
+
+		// See if the scroll delta needs to be inverted due to our
+		// direction:
+		if (direction == DIRECTION.BtoT_RtoL)
+			scrollDelta *= -1f;
 
 		ScrollListTo_Internal(scrollPos + scrollDelta);
 

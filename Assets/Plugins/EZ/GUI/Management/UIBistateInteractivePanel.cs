@@ -142,6 +142,27 @@ public class UIBistateInteractivePanel : UIPanelBase
 
 		lastPtrType = ptr.type;
 
+// Only check for out-of-viewport input if such is possible
+// (i.e. if we aren't on a hardware device where it is
+// impossible to have input outside the viewport)
+#if UNITY_EDITOR || !(UNITY_IPHONE || UNITY_ANDROID)
+		// See if the input should be considered a move-off
+		// because it is outside the viewport:
+		if(dismissOnMoveOff)
+		{
+			if (ptr.devicePos.x < 0 ||
+				ptr.devicePos.y < 0 ||
+				ptr.devicePos.x > ptr.camera.pixelWidth ||
+				ptr.devicePos.y > ptr.camera.pixelHeight)
+			{
+				// Interpret this as a move-off
+				if (m_panelState == STATE.SHOWING)
+					Hide();
+				return;
+			}
+		}
+#endif
+
 		// Change the state if necessary:
 		switch (ptr.evt)
 		{

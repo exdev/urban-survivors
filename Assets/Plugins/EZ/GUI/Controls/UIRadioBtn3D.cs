@@ -4,10 +4,6 @@
 //-----------------------------------------------------------------
 
 
-// When defined, uses the parent GameObject
-// as the grouping method
-#define RADIOBTN_USE_PARENT
-
 
 using UnityEngine;
 using System.Collections;
@@ -22,7 +18,7 @@ using System.Collections;
 /// with an existing 3D object in the scene.
 /// </remarks>
 [AddComponentMenu("EZ GUI/Controls/3D Radio Button")]
-public class UIRadioBtn3D : ControlBase
+public class UIRadioBtn3D : ControlBase, IRadioButton
 {
 	protected enum CONTROL_STATE
 	{
@@ -34,15 +30,6 @@ public class UIRadioBtn3D : ControlBase
 	// Keeps track of the control's state
 	CONTROL_STATE state;
 
-
-	//---------------------------------------------
-	// Static members - used to synchronize buttons
-	//---------------------------------------------
-
-	// Array of arrays of buttons. Each element is
-	// a RadioBtnGroup, which holds the group number
-	// and its list of buttons.
-	static ArrayList buttonGroups = new ArrayList();
 
 	//---------------------------------------------
 	// End Static members
@@ -73,6 +60,7 @@ public class UIRadioBtn3D : ControlBase
 		get { return btnValue; }
 		set
 		{
+			bool prevValue = btnValue;
 			btnValue = value;
 			
 			// Pop out the other buttons in the group:
@@ -81,9 +69,24 @@ public class UIRadioBtn3D : ControlBase
 
 			// Update the button's visual state:
 			SetButtonState();
+
+			// If our value changed:
+			if(prevValue != btnValue)
+			{
+				// Notify our change delegate:
+				if (changeDelegate != null)
+					changeDelegate(this);
+			}
 		}
 	}
 
+
+	/// <summary>
+	/// When true, the radio button will group itself with other
+	/// radio buttons based on whether they share the same
+	/// parent GameObject.
+	/// </summary>
+	public bool useParentForGrouping = true;
 
 
 	/// <summary>
@@ -94,9 +97,7 @@ public class UIRadioBtn3D : ControlBase
 	/// is not defined.  Otherwise, by default, radio buttons
 	/// group themselves according to a common parent GameObject.
 	/// </summary>
-#if !RADIOBTN_USE_PARENT
 	public int radioGroup;
-#endif
 
 	// Reference to the group that contains this
 	// radio button.
@@ -191,6 +192,9 @@ public class UIRadioBtn3D : ControlBase
 	//---------------------------------------------------
 	public override void OnInput(POINTER_INFO ptr)
 	{
+		if (deleted)
+			return;
+
 		if (!m_controlIsEnabled)
 		{
 			base.OnInput(ptr);
@@ -218,6 +222,7 @@ public class UIRadioBtn3D : ControlBase
 	//---------------------------------------------------
 	// Misc
 	//---------------------------------------------------
+/*
 	protected void OnEnable()
 	{
 #if RADIOBTN_USE_PARENT
@@ -226,9 +231,12 @@ public class UIRadioBtn3D : ControlBase
 		SetGroup(radioGroup);
 #endif
 	}
+*/
 
-	protected void OnDisable()
+	public override void OnDestroy()
 	{
+		base.OnDestroy();
+
 		if (group == null)
 			return;
 
@@ -243,12 +251,20 @@ public class UIRadioBtn3D : ControlBase
 	/// and it will thenceforth be mutually exclusive to all
 	/// other radio buttons in the same group.
 	/// </summary>
-	/// <param name="parent">The object that will be made the parent of the radio button.</param>
-#if RADIOBTN_USE_PARENT
-	public void SetGroup(Transform parent)
-#else
+	/// <param name="ID">The parent object of the radio button.</param>
+	public void SetGroup(GameObject parent)
+	{
+		SetGroup(parent.transform.GetHashCode());
+	}
+
+
+	/// <summary>
+	/// Makes the radio button a part of the specified group
+	/// and it will thenceforth be mutually exclusive to all
+	/// other radio buttons in the same group.
+	/// </summary>
+	/// <param name="ID">The ID of the group to which this radio will be assigned.  Can be an arbitrary integer, or if useParentForGrouping is true, the hashcode of the parent transform.</param>
 	public void SetGroup(int groupID)
-#endif
 	{
 		// Remove from any existing group first:
 		if (group != null)
@@ -257,41 +273,15 @@ public class UIRadioBtn3D : ControlBase
 			group = null;
 		}
 
-#if RADIOBTN_USE_PARENT
-		// This line makes Unity iPhone crash:
-		//transform.parent = parent;
-#else
 		radioGroup = groupID;
-#endif
 
+		group = RadioBtnGroup.GetGroup(groupID);
 
-		// Add self to a button group:
-		for (int i = 0; i < buttonGroups.Count; ++i)
-		{
-#if RADIOBTN_USE_PARENT
-			if (((RadioBtnGroup)buttonGroups[i]).groupID == transform.parent)
-#else
-			if(((RadioBtnGroup)buttonGroups[i]).groupID == radioGroup)
-#endif
-			{
-				group = ((RadioBtnGroup)buttonGroups[i]);
-				group.buttons.Add(this);
-				if (btnValue)
-					PopOtherButtonsInGroup();
-			}
-		}
-		// If we didn't find a matching group, add a new one:
-		if (group == null)
-		{
-			group = new RadioBtnGroup();
-#if RADIOBTN_USE_PARENT
-			group.groupID = transform.parent;
-#else
-			group.groupID = radioGroup;
-#endif
-			group.buttons.Add(this);
-			buttonGroups.Add(group);
-		}
+		// Add self to the button group:
+		group.buttons.Add(this);
+
+		if (btnValue)
+			PopOtherButtonsInGroup();
 	}
 
 
@@ -302,7 +292,7 @@ public class UIRadioBtn3D : ControlBase
 		btnValue = defaultValue;
 	}
 
-	protected void Start()
+	public override void Start()
 	{
 		state = controlIsEnabled ? (btnValue ? CONTROL_STATE.True : CONTROL_STATE.False) : CONTROL_STATE.Disabled;
 /*
@@ -331,6 +321,13 @@ public class UIRadioBtn3D : ControlBase
 
 			//SetState(stateIdx);
 		}
+
+		Value = btnValue;
+
+		if (useParentForGrouping && transform.parent != null)
+			SetGroup(transform.parent.GetHashCode());
+		else
+			SetGroup(radioGroup);
 	}
 
 	public override void Copy(IControl c)
@@ -402,10 +399,6 @@ public class UIRadioBtn3D : ControlBase
 			prevTransition.StopSafe();
 
 		StartTransition(index, prevState);
-
-		// Notify our change delegate:
-		if (changeDelegate != null)
-			changeDelegate(this);
 	}
 
 	// Starts the appropriate transition
