@@ -397,8 +397,9 @@ public class PlayerBoy : PlayerBase {
     // ------------------------------------------------------------------ 
 
     protected void OnStun () {
-        Stop();
+        States[1] = null;
         this.anim.Stop();
+        Stop();
 
         // NOTE: it could be possible we interupt to hit when boy is attacking.
         AttackInfo atk_info = this.GetAttackInfo();

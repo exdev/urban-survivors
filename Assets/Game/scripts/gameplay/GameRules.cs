@@ -77,6 +77,8 @@ public class GameRules : MonoBehaviour {
         if ( this.isGameOver == false ) {
             if ( this.playerBoy.noHP() && this.playerGirl.noHP() ) {
                 this.isGameOver = true;
+                this.playerBoy.StopCoroutine("WaitForRecover");
+                this.playerGirl.StopCoroutine("WaitForRecover");
                 this.restartCounter = this.RestartForSeconds; 
             }
         }

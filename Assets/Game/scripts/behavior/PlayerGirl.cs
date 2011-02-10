@@ -557,7 +557,7 @@ public class PlayerGirl : PlayerBase {
             shootInfo.AdjustAnim(this.anim);
             this.anim.CrossFade(shootInfo.reloadAnim);
             shootInfo.Reload();
-
+            screenPad.SendMessage ( "GirlGoBerserkForSeconds", shootInfo.activeReloadTime );
             States[1] = UpdateReload;
         }
     }

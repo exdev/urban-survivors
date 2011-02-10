@@ -31,9 +31,9 @@ public class UIStatus : MonoBehaviour {
 
     public GameObject gameOver = null;
     public UIProgressBar boyProgressBar = null;
-    public GameObject boyFace = null; 
+    public PackedSprite boyFace = null; 
     public UIProgressBar girlProgressBar = null;
-    public GameObject girlFace = null; 
+    public PackedSprite girlFace = null; 
     public SpriteText restartCounterText = null;
     public SpriteText bulletCounterText = null;
 
@@ -310,10 +310,10 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void OnBoyHit () {
-        iTween.Stop(this.boyFace, "shake" );
+        iTween.Stop(this.boyFace.gameObject, "shake" );
         this.boyFace.transform.position = this.initBoyTrans.position;
         this.boyFace.transform.rotation = this.initBoyTrans.rotation;
-        iTween.ShakePosition(this.boyFace, 10.0f * Vector3.right, 0.5f );
+        iTween.ShakePosition(this.boyFace.gameObject, 10.0f * Vector3.right, 0.5f );
         // iTween.ShakeRotation(this.boyFace, 30.0f * Vector3.forward, 0.5f );
     }
 
@@ -322,10 +322,10 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void OnGirlHit () {
-        iTween.Stop(this.girlFace, "shake" );
+        iTween.Stop(this.girlFace.gameObject, "shake" );
         this.girlFace.transform.position = this.initGirlTrans.position;
         this.girlFace.transform.rotation = this.initGirlTrans.rotation;
-        iTween.ShakePosition(this.girlFace, 10.0f * Vector3.right, 0.5f );
+        iTween.ShakePosition(this.girlFace.gameObject, 10.0f * Vector3.right, 0.5f );
         // iTween.ShakeRotation(this.girlFace, 30.0f * Vector3.forward, 0.5f );
     }
 
@@ -506,5 +506,15 @@ public class UIStatus : MonoBehaviour {
             DisableReloadButton();
             this.ReloadButtonState = UpdateReloadDeactive;
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    IEnumerator GirlGoBerserkForSeconds ( float _seconds ) {
+        this.girlFace.PlayAnim("goBerserk");
+        yield return new WaitForSeconds(_seconds); 
+        this.girlFace.StopAnim();
     }
 }
