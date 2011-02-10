@@ -75,7 +75,7 @@ public class GameRules : MonoBehaviour {
     void Update () {
         // check if we got game over status
         if ( this.isGameOver == false ) {
-            if ( this.playerBoy.IsDown() && this.playerGirl.IsDown() ) {
+            if ( this.playerBoy.noHP() && this.playerGirl.noHP() ) {
                 this.isGameOver = true;
                 this.restartCounter = this.RestartForSeconds; 
             }
@@ -187,28 +187,30 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void PlayerRecover ( float _amount ) {
-        // TODO: I think recover girl first would be a better way.
+    // DELME { 
+    // public void PlayerRecover ( float _amount ) {
+    //     // TODO: I think recover girl first would be a better way.
 
-        PlayerInfo boyInfo = playerBoy.playerInfo;
-        PlayerInfo girlInfo = playerGirl.playerInfo;
+    //     PlayerInfo boyInfo = playerBoy.playerInfo;
+    //     PlayerInfo girlInfo = playerGirl.playerInfo;
 
-        float hpLoseBoy = boyInfo.maxHP - boyInfo.curHP;
-        float hpLoseGirl = girlInfo.maxHP - girlInfo.curHP;
+    //     float hpLoseBoy = boyInfo.maxHP - boyInfo.curHP;
+    //     float hpLoseGirl = girlInfo.maxHP - girlInfo.curHP;
 
-        if ( playerGirl.IsDown() || hpLoseGirl > hpLoseBoy ) {
-            playerGirl.Recover(_amount);
-            float hpLeft = hpLoseGirl - _amount;
-            if ( hpLeft > 0.0f )
-                playerBoy.Recover(hpLeft);
-        }
-        else {
-            playerBoy.Recover(_amount);
-            float hpLeft = hpLoseBoy - _amount;
-            if ( hpLeft > 0.0f )
-                playerGirl.Recover(hpLeft);
-        }
-    }
+    //     if ( playerGirl.IsDown() || hpLoseGirl > hpLoseBoy ) {
+    //         playerGirl.Recover(_amount);
+    //         float hpLeft = hpLoseGirl - _amount;
+    //         if ( hpLeft > 0.0f )
+    //             playerBoy.Recover(hpLeft);
+    //     }
+    //     else {
+    //         playerBoy.Recover(_amount);
+    //         float hpLeft = hpLoseBoy - _amount;
+    //         if ( hpLeft > 0.0f )
+    //             playerGirl.Recover(hpLeft);
+    //     }
+    // }
+    // } DELME end 
 
     // ------------------------------------------------------------------ 
     // Desc: 

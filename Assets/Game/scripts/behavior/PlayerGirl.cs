@@ -79,7 +79,7 @@ public class PlayerGirl : PlayerBase {
     // ------------------------------------------------------------------ 
 
     void LateUpdate () {
-        if ( this.isDown == false ) {
+        if ( this.noHP() == false ) {
             // NOTE: upper-body rotation must be calculate after lower-body.
             this.lowerBody.forward = this.aimDir;
             this.upperBody.forward = this.aimDir;
@@ -256,13 +256,12 @@ public class PlayerGirl : PlayerBase {
 
         this.Stop();
         this.transform.forward = this.upperBody.forward;
-        this.isDown = true; // DELME!!!!
 
         this.anim.Play("fallDown", PlayMode.StopAll);
         yield return new WaitForSeconds( this.anim["fallDown"].length );
         this.anim.CrossFade("downIdle");
 
-        yield return StartCoroutine( WaitForRecover() );
+        yield return StartCoroutine( "WaitForRecover" );
 
         // go back to idle
         this.anim.CrossFade("idle");
@@ -300,7 +299,7 @@ public class PlayerGirl : PlayerBase {
 
         // go to reload
         if ( shootInfo.OutOfAmmo() && shootInfo.RemainBullets() > 0 ) {
-            screenPad.gameObject.SendMessage ( "OnReload" );
+            screenPad.SendMessage ( "OnReload" );
             return;
         }
 
@@ -499,7 +498,7 @@ public class PlayerGirl : PlayerBase {
 
     void OnTriggerEnter ( Collider _other ) {
         if ( base.ApplyDamage(_other) ) {
-            screenPad.gameObject.SendMessage ( "OnGirlHit" );
+            screenPad.SendMessage ( "OnGirlHit" );
         }
 
         if ( this.lastHit.stunType != HitInfo.StunType.none ) {
@@ -574,4 +573,18 @@ public class PlayerGirl : PlayerBase {
         }
         return 0.0f;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnRecover ( float _hp ) { 
+        if ( this.noHP() ) {
+            StopCoroutine( "WaitForRecover" );
+            // go back to idle
+            this.anim.CrossFade("idle");
+            States[0] = UpdateIdle;
+        }
+        this.playerInfo.curHP = Mathf.Min( this.playerInfo.curHP + _hp, this.playerInfo.maxHP );
+    } 
 }

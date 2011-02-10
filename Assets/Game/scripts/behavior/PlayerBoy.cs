@@ -257,13 +257,12 @@ public class PlayerBoy : PlayerBase {
         States[1] = null;
 
         this.Stop();
-        this.isDown = true; // DELME!!!!
 
         this.anim.Play("fallDown", PlayMode.StopAll);
         yield return new WaitForSeconds( this.anim["fallDown"].length );
 
         this.anim.CrossFade("downIdle");
-        yield return StartCoroutine( WaitForRecover() );
+        yield return StartCoroutine( "WaitForRecover" );
 
         this.anim.CrossFade("getUp");
         yield return new WaitForSeconds( this.anim["getUp"].length );
@@ -354,7 +353,7 @@ public class PlayerBoy : PlayerBase {
 
     void OnTriggerEnter ( Collider _other ) {
         if ( base.ApplyDamage(_other) ) {
-            screenPad.gameObject.SendMessage ( "OnBoyHit" );
+            screenPad.SendMessage ( "OnBoyHit" );
         }
 
         if ( this.lastHit.stunType != HitInfo.StunType.none ) {
@@ -367,6 +366,11 @@ public class PlayerBoy : PlayerBase {
     // ------------------------------------------------------------------ 
 
     void OnMelee () {
+        // never act when player noHP or OnStun
+        if ( this.noHP() || States[0] == UpdateStun ) {
+            return;
+        }
+
         if ( States[1] == null ) {
             StartCombo();
         }
@@ -394,6 +398,7 @@ public class PlayerBoy : PlayerBase {
 
     protected void OnStun () {
         Stop();
+        this.anim.Stop();
 
         // NOTE: it could be possible we interupt to hit when boy is attacking.
         AttackInfo atk_info = this.GetAttackInfo();
@@ -413,4 +418,21 @@ public class PlayerBoy : PlayerBase {
 
         States[0] = UpdateStun;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    IEnumerator OnRecover ( float _hp ) { 
+        if ( this.noHP() ) {
+            StopCoroutine( "WaitForRecover" );
+            this.anim.CrossFade("getUp");
+            yield return new WaitForSeconds( this.anim["getUp"].length );
+
+            // go back to idle
+            this.anim.CrossFade("idle");
+            States[0] = UpdateIdle;
+        }
+        this.playerInfo.curHP = Mathf.Min( this.playerInfo.curHP + _hp, this.playerInfo.maxHP );
+    } 
 }

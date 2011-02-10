@@ -31,7 +31,6 @@ public class PlayerBase : Actor {
     public PlayerInfo playerInfo = new PlayerInfo();
     public Transform weaponAnchor = null;
 
-    protected bool isDown = false;
     static protected ScreenPad screenPad = null;
     protected GameObject curWeapon = null;
     protected GameObject weapon1 = null;
@@ -53,8 +52,8 @@ public class PlayerBase : Actor {
 
         // it is possible that we use HP pack save the player
         if ( GameRules.Instance().IsGameOver() == false
-             && this.IsDown() == true ) {
-            this.Recover(10.0f);
+             && this.noHP() ) {
+            this.SendMessage( "OnRecover", 10.0f );
         }
     }
 
@@ -163,11 +162,7 @@ public class PlayerBase : Actor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public bool IsDown () { return this.isDown; } 
-    public void Recover ( float _hp ) { 
-        this.isDown = false; 
-        this.playerInfo.curHP = Mathf.Min( this.playerInfo.curHP + _hp, this.playerInfo.maxHP );
-    } 
+    public bool noHP () { return playerInfo.curHP <= 0.0f; } 
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -175,7 +170,7 @@ public class PlayerBase : Actor {
 
     protected bool ApplyDamage ( Collider _other ) {
         // don't do anything if player is down
-        if ( this.isDown )
+        if ( this.noHP() )
             return false;
 
         //

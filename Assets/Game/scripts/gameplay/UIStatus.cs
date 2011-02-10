@@ -287,10 +287,11 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void DisableReloadButton () {
-        reloadButton.color.a = 0.1f;
-        reloadButton.SetColor(reloadButton.color);
-        reloadindEffect.color.a = 0.1f;
-        reloadindEffect.SetColor(reloadindEffect.color);
+        reloadButton.color.a = 1.0f;
+        reloadButton.SetColor( reloadButton.color + Color.gray );
+
+        reloadindEffect.color.a = 1.0f;
+        reloadindEffect.SetColor(reloadindEffect.color + Color.gray);
     }
 
     // ------------------------------------------------------------------ 
