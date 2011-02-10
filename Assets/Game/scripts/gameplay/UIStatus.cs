@@ -36,6 +36,7 @@ public class UIStatus : MonoBehaviour {
     public PackedSprite girlFace = null; 
     public SpriteText restartCounterText = null;
     public SpriteText bulletCounterText = null;
+    public SpriteText totalBulletCounterText = null;
 
     public PackedSprite aimingOutline = null;
     public PackedSprite aimingNeedle = null;
@@ -58,6 +59,7 @@ public class UIStatus : MonoBehaviour {
 
     protected delegate void StateUpdate();
     protected StateUpdate ReloadButtonState;
+    protected bool blinkText = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -68,11 +70,11 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Awake () {
-        DebugHelper.Assert(this.boyProgressBar, "boy progress bar not set");
-        DebugHelper.Assert(this.girlProgressBar, "girl progress bar not set");
-        DebugHelper.Assert(this.restartCounterText, "restart counter not set");
-        DebugHelper.Assert(this.bulletCounterText, "bullet counter not set");
-        DebugHelper.Assert(this.gameOver, "gameOver object not set");
+        // DebugHelper.Assert(this.boyProgressBar, "boy progress bar not set");
+        // DebugHelper.Assert(this.girlProgressBar, "girl progress bar not set");
+        // DebugHelper.Assert(this.restartCounterText, "restart counter not set");
+        // DebugHelper.Assert(this.bulletCounterText, "bullet counter not set");
+        // DebugHelper.Assert(this.gameOver, "gameOver object not set");
 
         gameOver.SetActiveRecursively(false);
         screenPad = GetComponent<ScreenPad>();
@@ -119,18 +121,27 @@ public class UIStatus : MonoBehaviour {
         }
 
         // update bullets
-        if ( this.bulletCounterText ) {
+        if ( this.bulletCounterText && this.totalBulletCounterText ) {
             ShootInfo shootInfo = girl.GetShootInfo();
 
 			// bullet counter display color
-			if (shootInfo.CurBullets()<=10)
-				this.bulletCounterText.SetColor(Color.red);
-				else if (shootInfo.CurBullets()<=20)
-					this.bulletCounterText.SetColor(Color.yellow);
-			else this.bulletCounterText.SetColor(Color.white);
+            if ( this.blinkText ) {
+                Color blinkColor = this.bulletCounterText.color;
+                blinkColor.r = Time.time % 1.0f;
+                this.bulletCounterText.SetColor(blinkColor);
+            }
+            else {
+                if (shootInfo.CurBullets()<=10)
+                    this.bulletCounterText.SetColor(Color.red);
+                else if (shootInfo.CurBullets()<=20)
+                    this.bulletCounterText.SetColor(Color.yellow);
+                else 
+                    this.bulletCounterText.SetColor(Color.white);
+            }
 			
             // curbullet / totalbullet
-            this.bulletCounterText.Text = shootInfo.CurBullets() + "/" + shootInfo.RemainBullets();
+            this.bulletCounterText.Text = shootInfo.CurBullets() + "/" + shootInfo.capacity;
+            this.totalBulletCounterText.Text = "" + shootInfo.RemainBullets();
         }
 
         // ======================================================== 
@@ -445,6 +456,7 @@ public class UIStatus : MonoBehaviour {
 
     public void OnReload () {
         //
+        this.StopActiveReload();
         PlayerGirl girl = GameRules.Instance().GetPlayerGirl() as PlayerGirl;
         // ShootInfo shootInfo = girl.GetShootInfo();
         this.ShowActiveReloadBar();
@@ -512,9 +524,20 @@ public class UIStatus : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    IEnumerator GirlGoBerserkForSeconds ( float _seconds ) {
+    IEnumerator GoActiveReloadForSeconds ( float _seconds ) {
         this.girlFace.PlayAnim("goBerserk");
+        this.blinkText = true;
         yield return new WaitForSeconds(_seconds); 
+        StopActiveReload();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void StopActiveReload () {
+        this.StopCoroutine("GoActiveReloadForSeconds");
+        this.blinkText = false;
         this.girlFace.StopAnim();
     }
 }
