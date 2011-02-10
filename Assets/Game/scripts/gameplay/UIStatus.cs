@@ -355,7 +355,7 @@ public class UIStatus : MonoBehaviour {
         // this code controls active reload bar color.alpha fade "from - to"
         Hashtable args1 = iTween.Hash( "from", 1.0f, 
                                        "to", 0.0f,
-                                       "time", 0.4f,
+                                       "time", 2.0f,
                                        "easetype", iTween.EaseType.easeOutQuint, 
                                        "onupdatetarget", this.gameObject,
                                        "onupdate", "ActiveReloadBarColorUpdate"
@@ -365,13 +365,25 @@ public class UIStatus : MonoBehaviour {
 
         // For Designer { 
         // this code controls active reload bar fade out scale.
-        Hashtable args2 = iTween.Hash( "scale", new Vector3(1.0f, 3.0f, 1.0f),
+
+        Hashtable args2 = iTween.Hash( "scale", new Vector3(1.6f, 2.0f, 1.5f),
                                        "time", 0.5f,
-                                       "easetype", iTween.EaseType.easeOutCirc 
+                                       "easetype", iTween.EaseType.bounce 
                                      );
         iTween.ScaleTo ( this.activeReloadBar.transform.parent.gameObject, 
                          args2 );
         // } For Designer end 
+
+/*
+		//nantas: added color change to white when succeeded active reloading
+		Hashtable args3 = iTween.Hash( "color", Color.white, 
+			                           "time", 0.5f,
+			                           "easetype", iTween.EaseType.easeInQuad
+								
+			                         );
+		iTween.ColorTo ( this.gameObject, args3 );
+*/
+
     } 
 
     // ------------------------------------------------------------------ 
