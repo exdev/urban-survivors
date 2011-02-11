@@ -36,7 +36,10 @@ public class ScreenPad : MonoBehaviour {
     Circle reloadZone = new Circle();
     Circle moveZone = new Circle();
     Circle aimingZone = new Circle();
+
+#if UNITY_IPHONE
     List<Touch> availableTouches = new List<Touch>();
+#endif
 
     Vector2 moveDir = Vector2.zero;
     Vector2 aimingDir = Vector2.up;

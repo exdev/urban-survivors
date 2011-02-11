@@ -298,7 +298,7 @@ public class CompHelper {
         _dest.sharedMaterials = _src.sharedMaterials;
         _dest.quality = _src.quality;
         _dest.updateWhenOffscreen = _src.updateWhenOffscreen;
-        _dest.skinNormals = _src.skinNormals;
+        // _dest.skinNormals = _src.skinNormals;
         _dest.sharedMesh = _src.sharedMesh;
         return true;
     }

@@ -268,7 +268,7 @@ public class UIStatus : MonoBehaviour {
 
         //
         if ( girl.IsReloading() == false ) {
-            StartCoroutine(HideActiveReloadBar());
+            StartCoroutine(HideActiveReloadBar("none"));
             DisableReloadButton();
             ReloadButtonState = UpdateReloadDeactive;
             return;
@@ -324,9 +324,12 @@ public class UIStatus : MonoBehaviour {
 
     void OnBoyHit () {
         iTween.Stop(this.boyFace.gameObject, "shake" );
+        iTween.ShakePosition( this.boyFace.gameObject, 
+                              iTween.Hash( "amount", 10.0f * Vector3.right, 
+                                           "time", 0.5f
+                                         ) );
         this.boyFace.transform.position = this.initBoyTrans.position;
         this.boyFace.transform.rotation = this.initBoyTrans.rotation;
-        iTween.ShakePosition(this.boyFace.gameObject, 10.0f * Vector3.right, 0.5f );
         // iTween.ShakeRotation(this.boyFace, 30.0f * Vector3.forward, 0.5f );
     }
 
@@ -336,22 +339,26 @@ public class UIStatus : MonoBehaviour {
 
     void OnGirlHit () {
         iTween.Stop(this.girlFace.gameObject, "shake" );
+        iTween.ShakePosition( this.girlFace.gameObject, 
+                              iTween.Hash( "amount", 10.0f * Vector3.right, 
+                                           "time", 0.5f
+                                         ) );
         this.girlFace.transform.position = this.initGirlTrans.position;
         this.girlFace.transform.rotation = this.initGirlTrans.rotation;
-        iTween.ShakePosition(this.girlFace.gameObject, 10.0f * Vector3.right, 0.5f );
         // iTween.ShakeRotation(this.girlFace, 30.0f * Vector3.forward, 0.5f );
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
+    // NOTE: we can receive "failed", "successful" and "none" 
     // ------------------------------------------------------------------ 
 
-    public IEnumerator HideActiveReloadBar ( bool _failed = false ) {
+    public IEnumerator HideActiveReloadBar ( string _state ) {
         iTween.Stop ( this.activeReloadFloat.gameObject, "move" ); 
         iTween.Stop ( this.reloadindEffect.gameObject, "rotate" ); 
         this.reloadindEffect.transform.rotation = Quaternion.identity;
 
-        if ( _failed ) {
+        if ( _state == "failed" ) {
             // For Designer: when failed active reload { 
             // this code controls active reload bar failed color. 
             // failed color
@@ -367,31 +374,29 @@ public class UIStatus : MonoBehaviour {
             yield return new WaitForSeconds(0.5f);
             // } For Designer end 
         }
-        else {
+        else if ( _state == "successful" ) {
             // NOTE: the color already white, you can't explosure color in Unity3d,
             //       I suggest using one more texture/effect overlap the bar for presentation.
             // For Designer: when succeeded active reload { 
             // this code controls active reload bar fade out scale.
-			
-            Hashtable args2 = iTween.Hash( "scale", new Vector3(1.5f, 3.0f, 1.0f),
-                                           "time", 0.3f,
-                                           "easetype", iTween.EaseType.bounce 
-                                         );
             iTween.ScaleTo ( this.activeReloadBar.transform.parent.gameObject, 
-                             args2 );
+                             iTween.Hash( "scale", new Vector3(1.5f, 3.0f, 1.0f),
+                                          "time", 0.3f,
+                                          "easetype", iTween.EaseType.bounce 
+                                        ) );
             // } For Designer end 
         }
 
         // For Designer { 
         // this code controls active reload bar color.alpha fade "from - to"
-        Hashtable args1 = iTween.Hash( "from", 1.0f, 
-                                       "to", 0.0f,
-                                       "time", 2.0f,
-                                       "easetype", iTween.EaseType.easeOutQuint, 
-                                       "onupdatetarget", this.gameObject,
-                                       "onupdate", "ActiveReloadBarColorUpdate"
-                                     );
-        iTween.ValueTo ( this.gameObject, args1 );
+        iTween.ValueTo ( this.gameObject, 
+                         iTween.Hash( "from", 1.0f, 
+                                      "to", 0.0f,
+                                      "time", 2.0f,
+                                      "easetype", iTween.EaseType.easeOutQuint, 
+                                      "onupdatetarget", this.gameObject,
+                                      "onupdate", "ActiveReloadBarColorUpdate"
+                                    ) );
         // } For Designer end 
 		
     } 
@@ -423,14 +428,14 @@ public class UIStatus : MonoBehaviour {
         activeReloadFloat.SetColor(col);
         activeReloadZone.SetColor(col);
 
-        Hashtable args = iTween.Hash( "from", 0.0f, 
+        iTween.ValueTo ( this.gameObject, 
+                         iTween.Hash( "from", 0.0f, 
                                       "to", 1.0f,
                                       "time", 0.2f,
                                       "easetype", iTween.EaseType.easeOutQuint, 
                                       "onupdatetarget", this.gameObject,
                                       "onupdate", "ActiveReloadBarColorUpdate"
-                                    );
-        iTween.ValueTo ( this.gameObject, args );
+                                    ) );
 
         // reset the reload float.
         float left_worldpos = this.activeReloadBar.transform.position.x - activeReloadBar.width * 0.5f; 
@@ -473,12 +478,12 @@ public class UIStatus : MonoBehaviour {
             reloadindEffect.SetColor(reloadindEffect.color);
 
             iTween.ScaleFrom ( this.reloadButton.gameObject, new Vector3( 1.5f, 1.5f, 1.5f ), 0.4f ); 
-            Hashtable args = iTween.Hash( "amount", Vector3.forward,
-                                          "time", 1.0f,
-                                          "easetype", iTween.EaseType.easeInOutQuad, 
-                                          "looptype", iTween.LoopType.loop 
-                                        );
-            iTween.RotateBy ( this.reloadindEffect.gameObject, args ); 
+            iTween.RotateBy ( this.reloadindEffect.gameObject, 
+                              iTween.Hash( "amount", Vector3.forward,
+                                           "time", 1.0f,
+                                           "easetype", iTween.EaseType.easeInOutQuad, 
+                                           "looptype", iTween.LoopType.loop 
+                                         ) ); 
         }
 
         {
@@ -486,11 +491,11 @@ public class UIStatus : MonoBehaviour {
             float reloadTime = girl.ReloadTime();
             Vector3 newPos = this.activeReloadFloat.transform.position 
                 + new Vector3( activeReloadBar.width, 0.0f, 0.0f );
-            Hashtable args = iTween.Hash( "position", newPos,
-                                          "time", reloadTime,
-                                          "easetype", iTween.EaseType.easeOutQuart 
-                                        );
-            iTween.MoveTo ( this.activeReloadFloat.gameObject, args ); 
+            iTween.MoveTo ( this.activeReloadFloat.gameObject, 
+                            iTween.Hash( "position", newPos,
+                                         "time", reloadTime,
+                                         "easetype", iTween.EaseType.easeOutQuart 
+                                       ) ); 
 
             //
             girl.SendMessage("OnReload");
@@ -513,12 +518,12 @@ public class UIStatus : MonoBehaviour {
 
         if ( float_pos >= min_arpos && float_pos <= max_arpos ) {
             girl.SendMessage("OnActiveReload");
-            StartCoroutine(HideActiveReloadBar());
+            StartCoroutine(HideActiveReloadBar("successful"));
             DisableReloadButton();
             this.ReloadButtonState = UpdateReloadDeactive;
         }
         else {
-            StartCoroutine(HideActiveReloadBar(true));
+            StartCoroutine(HideActiveReloadBar("failed"));
             DisableReloadButton();
             this.ReloadButtonState = UpdateReloadDeactive;
         }
