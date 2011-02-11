@@ -29,12 +29,10 @@ public class UIStatus : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public GameObject gameOver = null;
     public UIProgressBar boyProgressBar = null;
     public PackedSprite boyFace = null; 
     public UIProgressBar girlProgressBar = null;
     public PackedSprite girlFace = null; 
-    public SpriteText restartCounterText = null;
     public SpriteText bulletCounterText = null;
     public SpriteText totalBulletCounterText = null;
 
@@ -70,13 +68,6 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Awake () {
-        // DebugHelper.Assert(this.boyProgressBar, "boy progress bar not set");
-        // DebugHelper.Assert(this.girlProgressBar, "girl progress bar not set");
-        // DebugHelper.Assert(this.restartCounterText, "restart counter not set");
-        // DebugHelper.Assert(this.bulletCounterText, "bullet counter not set");
-        // DebugHelper.Assert(this.gameOver, "gameOver object not set");
-
-        gameOver.SetActiveRecursively(false);
         screenPad = GetComponent<ScreenPad>();
 
         this.initBoyTrans = boyFace.transform;
@@ -113,12 +104,6 @@ public class UIStatus : MonoBehaviour {
         PlayerGirl girl = GameRules.Instance().GetPlayerGirl() as PlayerGirl;
         PlayerInfo girlInfo = GameRules.Instance().GetPlayerGirlInfo();
         this.girlProgressBar.Value = 1.0f - girlInfo.curHP/girlInfo.maxHP;
-
-        if ( GameRules.Instance().IsGameOver() ) {
-            gameOver.SetActiveRecursively(true);
-            if ( this.restartCounterText )
-                this.restartCounterText.Text = string.Format( "{0:0}", GameRules.Instance().RestartCounter() );
-        }
 
         // update bullets
         if ( this.bulletCounterText && this.totalBulletCounterText ) {

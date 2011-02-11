@@ -189,6 +189,7 @@ public class AI_ZombieBase : Actor {
     // ------------------------------------------------------------------ 
 
     public virtual void OnDead () {
+        GameRules.Instance().CountDeadZombie();
         int i = dropItemProbability.GetIndex();
         if ( dropItems[i].prefab )
             GameObject.Instantiate( dropItems[i].prefab, transform.position, Quaternion.identity );

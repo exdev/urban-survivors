@@ -28,6 +28,10 @@ public class GameRules : MonoBehaviour {
     public bool multiPlayer = false;
     public float enemyDeadFarAway = 10.0f;
 
+    public GameObject gameOver = null;
+    public SpriteText restartCounterText = null;
+    public SpriteText deadZombeCounter = null;
+
     protected static GameRules instance  = null;
 
     protected PlayerBase playerBoy = null;
@@ -35,6 +39,7 @@ public class GameRules : MonoBehaviour {
     protected GameObject startPoint = null;
     protected bool isGameOver = false;
     protected float restartCounter = 0.0f;
+    protected int deadZombies = 0;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -59,6 +64,7 @@ public class GameRules : MonoBehaviour {
             playerBoy = goBoy.GetComponent<PlayerBase>(); 
             GameObject goGirl = GameObject.FindWithTag("player_girl");
             playerGirl = goGirl.GetComponent<PlayerBase>();
+            gameOver.SetActiveRecursively(false);
 
             //
             startPoint = GameObject.Find("StartPoint");
@@ -80,22 +86,27 @@ public class GameRules : MonoBehaviour {
                 this.playerBoy.StopCoroutine("WaitForRecover");
                 this.playerGirl.StopCoroutine("WaitForRecover");
                 this.restartCounter = this.RestartForSeconds; 
+                this.gameOver.SetActiveRecursively(true);
             }
         }
         else {
+            if ( this.restartCounterText )
+                this.restartCounterText.Text = string.Format( "{0:0}", GameRules.Instance().RestartCounter() );
+
             this.restartCounter -= Time.deltaTime;
-            if ( this.restartCounter <= 0.0f ) {
+            if ( this.restartCounter <= 0.0f )
                 Application.LoadLevel(0);
-            }
         }
+
+        if ( this.deadZombeCounter )
+            this.deadZombeCounter.Text = "dead zombies: " + this.deadZombies;
 
         // kill enemies when far away than 
         List<GameObject> enemies = GetEnemies ();
         Vector3 boyPos = playerBoy.transform.position;
         Vector3 girlPos = playerGirl.transform.position;
 
-        foreach ( GameObject go in enemies ) 
-        {
+        foreach ( GameObject go in enemies ) {
             if ( (go.transform.position - boyPos).magnitude >= enemyDeadFarAway ||
                  (go.transform.position - girlPos).magnitude >= enemyDeadFarAway ) 
             {
@@ -261,4 +272,10 @@ public class GameRules : MonoBehaviour {
         _player = target;
         _dist = nearest;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void CountDeadZombie () { this.deadZombies++; }
 }
