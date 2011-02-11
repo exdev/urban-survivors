@@ -125,23 +125,25 @@ public class UIStatus : MonoBehaviour {
             ShootInfo shootInfo = girl.GetShootInfo();
 
 			// bullet counter display color
-            if ( this.blinkText ) {
-                Color blinkColor = this.bulletCounterText.color;
-                blinkColor.r = Time.time % 1.0f;
-                this.bulletCounterText.SetColor(blinkColor);
-            }
-            else {
-                if (shootInfo.CurBullets()<=10)
+          
+            
+            if (shootInfo.CurBullets()<=10)
                     this.bulletCounterText.SetColor(Color.red);
-                else if (shootInfo.CurBullets()<=20)
+            else if (shootInfo.CurBullets()<=20)
                     this.bulletCounterText.SetColor(Color.yellow);
-                else 
+                 else 
                     this.bulletCounterText.SetColor(Color.white);
-            }
+            
+			if ( this.blinkText ) {
+		                Color blinkColor = this.bulletCounterText.color;
+		                blinkColor.g = Time.time % 0.5f;
+		                this.bulletCounterText.SetColor(blinkColor);
+						this.bulletCounterText.SetCharacterSize(70.0f);
+	        }
 			
             // curbullet / totalbullet
-            this.bulletCounterText.Text = shootInfo.CurBullets() + "/" + shootInfo.capacity;
-            this.totalBulletCounterText.Text = "" + shootInfo.RemainBullets();
+            this.bulletCounterText.Text = shootInfo.CurBullets() + "";
+            this.totalBulletCounterText.Text = "/" + shootInfo.RemainBullets();
         }
 
         // ======================================================== 
@@ -370,8 +372,9 @@ public class UIStatus : MonoBehaviour {
             //       I suggest using one more texture/effect overlap the bar for presentation.
             // For Designer: when succeeded active reload { 
             // this code controls active reload bar fade out scale.
-            Hashtable args2 = iTween.Hash( "scale", new Vector3(1.5f, 2.0f, 1.0f),
-                                           "time", 0.2f,
+			
+            Hashtable args2 = iTween.Hash( "scale", new Vector3(1.5f, 3.0f, 1.0f),
+                                           "time", 0.3f,
                                            "easetype", iTween.EaseType.bounce 
                                          );
             iTween.ScaleTo ( this.activeReloadBar.transform.parent.gameObject, 
@@ -390,6 +393,7 @@ public class UIStatus : MonoBehaviour {
                                      );
         iTween.ValueTo ( this.gameObject, args1 );
         // } For Designer end 
+		
     } 
 
     // ------------------------------------------------------------------ 
@@ -538,6 +542,7 @@ public class UIStatus : MonoBehaviour {
     void StopActiveReload () {
         this.StopCoroutine("GoActiveReloadForSeconds");
         this.blinkText = false;
+		this.bulletCounterText.SetCharacterSize(50.0f);
         this.girlFace.StopAnim();
     }
 }
