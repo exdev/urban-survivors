@@ -27,8 +27,11 @@ public class Spawner_base : MonoBehaviour {
     public int totalAmount = -1;
     public int minAlive = 1; // The minimum number of pawns that will be spawned every time the code execute.
     public int maxAlive = 1; // The maximum number of pawns that will be spawned every time the code execute.
+    public bool showSpawns = false; 
 
-    protected List<Object> existObjects = new List<Object>();
+    [System.NonSerialized]
+    [HideInInspector]
+    public List<Object> existObjects = new List<Object>();
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions

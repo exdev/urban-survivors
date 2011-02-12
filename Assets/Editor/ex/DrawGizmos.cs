@@ -23,7 +23,7 @@ class DrawGizmos {
     // ------------------------------------------------------------------ 
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
-    static void DrawPeriodicSource ( Source_periodic _c, GizmoType _gizmoType ) {
+    static void Draw ( Source_periodic _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
         Vector3 position = _c.transform.position;
@@ -35,7 +35,7 @@ class DrawGizmos {
     // ------------------------------------------------------------------ 
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
-    static void DrawPeriodicSource ( Source_collider _c, GizmoType _gizmoType ) {
+    static void Draw ( Source_collider _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
         Vector3 position = _c.transform.position;
@@ -53,11 +53,28 @@ class DrawGizmos {
     }
 
     // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
+    static void Draw ( Spawner_base _c, GizmoType _gizmoType ) {
+        if ( _c.showSpawns ) {
+            foreach ( Object obj in _c.existObjects ) {
+                if ( obj == null )
+                    continue;
+                Vector3 position = _c.transform.position;
+                Gizmos.color = new Color( 0.0f, 0.0f, 1.0f, 1.0f );
+                Gizmos.DrawLine (position, (obj as GameObject).transform.position);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     // Desc: Spawner_point
     // ------------------------------------------------------------------ 
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
-    static void DrawPeriodicSource ( Spawner_point _c, GizmoType _gizmoType ) {
+    static void Draw ( Spawner_point _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
         Vector3 position = _c.transform.position;
@@ -69,7 +86,7 @@ class DrawGizmos {
     // ------------------------------------------------------------------ 
 
     [DrawGizmo (GizmoType.SelectedOrChild | GizmoType.Pickable)]
-    static void DrawPeriodicSource ( Spawner_zone _c, GizmoType _gizmoType ) {
+    static void Draw ( Spawner_zone _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
         Vector3 position = _c.transform.position;
@@ -84,7 +101,7 @@ class DrawGizmos {
     // ------------------------------------------------------------------ 
 
     [DrawGizmo (GizmoType.Selected | GizmoType.Pickable)]
-    static void DrawPeriodicSource ( Response_listSpawn _c, GizmoType _gizmoType ) {
+    static void Draw ( Response_listSpawn _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
         Gizmos.color = Color.yellow;
@@ -101,7 +118,7 @@ class DrawGizmos {
     // ------------------------------------------------------------------ 
 
     [DrawGizmo (GizmoType.Selected | GizmoType.Pickable)]
-    static void DrawPeriodicSource ( Response_listDespawn _c, GizmoType _gizmoType ) {
+    static void Draw ( Response_listDespawn _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
         Gizmos.color = Color.blue;
@@ -118,7 +135,7 @@ class DrawGizmos {
     // ------------------------------------------------------------------ 
 
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
-    static void DrawPeriodicSource ( StartPoint _c, GizmoType _gizmoType ) {
+    static void Draw ( StartPoint _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
         Vector3 position = _c.transform.position;

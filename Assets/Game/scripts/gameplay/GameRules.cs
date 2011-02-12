@@ -32,11 +32,12 @@ public class GameRules : MonoBehaviour {
     public SpriteText restartCounterText = null;
     public SpriteText deadZombeCounter = null;
 
+    public StartPoint[] startPoints = null;
+
     protected static GameRules instance  = null;
 
     protected PlayerBase playerBoy = null;
     protected PlayerBase playerGirl = null;
-    protected GameObject startPoint = null;
     protected bool isGameOver = false;
     protected float restartCounter = 0.0f;
     protected int deadZombies = 0;
@@ -67,9 +68,12 @@ public class GameRules : MonoBehaviour {
             gameOver.SetActiveRecursively(false);
 
             //
-            startPoint = GameObject.Find("StartPoint");
-            if ( startPoint ) {
-                PlacePlayerAtStartPoint();
+            if ( startPoints.Length != 0 ) {
+                int i = (int)Random.Range( 0.0f, (float)(startPoints.Length) );
+                PlacePlayerAtStartPoint(this.startPoints[i].transform);
+            }
+            else {
+                Debug.LogWarning("Can't find start point");
             }
         }
     }
@@ -113,6 +117,9 @@ public class GameRules : MonoBehaviour {
                 Destroy(go);
             }
         }
+
+        // for DEBUG
+        DebugHelper.ScreenPrint("Total Enimies in the scene: " + this.GetEnemies().Count );
     }
 
     // ------------------------------------------------------------------ 
@@ -127,9 +134,9 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void PlacePlayerAtStartPoint () {
-        Vector3 start_pos = startPoint.transform.position;
-        Quaternion start_rot = startPoint.transform.rotation;
+    void PlacePlayerAtStartPoint ( Transform _startPoint ) {
+        Vector3 start_pos = _startPoint.position;
+        Quaternion start_rot = _startPoint.rotation;
 
         GameObject boy = GameRules.Instance().GetPlayerBoy().gameObject;
         if (boy) {
