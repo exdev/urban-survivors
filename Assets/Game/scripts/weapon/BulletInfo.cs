@@ -49,16 +49,16 @@ public class BulletInfo : MonoBehaviour {
         if ( counter >= lifeTime ) {
             SpawnManager.Instance().Destroy(gameObject);
         }
-        // transform.position = transform.position + speed * Time.deltaTime * transform.forward;
+        transform.position = transform.position + speed * Time.deltaTime * transform.forward;
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void FixedUpdate () {
-        rigidbody.AddForce( transform.forward * speed, ForceMode.VelocityChange );
-    }
+    // void FixedUpdate () {
+    //     rigidbody.AddForce( transform.forward * speed, ForceMode.VelocityChange );
+    // }
 
     // ------------------------------------------------------------------ 
     // Desc: 
