@@ -51,6 +51,10 @@ public class UIStatus : MonoBehaviour {
     public PackedSprite activeReloadFloat = null;
     public PackedSprite activeReloadZone = null;
 
+    public GameObject hint_lowAmmo = null; 
+    public GameObject hint_reloadBin = null; 
+    public GameObject hint_tapAgain = null; 
+
     protected ScreenPad screenPad = null;
     protected Transform initBoyTrans; 
     protected Transform initGirlTrans; 
@@ -77,6 +81,10 @@ public class UIStatus : MonoBehaviour {
         activeReloadBar.SetColor( new Color( 1.0f, 1.0f, 1.0f, 0.0f ) );
         activeReloadFloat.SetColor( new Color( 1.0f, 1.0f, 1.0f, 0.0f ) );
         activeReloadZone.SetColor( new Color( 1.0f, 1.0f, 1.0f, 0.0f ) );
+
+        this.hint_lowAmmo.SetActiveRecursively(false);
+        this.hint_reloadBin.SetActiveRecursively(false);
+        this.hint_tapAgain.SetActiveRecursively(false);
 
         // 
         this.ActiveAimingZone(false);
@@ -110,14 +118,23 @@ public class UIStatus : MonoBehaviour {
             ShootInfo shootInfo = girl.GetShootInfo();
 
 			// bullet counter display color
-          
-            
-            if (shootInfo.CurBullets()<=10)
-                    this.bulletCounterText.SetColor(Color.red);
-            else if (shootInfo.CurBullets()<=20)
-                    this.bulletCounterText.SetColor(Color.yellow);
-                 else 
-                    this.bulletCounterText.SetColor(Color.white);
+            //
+            if (shootInfo.CurBullets()<=10) {
+                this.bulletCounterText.SetColor(Color.red);
+                this.hint_reloadBin.SetActiveRecursively(true);
+            }
+            else if (shootInfo.CurBullets()<=20) {
+                this.bulletCounterText.SetColor(Color.yellow);
+            }
+            else {
+                this.bulletCounterText.SetColor(Color.white);
+            }
+
+            //
+            if ( shootInfo.RemainBullets() <= 20 )
+                this.hint_lowAmmo.SetActiveRecursively(true);
+            else
+                this.hint_lowAmmo.SetActiveRecursively(false);
             
 			if ( this.blinkText ) {
 		                Color blinkColor = this.bulletCounterText.color;
@@ -285,11 +302,11 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void DisableReloadButton () {
-        reloadButton.color.a = 1.0f;
-        reloadButton.SetColor( reloadButton.color + Color.gray );
+        reloadButton.color.a = 0.2f;
+        reloadButton.SetColor( reloadButton.color );
 
-        reloadindEffect.color.a = 1.0f;
-        reloadindEffect.SetColor(reloadindEffect.color + Color.gray);
+        reloadindEffect.color.a = 0.2f;
+        reloadindEffect.SetColor(reloadindEffect.color );
     }
 
     // ------------------------------------------------------------------ 
@@ -382,6 +399,7 @@ public class UIStatus : MonoBehaviour {
                                       "onupdatetarget", this.gameObject,
                                       "onupdate", "ActiveReloadBarColorUpdate"
                                     ) );
+        this.hint_tapAgain.SetActiveRecursively(false);
         // } For Designer end 
 		
     } 
@@ -484,6 +502,8 @@ public class UIStatus : MonoBehaviour {
 
             //
             girl.SendMessage("OnReload");
+            this.hint_reloadBin.SetActiveRecursively(false);
+            this.hint_tapAgain.SetActiveRecursively(true);
             this.ReloadButtonState = UpdateAcceptActiveReload;
         }
     }
