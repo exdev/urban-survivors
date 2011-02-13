@@ -27,6 +27,7 @@ public class GameRules : MonoBehaviour {
     public float RestartForSeconds = 5.0f; 
     public bool multiPlayer = false;
     public float enemyDeadFarAway = 10.0f;
+    public float spawnDistance = 10.0f;
 
     public GameObject gameOver = null;
     public SpriteText restartCounterText = null;

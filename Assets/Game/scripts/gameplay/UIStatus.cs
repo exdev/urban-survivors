@@ -131,7 +131,7 @@ public class UIStatus : MonoBehaviour {
             }
 
             //
-            if ( shootInfo.RemainBullets() <= 20 )
+            if ( shootInfo.RemainBullets() <= 50 )
                 this.hint_lowAmmo.SetActiveRecursively(true);
             else
                 this.hint_lowAmmo.SetActiveRecursively(false);

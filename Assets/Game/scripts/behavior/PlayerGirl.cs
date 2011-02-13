@@ -263,9 +263,11 @@ public class PlayerGirl : PlayerBase {
 
         yield return StartCoroutine( "WaitForRecover" );
 
-        // go back to idle
-        this.anim.CrossFade("idle");
-        States[0] = UpdateIdle;
+        // DELME: do it in OnRecover { 
+        // // go back to idle
+        // this.anim.CrossFade("idle");
+        // States[0] = UpdateIdle;
+        // } DELME end 
     }
 
     // ------------------------------------------------------------------ 
