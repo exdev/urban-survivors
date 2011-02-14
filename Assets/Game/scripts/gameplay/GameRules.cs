@@ -31,9 +31,9 @@ public class GameRules : MonoBehaviour {
 
     public GameObject gameOver = null;
     public SpriteText restartCounterText = null;
-    public SpriteText deadZombeCounter = null;
 
     public StartPoint[] startPoints = null;
+    public GameObject CurrentMission = null;
 
     protected static GameRules instance  = null;
 
@@ -41,7 +41,6 @@ public class GameRules : MonoBehaviour {
     protected PlayerBase playerGirl = null;
     protected bool isGameOver = false;
     protected float restartCounter = 0.0f;
-    protected int deadZombies = 0;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -102,9 +101,6 @@ public class GameRules : MonoBehaviour {
             if ( this.restartCounter <= 0.0f )
                 Application.LoadLevel(0);
         }
-
-        if ( this.deadZombeCounter )
-            this.deadZombeCounter.Text = "dead zombies: " + this.deadZombies;
 
         // kill enemies when far away than 
         List<GameObject> enemies = GetEnemies ();
@@ -280,10 +276,4 @@ public class GameRules : MonoBehaviour {
         _player = target;
         _dist = nearest;
     }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public void CountDeadZombie () { this.deadZombies++; }
 }

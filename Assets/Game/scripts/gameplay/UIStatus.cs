@@ -29,10 +29,15 @@ public class UIStatus : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    public GameObject[] ShowHideControls;
+    protected Vector3[] showHideInitPos;
+
     public UIProgressBar boyProgressBar = null;
     public PackedSprite boyFace = null; 
+
     public UIProgressBar girlProgressBar = null;
     public PackedSprite girlFace = null; 
+
     public SpriteText bulletCounterText = null;
     public SpriteText totalBulletCounterText = null;
 
@@ -90,6 +95,12 @@ public class UIStatus : MonoBehaviour {
         this.ActiveAimingZone(false);
         this.ActiveMovingZone(false);
         this.ActiveMeleeButton(false);
+
+        //
+        this.showHideInitPos = new Vector3[ShowHideControls.Length];
+        for ( int i = 0; i < ShowHideControls.Length; ++i ) {
+            showHideInitPos[i] = ShowHideControls[i].transform.localPosition;
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -97,8 +108,41 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Start () {
+        this.ShowControls(true);
         DisableReloadButton();
         ReloadButtonState = UpdateReloadDeactive;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void ShowControls ( bool _show ) {
+        if ( _show ) {
+            for ( int i = 0; i < ShowHideControls.Length; ++i ) {
+                Vector3 pos = showHideInitPos[i] + showHideInitPos[i].normalized * 200.0f;
+                iTween.MoveFrom( ShowHideControls[i],
+                                 iTween.Hash( "position", pos,
+                                              "time", 1.0f,
+                                              "isLocal", true,
+                                              "easetype", iTween.EaseType.easeOutBack
+                                            ) );
+            }
+        }
+        else {
+            // TODO { 
+            foreach ( GameObject go in ShowHideControls ) {
+                Vector3 pos = go.transform.localPosition;
+                pos += pos.normalized * 200.0f;
+                iTween.MoveFrom( go,
+                                 iTween.Hash( "position", pos,
+                                              "time", 1.0f,
+                                              "isLocal", true,
+                                              "easetype", iTween.EaseType.easeOutBack
+                                            ) );
+            }
+            // } TODO end 
+        }
     }
 
     // ------------------------------------------------------------------ 
