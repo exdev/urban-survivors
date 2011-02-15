@@ -23,6 +23,7 @@ public class ZombieKiller : MissionBase {
     ///////////////////////////////////////////////////////////////////////////////
 
     Vector3 startSceneInitPos;
+    bool stayMissionCompleteScene;
 
     ///////////////////////////////////////////////////////////////////////////////
     //
@@ -72,9 +73,8 @@ public class ZombieKiller : MissionBase {
     // ------------------------------------------------------------------ 
 
 	void Start () {
-        this.txtDeadZombeCounter.gameObject.SetActiveRecursively(true);
-        StartScene.SetActiveRecursively(false);
-        FinishScene.SetActiveRecursively(false);
+        ResetMission();
+        this.stayMissionCompleteScene = false;
 	}
 
     // ------------------------------------------------------------------ 
@@ -83,6 +83,7 @@ public class ZombieKiller : MissionBase {
 
     void ShowMissionComplete ( bool _show ) {
         FinishScene.SetActiveRecursively(_show);
+        this.txtDeadZombeCounter.gameObject.SetActiveRecursively(false);
 
         // // hide mission complete scene
         // this.txtMissionComplete.gameObject.SetActiveRecursively(_show);
@@ -100,7 +101,21 @@ public class ZombieKiller : MissionBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public void ResetMission () {
+        this.txtDeadZombeCounter.gameObject.SetActiveRecursively(false);
+        StartScene.SetActiveRecursively(false);
+        FinishScene.SetActiveRecursively(false);
+        this.CurrentCount = 0;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
 	public override IEnumerator StartMission () {
+        ResetMission();
+        Game.Pause();
+
         StartScene.transform.position = startSceneInitPos; 
         StartScene.SetActiveRecursively(true);
         txtZombieToKill.Text = "kill " + this.CompleteCount + " zombies !!!";
@@ -110,15 +125,19 @@ public class ZombieKiller : MissionBase {
 
         iTween.MoveFrom ( this.StartScene, iTween.Hash( "position", from, 
                                                         "time", 1.0f,
-                                                        "easetype", iTween.EaseType.easeOutBack 
+                                                        "easetype", iTween.EaseType.easeOutBack, 
+                                                        "ignoretimescale", true
                                                       ) );
-        yield return new WaitForSeconds(this.StartSceneShowForSeconds); 
+        yield return StartCoroutine ( CoroutineHelper.WaitForRealSeconds(this.StartSceneShowForSeconds) ); 
         iTween.MoveTo ( this.StartScene, iTween.Hash( "position", to, 
                                                       "time", 1.0f,
                                                       "easetype", iTween.EaseType.easeOutBack, 
+                                                      "ignoretimescale", true,
                                                       "oncomplete", "HideStartScene",
                                                       "oncompletetarget", this.gameObject
                                                     ) );
+        this.txtDeadZombeCounter.gameObject.SetActiveRecursively(true);
+        StartCoroutine(Game.Run());
     }
 
     // ------------------------------------------------------------------ 
@@ -139,11 +158,23 @@ public class ZombieKiller : MissionBase {
                 "dead zombies: " + this.CurrentCount + "/" + this.CompleteCount;
         }
 
-        if ( this.CurrentCount >= this.CompleteCount ) {
-            // TODO { 
-            // Time.timeScale = 0.0f;
-            // ShowMissionComplete(true);
-            // } TODO end 
+        if ( this.stayMissionCompleteScene == false ) {
+            if ( this.CurrentCount >= this.CompleteCount ) {
+                Game.Pause();
+                ShowMissionComplete(true);
+                this.stayMissionCompleteScene = true;
+            }
+        }
+        else {
+            // HACK TEMP { 
+            // update for selection next, return.
+            // TODO: about the selection.
+            if ( Input.GetKeyDown(KeyCode.Space) ) {
+                Debug.Log("start mission");
+                this.stayMissionCompleteScene = false;
+                StartCoroutine(this.StartMission());
+            }
+            // } HACK TEMP end 
         }
 	}
 

@@ -86,7 +86,7 @@ public class UIStatus : MonoBehaviour {
         this.showHideInitPos = new Vector3[ShowHideControls.Length];
         for ( int i = 0; i < ShowHideControls.Length; ++i ) {
             showHideInitPos[i] = ShowHideControls[i].transform.localPosition;
-            Vector3 offset = showHideInitPos[i].normalized * 200.0f;
+            Vector3 offset = showHideInitPos[i].normalized * 400.0f;
             ShowHideControls[i].transform.localPosition = new Vector3( showHideInitPos[i].x + offset.x,
                                                                        showHideInitPos[i].y + offset.y,
                                                                        showHideInitPos[i].z );
@@ -129,21 +129,23 @@ public class UIStatus : MonoBehaviour {
                                iTween.Hash( "position", showHideInitPos[i],
                                             "time", _sec, 
                                             "isLocal", true,
-                                            "easetype", iTween.EaseType.easeOutBack
+                                            "easetype", iTween.EaseType.easeOutBack,
+                                            "ignoretimescale", true
                                           ) );
             }
         }
         else {
             for ( int i = 0; i < ShowHideControls.Length; ++i ) {
                 Vector3 pos = showHideInitPos[i];
-                pos = new Vector3 ( pos.x + pos.normalized.x * 200.0f,
-                                    pos.y + pos.normalized.y * 200.0f,
+                pos = new Vector3 ( pos.x + pos.normalized.x * 400.0f,
+                                    pos.y + pos.normalized.y * 400.0f,
                                     pos.z );
                 iTween.MoveTo( ShowHideControls[i],
                                iTween.Hash( "position", pos,
                                             "time", _sec,
                                             "isLocal", true,
-                                            "easetype", iTween.EaseType.easeOutBack
+                                            "easetype", iTween.EaseType.easeOutBack,
+                                            "ignoretimescale", true
                                           ) );
             }
         }

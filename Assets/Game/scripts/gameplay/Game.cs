@@ -181,10 +181,16 @@ public class Game : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     static public void Pause () {
-        // TODO
+        Time.timeScale = 0.0f;
+        instance.screenPad.GetComponent<UIStatus>().ShowControls(false,1.0f);
+        instance.screenPad.AcceptInput(false);
     }
-    static public void Run () {
-        // TODO
+
+    static public IEnumerator Run () {
+        Time.timeScale = 1.0f;
+        instance.screenPad.GetComponent<UIStatus>().ShowControls(true,1.0f);
+        yield return new WaitForSeconds(1.0f);
+        instance.screenPad.AcceptInput(true);
     }
 
     // ------------------------------------------------------------------ 
