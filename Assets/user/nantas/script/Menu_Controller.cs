@@ -17,20 +17,56 @@ public class Menu_Controller : MonoBehaviour
 	
 	}
 	
+	//bring in first panel "tap to start"
 	public void Begin()
 	{
 		// Do our initial intro-zoom at start
 		mainMenu.BringIn(startUp);
 		Debug.Log("began");
-		
-		// Move our fog to match:
-		//MoveForward();
+
 	}
 	
-	public void buttonPressed()
+	//player tapped to start real menu
+	public void startMenu ()
 	{
 		Debug.Log("button pressed!");
 		btnBack.Hide(false);
+	}
+	
+	//singleplayer choosed
+	public void singlePlayer()
+	{
+		//todo
+		Debug.Log("singleplayer mode");
+	}
+	
+	//multiplayer choosed
+	public void multiPlayer ()
+	{
+		//todo
+		Debug.Log("multiplayer mode");
+	}
+	
+	//zombie killer choosed
+	public void missionKill ()
+	{
+		//todo
+		Debug.Log("zombie killer mode");
+		btnBack.Hide(true);
+		//after saving variable and stuff, start loading
+		Invoke("startLoading",1.0f);
+	}
+	
+	//collector mode choosed
+	public void missionCollect ()
+	{
+		//todo
+		Debug.Log("collecting mode");
+		btnBack.Hide(true);
+		//after saving variable and stuff, start loading
+		Invoke("startLoading",1.0f);
+	
+		
 	}
 	
 	public void moveForward()
@@ -46,7 +82,8 @@ public class Menu_Controller : MonoBehaviour
 	
 	public void startLoading()
 	{
-		btnBack.Delete();
+	
+		Application.LoadLevel("arena_size");
 		
 	}
 
