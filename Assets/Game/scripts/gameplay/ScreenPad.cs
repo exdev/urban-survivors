@@ -50,6 +50,7 @@ public class ScreenPad : MonoBehaviour {
     int reloadButtonStat = 0; // 1 down, 2 up
     int moveZoneStat = 0; // 1 down, 2 up
     int aimingZoneStat = 0; // 1 down, 2 up
+    bool acceptInput = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -94,6 +95,13 @@ public class ScreenPad : MonoBehaviour {
         //
         this.moveAnalog = this.moveAnchor.Find("Analog");
         DebugHelper.Assert( this.moveAnalog != null, "pls assign moveAnalog" );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Start () {
         this.moveZone.center = this.hudCamera.WorldToScreenPoint(this.moveAnchor.position); 
         this.moveZone.radius = 69.0f;
 
@@ -109,6 +117,12 @@ public class ScreenPad : MonoBehaviour {
         this.reloadZone.center = this.hudCamera.WorldToScreenPoint(this.reloadOutline.position);
         this.reloadZone.radius = 50.0f;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void AcceptInput( bool _accept ) { this.acceptInput = _accept; }
 	
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -119,17 +133,20 @@ public class ScreenPad : MonoBehaviour {
         if ( this.shootCounter > 0.0f )
             this.shootCounter -= Time.deltaTime;
 
+        // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
+        this.moveDir = Vector2.zero;
+        this.availableTouches.Clear();
+
+        this.reloadButtonStat = 0;
+        this.meleeButtonStat = 0;
+        this.aimingZoneStat = 0;
+        this.moveZoneStat = 0;
+
+        if ( this.acceptInput == false )
+            return;
+
         if ( this.useRemoteTouch ) {
 #if UNITY_IPHONE
-            // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
-            this.moveDir = Vector2.zero;
-            this.availableTouches.Clear();
-
-            this.reloadButtonStat = 0;
-            this.meleeButtonStat = 0;
-            this.aimingZoneStat = 0;
-            this.moveZoneStat = 0;
-
             // first check if move finger invalid
             Touch move_finger = new Touch();
             Touch aiming_finger = new Touch();
@@ -211,9 +228,6 @@ public class ScreenPad : MonoBehaviour {
             // } DEBUG end 
 #endif
             } else {
-                this.meleeButtonStat = 0;
-                this.reloadButtonStat = 0;
-
                 // handle keyboard move
                 float moveFB = Input.GetAxisRaw("Vertical");
                 float moveLR = Input.GetAxisRaw("Horizontal");
@@ -275,7 +289,7 @@ public class ScreenPad : MonoBehaviour {
 #if UNITY_IPHONE
                 // the screen touch priority is higher than aimingZone
                 if ( this.availableTouches.Count != 0 ) {
-                    GameObject girl = GameRules.Instance().GetPlayerGirl().gameObject;
+                    GameObject girl = Game.GetPlayerGirl().gameObject;
                     Vector3 girlScreenPos = Camera.main.WorldToScreenPoint(girl.transform.position);
                     Vector2 girlScreenPos_v2 = new Vector2(girlScreenPos.x, girlScreenPos.y); 
 
@@ -289,18 +303,18 @@ public class ScreenPad : MonoBehaviour {
                     Vector2 desiredDir = delta.normalized; 
                     // DISABLE: this.aimingDir = -delta.normalized; // this is old method, inverse needle
                     // adjust the aiming direction by 
-                    desiredDir = (GameRules.Instance().GetPlayerGirl() as PlayerGirl).GetAutoLockDir(desiredDir);
+                    desiredDir = (Game.GetPlayerGirl() as PlayerGirl).GetAutoLockDir(desiredDir);
                     this.aimingDir = desiredDir; 
                     this.shootCounter = this.shootingDuration;
                 }
 #endif
             } else {
-                GameObject girl = GameRules.Instance().GetPlayerGirl().gameObject;
+                GameObject girl = Game.GetPlayerGirl().gameObject;
                 Vector3 girlScreenPos = Camera.main.WorldToScreenPoint(girl.transform.position);
                 Vector2 girlScreenPos_v2 = new Vector2(girlScreenPos.x, girlScreenPos.y); 
                 Vector2 delta = new Vector2(Input.mousePosition.x,Input.mousePosition.y) - girlScreenPos_v2;
                 Vector2 desiredDir = delta.normalized; 
-                desiredDir = (GameRules.Instance().GetPlayerGirl() as PlayerGirl).GetAutoLockDir(desiredDir);
+                desiredDir = (Game.GetPlayerGirl() as PlayerGirl).GetAutoLockDir(desiredDir);
                 this.aimingDir = desiredDir;
             } // end if ( !this.useRemoteTouch )
 

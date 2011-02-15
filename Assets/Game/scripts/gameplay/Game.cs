@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : GameRules.cs
+// File         : Game.cs
 // Author       : Wu Jie 
-// Last Change  : 10/29/2010 | 01:08:32 AM | Friday,October
+// Last Change  : 02/15/2011 | 16:10:26 PM | Tuesday,February
 // Description  : 
 // ======================================================================================
 
@@ -18,7 +18,14 @@ using System.Collections.Generic;
 ///////////////////////////////////////////////////////////////////////////////
 
 [System.Serializable]
-public class GameRules : MonoBehaviour {
+public class Game : MonoBehaviour {
+
+    static Game instance  = null;
+
+    PlayerBase playerBoy = null;
+    PlayerBase playerGirl = null;
+    bool isGameOver = false;
+    float restartCounter = 0.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -35,22 +42,9 @@ public class GameRules : MonoBehaviour {
     public StartPoint[] startPoints = null;
     public GameObject CurrentMission = null;
 
-    protected static GameRules instance  = null;
-
-    protected PlayerBase playerBoy = null;
-    protected PlayerBase playerGirl = null;
-    protected bool isGameOver = false;
-    protected float restartCounter = 0.0f;
-
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public static GameRules Instance() { return instance; }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -65,17 +59,24 @@ public class GameRules : MonoBehaviour {
             playerBoy = goBoy.GetComponent<PlayerBase>(); 
             GameObject goGirl = GameObject.FindWithTag("player_girl");
             playerGirl = goGirl.GetComponent<PlayerBase>();
-            gameOver.SetActiveRecursively(false);
 
             //
             if ( startPoints.Length != 0 ) {
-                int i = (int)Random.Range( 0.0f, (float)(startPoints.Length) );
+                int i = (int)(Random.value * (startPoints.Length-1));
                 PlacePlayerAtStartPoint(this.startPoints[i].transform);
             }
             else {
-                Debug.LogWarning("Can't find start point");
+                Debug.LogError("Can't find start point");
             }
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Start () {
+        gameOver.SetActiveRecursively(false);
     }
 
     // ------------------------------------------------------------------ 
@@ -95,7 +96,7 @@ public class GameRules : MonoBehaviour {
         }
         else {
             if ( this.restartCounterText )
-                this.restartCounterText.Text = string.Format( "{0:0}", GameRules.Instance().RestartCounter() );
+                this.restartCounterText.Text = string.Format( "{0:0}", Game.RestartCounter() );
 
             this.restartCounter -= Time.deltaTime;
             if ( this.restartCounter <= 0.0f )
@@ -123,25 +124,17 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public bool IsMultiPlayer () { return this.multiPlayer; } 
-    public bool IsGameOver () { return this.isGameOver; } 
-    public float RestartCounter () { return this.restartCounter; } 
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
     void PlacePlayerAtStartPoint ( Transform _startPoint ) {
         Vector3 start_pos = _startPoint.position;
         Quaternion start_rot = _startPoint.rotation;
 
-        GameObject boy = GameRules.Instance().GetPlayerBoy().gameObject;
+        GameObject boy = Game.GetPlayerBoy().gameObject;
         if (boy) {
             boy.transform.position = start_pos;
             boy.transform.rotation = start_rot;
         }
 
-        GameObject girl = GameRules.Instance().GetPlayerGirl().gameObject;
+        GameObject girl = Game.GetPlayerGirl().gameObject;
         if (girl) {
             girl.transform.position = start_pos - boy.transform.forward * 2.0f;
             girl.transform.rotation = start_rot;
@@ -153,10 +146,25 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public GameObject[] GetPlayers () {
+    static public GameObject Mission() { return instance.CurrentMission; }
+    static public float SpawnDistance() { return instance.spawnDistance; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static public bool IsMultiPlayer () { return instance.multiPlayer; } 
+    static public bool IsGameOver () { return instance.isGameOver; } 
+    static public float RestartCounter () { return instance.restartCounter; } 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static public GameObject[] GetPlayers () {
         GameObject[] goList = new GameObject[2];
-        goList[0] = playerBoy.gameObject;
-        goList[1] = playerGirl.gameObject;
+        goList[0] = instance.playerBoy.gameObject;
+        goList[1] = instance.playerGirl.gameObject;
         return goList;
     }
 
@@ -164,17 +172,14 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public PlayerBase GetPlayerBoy () { return playerBoy; }
-    public PlayerInfo GetPlayerBoyInfo () { return playerBoy.playerInfo; }
-
-    public PlayerBase GetPlayerGirl () { return playerGirl; }
-    public PlayerInfo GetPlayerGirlInfo () { return playerGirl.playerInfo; }
+    static public PlayerBase GetPlayerBoy () { return instance.playerBoy; }
+    static public PlayerBase GetPlayerGirl () { return instance.playerGirl; }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public List<GameObject> GetEnemies () { 
+    static public List<GameObject> GetEnemies () { 
         List<GameObject> enemies = new List<GameObject>();
         enemies.AddRange ( GameObject.FindGameObjectsWithTag("zombie_girl") ); 
         enemies.AddRange ( GameObject.FindGameObjectsWithTag("zombie_no1") ); 
@@ -185,7 +190,7 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public List<GameObject> GetEnemiesByTag ( string _tagName ) { 
+    static public List<GameObject> GetEnemiesByTag ( string _tagName ) { 
         List<GameObject> enemies = new List<GameObject>();
         enemies.AddRange ( GameObject.FindGameObjectsWithTag(_tagName) ); 
         return enemies;
@@ -195,8 +200,8 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void PickupBullets ( int _bullets ) {
-        ShootInfo shootInfo = playerGirl.GetShootInfo();
+    static public void PickupBullets ( int _bullets ) {
+        ShootInfo shootInfo = instance.playerGirl.GetShootInfo();
         shootInfo.AddBullets(_bullets);
     }
 
@@ -233,11 +238,11 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void GetNearestPlayer ( Transform _self, out Transform _player, out float _dist ) { 
+    static public void GetNearestPlayer ( Transform _self, out Transform _player, out float _dist ) { 
         Transform target = null;
         float nearest = 999.0f;
 
-        GameObject[] players = GameRules.Instance().GetPlayers();
+        GameObject[] players = Game.GetPlayers();
         foreach( GameObject player in players ) {
             float len = (player.transform.position - _self.position).magnitude;
             if ( len < nearest ) {
@@ -255,11 +260,11 @@ public class GameRules : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void GetNearestAlivedPlayer ( Transform _self, out Transform _player, out float _dist ) { 
+    static public void GetNearestAlivedPlayer ( Transform _self, out Transform _player, out float _dist ) { 
         Transform target = null;
         float nearest = 9999.0f;
 
-        GameObject[] players = GameRules.Instance().GetPlayers();
+        GameObject[] players = Game.GetPlayers();
         foreach( GameObject player in players ) {
             PlayerBase p = player.GetComponent<PlayerBase>();
             if ( p.playerInfo.curHP <= 0.0f ) {

@@ -443,7 +443,7 @@ public class PlayerGirl : PlayerBase {
         // TODO { 
         // Vector2 my_pos = new Vector2 ( this.transform.position.x, 
         //                                this.transform.position.z );
-        // List<GameObject> enemies = GameRules.Instance().GetEnemies();
+        // List<GameObject> enemies = Game.GetEnemies();
         // foreach ( GameObject enemy in enemies ) {
         //     CharacterController ctrl = enemy.collider as CharacterController;
         //     if ( ctrl ) {

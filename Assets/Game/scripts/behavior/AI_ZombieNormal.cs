@@ -89,7 +89,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
         }
 
         public override bool exec () { 
-            GameObject[] players = GameRules.Instance().GetPlayers();
+            GameObject[] players = Game.GetPlayers();
             foreach( GameObject player in players ) {
                 float len = (player.transform.position - this.trans.position).magnitude;
                 if ( len < range ) {

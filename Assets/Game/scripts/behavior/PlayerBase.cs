@@ -51,7 +51,7 @@ public class PlayerBase : Actor {
         // Debug.Log("after recover time" + Time.time ); // DEBUG
 
         // it is possible that we use HP pack save the player
-        if ( GameRules.Instance().IsGameOver() == false
+        if ( Game.IsGameOver() == false
              && this.noHP() ) {
             this.SendMessage( "OnRecover", 10.0f );
         }
@@ -83,7 +83,7 @@ public class PlayerBase : Actor {
             GameObject hud_s = GameObject.Find("HUD_s");
             GameObject hud_m = GameObject.Find("HUD_m");
 
-            if ( GameRules.Instance().IsMultiPlayer() ) {
+            if ( Game.IsMultiPlayer() ) {
                 hud = hud_m;
                 if ( hud_s ) hud_s.SetActiveRecursively(false);
             }

@@ -54,7 +54,7 @@ public class AI_ZombieBase : Actor {
         public override void exec () {
             float dist = 0.0f;
             Transform player = null;
-            GameRules.Instance().GetNearestAlivedPlayer( this.actor.transform,
+            Game.GetNearestAlivedPlayer( this.actor.transform,
                                                          out player,
                                                          out dist );
             // it is possible that all the player down
@@ -82,7 +82,7 @@ public class AI_ZombieBase : Actor {
         public override bool exec () {
             float dist = 0.0f;
             Transform player = null;
-            GameRules.Instance().GetNearestAlivedPlayer( this.actor.transform,
+            Game.GetNearestAlivedPlayer( this.actor.transform,
                                                          out player,
                                                          out dist );
             if ( dist > this.distance ) // not in distance 
@@ -189,7 +189,7 @@ public class AI_ZombieBase : Actor {
     // ------------------------------------------------------------------ 
 
     public virtual void OnDead () {
-        GameRules.Instance().CurrentMission.SendMessage("OnZombieDead");
+        Game.Mission().SendMessage("OnZombieDead");
         int i = dropItemProbability.GetIndex();
         if ( dropItems[i].prefab )
             GameObject.Instantiate( dropItems[i].prefab, transform.position, Quaternion.identity );
