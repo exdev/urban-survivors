@@ -142,7 +142,12 @@ public class Actor : Steer {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Awake () {
+    protected new void Awake () {
+        base.Awake();
+
+        // init the player basic values.
+        this.anim = gameObject.GetComponent(typeof(Animation)) as Animation;
+        this.targetPos = transform.position;
     }
 
     // ------------------------------------------------------------------ 
@@ -151,9 +156,6 @@ public class Actor : Steer {
 
 	protected new void Start () {
         base.Start();
-        // init the player basic values.
-        this.anim = gameObject.GetComponent(typeof(Animation)) as Animation;
-        this.targetPos = transform.position;
     }
 
     // ------------------------------------------------------------------ 

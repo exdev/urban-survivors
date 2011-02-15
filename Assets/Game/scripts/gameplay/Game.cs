@@ -26,6 +26,7 @@ public class Game : MonoBehaviour {
     PlayerBase playerGirl = null;
     bool isGameOver = false;
     float restartCounter = 0.0f;
+    ScreenPad screenPad = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -40,7 +41,7 @@ public class Game : MonoBehaviour {
     public SpriteText restartCounterText = null;
 
     public StartPoint[] startPoints = null;
-    public GameObject CurrentMission = null;
+    public MissionBase CurrentMission = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -68,6 +69,33 @@ public class Game : MonoBehaviour {
             else {
                 Debug.LogError("Can't find start point");
             }
+
+
+            // init hud
+            if ( screenPad == null ) {
+                GameObject hud = null;
+                GameObject hud_s = GameObject.Find("HUD_s");
+                GameObject hud_m = GameObject.Find("HUD_m");
+
+                if ( Game.IsMultiPlayer() ) {
+                    hud = hud_m;
+                    if ( hud_s ) hud_s.SetActiveRecursively(false);
+                }
+                else {
+                    hud = hud_s;
+                    if ( hud_m ) hud_m.SetActiveRecursively(false);
+                }
+
+                if ( hud ) {
+                    screenPad = hud.GetComponent<ScreenPad>();
+                }
+
+#if UNITY_IPHONE
+                if ( Application.isEditor == false ) {
+                    DebugHelper.Assert( screenPad, "screenPad not found" );
+                }
+#endif
+            }
         }
     }
 
@@ -75,8 +103,14 @@ public class Game : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Start () {
+    IEnumerator Start () {
         gameOver.SetActiveRecursively(false);
+
+        // start the mission
+        yield return StartCoroutine(CurrentMission.StartMission());
+        screenPad.GetComponent<UIStatus>().ShowControls(true,1.0f);
+        yield return new WaitForSeconds(1.0f);
+        screenPad.AcceptInput(true);
     }
 
     // ------------------------------------------------------------------ 
@@ -117,7 +151,7 @@ public class Game : MonoBehaviour {
         }
 
         // for DEBUG
-        DebugHelper.ScreenPrint("Total Enimies in the scene: " + this.GetEnemies().Count );
+        // DebugHelper.ScreenPrint("Total Enimies in the scene: " + this.GetEnemies().Count );
     }
 
     // ------------------------------------------------------------------ 
@@ -146,8 +180,20 @@ public class Game : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public GameObject Mission() { return instance.CurrentMission; }
+    static public void Pause () {
+        // TODO
+    }
+    static public void Run () {
+        // TODO
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static public MissionBase Mission() { return instance.CurrentMission; }
     static public float SpawnDistance() { return instance.spawnDistance; }
+    static public ScreenPad ScreenPad() { return instance.screenPad; }
 
     // ------------------------------------------------------------------ 
     // Desc: 

@@ -17,5 +17,13 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 public class MissionBase : MonoBehaviour {
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	public virtual IEnumerator StartMission () {
+        yield return new WaitForSeconds(0); 
+    }
 }
 
