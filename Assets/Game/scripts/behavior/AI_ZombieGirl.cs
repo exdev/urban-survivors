@@ -86,7 +86,9 @@ public class AI_ZombieGirl : AI_ZombieBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Awake () {
+    protected new void Awake () {
+        base.Awake();
+
         if ( fxDead  == null && this.FX_dead ) {
             fxDead = (GameObject)Instantiate( this.FX_dead );
         }

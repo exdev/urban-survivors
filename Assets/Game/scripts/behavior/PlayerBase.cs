@@ -31,7 +31,6 @@ public class PlayerBase : Actor {
     public PlayerInfo playerInfo = new PlayerInfo();
     public Transform weaponAnchor = null;
 
-    static protected ScreenPad screenPad = null;
     protected GameObject curWeapon = null;
     protected GameObject weapon1 = null;
     protected GameObject weapon2 = null;
@@ -61,10 +60,15 @@ public class PlayerBase : Actor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Awake () {
+    protected new void Awake () {
+        base.Awake();
+
         if ( fxHitBite == null && this.FX_HIT_bite ) {
             fxHitBite = (GameObject)Instantiate( this.FX_HIT_bite );
         }
+
+        // check values
+        DebugHelper.Assert( this.weaponAnchor, "can't find WeaponAnchor");
     }
 
     // ------------------------------------------------------------------ 
@@ -73,36 +77,6 @@ public class PlayerBase : Actor {
 
 	protected new void Start () {
         base.Start();
-
-        // check values
-        DebugHelper.Assert( this.weaponAnchor, "can't find WeaponAnchor");
-
-        // init hud
-        if ( screenPad == null ) {
-            GameObject hud = null;
-            GameObject hud_s = GameObject.Find("HUD_s");
-            GameObject hud_m = GameObject.Find("HUD_m");
-
-            if ( Game.IsMultiPlayer() ) {
-                hud = hud_m;
-                if ( hud_s ) hud_s.SetActiveRecursively(false);
-            }
-            else {
-                hud = hud_s;
-                if ( hud_m ) hud_m.SetActiveRecursively(false);
-            }
-
-            if ( hud ) {
-                screenPad = hud.GetComponent<ScreenPad>();
-            }
-
-#if UNITY_IPHONE
-            if ( Application.isEditor == false ) {
-                DebugHelper.Assert( screenPad, "screenPad not found" );
-            }
-#endif
-        }
-
         InitInfo();
     }
 

@@ -279,7 +279,7 @@ public class PlayerBoy : PlayerBase {
     // ------------------------------------------------------------------ 
 
     void HandleInput() {
-        this.screenDir = screenPad ? screenPad.GetMoveDirection() : Vector2.zero;
+        this.screenDir = Game.ScreenPad() ? Game.ScreenPad().GetMoveDirection() : Vector2.zero;
     }
 
     // ------------------------------------------------------------------ 
@@ -355,7 +355,7 @@ public class PlayerBoy : PlayerBase {
 
     void OnTriggerEnter ( Collider _other ) {
         if ( base.ApplyDamage(_other) ) {
-            screenPad.SendMessage ( "OnBoyHit" );
+            Game.ScreenPad().SendMessage ( "OnBoyHit" );
         }
 
         if ( this.lastHit.stunType != HitInfo.StunType.none ) {

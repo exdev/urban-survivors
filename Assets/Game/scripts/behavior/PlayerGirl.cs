@@ -160,7 +160,7 @@ public class PlayerGirl : PlayerBase {
 
     void UpdateIdle () {
         // shooting
-        if ( States[1] == null && screenPad.CanShoot() ) {
+        if ( States[1] == null && Game.ScreenPad().CanShoot() ) {
             States[1] = UpdateShoot;
         }
 
@@ -189,7 +189,7 @@ public class PlayerGirl : PlayerBase {
 
     void UpdateFollow () {
         // shooting
-        if ( States[1] == null && screenPad.CanShoot() ) {
+        if ( States[1] == null && Game.ScreenPad().CanShoot() ) {
             States[1] = UpdateShoot;
         }
 
@@ -223,7 +223,7 @@ public class PlayerGirl : PlayerBase {
 
     void UpdateAvoid () {
         // shooting
-        if ( States[1] == null && screenPad.CanShoot() ) {
+        if ( States[1] == null && Game.ScreenPad().CanShoot() ) {
             States[1] = UpdateShoot;
         }
 
@@ -288,7 +288,7 @@ public class PlayerGirl : PlayerBase {
         ShootInfo shootInfo = this.GetShootInfo();
 
         // stop shoot
-        if ( screenPad.CanShoot() == false ) {
+        if ( Game.ScreenPad().CanShoot() == false ) {
             States[1] = null;
             return;
         }
@@ -301,7 +301,7 @@ public class PlayerGirl : PlayerBase {
 
         // go to reload
         if ( shootInfo.OutOfAmmo() && shootInfo.RemainBullets() > 0 ) {
-            screenPad.SendMessage ( "OnReload" );
+            Game.ScreenPad().SendMessage ( "OnReload" );
             return;
         }
 
@@ -392,7 +392,7 @@ public class PlayerGirl : PlayerBase {
         // DISABLE { 
         // // get move direction
         // if ( this.followTarget == null ) {
-        //     Vector2 screen_dir = screenPad.GetMoveDirection();
+        //     Vector2 screen_dir = Game.ScreenPad().GetMoveDirection();
         //     if ( screen_dir.sqrMagnitude >= 0.0f ) {
         //         this.moveDir.x = screen_dir.x;
         //         this.moveDir.y = screen_dir.y;
@@ -404,8 +404,8 @@ public class PlayerGirl : PlayerBase {
         // }
         // } DISABLE end 
 
-        // get direction by screenPad
-        Vector2 aimDir2D = screenPad.GetAimingDirection();
+        // get direction by Game.ScreenPad()
+        Vector2 aimDir2D = Game.ScreenPad().GetAimingDirection();
         this.aimDir = Vector3.zero; 
         this.aimDir.x = aimDir2D.x; 
         this.aimDir.y = aimDir2D.y; 
@@ -500,7 +500,7 @@ public class PlayerGirl : PlayerBase {
 
     void OnTriggerEnter ( Collider _other ) {
         if ( base.ApplyDamage(_other) ) {
-            screenPad.SendMessage ( "OnGirlHit" );
+            Game.ScreenPad().SendMessage ( "OnGirlHit" );
         }
 
         if ( this.lastHit.stunType != HitInfo.StunType.none ) {
@@ -559,7 +559,7 @@ public class PlayerGirl : PlayerBase {
             shootInfo.AdjustAnim(this.anim);
             this.anim.CrossFade(shootInfo.reloadAnim);
             shootInfo.Reload();
-            screenPad.SendMessage ( "GoActiveReloadForSeconds", shootInfo.activeReloadTime );
+            Game.ScreenPad().SendMessage ( "GoActiveReloadForSeconds", shootInfo.activeReloadTime );
             States[1] = UpdateReload;
         }
     }

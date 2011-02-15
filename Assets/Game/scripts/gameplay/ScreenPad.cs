@@ -101,28 +101,25 @@ public class ScreenPad : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Start () {
-        this.moveZone.center = this.hudCamera.WorldToScreenPoint(this.moveAnchor.position); 
-        this.moveZone.radius = 69.0f;
+    public void AcceptInput( bool _accept ) { 
+        this.acceptInput = _accept; 
+        if ( this.acceptInput ) {
+            this.moveZone.center = this.hudCamera.WorldToScreenPoint(this.moveAnchor.position); 
+            this.moveZone.radius = 69.0f;
 
-        //
-        // this.aimingNeedle = this.aimingAnchor.Find("Needle");
-        // DebugHelper.Assert( this.aimingNeedle != null, "pls assign aimingNeedle" );
-        this.aimingZone.center = this.hudCamera.WorldToScreenPoint(this.aimingAnchor.position); 
-        this.aimingZone.radius = 64.0f;
+            //
+            // this.aimingNeedle = this.aimingAnchor.Find("Needle");
+            // DebugHelper.Assert( this.aimingNeedle != null, "pls assign aimingNeedle" );
+            this.aimingZone.center = this.hudCamera.WorldToScreenPoint(this.aimingAnchor.position); 
+            this.aimingZone.radius = 64.0f;
 
-        this.meleeZone.center = this.hudCamera.WorldToScreenPoint(this.meleeOutline.position);
-        this.meleeZone.radius = 50.0f;
+            this.meleeZone.center = this.hudCamera.WorldToScreenPoint(this.meleeOutline.position);
+            this.meleeZone.radius = 50.0f;
 
-        this.reloadZone.center = this.hudCamera.WorldToScreenPoint(this.reloadOutline.position);
-        this.reloadZone.radius = 50.0f;
+            this.reloadZone.center = this.hudCamera.WorldToScreenPoint(this.reloadOutline.position);
+            this.reloadZone.radius = 50.0f;
+        } 
     }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public void AcceptInput( bool _accept ) { this.acceptInput = _accept; }
 	
     // ------------------------------------------------------------------ 
     // Desc: 
