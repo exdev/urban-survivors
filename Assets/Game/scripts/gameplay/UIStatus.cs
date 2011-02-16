@@ -67,6 +67,7 @@ public class UIStatus : MonoBehaviour {
     protected delegate void StateUpdate();
     protected StateUpdate ReloadButtonState;
     protected bool blinkText = false;
+    protected bool showControls = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -122,8 +123,12 @@ public class UIStatus : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void ShowControls ( bool _show, float _sec ) {
+    public IEnumerator ShowControls ( bool _show, float _sec ) {
+        this.showControls = _show;
         if ( _show ) {
+            yield return StartCoroutine ( CoroutineHelper.WaitForRealSeconds(0.1f) ); 
+
+            // process fade in
             for ( int i = 0; i < ShowHideControls.Length; ++i ) {
                 iTween.MoveTo( ShowHideControls[i],
                                iTween.Hash( "position", showHideInitPos[i],
@@ -135,6 +140,32 @@ public class UIStatus : MonoBehaviour {
             }
         }
         else {
+            // reset the button status
+            iTween.Stop(this.gameObject, true );
+
+            this.girlFace.transform.position = this.initGirlTrans.position;
+            this.girlFace.transform.rotation = this.initGirlTrans.rotation;
+            this.boyFace.transform.position = this.initBoyTrans.position;
+            this.boyFace.transform.rotation = this.initBoyTrans.rotation;
+
+            this.hint_lowAmmo.SetActiveRecursively(false);
+            this.hint_reloadBin.SetActiveRecursively(false);
+            this.hint_tapAgain.SetActiveRecursively(false);
+            this.ActiveAimingZone(false);
+            this.ActiveMovingZone(false);
+            this.ActiveMeleeButton(false);
+
+            // hide active reload bar at the beginning
+            activeReloadBar.SetColor( new Color( 1.0f, 1.0f, 1.0f, 0.0f ) );
+            activeReloadFloat.SetColor( new Color( 1.0f, 1.0f, 1.0f, 0.0f ) );
+            activeReloadZone.SetColor( new Color( 1.0f, 1.0f, 1.0f, 0.0f ) );
+
+            // init reload button state
+            DisableReloadButton();
+            ReloadButtonState = UpdateReloadDeactive;
+            yield return StartCoroutine ( CoroutineHelper.WaitForRealSeconds(0.2f) ); 
+
+            // process fade out
             for ( int i = 0; i < ShowHideControls.Length; ++i ) {
                 Vector3 pos = showHideInitPos[i];
                 pos = new Vector3 ( pos.x + pos.normalized.x * 400.0f,
@@ -164,38 +195,40 @@ public class UIStatus : MonoBehaviour {
         this.girlProgressBar.Value = 1.0f - girlInfo.curHP/girlInfo.maxHP;
 
         // update bullets
-        if ( this.bulletCounterText && this.totalBulletCounterText ) {
-            ShootInfo shootInfo = girl.GetShootInfo();
+        if ( this.showControls ) {
+            if ( this.bulletCounterText && this.totalBulletCounterText ) {
+                ShootInfo shootInfo = girl.GetShootInfo();
 
-			// bullet counter display color
-            //
-            if (shootInfo.CurBullets()<=10) {
-                this.bulletCounterText.SetColor(Color.red);
-                this.hint_reloadBin.SetActiveRecursively(true);
-            }
-            else if (shootInfo.CurBullets()<=20) {
-                this.bulletCounterText.SetColor(Color.yellow);
-            }
-            else {
-                this.bulletCounterText.SetColor(Color.white);
-            }
+                // bullet counter display color
+                if (shootInfo.CurBullets()<=10) {
+                    this.bulletCounterText.SetColor(Color.red);
+                    this.hint_reloadBin.SetActiveRecursively(true);
+                }
+                else if (shootInfo.CurBullets()<=20) {
+                    this.bulletCounterText.SetColor(Color.yellow);
+                }
+                else {
+                    this.bulletCounterText.SetColor(Color.white);
+                }
 
-            //
-            if ( shootInfo.RemainBullets() <= 50 )
-                this.hint_lowAmmo.SetActiveRecursively(true);
-            else
-                this.hint_lowAmmo.SetActiveRecursively(false);
-            
-			if ( this.blinkText ) {
-		                Color blinkColor = this.bulletCounterText.color;
-		                blinkColor.g = Time.time % 0.5f;
-		                this.bulletCounterText.SetColor(blinkColor);
-						this.bulletCounterText.SetCharacterSize(70.0f);
-	        }
-			
-            // curbullet / totalbullet
-            this.bulletCounterText.Text = shootInfo.CurBullets() + "";
-            this.totalBulletCounterText.Text = "/" + shootInfo.RemainBullets();
+                //
+                if ( shootInfo.RemainBullets() <= 50 ) {
+                    this.hint_lowAmmo.SetActiveRecursively(true);
+                }
+                else
+                    this.hint_lowAmmo.SetActiveRecursively(false);
+
+                if ( this.blinkText ) {
+                    Color blinkColor = this.bulletCounterText.color;
+                    blinkColor.g = Time.time % 0.5f;
+                    this.bulletCounterText.SetColor(blinkColor);
+                    this.bulletCounterText.SetCharacterSize(70.0f);
+                }
+
+                // curbullet / totalbullet
+                this.bulletCounterText.Text = shootInfo.CurBullets() + "";
+                this.totalBulletCounterText.Text = "/" + shootInfo.RemainBullets();
+            }
         }
 
         // ======================================================== 
@@ -374,14 +407,15 @@ public class UIStatus : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnBoyHit () {
+    IEnumerator OnBoyHit () {
         iTween.Stop(this.boyFace.gameObject, "shake" );
+        this.boyFace.transform.position = this.initBoyTrans.position;
+        this.boyFace.transform.rotation = this.initBoyTrans.rotation;
+        yield return new WaitForSeconds(0.1f);
         iTween.ShakePosition( this.boyFace.gameObject, 
                               iTween.Hash( "amount", 10.0f * Vector3.right, 
                                            "time", 0.5f
                                          ) );
-        this.boyFace.transform.position = this.initBoyTrans.position;
-        this.boyFace.transform.rotation = this.initBoyTrans.rotation;
         // iTween.ShakeRotation(this.boyFace, 30.0f * Vector3.forward, 0.5f );
     }
 
@@ -389,14 +423,15 @@ public class UIStatus : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnGirlHit () {
+    IEnumerator OnGirlHit () {
         iTween.Stop(this.girlFace.gameObject, "shake" );
+        this.boyFace.transform.position = this.initBoyTrans.position;
+        this.boyFace.transform.rotation = this.initBoyTrans.rotation;
+        yield return new WaitForSeconds(0.1f);
         iTween.ShakePosition( this.girlFace.gameObject, 
                               iTween.Hash( "amount", 10.0f * Vector3.right, 
                                            "time", 0.5f
                                          ) );
-        this.girlFace.transform.position = this.initGirlTrans.position;
-        this.girlFace.transform.rotation = this.initGirlTrans.rotation;
         // iTween.ShakeRotation(this.girlFace, 30.0f * Vector3.forward, 0.5f );
     }
 

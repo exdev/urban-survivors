@@ -560,6 +560,7 @@ public class PlayerGirl : PlayerBase {
             this.anim.CrossFade(shootInfo.reloadAnim);
             shootInfo.Reload();
             Game.ScreenPad().SendMessage ( "GoActiveReloadForSeconds", shootInfo.activeReloadTime );
+            Game.Mission().SendMessage ( "OnPerfectReload" );
             States[1] = UpdateReload;
         }
     }

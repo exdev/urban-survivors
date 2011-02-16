@@ -33,7 +33,7 @@ public class Emitter_S : Emitter {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public override void Emit ( Transform _anchor, GameObject _bullet ) {
+    public override int Emit ( Transform _anchor, GameObject _bullet ) {
         // create a bullet, and rotate it based on the vector inputRotation
         float half_ang = this.angle * 0.5f;
 
@@ -46,6 +46,8 @@ public class Emitter_S : Emitter {
 
             // GameObject spawnBullet = Instantiate(_bullet, _anchor.position, rot ) as GameObject;
             GameObject spawnBullet = SpawnManager.Instance().Spawn(_bullet, _anchor.position, rot );
+            spawnBullet.renderer.material = _bullet.renderer.material;
+
             BulletInfo bi = spawnBullet.GetComponent<BulletInfo>();
             bi.ownerDamageInfo = this.GetComponent<DamageInfo>();
 
@@ -58,5 +60,6 @@ public class Emitter_S : Emitter {
                 fireEffect.particleEmitter.Emit();
             }
         }
+        return this.max_bullet;
     }
 }

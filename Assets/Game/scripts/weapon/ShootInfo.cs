@@ -40,6 +40,9 @@ public class ShootInfo : MonoBehaviour {
     public Vector2 arRangeInPercentage = new Vector2( 0.0f, 1.0f );
     public float arLengthInPercentage = 0.2f;
 
+    public Material matNormal = null;
+    public Material matActiveReload = null;
+
     protected int bullets = 10;
     protected int remainBullets = 100;
 
@@ -135,9 +138,15 @@ public class ShootInfo : MonoBehaviour {
 
     public void Fire () {
         if ( OutOfAmmo() == false ) {
-            // TODO: bullet consume.
-            this.emitter.Emit(this.anchor,this.bullet);
-            this.bullets -= 1;
+            if ( activeReloadCounter > 0.0f ) {
+                this.bullet.renderer.material = this.matActiveReload;
+            }
+            else {
+                this.bullet.renderer.material = this.matNormal;
+            }
+            int bullet_count = this.emitter.Emit(this.anchor,this.bullet);
+            this.bullets -= bullet_count;
+            Game.Mission().SendMessage( "OnBulletUsed", bullet_count );
         }
     }
 

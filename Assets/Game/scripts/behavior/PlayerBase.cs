@@ -169,6 +169,7 @@ public class PlayerBase : Actor {
         }
         float dmgOutput = DamageRule.Instance().CalculateDamage( this.playerInfo, dmgInfo );
         this.playerInfo.accDmgNormal += dmgOutput;
+        Game.Mission().SendMessage ( "OnPlayerHit", dmgOutput );
 
         if ( this.playerInfo.accDmgNormal >= this.playerInfo.normalStun ) {
             this.lastHit.stunType = HitInfo.StunType.normal;
