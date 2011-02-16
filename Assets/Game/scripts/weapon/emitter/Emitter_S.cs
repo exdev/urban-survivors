@@ -46,6 +46,8 @@ public class Emitter_S : Emitter {
 
             // GameObject spawnBullet = Instantiate(_bullet, _anchor.position, rot ) as GameObject;
             GameObject spawnBullet = SpawnManager.Instance().Spawn(_bullet, _anchor.position, rot );
+            spawnBullet.renderer.material = _bullet.renderer.material;
+
             BulletInfo bi = spawnBullet.GetComponent<BulletInfo>();
             bi.ownerDamageInfo = this.GetComponent<DamageInfo>();
 
