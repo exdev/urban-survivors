@@ -109,8 +109,7 @@ public class Game : MonoBehaviour {
         // start the mission
         yield return StartCoroutine(CurrentMission.StartMission());
         UIStatus uistatus = screenPad.GetComponent<UIStatus>();
-        // uistatus.StartCoroutine( uistatus.ShowControls (true, 1.0f) );
-        uistatus.ShowControls (true, 1.0f);
+        yield return uistatus.StartCoroutine( uistatus.ShowControls (true, 1.0f) );
         yield return new WaitForSeconds(1.0f);
         screenPad.AcceptInput(true);
     }
@@ -182,19 +181,19 @@ public class Game : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void Pause () {
-        Time.timeScale = 0.0f;
-        UIStatus uistatus = instance.screenPad.GetComponent<UIStatus>();
-        uistatus.ShowControls (false, 1.0f); 
+    static public IEnumerator Pause () {
         instance.screenPad.AcceptInput(false);
+        UIStatus uistatus = instance.screenPad.GetComponent<UIStatus>();
+        yield return uistatus.StartCoroutine( uistatus.ShowControls (false, 1.0f) );
+        Time.timeScale = 0.0f;
     }
 
     static public IEnumerator Run () {
-        Time.timeScale = 1.0f;
         UIStatus uistatus = instance.screenPad.GetComponent<UIStatus>();
-        uistatus.ShowControls (true, 1.0f); 
-        yield return new WaitForSeconds(1.0f);
+        yield return uistatus.StartCoroutine( uistatus.ShowControls (true, 1.0f) );
+        yield return instance.StartCoroutine ( CoroutineHelper.WaitForRealSeconds(1.0f) ); 
         instance.screenPad.AcceptInput(true);
+        Time.timeScale = 1.0f;
     }
 
     // ------------------------------------------------------------------ 

@@ -67,6 +67,7 @@ public class UIStatus : MonoBehaviour {
     protected delegate void StateUpdate();
     protected StateUpdate ReloadButtonState;
     protected bool blinkText = false;
+    protected bool showControls = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -122,8 +123,12 @@ public class UIStatus : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void ShowControls ( bool _show, float _sec ) {
+    public IEnumerator ShowControls ( bool _show, float _sec ) {
+        this.showControls = _show;
         if ( _show ) {
+            yield return StartCoroutine ( CoroutineHelper.WaitForRealSeconds(0.1f) ); 
+
+            // process fade in
             for ( int i = 0; i < ShowHideControls.Length; ++i ) {
                 iTween.MoveTo( ShowHideControls[i],
                                iTween.Hash( "position", showHideInitPos[i],
@@ -135,7 +140,20 @@ public class UIStatus : MonoBehaviour {
             }
         }
         else {
+            // reset the button status
             iTween.Stop(this.gameObject, true );
+            this.hint_lowAmmo.SetActiveRecursively(false);
+            this.hint_reloadBin.SetActiveRecursively(false);
+            this.hint_tapAgain.SetActiveRecursively(false);
+            this.ActiveAimingZone(false);
+            this.ActiveMovingZone(false);
+            this.ActiveMeleeButton(false);
+            // init reload button state
+            DisableReloadButton();
+            ReloadButtonState = UpdateReloadDeactive;
+            yield return StartCoroutine ( CoroutineHelper.WaitForRealSeconds(0.1f) ); 
+
+            // process fade out
             for ( int i = 0; i < ShowHideControls.Length; ++i ) {
                 Vector3 pos = showHideInitPos[i];
                 pos = new Vector3 ( pos.x + pos.normalized.x * 400.0f,
@@ -165,38 +183,39 @@ public class UIStatus : MonoBehaviour {
         this.girlProgressBar.Value = 1.0f - girlInfo.curHP/girlInfo.maxHP;
 
         // update bullets
-        if ( this.bulletCounterText && this.totalBulletCounterText ) {
-            ShootInfo shootInfo = girl.GetShootInfo();
+        if ( this.showControls ) {
+            if ( this.bulletCounterText && this.totalBulletCounterText ) {
+                ShootInfo shootInfo = girl.GetShootInfo();
 
-			// bullet counter display color
-            //
-            if (shootInfo.CurBullets()<=10) {
-                this.bulletCounterText.SetColor(Color.red);
-                this.hint_reloadBin.SetActiveRecursively(true);
-            }
-            else if (shootInfo.CurBullets()<=20) {
-                this.bulletCounterText.SetColor(Color.yellow);
-            }
-            else {
-                this.bulletCounterText.SetColor(Color.white);
-            }
+                // bullet counter display color
+                if (shootInfo.CurBullets()<=10) {
+                    this.bulletCounterText.SetColor(Color.red);
+                    this.hint_reloadBin.SetActiveRecursively(true);
+                }
+                else if (shootInfo.CurBullets()<=20) {
+                    this.bulletCounterText.SetColor(Color.yellow);
+                }
+                else {
+                    this.bulletCounterText.SetColor(Color.white);
+                }
 
-            //
-            if ( shootInfo.RemainBullets() <= 50 )
-                this.hint_lowAmmo.SetActiveRecursively(true);
-            else
-                this.hint_lowAmmo.SetActiveRecursively(false);
-            
-			if ( this.blinkText ) {
-		                Color blinkColor = this.bulletCounterText.color;
-		                blinkColor.g = Time.time % 0.5f;
-		                this.bulletCounterText.SetColor(blinkColor);
-						this.bulletCounterText.SetCharacterSize(70.0f);
-	        }
-			
-            // curbullet / totalbullet
-            this.bulletCounterText.Text = shootInfo.CurBullets() + "";
-            this.totalBulletCounterText.Text = "/" + shootInfo.RemainBullets();
+                //
+                if ( shootInfo.RemainBullets() <= 50 )
+                    this.hint_lowAmmo.SetActiveRecursively(true);
+                else
+                    this.hint_lowAmmo.SetActiveRecursively(false);
+
+                if ( this.blinkText ) {
+                    Color blinkColor = this.bulletCounterText.color;
+                    blinkColor.g = Time.time % 0.5f;
+                    this.bulletCounterText.SetColor(blinkColor);
+                    this.bulletCounterText.SetCharacterSize(70.0f);
+                }
+
+                // curbullet / totalbullet
+                this.bulletCounterText.Text = shootInfo.CurBullets() + "";
+                this.totalBulletCounterText.Text = "/" + shootInfo.RemainBullets();
+            }
         }
 
         // ======================================================== 

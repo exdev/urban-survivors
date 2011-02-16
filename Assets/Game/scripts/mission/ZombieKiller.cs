@@ -114,7 +114,7 @@ public class ZombieKiller : MissionBase {
 
 	public override IEnumerator StartMission () {
         ResetMission();
-        Game.Pause();
+        StartCoroutine(Game.Pause());
 
         StartScene.transform.position = startSceneInitPos; 
         StartScene.SetActiveRecursively(true);
@@ -160,7 +160,7 @@ public class ZombieKiller : MissionBase {
 
         if ( this.stayMissionCompleteScene == false ) {
             if ( this.CurrentCount >= this.CompleteCount ) {
-                Game.Pause();
+                StartCoroutine(Game.Pause());
                 ShowMissionComplete(true);
                 this.stayMissionCompleteScene = true;
             }
