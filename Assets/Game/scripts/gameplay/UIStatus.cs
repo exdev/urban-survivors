@@ -142,16 +142,28 @@ public class UIStatus : MonoBehaviour {
         else {
             // reset the button status
             iTween.Stop(this.gameObject, true );
+
+            this.girlFace.transform.position = this.initGirlTrans.position;
+            this.girlFace.transform.rotation = this.initGirlTrans.rotation;
+            this.boyFace.transform.position = this.initBoyTrans.position;
+            this.boyFace.transform.rotation = this.initBoyTrans.rotation;
+
             this.hint_lowAmmo.SetActiveRecursively(false);
             this.hint_reloadBin.SetActiveRecursively(false);
             this.hint_tapAgain.SetActiveRecursively(false);
             this.ActiveAimingZone(false);
             this.ActiveMovingZone(false);
             this.ActiveMeleeButton(false);
+
+            // hide active reload bar at the beginning
+            activeReloadBar.SetColor( new Color( 1.0f, 1.0f, 1.0f, 0.0f ) );
+            activeReloadFloat.SetColor( new Color( 1.0f, 1.0f, 1.0f, 0.0f ) );
+            activeReloadZone.SetColor( new Color( 1.0f, 1.0f, 1.0f, 0.0f ) );
+
             // init reload button state
             DisableReloadButton();
             ReloadButtonState = UpdateReloadDeactive;
-            yield return StartCoroutine ( CoroutineHelper.WaitForRealSeconds(0.1f) ); 
+            yield return StartCoroutine ( CoroutineHelper.WaitForRealSeconds(0.2f) ); 
 
             // process fade out
             for ( int i = 0; i < ShowHideControls.Length; ++i ) {
@@ -200,8 +212,9 @@ public class UIStatus : MonoBehaviour {
                 }
 
                 //
-                if ( shootInfo.RemainBullets() <= 50 )
+                if ( shootInfo.RemainBullets() <= 50 ) {
                     this.hint_lowAmmo.SetActiveRecursively(true);
+                }
                 else
                     this.hint_lowAmmo.SetActiveRecursively(false);
 
@@ -396,9 +409,9 @@ public class UIStatus : MonoBehaviour {
 
     IEnumerator OnBoyHit () {
         iTween.Stop(this.boyFace.gameObject, "shake" );
-        yield return new WaitForSeconds(0.1f);
         this.boyFace.transform.position = this.initBoyTrans.position;
         this.boyFace.transform.rotation = this.initBoyTrans.rotation;
+        yield return new WaitForSeconds(0.1f);
         iTween.ShakePosition( this.boyFace.gameObject, 
                               iTween.Hash( "amount", 10.0f * Vector3.right, 
                                            "time", 0.5f
@@ -412,9 +425,9 @@ public class UIStatus : MonoBehaviour {
 
     IEnumerator OnGirlHit () {
         iTween.Stop(this.girlFace.gameObject, "shake" );
+        this.boyFace.transform.position = this.initBoyTrans.position;
+        this.boyFace.transform.rotation = this.initBoyTrans.rotation;
         yield return new WaitForSeconds(0.1f);
-        this.girlFace.transform.position = this.initGirlTrans.position;
-        this.girlFace.transform.rotation = this.initGirlTrans.rotation;
         iTween.ShakePosition( this.girlFace.gameObject, 
                               iTween.Hash( "amount", 10.0f * Vector3.right, 
                                            "time", 0.5f

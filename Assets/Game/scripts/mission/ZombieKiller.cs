@@ -22,16 +22,24 @@ public class ZombieKiller : MissionBase {
     //
     ///////////////////////////////////////////////////////////////////////////////
 
+    delegate void StateUpdate();
+    StateUpdate State;
+
     Vector3 startSceneInitPos;
-    bool stayMissionCompleteScene;
+    float missionReportStartTime;
+
+    float timeMissionStart = 0.0f;
+    float timeMissionFinished = 0.0f;
+
+    int CurrentCount = 0; 
+    float DamageTaken = 0.0f;
+    int BulletUsed = 0;
+    int PerfectReloadCount = 0;
 
     ///////////////////////////////////////////////////////////////////////////////
     //
     ///////////////////////////////////////////////////////////////////////////////
 
-    [System.NonSerialized]
-    [HideInInspector]
-    public int CurrentCount = 0; 
     public int CompleteCount = 100; 
     public GameObject StartScene = null;
     public GameObject FinishScene = null;
@@ -55,6 +63,7 @@ public class ZombieKiller : MissionBase {
 
     //
     public float StartSceneShowForSeconds = 2.0f;
+    public float MissionReportForSeconds = 2.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
@@ -74,28 +83,7 @@ public class ZombieKiller : MissionBase {
 
 	void Start () {
         ResetMission();
-        this.stayMissionCompleteScene = false;
 	}
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void ShowMissionComplete ( bool _show ) {
-        FinishScene.SetActiveRecursively(_show);
-        this.txtDeadZombeCounter.gameObject.SetActiveRecursively(false);
-
-        // // hide mission complete scene
-        // this.txtMissionComplete.gameObject.SetActiveRecursively(_show);
-        // this.txtZombieKilled.gameObject.SetActiveRecursively(_show);
-        // this.txtTime.gameObject.SetActiveRecursively(_show);
-        // this.txtDamageTaken.gameObject.SetActiveRecursively(_show);
-        // this.txtBulletUsed.gameObject.SetActiveRecursively(_show);
-        // this.txtPerfectReloads.gameObject.SetActiveRecursively(_show);
-        // this.txtExpBounus.gameObject.SetActiveRecursively(_show);
-        // this.txtNext.gameObject.SetActiveRecursively(_show);
-        // this.txtMenu.gameObject.SetActiveRecursively(_show);
-    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -105,7 +93,11 @@ public class ZombieKiller : MissionBase {
         this.txtDeadZombeCounter.gameObject.SetActiveRecursively(false);
         StartScene.SetActiveRecursively(false);
         FinishScene.SetActiveRecursively(false);
+        
         this.CurrentCount = 0;
+        this.DamageTaken = 0.0f;
+        this.BulletUsed = 0;
+        this.PerfectReloadCount = 0;
     }
 
     // ------------------------------------------------------------------ 
@@ -138,6 +130,9 @@ public class ZombieKiller : MissionBase {
                                                     ) );
         this.txtDeadZombeCounter.gameObject.SetActiveRecursively(true);
         StartCoroutine(Game.Run());
+
+        timeMissionStart = Time.time;
+        State = UpdateMission;
     }
 
     // ------------------------------------------------------------------ 
@@ -158,29 +153,121 @@ public class ZombieKiller : MissionBase {
                 "dead zombies: " + this.CurrentCount + "/" + this.CompleteCount;
         }
 
-        if ( this.stayMissionCompleteScene == false ) {
-            if ( this.CurrentCount >= this.CompleteCount ) {
-                StartCoroutine(Game.Pause());
-                ShowMissionComplete(true);
-                this.stayMissionCompleteScene = true;
-            }
-        }
-        else {
-            // HACK TEMP { 
-            // update for selection next, return.
-            // TODO: about the selection.
-            if ( Input.GetKeyDown(KeyCode.Space) ) {
-                Debug.Log("start mission");
-                this.stayMissionCompleteScene = false;
-                StartCoroutine(this.StartMission());
-            }
-            // } HACK TEMP end 
-        }
+        if ( State != null )
+            State();
 	}
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnZombieDead () { this.CurrentCount++; }
+    void UpdateMission () {
+        if ( this.CurrentCount >= this.CompleteCount ) {
+            State = null;
+            StartCoroutine(OnMissionComplete());
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void UpdateMissionReport () {
+        float delta = Time.realtimeSinceStartup - missionReportStartTime;
+        if ( delta >= MissionReportForSeconds ) {
+            State = WaitForUserInput;
+        }
+
+        // we use 0.5 seconds to refresh
+        float ratio = Mathf.Min( 1.0f, delta/0.5f );
+
+        // report list
+        this.txtZombieKilled.Text = "zombie killed: " + (int)(this.CurrentCount * ratio);
+        this.txtTime.Text = "time: " 
+            + string.Format( "{0:0}", (timeMissionFinished - timeMissionStart) * ratio )
+            + " sec";
+        this.txtDamageTaken.Text = "damage taken: " 
+            + string.Format( "{0:0}", this.DamageTaken * ratio );
+        this.txtBulletUsed.Text = "bullet used: " + (int)(this.BulletUsed * ratio);
+        this.txtPerfectReloads.Text = "perfect reloads: " + (int)(this.PerfectReloadCount * ratio);
+        // TODO { 
+        // this.txtExpBounus.Text = "EXP Bounus: " + ;
+        // } TODO end 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void WaitForUserInput () {
+        bool hasTouched = false;
+        if ( Game.ScreenPad().useRemoteTouch ) {
+            foreach ( Touch t in Input.touches ) {
+                if ( t.phase == TouchPhase.Began ) {
+                    hasTouched = true;
+                    break;
+                }
+            }
+        }
+        else {
+            hasTouched = Input.GetButton("Fire"); 
+        }
+
+        //
+        if ( hasTouched ) {
+            State = null;
+            StartCoroutine(this.StartMission());
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    IEnumerator OnMissionComplete() {
+        Time.timeScale = 0.2f;
+        yield return StartCoroutine ( CoroutineHelper.WaitForRealSeconds(2.0f) ); 
+
+        // pause the game
+        StartCoroutine(Game.Pause());
+
+        // go to mission report state
+        this.txtDeadZombeCounter.gameObject.SetActiveRecursively(false);
+        FinishScene.SetActiveRecursively(true);
+        missionReportStartTime = Time.realtimeSinceStartup;
+        timeMissionFinished = Time.time;
+        State = UpdateMissionReport;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnZombieDead () { 
+        this.CurrentCount++; 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnPlayerHit ( float _dmg ) {
+        this.DamageTaken += _dmg;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnBulletUsed ( int _count ) {
+        this.BulletUsed += _count;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnPerfectReload () {
+        this.PerfectReloadCount++;
+    }
 }

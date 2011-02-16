@@ -138,15 +138,15 @@ public class ShootInfo : MonoBehaviour {
 
     public void Fire () {
         if ( OutOfAmmo() == false ) {
-            // TODO: bullet consume.
             if ( activeReloadCounter > 0.0f ) {
                 this.bullet.renderer.material = this.matActiveReload;
             }
             else {
                 this.bullet.renderer.material = this.matNormal;
             }
-            this.emitter.Emit(this.anchor,this.bullet);
-            this.bullets -= 1;
+            int bullet_count = this.emitter.Emit(this.anchor,this.bullet);
+            this.bullets -= bullet_count;
+            Game.Mission().SendMessage( "OnBulletUsed", bullet_count );
         }
     }
 
