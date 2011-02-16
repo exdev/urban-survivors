@@ -128,7 +128,7 @@ public class ZombieKiller : MissionBase {
                                                         "easetype", iTween.EaseType.easeOutBack, 
                                                         "ignoretimescale", true
                                                       ) );
-        yield return StartCoroutine ( CoroutineHelper.WaitForRealSeconds(this.StartSceneShowForSeconds) ); 
+        yield return StartCoroutine ( CoroutineHelper.WaitForRealSeconds(this.StartSceneShowForSeconds+1.0f) ); 
         iTween.MoveTo ( this.StartScene, iTween.Hash( "position", to, 
                                                       "time", 1.0f,
                                                       "easetype", iTween.EaseType.easeOutBack, 

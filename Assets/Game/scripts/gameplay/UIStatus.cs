@@ -135,6 +135,7 @@ public class UIStatus : MonoBehaviour {
             }
         }
         else {
+            iTween.Stop(this.gameObject, true );
             for ( int i = 0; i < ShowHideControls.Length; ++i ) {
                 Vector3 pos = showHideInitPos[i];
                 pos = new Vector3 ( pos.x + pos.normalized.x * 400.0f,
@@ -374,14 +375,15 @@ public class UIStatus : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnBoyHit () {
+    IEnumerator OnBoyHit () {
         iTween.Stop(this.boyFace.gameObject, "shake" );
+        yield return new WaitForSeconds(0.1f);
+        this.boyFace.transform.position = this.initBoyTrans.position;
+        this.boyFace.transform.rotation = this.initBoyTrans.rotation;
         iTween.ShakePosition( this.boyFace.gameObject, 
                               iTween.Hash( "amount", 10.0f * Vector3.right, 
                                            "time", 0.5f
                                          ) );
-        this.boyFace.transform.position = this.initBoyTrans.position;
-        this.boyFace.transform.rotation = this.initBoyTrans.rotation;
         // iTween.ShakeRotation(this.boyFace, 30.0f * Vector3.forward, 0.5f );
     }
 
@@ -389,14 +391,15 @@ public class UIStatus : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnGirlHit () {
+    IEnumerator OnGirlHit () {
         iTween.Stop(this.girlFace.gameObject, "shake" );
+        yield return new WaitForSeconds(0.1f);
+        this.girlFace.transform.position = this.initGirlTrans.position;
+        this.girlFace.transform.rotation = this.initGirlTrans.rotation;
         iTween.ShakePosition( this.girlFace.gameObject, 
                               iTween.Hash( "amount", 10.0f * Vector3.right, 
                                            "time", 0.5f
                                          ) );
-        this.girlFace.transform.position = this.initGirlTrans.position;
-        this.girlFace.transform.rotation = this.initGirlTrans.rotation;
         // iTween.ShakeRotation(this.girlFace, 30.0f * Vector3.forward, 0.5f );
     }
 
