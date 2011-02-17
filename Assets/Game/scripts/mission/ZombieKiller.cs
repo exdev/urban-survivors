@@ -200,24 +200,26 @@ public class ZombieKiller : MissionBase {
     // ------------------------------------------------------------------ 
 
     void WaitForUserInput () {
-        bool hasTouched = false;
-        if ( Game.ScreenPad().useRemoteTouch ) {
-            foreach ( Touch t in Input.touches ) {
-                if ( t.phase == TouchPhase.Began ) {
-                    hasTouched = true;
-                    break;
-                }
-            }
-        }
-        else {
-            hasTouched = Input.GetButton("Fire"); 
-        }
+        // NOTE: it will wait for OnNextMission
 
-        //
-        if ( hasTouched ) {
-            State = null;
-            StartCoroutine(this.StartMission());
-        }
+        // bool hasTouched = false;
+        // if ( Game.ScreenPad().useRemoteTouch ) {
+        //     foreach ( Touch t in Input.touches ) {
+        //         if ( t.phase == TouchPhase.Began ) {
+        //             hasTouched = true;
+        //             break;
+        //         }
+        //     }
+        // }
+        // else {
+        //     hasTouched = Input.GetButton("Fire"); 
+        // }
+
+        // //
+        // if ( hasTouched ) {
+        //     State = null;
+        //     StartCoroutine(this.StartMission());
+        // }
     }
 
     // ------------------------------------------------------------------ 
@@ -237,6 +239,16 @@ public class ZombieKiller : MissionBase {
         missionReportStartTime = Time.realtimeSinceStartup;
         timeMissionFinished = Time.time;
         State = UpdateMissionReport;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnNextMission () {
+        Debug.Log("next mission");
+        State = null;
+        StartCoroutine(this.StartMission());
     }
 
     // ------------------------------------------------------------------ 

@@ -35,13 +35,14 @@ public class ShootInfo : MonoBehaviour {
     public float reloadSpeed = 1.0f;
     // public float accuracy = 1.0f; // DELME: looks like accuracy is hardcoded in the Emitter.
     public int capacity = 10;
+
     public float activeReloadTime = 2.0f;
+    public float arShootSpeed = 2.0f;
+    public float arReloadSpeed = 4.0f;
+    public float arDamageIncrease = 1.2f;
 
     public Vector2 arRangeInPercentage = new Vector2( 0.0f, 1.0f );
     public float arLengthInPercentage = 0.2f;
-
-    public Material matNormal = null;
-    public Material matActiveReload = null;
 
     protected int bullets = 10;
     protected int remainBullets = 100;
@@ -98,19 +99,19 @@ public class ShootInfo : MonoBehaviour {
 
         if ( activeReloadCounter > 0.0f ) {
             DamageInfo dmgInfo = this.GetComponent<DamageInfo>();
-            dmgInfo.isActiveReload = true;
+            dmgInfo.arDamageIncrease = this.arDamageIncrease;
 
             // adjust shoot speed;
             state = _anim[this.shootAnim];
-            state.normalizedSpeed = shootSpeed * 2.0f;
+            state.normalizedSpeed = arShootSpeed;
 
             // adjust reload speed;
             state = _anim[this.reloadAnim];
-            state.normalizedSpeed = reloadSpeed * 4.0f;
+            state.normalizedSpeed = arReloadSpeed;
         }
         else {
             DamageInfo dmgInfo = this.GetComponent<DamageInfo>();
-            dmgInfo.isActiveReload = false;
+            dmgInfo.arDamageIncrease = 1.0f;
 
             // adjust shoot speed;
             state = _anim[this.shootAnim];
@@ -138,13 +139,7 @@ public class ShootInfo : MonoBehaviour {
 
     public void Fire () {
         if ( OutOfAmmo() == false ) {
-            if ( activeReloadCounter > 0.0f ) {
-                this.bullet.renderer.material = this.matActiveReload;
-            }
-            else {
-                this.bullet.renderer.material = this.matNormal;
-            }
-            int bullet_count = this.emitter.Emit(this.anchor,this.bullet);
+            int bullet_count = this.emitter.Emit(this.anchor,this.bullet,activeReloadCounter > 0.0f);
             this.bullets -= bullet_count;
             Game.Mission().SendMessage( "OnBulletUsed", bullet_count );
         }

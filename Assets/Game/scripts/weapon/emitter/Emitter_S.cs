@@ -33,7 +33,7 @@ public class Emitter_S : Emitter {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public override int Emit ( Transform _anchor, GameObject _bullet ) {
+    public override int Emit ( Transform _anchor, GameObject _bullet, bool _activeReload ) {
         // create a bullet, and rotate it based on the vector inputRotation
         float half_ang = this.angle * 0.5f;
 
@@ -46,9 +46,30 @@ public class Emitter_S : Emitter {
 
             // GameObject spawnBullet = Instantiate(_bullet, _anchor.position, rot ) as GameObject;
             GameObject spawnBullet = SpawnManager.Instance().Spawn(_bullet, _anchor.position, rot );
-            spawnBullet.renderer.material = _bullet.renderer.material;
+
+            // TODO { 
+            // if ( activeReloadCounter > 0.0f ) {
+            //     this.bullet.renderer.material = this.matActiveReload;
+            //     // this.bullet.transform.lossyScale = new Vector3( 2.0f, 2.0f, 1.0f );
+            // }
+            // else {
+            //     this.bullet.renderer.material = this.matNormal;
+            //     // this.bullet.transform.lossyScale = Vector3.one;
+            // }
+            // spawnBullet.renderer.material = _bullet.renderer.material;
+            // // spawnBullet.transform.lossyScale = _bullet.transform.lossyScale;
+            // } TODO end 
 
             BulletInfo bi = spawnBullet.GetComponent<BulletInfo>();
+            if ( _activeReload ) {
+                spawnBullet.transform.localScale = 2.0f * _bullet.transform.localScale;
+                spawnBullet.renderer.material = bi.matActiveReload;
+            }
+            else {
+                spawnBullet.transform.localScale = _bullet.transform.localScale;
+                spawnBullet.renderer.material = bi.matNormal;
+            }
+
             bi.ownerDamageInfo = this.GetComponent<DamageInfo>();
 
             DebugHelper.Assert( spawnBullet, "failed to spawn bullet" );

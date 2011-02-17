@@ -129,10 +129,7 @@ public class DamageRule : MonoBehaviour {
         }
 
         float dmgOutput = _dmgInfo.DP;
-        // FIXME, HACK { this will have a bug, because DamageInfo is a reference, so the bullet that shooted will change the state. { 
-        if ( _dmgInfo.isActiveReload )
-            dmgOutput *= 1.2f;
-        // } FIXME, HACK end 
+        dmgOutput *= _dmgInfo.arDamageIncrease;
         _defender.curHP -= dmgOutput;
         return dmgOutput;
     }
