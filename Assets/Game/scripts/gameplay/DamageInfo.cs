@@ -37,5 +37,5 @@ public class DamageInfo : MonoBehaviour {
     public KnockBackType knockBackType = KnockBackType.none;
     [System.NonSerialized] public GameObject owner = null;
     [System.NonSerialized] public ActorInfo owner_info = null;
-    [System.NonSerialized] public bool isActiveReload = false; 
+    [System.NonSerialized] public float arDamageIncrease = 1.0f; 
 }

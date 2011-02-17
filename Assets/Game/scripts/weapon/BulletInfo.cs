@@ -25,6 +25,8 @@ public class BulletInfo : MonoBehaviour {
     public float speed = 20.0f;
     public float lifeTime = 1.0f;
     public DamageInfo ownerDamageInfo = null; // NOTE: if we don't use public, Instantiate will not copy this. 
+    public Material matNormal = null;
+    public Material matActiveReload = null;
 
     protected float counter = 0.0f;
 
