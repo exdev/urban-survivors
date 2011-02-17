@@ -22,18 +22,20 @@ class DrawGizmos {
     // Desc: periodic trigger 
     // ------------------------------------------------------------------ 
 
+    // [DrawGizmo (GizmoType.SelectedOrChild | GizmoType.Pickable)]
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void Draw ( Source_periodic _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
         Vector3 position = _c.transform.position;
-        Gizmos.DrawIcon (position, "Adobe.ico");
+        Gizmos.DrawIcon (position, "Desktop.ico");
     }
 
     // ------------------------------------------------------------------ 
     // Desc: Source_collider
     // ------------------------------------------------------------------ 
 
+    // [DrawGizmo (GizmoType.SelectedOrChild | GizmoType.Pickable)]
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void Draw ( Source_collider _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
@@ -56,7 +58,8 @@ class DrawGizmos {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
+    [DrawGizmo (GizmoType.SelectedOrChild | GizmoType.Pickable)]
+    // [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void Draw ( Spawner_base _c, GizmoType _gizmoType ) {
         if ( _c.showSpawns ) {
             foreach ( Object obj in _c.existObjects ) {
@@ -73,6 +76,7 @@ class DrawGizmos {
     // Desc: Spawner_point
     // ------------------------------------------------------------------ 
 
+    // [DrawGizmo (GizmoType.SelectedOrChild | GizmoType.Pickable)]
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void Draw ( Spawner_point _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
@@ -85,7 +89,8 @@ class DrawGizmos {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [DrawGizmo (GizmoType.SelectedOrChild | GizmoType.Pickable)]
+    // [DrawGizmo (GizmoType.SelectedOrChild | GizmoType.Pickable)]
+    [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void Draw ( Spawner_zone _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
@@ -100,7 +105,8 @@ class DrawGizmos {
     // Desc: Response_listSpawn
     // ------------------------------------------------------------------ 
 
-    [DrawGizmo (GizmoType.Selected | GizmoType.Pickable)]
+    [DrawGizmo (GizmoType.SelectedOrChild | GizmoType.Pickable)]
+    // [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void Draw ( Response_listSpawn _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
@@ -117,7 +123,8 @@ class DrawGizmos {
     // Desc: Response_listDespawn
     // ------------------------------------------------------------------ 
 
-    [DrawGizmo (GizmoType.Selected | GizmoType.Pickable)]
+    [DrawGizmo (GizmoType.SelectedOrChild | GizmoType.Pickable)]
+    // [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void Draw ( Response_listDespawn _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
@@ -134,12 +141,13 @@ class DrawGizmos {
     // Desc: StartPoint
     // ------------------------------------------------------------------ 
 
+    // [DrawGizmo (GizmoType.SelectedOrChild | GizmoType.Pickable)]
     [DrawGizmo (GizmoType.NotSelected | GizmoType.Pickable)]
     static void Draw ( StartPoint _c, GizmoType _gizmoType ) {
         if ( EditorApplication.isPlaying ) return;
 
         Vector3 position = _c.transform.position;
-        Gizmos.DrawIcon (position, "Napster.ico");
+        Gizmos.DrawIcon (position, "Foobar.ico");
     }
 }
 

@@ -45,9 +45,9 @@ public class Source_enemyLessThan : Source_periodic {
     protected override bool CheckCondition () {
         List<GameObject> gos;
         if ( enemyTag == "all" )
-            gos = GameRules.Instance().GetEnemies();
+            gos = Game.GetEnemies();
         else
-            gos = GameRules.Instance().GetEnemiesByTag(this.enemyTag);
+            gos = Game.GetEnemiesByTag(this.enemyTag);
         return gos.Count < enemyCount;
     }
 }

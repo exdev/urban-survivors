@@ -29,6 +29,16 @@ public class Spawner_point : Spawner_base {
     // ------------------------------------------------------------------ 
 
     public override void DoSpawn () {
+        // check if the character is too close to spawn point 
+        Vector3 boyPos = Game.GetPlayerBoy().transform.position;
+        Vector3 girlPos = Game.GetPlayerGirl().transform.position;
+        float dist = Game.SpawnDistance();
+        float sqrSpawnDistance = dist * dist;
+        if ( (this.transform.position - boyPos).sqrMagnitude < sqrSpawnDistance ||
+             (this.transform.position - girlPos).sqrMagnitude < sqrSpawnDistance )
+            return;
+
+        //
         int amount = calcSpawnAmount();
         Object obj;
         while ( amount > 0 ) {

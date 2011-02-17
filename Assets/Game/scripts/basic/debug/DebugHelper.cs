@@ -38,6 +38,17 @@ public class Line {
 
 public class DebugHelper : MonoBehaviour {
 
+    static DebugHelper instance = null;
+
+    // debug text
+    string debug_text = "";
+
+    // fps counter
+    float updateInterval = 0.5f;
+    float lastInterval = 0.0f;
+    float fps = 0.0f;
+    int frames = 0;
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -45,17 +56,6 @@ public class DebugHelper : MonoBehaviour {
     public bool showFps = true;
     public bool showDebugText = true;
     public bool showHotPoints = true;
-
-    private static DebugHelper instance = null;
-
-    // debug text
-    private string debug_text = "";
-
-    // fps counter
-    private float updateInterval = 0.5f;
-    private float lastInterval = 0.0f;
-    private float fps = 0.0f;
-    private int frames = 0;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions

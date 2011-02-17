@@ -264,12 +264,14 @@ public class PlayerBoy : PlayerBase {
         this.anim.CrossFade("downIdle");
         yield return StartCoroutine( "WaitForRecover" );
 
-        this.anim.CrossFade("getUp");
-        yield return new WaitForSeconds( this.anim["getUp"].length );
+        // DELME: do it in OnRecover { 
+        // this.anim.CrossFade("getUp");
+        // yield return new WaitForSeconds( this.anim["getUp"].length );
 
-        // go back to idle
-        this.anim.CrossFade("idle");
-        States[0] = UpdateIdle;
+        // // go back to idle
+        // this.anim.CrossFade("idle");
+        // States[0] = UpdateIdle;
+        // } DELME end 
     }
 
     // ------------------------------------------------------------------ 
@@ -277,7 +279,7 @@ public class PlayerBoy : PlayerBase {
     // ------------------------------------------------------------------ 
 
     void HandleInput() {
-        this.screenDir = screenPad ? screenPad.GetMoveDirection() : Vector2.zero;
+        this.screenDir = Game.ScreenPad() ? Game.ScreenPad().GetMoveDirection() : Vector2.zero;
     }
 
     // ------------------------------------------------------------------ 
@@ -353,7 +355,7 @@ public class PlayerBoy : PlayerBase {
 
     void OnTriggerEnter ( Collider _other ) {
         if ( base.ApplyDamage(_other) ) {
-            screenPad.SendMessage ( "OnBoyHit" );
+            Game.ScreenPad().SendMessage ( "OnBoyHit" );
         }
 
         if ( this.lastHit.stunType != HitInfo.StunType.none ) {

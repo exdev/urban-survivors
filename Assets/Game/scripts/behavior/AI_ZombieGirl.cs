@@ -86,7 +86,9 @@ public class AI_ZombieGirl : AI_ZombieBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Awake () {
+    protected new void Awake () {
+        base.Awake();
+
         if ( fxDead  == null && this.FX_dead ) {
             fxDead = (GameObject)Instantiate( this.FX_dead );
         }
@@ -200,7 +202,7 @@ public class AI_ZombieGirl : AI_ZombieBase {
 
     // IEnumerator GetNearestPlayerPos ( float _tickTime ) {
     //     while ( true ) {
-    //         GameObject[] players = GameRules.Instance().GetPlayers();
+    //         GameObject[] players = Game.GetPlayers();
     //         float nearest = 999.0f;
     //         foreach( GameObject player in players ) {
     //             float len = (player.transform.position - transform.position).magnitude;

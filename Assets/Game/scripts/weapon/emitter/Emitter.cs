@@ -39,7 +39,8 @@ public class Emitter : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public virtual void Emit ( Transform _anchor, GameObject _bullet ) {
+    public virtual int Emit ( Transform _anchor, GameObject _bullet ) {
         Debug.Log("warning! pls reimplement emitter in sub-class");
+        return 0;
     }
 }

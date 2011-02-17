@@ -83,7 +83,7 @@ public class ItemBulletPackage : MonoBehaviour {
 
     void OnTriggerEnter ( Collider _other ) {
         // TODO:
-        GameRules.Instance().PickupBullets(this.bullets);
+        Game.PickupBullets(this.bullets);
 
         // remove hp package and play trigger effect
         GameObject.Destroy(this.gameObject);
