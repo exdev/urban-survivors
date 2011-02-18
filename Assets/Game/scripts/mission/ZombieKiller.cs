@@ -58,8 +58,8 @@ public class ZombieKiller : MissionBase {
     public SpriteText txtPerfectReloads = null;
     public SpriteText txtExpBounus = null;
 
-    public SpriteText txtNext = null;
-    public SpriteText txtMenu = null;
+    public UIButton btnNext = null;
+    public UIButton btnMenu = null;
 
     //
     public float StartSceneShowForSeconds = 2.0f;
