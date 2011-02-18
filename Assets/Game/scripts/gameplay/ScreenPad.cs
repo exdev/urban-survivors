@@ -132,7 +132,9 @@ public class ScreenPad : MonoBehaviour {
 
         // NOTE: you can use this to check your count. if ( touches.Count == 1 ) {
         this.moveDir = Vector2.zero;
+#if UNITY_IPHONE
         this.availableTouches.Clear();
+#endif
 
         this.reloadButtonStat = 0;
         this.meleeButtonStat = 0;
