@@ -149,6 +149,23 @@ class DrawGizmos {
         Vector3 position = _c.transform.position;
         Gizmos.DrawIcon (position, "Foobar.ico");
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: StartPoint
+    // ------------------------------------------------------------------ 
+
+    [DrawGizmo (GizmoType.SelectedOrChild | GizmoType.Pickable)]
+    static void Draw ( LevelUp _c, GizmoType _gizmoType ) {
+        if ( EditorApplication.isPlaying ) return;
+
+        Gizmos.color = Color.green;
+        foreach ( GameObject go in _c.targets ) {
+            if ( go == null )
+                continue;
+            Vector3 position = _c.transform.position;
+            Gizmos.DrawLine (position, go.transform.position);
+        }
+    }
 }
 
 // KEEPME { 

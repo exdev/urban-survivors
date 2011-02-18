@@ -28,6 +28,14 @@ public class Spawner_zone : Spawner_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public new void Awake () {
+        base.Awake();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public override void DoSpawn () {
         int amount = calcSpawnAmount();
         Object obj;

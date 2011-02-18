@@ -44,6 +44,7 @@ public class ActorInfo {
     public ActorType actorType = ActorType.unknown; 
     public float maxHP = 100.0f;
     public bool isBerserk = false;
+    public float attack = 0.0f;
     [System.NonSerialized] public float curHP = 100.0f;
 }
 

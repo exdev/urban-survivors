@@ -33,9 +33,24 @@ public class Spawner_base : MonoBehaviour {
     [HideInInspector]
     public List<Object> existObjects = new List<Object>();
 
+    protected float zombie_hp = 0.0f;
+    protected float zombie_attack = 0.0f;
+
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Awake () {
+        AI_ZombieBase zb = Prefab.GetComponent<AI_ZombieBase>();
+        if ( zb ) {
+            zombie_hp = zb.zombieInfo.maxHP;
+            zombie_attack = zb.zombieInfo.attack;
+        }
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -76,5 +91,29 @@ public class Spawner_base : MonoBehaviour {
         }
 
         return 0;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void IncreaseMaxAlive ( int _amount ) {
+        maxAlive += _amount;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void IncreaseZombieHp ( float _amount ) {
+        zombie_hp += _amount;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void IncreaseZombieAttack ( float _amount ) {
+        zombie_attack += _amount;
     }
 }

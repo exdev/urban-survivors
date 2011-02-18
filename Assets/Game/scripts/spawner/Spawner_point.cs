@@ -28,6 +28,14 @@ public class Spawner_point : Spawner_base {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public new void Awake () {
+        base.Awake();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public override void DoSpawn () {
         // check if the character is too close to spawn point 
         Vector3 boyPos = Game.GetPlayerBoy().transform.position;
@@ -46,6 +54,13 @@ public class Spawner_point : Spawner_base {
             obj = Instantiate( Prefab, 
                                transform.position + new Vector3( offset.x, 0.0f, offset.y ),
                                transform.rotation );
+            GameObject go = obj as GameObject;
+            AI_ZombieBase zb = go.GetComponent<AI_ZombieBase>();
+            if (zb) {
+                zb.zombieInfo.curHP = zombie_hp;
+                zb.zombieInfo.maxHP = zombie_hp;
+                zb.zombieInfo.attack = zombie_attack;
+            }
             this.existObjects.Add(obj);
             --amount;
         }

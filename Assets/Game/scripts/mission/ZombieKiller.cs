@@ -253,8 +253,8 @@ public class ZombieKiller : MissionBase {
     // ------------------------------------------------------------------ 
 
     void OnNextMission () {
-        Debug.Log("next mission");
         State = null;
+        SendMessage("OnMissionLevelUp");
         StartCoroutine(this.StartMission());
     }
 
@@ -288,5 +288,13 @@ public class ZombieKiller : MissionBase {
 
     void OnPerfectReload () {
         this.PerfectReloadCount++;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void IncreaseCompleteCount ( int _amount ) {
+        this.CompleteCount += _amount;
     }
 }

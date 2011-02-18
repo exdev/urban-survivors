@@ -113,7 +113,7 @@ public class DamageRule : MonoBehaviour {
         if ( attacker.isBerserk ) {
             // TODO: there is no document about boy's damage in berserk state
         }
-        float dmgOutput = _dmgInfo.DP;
+        float dmgOutput = _dmgInfo.DP + attacker.attack;
         _defender.curHP -= dmgOutput;
         return dmgOutput;
     }
@@ -128,7 +128,7 @@ public class DamageRule : MonoBehaviour {
             // TODO: there is no document about boy's damage in berserk state
         }
 
-        float dmgOutput = _dmgInfo.DP;
+        float dmgOutput = _dmgInfo.DP + attacker.attack;
         dmgOutput *= _dmgInfo.arDamageIncrease;
         _defender.curHP -= dmgOutput;
         return dmgOutput;
