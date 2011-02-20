@@ -165,7 +165,7 @@ public class PlayerGirl : PlayerBase {
         }
 
         // go to falldown
-        if ( this.playerInfo.curHP <= 0.0f ) {
+        if ( this.noHP() ) {
             StartCoroutine(FallDown());
             return;
         }
@@ -191,6 +191,12 @@ public class PlayerGirl : PlayerBase {
         // shooting
         if ( States[1] == null && Game.ScreenPad().CanShoot() ) {
             States[1] = UpdateShoot;
+        }
+
+        // go to falldown
+        if ( this.noHP() ) {
+            StartCoroutine(FallDown());
+            return;
         }
 
         // if we in target distance
@@ -225,6 +231,12 @@ public class PlayerGirl : PlayerBase {
         // shooting
         if ( States[1] == null && Game.ScreenPad().CanShoot() ) {
             States[1] = UpdateShoot;
+        }
+
+        // go to falldown
+        if ( this.noHP() ) {
+            StartCoroutine(FallDown());
+            return;
         }
 
         if ( NeedAvoid() == false ) {
