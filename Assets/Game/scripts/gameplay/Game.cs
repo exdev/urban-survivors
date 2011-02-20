@@ -181,6 +181,15 @@ public class Game : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    static public void PlayAsGod ( bool _asGod ) {
+        GetPlayerBoy().AsGod(_asGod);
+        GetPlayerGirl().AsGod(_asGod);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     static public IEnumerator Pause () {
         instance.screenPad.AcceptInput(false);
         UIStatus uistatus = instance.screenPad.GetComponent<UIStatus>();

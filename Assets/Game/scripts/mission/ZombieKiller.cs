@@ -52,6 +52,7 @@ public class ZombieKiller : MissionBase {
     public GameObject FinishScene = null;
 
     // mission text
+    public PackedSprite zombieFace = null;
     public SpriteText txtDeadZombeCounter = null;
 
     // StartScene
@@ -97,6 +98,7 @@ public class ZombieKiller : MissionBase {
     // ------------------------------------------------------------------ 
 
     public void ResetMission () {
+        this.zombieFace.gameObject.SetActiveRecursively(false);
         this.txtDeadZombeCounter.gameObject.SetActiveRecursively(false);
         StartScene.SetActiveRecursively(false);
         FinishScene.SetActiveRecursively(false);
@@ -113,6 +115,7 @@ public class ZombieKiller : MissionBase {
 
 	public override IEnumerator StartMission () {
         ResetMission();
+        Game.PlayAsGod(false);
         StartCoroutine(Game.Pause());
 
         StartScene.transform.position = startSceneInitPos; 
@@ -135,6 +138,7 @@ public class ZombieKiller : MissionBase {
                                                       "oncomplete", "HideStartScene",
                                                       "oncompletetarget", this.gameObject
                                                     ) );
+        this.zombieFace.gameObject.SetActiveRecursively(true);
         this.txtDeadZombeCounter.gameObject.SetActiveRecursively(true);
         StartCoroutine(Game.Run());
 
@@ -169,6 +173,10 @@ public class ZombieKiller : MissionBase {
     // ------------------------------------------------------------------ 
 
     void UpdateMission () {
+        // don't do anything if game over
+        if ( Game.IsGameOver() )
+            return;
+
         if ( this.CurrentCount >= this.CompleteCount ) {
             State = null;
             StartCoroutine(OnMissionComplete());
@@ -234,6 +242,7 @@ public class ZombieKiller : MissionBase {
     // ------------------------------------------------------------------ 
 
     IEnumerator OnMissionComplete() {
+        Game.PlayAsGod(true);
         Time.timeScale = 0.2f;
         yield return StartCoroutine ( CoroutineHelper.WaitForRealSeconds(2.0f) ); 
 
@@ -241,6 +250,7 @@ public class ZombieKiller : MissionBase {
         StartCoroutine(Game.Pause());
 
         // go to mission report state
+        this.zombieFace.gameObject.SetActiveRecursively(false);
         this.txtDeadZombeCounter.gameObject.SetActiveRecursively(false);
         FinishScene.SetActiveRecursively(true);
         missionReportStartTime = Time.realtimeSinceStartup;

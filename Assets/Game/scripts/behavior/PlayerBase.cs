@@ -34,6 +34,7 @@ public class PlayerBase : Actor {
     protected GameObject curWeapon = null;
     protected GameObject weapon1 = null;
     protected GameObject weapon2 = null;
+    protected bool isGod = false;
 
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -142,9 +143,19 @@ public class PlayerBase : Actor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public void AsGod ( bool _isGod ) { this.isGod = _isGod; }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     protected bool ApplyDamage ( Collider _other ) {
         // don't do anything if player is down
         if ( this.noHP() )
+            return false;
+
+        // god don't get hurt
+        if ( this.isGod )
             return false;
 
         //
