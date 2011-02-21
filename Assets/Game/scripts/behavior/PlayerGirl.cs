@@ -178,6 +178,8 @@ public class PlayerGirl : PlayerBase {
 
         // go to avoid
         if ( NeedAvoid() ) {
+            this.Avoid();
+            ActMovement();
             States[0] = UpdateAvoid;
             return;
         }
@@ -188,6 +190,8 @@ public class PlayerGirl : PlayerBase {
     // ------------------------------------------------------------------ 
 
     void UpdateFollow () {
+        DebugHelper.ScreenPrint("SM: UpdateFollow");
+
         // shooting
         if ( States[1] == null && Game.ScreenPad().CanShoot() ) {
             States[1] = UpdateShoot;
@@ -199,6 +203,14 @@ public class PlayerGirl : PlayerBase {
             return;
         }
 
+        //
+        if ( NeedAvoid() ) {
+            this.Avoid();
+            ActMovement();
+            States[0] = UpdateAvoid;
+            return;
+        }
+
         // if we in target distance
         if ( IsCloseFollowTarget () ) {
             this.Stop();
@@ -207,19 +219,8 @@ public class PlayerGirl : PlayerBase {
             return;
         }
 
-        //
-        if ( NeedAvoid() ) {
-            States[0] = UpdateAvoid;
-            return;
-        }
-
         // moving
-        CharacterController fo = this.followTarget.collider as CharacterController;
-        Vector3 dir = (this.transform.position - fo.transform.position).normalized;
-        if ( Vector3.Dot ( fo.transform.forward, dir ) > -0.707f )
-            this.Seek(this.followTarget.transform.position + this.followTarget.transform.forward * -this.followDistance );
-        else
-            this.Seek(this.followTarget.transform.position);
+        this.CalcSeek();
         ActMovement();
     }
 
@@ -228,6 +229,8 @@ public class PlayerGirl : PlayerBase {
     // ------------------------------------------------------------------ 
 
     void UpdateAvoid () {
+        DebugHelper.ScreenPrint("SM: UpdateAvoid");
+
         // shooting
         if ( States[1] == null && Game.ScreenPad().CanShoot() ) {
             States[1] = UpdateShoot;
@@ -240,17 +243,23 @@ public class PlayerGirl : PlayerBase {
         }
 
         if ( NeedAvoid() == false ) {
-            // follow
-            if ( IsFarAwayFollowTarget () ) {
-                States[0] = UpdateFollow;
-                return;
-            }
-            // idle
-            else {
-                this.anim.CrossFade("idle");
-                States[0] = UpdateIdle;
-                return;
-            }
+            this.CalcSeek();
+            ActMovement();
+            States[0] = UpdateFollow;
+            return;
+
+            // // follow
+            // if ( IsFarAwayFollowTarget () ) {
+            //     ActMovement();
+            //     States[0] = UpdateFollow;
+            //     return;
+            // }
+            // // idle
+            // else {
+            //     this.anim.CrossFade("idle");
+            //     States[0] = UpdateIdle;
+            //     return;
+            // }
         }
 
         //
@@ -367,6 +376,19 @@ public class PlayerGirl : PlayerBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public void CalcSeek () {
+        CharacterController fo = this.followTarget.collider as CharacterController;
+        Vector3 dir = (this.transform.position - fo.transform.position).normalized;
+        if ( Vector3.Dot ( fo.transform.forward, dir ) > -0.707f )
+            this.Seek(this.followTarget.transform.position + this.followTarget.transform.forward * -this.followDistance );
+        else
+            this.Seek(this.followTarget.transform.position);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public bool IsFarAwayFollowTarget () {
         float cur_distance = (this.transform.position - this.followTarget.transform.position).magnitude;
         if ( cur_distance >= this.followDistance * 1.2f ) {
@@ -438,7 +460,10 @@ public class PlayerGirl : PlayerBase {
             force.y = 0.0f;
         }
         else if ( this.steeringState == SteeringState.avoiding ) {
-            force = GetSteering_Flee_MaxForces( this.followTarget.transform.position ); 
+            // add some bias 
+            // if Vector3.dot(force.normalized, this.followTarget ) 
+            force = GetSteering_Flee_MaxForces( this.followTarget.transform.position 
+                                                + new Vector3( 0.5f, 0.0f, 0.5f) ); 
             force.y = 0.0f;
         }
         else if ( this.steeringState == SteeringState.braking ) {
