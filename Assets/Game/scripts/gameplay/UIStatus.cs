@@ -202,7 +202,10 @@ public class UIStatus : MonoBehaviour {
                 // bullet counter display color
                 if (shootInfo.CurBullets()<=10) {
                     this.bulletCounterText.SetColor(Color.red);
-                    this.hint_reloadBin.SetActiveRecursively(true);
+                    if ( this.hint_reloadBin.active == false ) {
+                        this.hint_reloadBin.SetActiveRecursively(true);
+                        this.hint_reloadBin.SendMessage("StartBlink");
+                    }
                 }
                 else if (shootInfo.CurBullets()<=20) {
                     this.bulletCounterText.SetColor(Color.yellow);
@@ -213,7 +216,10 @@ public class UIStatus : MonoBehaviour {
 
                 //
                 if ( shootInfo.RemainBullets() <= 50 ) {
-                    this.hint_lowAmmo.SetActiveRecursively(true);
+                    if ( this.hint_lowAmmo.active == false ) {
+                        this.hint_lowAmmo.SetActiveRecursively(true);
+                        this.hint_lowAmmo.SendMessage("StartBlink");
+                    }
                 }
                 else
                     this.hint_lowAmmo.SetActiveRecursively(false);
@@ -588,7 +594,10 @@ public class UIStatus : MonoBehaviour {
             //
             girl.SendMessage("OnReload");
             this.hint_reloadBin.SetActiveRecursively(false);
-            this.hint_tapAgain.SetActiveRecursively(true);
+            if ( this.hint_tapAgain.active == false ) {
+                this.hint_tapAgain.SetActiveRecursively(true);
+                this.hint_tapAgain.SendMessage("StartBlink");
+            }
             this.ReloadButtonState = UpdateAcceptActiveReload;
         }
     }
