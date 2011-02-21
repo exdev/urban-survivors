@@ -141,8 +141,13 @@ public class ScreenPad : MonoBehaviour {
         this.aimingZoneStat = 0;
         this.moveZoneStat = 0;
 
-        if ( this.acceptInput == false )
+        if ( this.acceptInput == false ) {
+#if UNITY_IPHONE
+            this.moveID = -1;
+            this.aimingID = -1;
+#endif
             return;
+        }
 
         if ( this.useRemoteTouch ) {
 #if UNITY_IPHONE
