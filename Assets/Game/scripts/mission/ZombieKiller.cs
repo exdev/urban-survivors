@@ -280,6 +280,15 @@ public class ZombieKiller : MissionBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    void OnMainMenu () {
+        Time.timeScale = 1.0f;
+        Application.LoadLevel("mainMenu");
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     void OnZombieDead () { 
         this.CurrentCount++; 
     }
