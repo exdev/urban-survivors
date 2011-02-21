@@ -7,9 +7,13 @@ public class Menu_Controller : MonoBehaviour
 	public UIPanel startUp;
 	public UIButton btnBack;
 	public UIPanel firstPanelWithBack;
+	public UIButton btnSP;
+	public UIButton btnMP;
+	public UIButton btnKill;
+	public UIButton btnCollect;
 	
 	// Use this for initialization
-	void Start () 
+	void Awake () 
 	{
 		btnBack.Hide(true);
 		// Do our intro-zoom in 1 second
@@ -77,6 +81,10 @@ public class Menu_Controller : MonoBehaviour
 	public void getBack()
 	{
 		mainMenu.MoveBack();
+		btnSP.SetState(0);
+		btnMP.SetState(0);
+		btnKill.SetState(0);
+		btnCollect.SetState(0);
 		//if (mainMenu.CurrentPanel == firstPanelWithBack)
 	}
 	

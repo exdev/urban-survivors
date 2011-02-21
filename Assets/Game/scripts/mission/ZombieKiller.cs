@@ -268,6 +268,13 @@ public class ZombieKiller : MissionBase {
         StartCoroutine(this.StartMission());
     }
 
+	//go back to main menu
+	void OnLoadMenu (){
+		
+		Application.LoadLevel("mainMenu");
+	}
+
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
