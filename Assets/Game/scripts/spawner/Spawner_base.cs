@@ -33,8 +33,11 @@ public class Spawner_base : MonoBehaviour {
     [HideInInspector]
     public List<Object> existObjects = new List<Object>();
 
-    protected float zombie_hp = 0.0f;
-    protected float zombie_attack = 0.0f;
+    protected float zb_girl_hp = 0.0f;
+    protected float zb_girl_attack = 0.0f;
+
+    protected float zb_no1_hp = 0.0f;
+    protected float zb_no1_attack = 0.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -47,8 +50,14 @@ public class Spawner_base : MonoBehaviour {
     public void Awake () {
         AI_ZombieBase zb = Prefab.GetComponent<AI_ZombieBase>();
         if ( zb ) {
-            zombie_hp = zb.zombieInfo.maxHP;
-            zombie_attack = zb.zombieInfo.attack;
+            if ( zb.tag == "zombie_girl" )  {
+                zb_girl_hp = zb.zombieInfo.maxHP;
+                zb_girl_attack = zb.zombieInfo.attack;
+            }
+            else if ( zb.tag == "zombie_no1" ) {
+                zb_no1_hp = zb.zombieInfo.maxHP;
+                zb_no1_attack = zb.zombieInfo.attack;
+            }
         }
     }
 
@@ -105,15 +114,13 @@ public class Spawner_base : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void IncreaseZombieHp ( float _amount ) {
-        zombie_hp += _amount;
-    }
+    void IncreaseHp_zb_girl ( float _amount ) { zb_girl_hp += _amount; }
+    void IncreaseAttack_zb_girl ( float _amount ) { zb_girl_attack += _amount; }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void IncreaseZombieAttack ( float _amount ) {
-        zombie_attack += _amount;
-    }
+    void IncreaseHp_zb_no1 ( float _amount ) { zb_no1_hp += _amount; }
+    void IncreaseAttack_zb_no1 ( float _amount ) { zb_no1_attack += _amount; }
 }

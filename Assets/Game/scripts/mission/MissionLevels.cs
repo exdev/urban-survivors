@@ -55,4 +55,10 @@ public class MissionLevels : MonoBehaviour {
             Debug.LogError("TODO: finished!!!!");
         }
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public int CurrentLevel () { return currentLevel+1; } 
 }
