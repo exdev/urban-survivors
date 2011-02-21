@@ -57,9 +57,16 @@ public class Spawner_point : Spawner_base {
             GameObject go = obj as GameObject;
             AI_ZombieBase zb = go.GetComponent<AI_ZombieBase>();
             if (zb) {
-                zb.zombieInfo.curHP = zombie_hp;
-                zb.zombieInfo.maxHP = zombie_hp;
-                zb.zombieInfo.attack = zombie_attack;
+                if ( zb.tag == "zombie_girl" )  {
+                    zb.zombieInfo.curHP = zb_girl_hp;
+                    zb.zombieInfo.maxHP = zb_girl_hp;
+                    zb.zombieInfo.attack = zb_girl_attack;
+                }
+                else if ( zb.tag == "zombie_no1" ) {
+                    zb.zombieInfo.curHP = zb_no1_hp;
+                    zb.zombieInfo.maxHP = zb_no1_hp;
+                    zb.zombieInfo.attack = zb_no1_attack;
+                }
             }
             this.existObjects.Add(obj);
             --amount;

@@ -56,6 +56,7 @@ public class ZombieKiller : MissionBase {
     public SpriteText txtDeadZombeCounter = null;
 
     // StartScene
+    public SpriteText txtStage = null;
     public SpriteText txtZombieToKill = null;
 
     // FinishScene
@@ -120,6 +121,8 @@ public class ZombieKiller : MissionBase {
 
         StartScene.transform.position = startSceneInitPos; 
         StartScene.SetActiveRecursively(true);
+        int levelCount = this.GetComponent<MissionLevels>().CurrentLevel();
+        txtStage.Text = "stage " + levelCount;
         txtZombieToKill.Text = "kill " + this.CompleteCount + " zombies !!!";
 
         Vector3 from = startSceneInitPos + new Vector3( -1000.0f, 0.0f, 0.0f ); 
@@ -138,9 +141,14 @@ public class ZombieKiller : MissionBase {
                                                       "oncomplete", "HideStartScene",
                                                       "oncompletetarget", this.gameObject
                                                     ) );
+
+        yield return StartCoroutine(Game.Run());
+
         this.zombieFace.gameObject.SetActiveRecursively(true);
         this.txtDeadZombeCounter.gameObject.SetActiveRecursively(true);
-        StartCoroutine(Game.Run());
+        this.txtDeadZombeCounter.Text = "dead zombies: " + this.CurrentCount + "/" + this.CompleteCount;
+        iTween.ScaleFrom ( this.zombieFace.gameObject, new Vector3( 2.0f, 2.0f, 2.0f ), 0.6f ); 
+        iTween.ScaleFrom ( this.txtDeadZombeCounter.gameObject, new Vector3( 2.0f, 2.0f, 2.0f ), 0.6f ); 
 
         timeMissionStart = Time.time;
         State = UpdateMission;
