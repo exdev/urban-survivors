@@ -187,11 +187,11 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Update () {
-        PlayerInfo boyInfo = Game.GetPlayerBoy().playerInfo;
+        PlayerInfo boyInfo = Game.PlayerBoy().playerInfo;
         this.boyProgressBar.Value = boyInfo.curHP/boyInfo.maxHP;
 
-        PlayerGirl girl = Game.GetPlayerGirl() as PlayerGirl;
-        PlayerInfo girlInfo = Game.GetPlayerGirl().playerInfo;
+        PlayerGirl girl = Game.PlayerGirl() as PlayerGirl;
+        PlayerInfo girlInfo = Game.PlayerGirl().playerInfo;
         this.girlProgressBar.Value = 1.0f - girlInfo.curHP/girlInfo.maxHP;
 
         // update bullets
@@ -256,7 +256,7 @@ public class UIStatus : MonoBehaviour {
         // melee button
         if ( screenPad.MeleeButtonDown() ) {
             iTween.ScaleFrom ( this.meleeButton.gameObject, new Vector3( 1.5f, 1.5f, 1.5f ), 0.4f ); 
-            Game.GetPlayerBoy().SendMessage("OnMelee");
+            Game.PlayerBoy().SendMessage("OnMelee");
         }
         else if ( screenPad.MeleeButtonUp() ) {
             iTween.Stop ( this.meleeButton.gameObject, "scale" ); 
@@ -326,7 +326,7 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void UpdateReloadDeactive () {
-        PlayerGirl girl = Game.GetPlayerGirl() as PlayerGirl;
+        PlayerGirl girl = Game.PlayerGirl() as PlayerGirl;
         ShootInfo shootInfo = girl.GetShootInfo();
 
         if ( shootInfo.NoBulletForReloading() == false &&
@@ -355,7 +355,7 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void UpdateAcceptActiveReload () {
-        PlayerGirl girl = Game.GetPlayerGirl() as PlayerGirl;
+        PlayerGirl girl = Game.PlayerGirl() as PlayerGirl;
 
         //
         if ( girl.IsReloading() == false ) {
@@ -539,7 +539,7 @@ public class UIStatus : MonoBehaviour {
                          this.activeReloadFloat.transform.position.z );
 
         // calculate and place active reload zone.
-        PlayerGirl girl = Game.GetPlayerGirl() as PlayerGirl;
+        PlayerGirl girl = Game.PlayerGirl() as PlayerGirl;
         ShootInfo shootInfo = girl.GetShootInfo();
         Vector2 zoneInPercentage = shootInfo.CalcActiveReloadZone();
 
@@ -560,7 +560,7 @@ public class UIStatus : MonoBehaviour {
     public void OnReload () {
         //
         this.StopActiveReload();
-        PlayerGirl girl = Game.GetPlayerGirl() as PlayerGirl;
+        PlayerGirl girl = Game.PlayerGirl() as PlayerGirl;
         // ShootInfo shootInfo = girl.GetShootInfo();
         this.ShowActiveReloadBar();
 
@@ -607,7 +607,7 @@ public class UIStatus : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public void OnActiveReload () {
-        PlayerGirl girl = Game.GetPlayerGirl() as PlayerGirl;
+        PlayerGirl girl = Game.PlayerGirl() as PlayerGirl;
 
         float float_pos = this.activeReloadFloat.transform.position.x;
         float min_arpos = this.activeReloadZone.transform.position.x

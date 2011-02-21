@@ -29,6 +29,7 @@ public class LevelUp : MonoBehaviour {
     public float hp_up = 1.0f;
     public float attack_up = 1.0f;
     public int killed_count_up = 10;
+    public float hpRecoverAmount = 999;
 
     void OnLevelUp () {
         Debug.Log("level up");
@@ -48,5 +49,8 @@ public class LevelUp : MonoBehaviour {
                 go.SendMessage( "IncreaseZombieAttack", attack_up );
             }
         }
+
+        Game.PlayerBoy().SendMessage( "OnRecover", hpRecoverAmount );
+        Game.PlayerGirl().SendMessage( "OnRecover", hpRecoverAmount );
     }
 }

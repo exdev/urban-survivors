@@ -288,7 +288,7 @@ public class ScreenPad : MonoBehaviour {
 #if UNITY_IPHONE
                 // the screen touch priority is higher than aimingZone
                 if ( this.availableTouches.Count != 0 ) {
-                    GameObject girl = Game.GetPlayerGirl().gameObject;
+                    GameObject girl = Game.PlayerGirl().gameObject;
                     Vector3 girlScreenPos = Camera.main.WorldToScreenPoint(girl.transform.position);
                     Vector2 girlScreenPos_v2 = new Vector2(girlScreenPos.x, girlScreenPos.y); 
 
@@ -302,18 +302,18 @@ public class ScreenPad : MonoBehaviour {
                     Vector2 desiredDir = delta.normalized; 
                     // DISABLE: this.aimingDir = -delta.normalized; // this is old method, inverse needle
                     // adjust the aiming direction by 
-                    desiredDir = (Game.GetPlayerGirl() as PlayerGirl).GetAutoLockDir(desiredDir);
+                    desiredDir = (Game.PlayerGirl() as PlayerGirl).GetAutoLockDir(desiredDir);
                     this.aimingDir = desiredDir; 
                     this.shootCounter = this.shootingDuration;
                 }
 #endif
             } else {
-                GameObject girl = Game.GetPlayerGirl().gameObject;
+                GameObject girl = Game.PlayerGirl().gameObject;
                 Vector3 girlScreenPos = Camera.main.WorldToScreenPoint(girl.transform.position);
                 Vector2 girlScreenPos_v2 = new Vector2(girlScreenPos.x, girlScreenPos.y); 
                 Vector2 delta = new Vector2(Input.mousePosition.x,Input.mousePosition.y) - girlScreenPos_v2;
                 Vector2 desiredDir = delta.normalized; 
-                desiredDir = (Game.GetPlayerGirl() as PlayerGirl).GetAutoLockDir(desiredDir);
+                desiredDir = (Game.PlayerGirl() as PlayerGirl).GetAutoLockDir(desiredDir);
                 this.aimingDir = desiredDir;
             } // end if ( !this.useRemoteTouch )
 

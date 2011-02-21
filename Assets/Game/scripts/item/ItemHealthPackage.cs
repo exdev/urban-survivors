@@ -84,18 +84,18 @@ public class ItemHealthPackage : MonoBehaviour {
 
     void OnTriggerEnter ( Collider _other ) {
         // 
-        PlayerInfo girlInfo = Game.GetPlayerGirl().playerInfo;
+        PlayerInfo girlInfo = Game.PlayerGirl().playerInfo;
         float hpLoseGirl = girlInfo.maxHP - girlInfo.curHP;
         float hpLeft = this.hpAmount - hpLoseGirl;
 
         // recover girl first
         if ( hpLoseGirl > 0.0f ) {
-            Game.GetPlayerGirl().SendMessage("OnRecover", this.hpAmount);
+            Game.PlayerGirl().SendMessage("OnRecover", this.hpAmount);
             hpLeft = this.hpAmount - hpLoseGirl;
         }
         // poor brother, ony get hp if sister left some...
         if ( hpLeft > 0.0f ) {
-            Game.GetPlayerBoy().SendMessage("OnRecover", hpLeft);
+            Game.PlayerBoy().SendMessage("OnRecover", hpLeft);
         }
 
         // remove hp package and play trigger effect

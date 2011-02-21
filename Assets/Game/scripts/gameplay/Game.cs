@@ -163,13 +163,13 @@ public class Game : MonoBehaviour {
         Vector3 start_pos = _startPoint.position;
         Quaternion start_rot = _startPoint.rotation;
 
-        GameObject boy = Game.GetPlayerBoy().gameObject;
+        GameObject boy = Game.PlayerBoy().gameObject;
         if (boy) {
             boy.transform.position = start_pos;
             boy.transform.rotation = start_rot;
         }
 
-        GameObject girl = Game.GetPlayerGirl().gameObject;
+        GameObject girl = Game.PlayerGirl().gameObject;
         if (girl) {
             girl.transform.position = start_pos - boy.transform.forward * 2.0f;
             girl.transform.rotation = start_rot;
@@ -182,8 +182,8 @@ public class Game : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     static public void PlayAsGod ( bool _asGod ) {
-        GetPlayerBoy().AsGod(_asGod);
-        GetPlayerGirl().AsGod(_asGod);
+        PlayerBoy().AsGod(_asGod);
+        PlayerGirl().AsGod(_asGod);
     }
 
     // ------------------------------------------------------------------ 
@@ -236,8 +236,8 @@ public class Game : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public PlayerBase GetPlayerBoy () { return instance.playerBoy; }
-    static public PlayerBase GetPlayerGirl () { return instance.playerGirl; }
+    static public PlayerBase PlayerBoy () { return instance.playerBoy; }
+    static public PlayerBase PlayerGirl () { return instance.playerGirl; }
 
     // ------------------------------------------------------------------ 
     // Desc: 

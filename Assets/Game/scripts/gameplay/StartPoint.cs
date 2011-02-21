@@ -25,13 +25,13 @@ public class StartPoint : MonoBehaviour {
     // IEnumerator PlacePlayer () {
     //     yield return new WaitForEndOfFrame();
 
-    //     GameObject boy = Game.GetPlayerBoy();
+    //     GameObject boy = Game.PlayerBoy();
     //     if (boy) {
     //         boy.transform.position = transform.position;
     //         boy.transform.rotation = transform.rotation;
     //     }
 
-    //     GameObject girl = Game.GetPlayerGirl();
+    //     GameObject girl = Game.PlayerGirl();
     //     if (girl) {
     //         girl.transform.position = transform.position - boy.transform.forward * 2.0f;
     //         girl.transform.rotation = transform.rotation;
