@@ -43,6 +43,9 @@ public class Game : MonoBehaviour {
     public StartPoint[] startPoints = null;
     public MissionBase CurrentMission = null;
 
+    public GameObject hud_s = null;
+    public GameObject hud_m = null;
+
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -54,6 +57,13 @@ public class Game : MonoBehaviour {
     void Awake () {
         if( instance == null ) {
             instance = this;
+
+            // check if we have main menu options, and apply the options.
+            GameObject options = GameObject.Find("MainMenuOptions");
+            if ( options ) {
+                instance.multiPlayer = options.GetComponent<MainMenuOptions>().isMultiPlayer;
+                Debug.Log("multi player = " + instance.multiPlayer );
+            }
 
             //
             GameObject goBoy = GameObject.FindWithTag("player_boy");
@@ -74,17 +84,14 @@ public class Game : MonoBehaviour {
             // init hud
             if ( screenPad == null ) {
                 GameObject hud = null;
-                GameObject hud_s = GameObject.Find("HUD_s");
-                GameObject hud_m = GameObject.Find("HUD_m");
+                hud_m.SetActiveRecursively(false);
+                hud_s.SetActiveRecursively(false);
 
-                if ( Game.IsMultiPlayer() ) {
+                if ( Game.IsMultiPlayer() )
                     hud = hud_m;
-                    if ( hud_s ) hud_s.SetActiveRecursively(false);
-                }
-                else {
+                else
                     hud = hud_s;
-                    if ( hud_m ) hud_m.SetActiveRecursively(false);
-                }
+                hud.SetActiveRecursively(true);
 
                 if ( hud ) {
                     screenPad = hud.GetComponent<ScreenPad>();

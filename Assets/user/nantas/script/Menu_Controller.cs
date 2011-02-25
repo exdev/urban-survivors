@@ -11,6 +11,7 @@ public class Menu_Controller : MonoBehaviour
 	public UIButton btnMP;
 	public UIButton btnKill;
 	public UIButton btnCollect;
+    public MainMenuOptions menuOptions;
 	
 	// Use this for initialization
 	void Awake () 
@@ -42,6 +43,7 @@ public class Menu_Controller : MonoBehaviour
 	{
 		//todo
 		Debug.Log("singleplayer mode");
+        menuOptions.isMultiPlayer = false;
 	}
 	
 	//multiplayer choosed
@@ -49,6 +51,7 @@ public class Menu_Controller : MonoBehaviour
 	{
 		//todo
 		Debug.Log("multiplayer mode");
+        menuOptions.isMultiPlayer = true;
 	}
 	
 	//zombie killer choosed
