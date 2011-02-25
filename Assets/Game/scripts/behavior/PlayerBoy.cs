@@ -313,7 +313,8 @@ public class PlayerBoy : PlayerBase {
     void StartMeleeAttack () {
         AttackInfo atk_info = this.GetAttackInfo();
         atk_info.curCombo.attack_shape.active = true;
-        atk_info.curCombo.sfx_wipe.Play();
+        atk_info.audio.PlayOneShot(atk_info.curCombo.snd_wipe);
+        
     }
 
     // ------------------------------------------------------------------ 

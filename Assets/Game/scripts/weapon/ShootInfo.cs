@@ -44,7 +44,7 @@ public class ShootInfo : MonoBehaviour {
     public Vector2 arRangeInPercentage = new Vector2( 0.0f, 1.0f );
     public float arLengthInPercentage = 0.2f;
 
-    public AudioSource sfxFire = null;
+    public AudioClip snd_fire = null;
 
     protected int bullets = 10;
     protected int remainBullets = 100;
@@ -141,7 +141,7 @@ public class ShootInfo : MonoBehaviour {
 
     public void Fire () {
         if ( OutOfAmmo() == false ) {
-            sfxFire.Play();
+            audio.PlayOneShot(snd_fire);
             int bullet_count = this.emitter.Emit(this.anchor,this.bullet,activeReloadCounter > 0.0f);
             this.bullets -= bullet_count;
             Game.Mission().SendMessage( "OnBulletUsed", bullet_count );

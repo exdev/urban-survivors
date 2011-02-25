@@ -186,11 +186,11 @@ public class AI_ZombieNormal : AI_ZombieBase {
     public float attackDistance = 1.5f;
     public GameObject atkShape = null;
 
-    public AudioSource sfxOnSpawn = null;
-    public AudioSource sfxOnDeath = null;
-    public AudioSource sfxOnStun = null;
-    public AudioSource sfxOnAttack = null;
-    public AudioSource sfxOnMeleeHit = null;
+    public AudioClip snd_onspawn = null;
+    public AudioClip snd_ondeath = null;
+    public AudioClip snd_onstun = null;
+    public AudioClip snd_onattack = null;
+    public AudioClip snd_onmeleehit = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
@@ -448,7 +448,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
                 fxHitMelee.transform.position = _other.transform.position;
                 fxHitMelee.transform.rotation = _other.transform.rotation;
                 fxHitMelee.particleEmitter.Emit();
-                sfxOnMeleeHit.Play();
+                audio.PlayOneShot(snd_onmeleehit);
             }
         }
         else if ( _other.gameObject.layer == Layer.bullet_player ) {
@@ -530,7 +530,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
     // ------------------------------------------------------------------ 
 
     public void PlaySpawnSound () {
-        sfxOnSpawn.Play();
+        audio.PlayOneShot(snd_onspawn);
     } 
 
     // ------------------------------------------------------------------ 
@@ -548,8 +548,13 @@ public class AI_ZombieNormal : AI_ZombieBase {
         // Debug.Log("animName: " + animName); // DEBUG
         this.anim.Rewind(animName);
         this.anim.Play(animName);
-        if ( this.sfxOnStun.isPlaying == false )
-            this.sfxOnStun.Play();
+
+        // NOTE: isPlaying will only detect Play
+        if ( this.audio.isPlaying == false ) {
+            // this.audio.PlayOneShot(snd_onstun);
+            this.audio.clip = snd_onstun;
+            this.audio.Play();
+        }
     } 
 
     // ------------------------------------------------------------------ 
@@ -577,7 +582,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
         this.atkShape.active = false;
         this.gameObject.layer = Layer.dead_body;
         this.DisableSteering();
-        this.sfxOnDeath.Play();
+        audio.PlayOneShot(snd_ondeath);
     } 
 
     // ------------------------------------------------------------------ 
@@ -602,7 +607,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
 
 	void AttackOn (){
         this.atkShape.active = true;
-        this.sfxOnAttack.Play();
+        audio.PlayOneShot(snd_onattack);
 	}
 	
     // ------------------------------------------------------------------ 

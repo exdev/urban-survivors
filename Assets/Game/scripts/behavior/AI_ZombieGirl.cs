@@ -78,9 +78,9 @@ public class AI_ZombieGirl : AI_ZombieBase {
     public GameObject atkShape;
     public GameObject FX_dead = null;
 
-    public AudioSource sfxOnSpawn = null;
-    public AudioSource sfxOnDeath = null;
-    public AudioSource sfxOnAttack = null;
+    public AudioClip snd_onspawn = null;
+    public AudioClip snd_ondead = null;
+    public AudioClip snd_onattack = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
@@ -198,16 +198,8 @@ public class AI_ZombieGirl : AI_ZombieBase {
         // StartCoroutine(GetNearestPlayerPos(2.0f));
         // } KEEPME end 
 
-        this.Invoke("PlaySpawnSound", Random.Range(0.5f, 2.0f));
+        this.audio.PlayOneShot(snd_onspawn);
     }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public void PlaySpawnSound () {
-        sfxOnSpawn.Play();
-    } 
 
     // KEEPME { 
     // // ------------------------------------------------------------------ 
@@ -288,10 +280,8 @@ public class AI_ZombieGirl : AI_ZombieBase {
         fxDead.transform.position = this.transform.position;
         fxDead.transform.rotation = this.transform.rotation;
         fxDead.particleEmitter.Emit();
-        this.gameObject.SetActiveRecursively(false);
-        this.sfxOnDeath.gameObject.active = true;
-        this.sfxOnDeath.Play();
-        GameObject.Destroy(this.gameObject,2.0f);
+        AudioManager.PlayAt( snd_ondead, transform.position );
+        GameObject.Destroy(this.gameObject);
     } 
 
     // ------------------------------------------------------------------ 
@@ -317,7 +307,7 @@ public class AI_ZombieGirl : AI_ZombieBase {
 
 	void AttackOn (){
         this.atkShape.active = true;
-        this.sfxOnAttack.Play();
+        this.audio.PlayOneShot(snd_onattack);
 	}
 	
     // ------------------------------------------------------------------ 

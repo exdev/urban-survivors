@@ -32,7 +32,7 @@ public class ItemBulletPackage : MonoBehaviour {
     public int bullets = 10;
     public float lifeTime = 10.0f;
     public GameObject FX_onTrigger = null;
-    public AudioSource sfx_pickup = null;
+    public AudioClip snd_pickup = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions defines
@@ -87,10 +87,8 @@ public class ItemBulletPackage : MonoBehaviour {
         Game.PickupBullets(this.bullets);
 
         // remove hp package and play trigger effect
-        this.gameObject.SetActiveRecursively(false);
-        sfx_pickup.gameObject.active = true;
-        sfx_pickup.Play();
-        GameObject.Destroy(this.gameObject,2.0f);
+        AudioManager.PlayAt( snd_pickup, transform.position );
+        GameObject.Destroy(this.gameObject);
         if ( this.FX_onTrigger != null ) {
             GameObject fxOnTrigger = (GameObject)Instantiate( this.FX_onTrigger, this.transform.position + new Vector3(0.0f,0.1f,0.0f), this.transform.rotation );
             fxOnTrigger.particleEmitter.Emit();

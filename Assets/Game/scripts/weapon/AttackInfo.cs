@@ -28,7 +28,7 @@ public class ComboInfo {
     public float endTime = -1.0f; 
     public bool canCharge = false;
     public GameObject attack_shape = null;
-    public AudioSource sfx_wipe = null;
+    public AudioClip snd_wipe = null;
     [System.NonSerialized] public ComboInfo next = null;
     // TODO: public collision info 
 }
