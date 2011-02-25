@@ -27,6 +27,22 @@ public class AI_ZombieNormal : AI_ZombieBase {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    // class Action_Idle : FSM.Action {
+    class Action_OnIdle : FSM.Action {
+        AI_ZombieNormal zb = null;
+        public Action_OnIdle ( AI_ZombieNormal _zb ) {
+            this.zb = _zb;
+        }
+
+        public override void exec () {
+            this.zb.Act_OnIdle();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     // Desc: Action_Attack 
     // ------------------------------------------------------------------ 
 
@@ -170,6 +186,12 @@ public class AI_ZombieNormal : AI_ZombieBase {
     public float attackDistance = 1.5f;
     public GameObject atkShape = null;
 
+    public AudioSource sfxOnSpawn = null;
+    public AudioSource sfxOnDeath = null;
+    public AudioSource sfxOnStun = null;
+    public AudioSource sfxOnAttack = null;
+    public AudioSource sfxOnMeleeHit = null;
+
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
     ///////////////////////////////////////////////////////////////////////////////
@@ -220,7 +242,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
 
         // idle
         FSM.State state_idle = new FSM.State( "Idle", 
-                                              new Action_PlayAnim(this.anim,"idle1"), 
+                                              new Action_OnIdle(this), 
                                               new Action_RandomAnim(4.0f, 4.0f, this.anim, new string[]{"idle1","idle2"} ),
                                               null );
         // seekPlayers
@@ -332,6 +354,8 @@ public class AI_ZombieNormal : AI_ZombieBase {
         dmgInfo.owner = this.gameObject;
         // } HARDCODE end 
 
+        this.Invoke("PlaySpawnSound", Random.Range(0.5f, 2.0f));
+
         this.InitAnim();
         this.InitFSM();
     }
@@ -424,6 +448,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
                 fxHitMelee.transform.position = _other.transform.position;
                 fxHitMelee.transform.rotation = _other.transform.rotation;
                 fxHitMelee.particleEmitter.Emit();
+                sfxOnMeleeHit.Play();
             }
         }
         else if ( _other.gameObject.layer == Layer.bullet_player ) {
@@ -496,6 +521,22 @@ public class AI_ZombieNormal : AI_ZombieBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public void Act_OnIdle () {
+        this.anim.CrossFade("idle1");
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void PlaySpawnSound () {
+        sfxOnSpawn.Play();
+    } 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public void ActOnStun () {
         // NOTE: it could be possible we interupt to hit when zombie is attacking.
         this.atkShape.active = false;
@@ -507,6 +548,8 @@ public class AI_ZombieNormal : AI_ZombieBase {
         // Debug.Log("animName: " + animName); // DEBUG
         this.anim.Rewind(animName);
         this.anim.Play(animName);
+        if ( this.sfxOnStun.isPlaying == false )
+            this.sfxOnStun.Play();
     } 
 
     // ------------------------------------------------------------------ 
@@ -534,6 +577,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
         this.atkShape.active = false;
         this.gameObject.layer = Layer.dead_body;
         this.DisableSteering();
+        this.sfxOnDeath.Play();
     } 
 
     // ------------------------------------------------------------------ 
@@ -558,6 +602,7 @@ public class AI_ZombieNormal : AI_ZombieBase {
 
 	void AttackOn (){
         this.atkShape.active = true;
+        this.sfxOnAttack.Play();
 	}
 	
     // ------------------------------------------------------------------ 

@@ -78,6 +78,10 @@ public class AI_ZombieGirl : AI_ZombieBase {
     public GameObject atkShape;
     public GameObject FX_dead = null;
 
+    public AudioSource sfxOnSpawn = null;
+    public AudioSource sfxOnDeath = null;
+    public AudioSource sfxOnAttack = null;
+
     ///////////////////////////////////////////////////////////////////////////////
     // function defines
     ///////////////////////////////////////////////////////////////////////////////
@@ -193,7 +197,17 @@ public class AI_ZombieGirl : AI_ZombieBase {
         // StartCoroutine(GetRandomDest(2.0));
         // StartCoroutine(GetNearestPlayerPos(2.0f));
         // } KEEPME end 
+
+        this.Invoke("PlaySpawnSound", Random.Range(0.5f, 2.0f));
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void PlaySpawnSound () {
+        sfxOnSpawn.Play();
+    } 
 
     // KEEPME { 
     // // ------------------------------------------------------------------ 
@@ -274,7 +288,10 @@ public class AI_ZombieGirl : AI_ZombieBase {
         fxDead.transform.position = this.transform.position;
         fxDead.transform.rotation = this.transform.rotation;
         fxDead.particleEmitter.Emit();
-        GameObject.Destroy(this.gameObject);
+        this.gameObject.SetActiveRecursively(false);
+        this.sfxOnDeath.gameObject.active = true;
+        this.sfxOnDeath.Play();
+        GameObject.Destroy(this.gameObject,2.0f);
     } 
 
     // ------------------------------------------------------------------ 
@@ -300,6 +317,7 @@ public class AI_ZombieGirl : AI_ZombieBase {
 
 	void AttackOn (){
         this.atkShape.active = true;
+        this.sfxOnAttack.Play();
 	}
 	
     // ------------------------------------------------------------------ 

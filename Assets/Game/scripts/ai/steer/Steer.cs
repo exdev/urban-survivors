@@ -298,7 +298,8 @@ public class Steer : MonoBehaviour {
         // } TODO end 
 
         // Euler integrate (per frame) velocity into position
-        this.controller.Move ( (gravity + newVelocity) * Time.deltaTime);
+        if ( this.gameObject.active )
+            this.controller.Move ( (gravity + newVelocity) * Time.deltaTime);
 
         // regenerate local space (by default: align vehicle's forward axis with
         // new velocity, but this behavior may be overridden by derived classes.)

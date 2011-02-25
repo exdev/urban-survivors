@@ -37,6 +37,7 @@ public class PlayerGirl : PlayerBase {
 
     public GameObject followTarget;
     public float followDistance = 1.5f;
+    public AudioSource sfx_onstun = null;
 
     // protected
     protected Vector3 aimDir = Vector3.forward;
@@ -565,6 +566,7 @@ public class PlayerGirl : PlayerBase {
 
         this.anim.Rewind(animName);
         this.anim.CrossFade(animName);
+        this.sfx_onstun.Play();
 
         States[1] = UpdateStun;
     }
