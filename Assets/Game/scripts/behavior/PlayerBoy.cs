@@ -138,7 +138,7 @@ public class PlayerBoy : PlayerBase {
 
     void UpdateIdle () {
         // go to falldown
-        if ( this.playerInfo.curHP <= 0.0f ) {
+        if ( this.noHP() ) {
             StartCoroutine(FallDown());
             return;
         }
@@ -157,7 +157,7 @@ public class PlayerBoy : PlayerBase {
 
     void UpdateMove () {
         // go to falldown
-        if ( this.playerInfo.curHP <= 0.0f ) {
+        if ( this.noHP() ) {
             StartCoroutine(FallDown());
             return;
         }
@@ -184,6 +184,13 @@ public class PlayerBoy : PlayerBase {
     // ------------------------------------------------------------------ 
 
     public void UpdateCombo () {
+        // go to falldown
+        if ( this.noHP() ) {
+            StartCoroutine(FallDown());
+            return;
+        }
+
+        //
         AttackInfo atk_info = this.GetAttackInfo();
         if ( atk_info.curCombo == null ) {
             States[1] = null;
@@ -223,6 +230,13 @@ public class PlayerBoy : PlayerBase {
     // ------------------------------------------------------------------ 
 
     void UpdateStun () {
+        // go to falldown
+        if ( this.noHP() ) {
+            StartCoroutine(FallDown());
+            return;
+        }
+
+        //
         if ( this.anim.IsPlaying("hit1") == false &&
              this.anim.IsPlaying("hit2") == false )
         {

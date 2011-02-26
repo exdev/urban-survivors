@@ -74,13 +74,7 @@ public class ScreenPad : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	void Awake () {
-        DebugHelper.Assert( this.hudCamera != null, "pls assign hudCamera" );
-        DebugHelper.Assert( this.moveAnchor != null, "pls assign move anchor" );
-        DebugHelper.Assert( this.aimingAnchor != null, "pls assign aiming anchor" );
-        DebugHelper.Assert( this.meleeOutline != null, "pls assign meleeOutline" );
-        DebugHelper.Assert( this.reloadOutline != null, "pls assign reloadOutline" );
-
+	public void Init () {
         // always turn on keyboard and mouse when in PC version.
 #if !UNITY_IPHONE
         this.useRemoteTouch = false; 

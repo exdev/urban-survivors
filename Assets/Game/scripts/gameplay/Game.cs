@@ -63,6 +63,7 @@ public class Game : MonoBehaviour {
             if ( options ) {
                 instance.multiPlayer = options.GetComponent<MainMenuOptions>().isMultiPlayer;
                 Debug.Log("multi player = " + instance.multiPlayer );
+                GameObject.Destroy(options);
             }
 
             //
@@ -95,6 +96,7 @@ public class Game : MonoBehaviour {
 
                 if ( hud ) {
                     screenPad = hud.GetComponent<ScreenPad>();
+                    screenPad.Init();
                 }
 
 #if UNITY_IPHONE

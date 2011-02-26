@@ -12,7 +12,8 @@ public class Menu_Controller : MonoBehaviour
 	public UIButton btnKill;
 	public UIButton btnCollect;
 	public GameObject titleImage;
-    public MainMenuOptions menuOptions;
+    
+    protected GameObject options;
 	
 	// Use this for initialization
 	void Awake () 
@@ -20,7 +21,8 @@ public class Menu_Controller : MonoBehaviour
 		//btnBack.Hide(true);
 		// Do our intro-zoom in 1 second
 		Invoke("Begin", 0.5f);
-	
+        options = GameObject.Find("MainMenuOptions");
+        DebugHelper.Assert( options != null, "can't find MainMenuOptions game object" );
 	}
 	
 	//bring in first panel "tap to start"
@@ -46,19 +48,15 @@ public class Menu_Controller : MonoBehaviour
 	}
 	
 	//singleplayer choosed
-	public void singlePlayer()
-	{
-		//todo
+	public void singlePlayer() {
 		Debug.Log("singleplayer mode");
-        menuOptions.isMultiPlayer = false;
+        options.GetComponent<MainMenuOptions>().isMultiPlayer = false;
 	}
 	
 	//multiplayer choosed
-	public void multiPlayer ()
-	{
-		//todo
+	public void multiPlayer () {
 		Debug.Log("multiplayer mode");
-        menuOptions.isMultiPlayer = true;
+        options.GetComponent<MainMenuOptions>().isMultiPlayer = true;
 	}
 	
 	//zombie killer choosed
