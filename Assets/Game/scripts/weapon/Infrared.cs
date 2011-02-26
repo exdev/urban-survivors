@@ -40,7 +40,7 @@ public class Infrared : MonoBehaviour {
         LineRenderer lr = this.anchor.gameObject.GetComponent<LineRenderer>();
         if ( lr == null ) {
             lr = this.anchor.gameObject.AddComponent<LineRenderer>();
-            lr.useWorldSpace = false;
+            lr.useWorldSpace = true;
             lr.SetWidth(lineSize, lineSize);
             lr.material = material;
             lr.SetPosition(0, Vector3.zero );
@@ -67,14 +67,16 @@ public class Infrared : MonoBehaviour {
             // The ~ operator does this, it inverts a bitmask.
             layerMask = ~layerMask;
 
-            float dist = 100.0f;
+            float dist = 1000.0f;
             RaycastHit hit;
             Vector3 fwd = this.anchor.forward;
             fwd.y = 0.0f;
-            if ( Physics.Raycast ( this.anchor.position, fwd.normalized, out hit, 100.0f, layerMask ) ) {
+            fwd.Normalize();
+            if ( Physics.Raycast ( this.anchor.position, fwd, out hit, dist, layerMask ) ) {
                 dist = hit.distance;
             }
-            lr.SetPosition( 1, Vector3.forward * dist );
+            lr.SetPosition( 0, this.anchor.position );
+            lr.SetPosition( 1, this.anchor.position + fwd * dist );
         }
     }
 }
