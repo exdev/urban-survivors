@@ -28,6 +28,13 @@ public class MainMenuOptions : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
 	void Awake () {
+#if UNITY_IPHONE
+       // lock the screen
+       iPhoneKeyboard.autorotateToPortrait = false; 
+       iPhoneKeyboard.autorotateToPortraitUpsideDown = false; 
+       iPhoneKeyboard.autorotateToLandscapeRight = false; 
+       iPhoneKeyboard.autorotateToLandscapeLeft = true;
+#endif		
         DontDestroyOnLoad (this.gameObject);
 	}
 }

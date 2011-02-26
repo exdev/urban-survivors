@@ -57,7 +57,6 @@ public class Game : MonoBehaviour {
     void Awake () {
         if( instance == null ) {
             instance = this;
-
             // check if we have main menu options, and apply the options.
             GameObject options = GameObject.Find("MainMenuOptions");
             if ( options ) {
