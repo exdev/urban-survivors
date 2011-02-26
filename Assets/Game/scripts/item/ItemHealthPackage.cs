@@ -100,7 +100,7 @@ public class ItemHealthPackage : MonoBehaviour {
         }
 
         // remove hp package and play trigger effect
-        AudioManager.PlayAt( snd_pickup, transform.position );
+        AudioManager.PlayAt( transform.position, snd_pickup );
         GameObject.Destroy ( this.gameObject );
         if ( this.FX_onTrigger != null ) {
             GameObject fxOnTrigger = (GameObject)Instantiate( this.FX_onTrigger, this.transform.position + new Vector3(0.0f,0.1f,0.0f), this.transform.rotation );

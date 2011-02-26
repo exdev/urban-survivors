@@ -60,6 +60,9 @@ public class UIStatus : MonoBehaviour {
     public GameObject hint_reloadBin = null; 
     public GameObject hint_tapAgain = null; 
 
+    public AudioClip snd_onar_success = null;
+    public AudioClip snd_onar_failed = null;
+
     protected ScreenPad screenPad = null;
     protected Transform initBoyTrans; 
     protected Transform initGirlTrans; 
@@ -452,6 +455,8 @@ public class UIStatus : MonoBehaviour {
         this.reloadindEffect.transform.rotation = Quaternion.identity;
 
         if ( _state == "failed" ) {
+            AudioManager.PlayAt( Vector3.zero, snd_onar_failed, 0.5f );
+
             // For Designer: when failed active reload { 
             // this code controls active reload bar failed color. 
             // failed color
@@ -468,6 +473,8 @@ public class UIStatus : MonoBehaviour {
             // } For Designer end 
         }
         else if ( _state == "successful" ) {
+            AudioManager.PlayAt( Vector3.zero, snd_onar_success, 0.5f );
+
             // NOTE: the color already white, you can't explosure color in Unity3d,
             //       I suggest using one more texture/effect overlap the bar for presentation.
             // For Designer: when succeeded active reload { 

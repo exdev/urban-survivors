@@ -280,7 +280,7 @@ public class AI_ZombieGirl : AI_ZombieBase {
         fxDead.transform.position = this.transform.position;
         fxDead.transform.rotation = this.transform.rotation;
         fxDead.particleEmitter.Emit();
-        AudioManager.PlayAt( snd_ondead, transform.position );
+        AudioManager.PlayAt( transform.position, snd_ondead );
         GameObject.Destroy(this.gameObject);
     } 
 

@@ -58,12 +58,13 @@ public class AudioManager : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public static void PlayAt ( AudioClip _clip, Vector3 _worldPos ) {
+    public static void PlayAt ( Vector3 _worldPos, AudioClip _clip, float _volume = 1.0f ) {
         bool played = false;
         foreach ( GameObject go in instance.audioPlayers ) {
             if ( go.audio.isPlaying == false ) {
                 go.transform.position = _worldPos;
                 go.audio.clip = _clip; 
+                go.audio.volume = _volume; 
                 go.audio.Play();
                 played = true;
                 break;

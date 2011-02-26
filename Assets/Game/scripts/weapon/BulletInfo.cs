@@ -18,6 +18,10 @@ using System.Collections;
 
 public class BulletInfo : MonoBehaviour {
 
+    protected static GameObject fxHitBuilding = null;
+
+    protected float counter = 0.0f;
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -27,12 +31,21 @@ public class BulletInfo : MonoBehaviour {
     public DamageInfo ownerDamageInfo = null; // NOTE: if we don't use public, Instantiate will not copy this. 
     public Material matNormal = null;
     public Material matActiveReload = null;
-
-    protected float counter = 0.0f;
+    public GameObject FX_HIT_building = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Awake () {
+        if ( fxHitBuilding == null && this.FX_HIT_building ) {
+            fxHitBuilding = (GameObject)Instantiate( this.FX_HIT_building );
+        }
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -78,6 +91,12 @@ public class BulletInfo : MonoBehaviour {
         //     Debug.Log( "warning: the particle instance not instantiate!" );
         // }
         // } TODO end 
+
+        if ( _other.gameObject.layer == Layer.building ) {
+            fxHitBuilding.transform.position = transform.position;
+            fxHitBuilding.transform.rotation = transform.rotation;
+            fxHitBuilding.particleEmitter.Emit();
+        }
 
         // TODO: bullet type, hit what? should get through or not. { 
         // destroy bullet

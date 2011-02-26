@@ -45,6 +45,7 @@ public class ShootInfo : MonoBehaviour {
     public float arLengthInPercentage = 0.2f;
 
     public AudioClip snd_fire = null;
+    public AudioClip snd_onreload = null;
 
     protected int bullets = 10;
     protected int remainBullets = 100;
@@ -157,6 +158,7 @@ public class ShootInfo : MonoBehaviour {
         amount = Mathf.Min( this.remainBullets, amount );
         this.remainBullets -= amount;
         this.bullets += amount;
+        audio.PlayOneShot(snd_onreload);
     }
 
     // ------------------------------------------------------------------ 
