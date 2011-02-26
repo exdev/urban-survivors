@@ -11,12 +11,13 @@ public class Menu_Controller : MonoBehaviour
 	public UIButton btnMP;
 	public UIButton btnKill;
 	public UIButton btnCollect;
+	public GameObject titleImage;
     public MainMenuOptions menuOptions;
 	
 	// Use this for initialization
 	void Awake () 
 	{
-		btnBack.Hide(true);
+		//btnBack.Hide(true);
 		// Do our intro-zoom in 1 second
 		Invoke("Begin", 0.5f);
 	
@@ -34,8 +35,14 @@ public class Menu_Controller : MonoBehaviour
 	//player tapped to start real menu
 	public void startMenu ()
 	{
+		Hashtable ht = new Hashtable();
+		ht.Add("x",285);
+		ht.Add("y",10);
+		ht.Add("z",50);
+		ht.Add("time",0.3);
 		Debug.Log("button pressed!");
-		btnBack.Hide(false);
+		iTween.MoveTo(titleImage, ht);
+		//btnBack.Hide(false);
 	}
 	
 	//singleplayer choosed
@@ -59,7 +66,7 @@ public class Menu_Controller : MonoBehaviour
 	{
 		//todo
 		Debug.Log("zombie killer mode");
-		btnBack.Hide(true);
+		//btnBack.Hide(true);
 		//after saving variable and stuff, start loading
 		Invoke("startLoading",1.0f);
 	}
@@ -69,7 +76,7 @@ public class Menu_Controller : MonoBehaviour
 	{
 		//todo
 		Debug.Log("collecting mode");
-		btnBack.Hide(true);
+		//btnBack.Hide(true);
 		//after saving variable and stuff, start loading
 		Invoke("startLoading",1.0f);
 	
